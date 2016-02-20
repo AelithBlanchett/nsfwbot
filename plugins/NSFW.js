@@ -385,23 +385,33 @@ module.exports = function (parent, args) {
 
                                 if(total.max() < 0){
                                     fChatLibInstance.sendMessage("Dice penalty: "+total.max());
+                                    if(currentFight.whoseturn == 0){
+                                        currentFight.firstBonusRoll += ""+total.max();
+                                        fChatLibInstance.sendMessage("bonus added: "+currentFight.firstBonusRoll);
+                                    }
+                                    else if(currentFight.whoseturn == 1){
+                                        currentFight.secondBonusRoll += ""+ total.max();
+                                        fChatLibInstance.sendMessage("bonus added: "+currentFight.secondBonusRoll);
+                                    }
                                 }
-                                //for (var attrname in test2) { console.log(test[attrname] - test2[attrname]); }
+
+                                //roll for turn
+                                currentFight.actionTaken = "hit";
+                                currentFight.actionPoints = parseInt(dmg);
+
+
+                                if (currentFight.turn > 0) {
+                                    roll();
+                                }
                             }
                             else {
 
                             }
                         });
-                        //for (var attrname in test2) { test[attrname] = test2[attrname]; }
                     }
                     else {
                         fChatLibInstance.sendMessage("This move has not been found. Check the spelling.");
                     }
-                    //currentFight.actionTaken = "lust";
-                    //currentFight.actionPoints = parseInt(args);
-                    //if (currentFight.turn > 0) {
-                    //    roll();
-                    //}
                 }
                 else if(data.character == currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character) {
                     fChatLibInstance.sendMessage("It's not your turn to attack.");
