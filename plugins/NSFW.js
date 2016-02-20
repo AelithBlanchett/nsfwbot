@@ -331,6 +331,24 @@ module.exports = function (parent, args) {
         }
     }
 
+    cmdHandler.escape = cmdHandler.escapeHold = function(args,data){
+        if (checkIfFightIsGoingOn()) {
+            if (data.character == currentFighters[currentFight.whoseturn].character) {
+                currentFight.actionTaken = "escape";
+                if (currentFight.turn > 0) {
+                    roll();
+                }
+            }
+            else {
+                fChatLibInstance.sendMessage("It's not your turn to attack.");
+            }
+
+        }
+        else {
+            fChatLibInstance.sendMessage("There isn't a match going on at the moment.");
+        }
+    }
+
     //cmdHandler.brawl = function(args,data){
     //    if (args.length > 0) {
     //        //if (checkIfFightIsGoingOn()) {
@@ -498,6 +516,10 @@ function checkRollWinner() {
         else if (currentFight.actionTaken == "lust") {
             attackLust(currentFight.actionPoints);
         }
+        else if (currentFight.actionTaken == "escape") {
+            //success
+            fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!");
+        }
         else {
             fChatLibInstance.sendMessage("Was it... lust? a hit?");
         }
@@ -553,6 +575,10 @@ function checkDiceRollWinner(idWinner) {
             }
             else if(currentFight.actionTaken == "lust"){
                 attackLust(currentFight.actionPoints);
+            }
+            else if(currentFight.actionTaken == "escape"){
+                //success
+                fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!");
             }
             else {
                 fChatLibInstance.sendMessage("Was it... lust? a hit?");
