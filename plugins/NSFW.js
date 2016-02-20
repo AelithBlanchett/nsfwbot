@@ -141,12 +141,64 @@ module.exports = function (parent, args) {
                     "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
                     "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
                     "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n\n"+
-                    "[b][color=red]Perks:[/color][/b]: " + stats.features.toString());
+                    "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
             }
             else {
                 fChatLibInstance.sendMessage("Are you sure you're registered?");
             }
         });
+    }
+
+    cmdHandler.addStats = function(args,data) {
+        if(fChatLibInstance.isUserChatOP(data.channel, data.character)){
+            arr = args.split(' '),
+            result = arr.splice(0,2);
+            result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
+
+            if(result.length == 3 && result[0] != "" && !isNaN(result[1]) && result[2] != ""){
+                fChatLibInstance.sendMessage("Will add "+parseInt(result[1])+" points of "+result[0]+" to "+result[2]);
+                var newStats = {strength: 0, dexterity: 0, agility: 0, flexibility: 0, endurance: 0, toughness: 0, character: result[2]};
+                switch(result[0].toLowerCase()){
+                    case "strength":
+                        newStats.strength = parseInt(result[1]);
+                        break;
+                    case "dexterity":
+                        newStats.dexterity = parseInt(result[1]);
+                        break;
+                    case "agility":
+                        newStats.agility = parseInt(result[1]);
+                        break;
+                    case "flexibility":
+                        newStats.flexibility = parseInt(result[1]);
+                        break;
+                    case "endurance":
+                        newStats.endurance = parseInt(result[1]);
+                        break;
+                    case "toughness":
+                        newStats.toughness = parseInt(result[1]);
+                        break;
+                }
+                client.hgetall(newStats.character, function (err, result) {
+                    if (result != null) {
+                        result.strength = parseInt(result.strength) + newStats.strength;
+                        result.dexterity = parseInt(result.dexterity) + newStats.dexterity;
+                        result.agility = parseInt(result.agility) + newStats.agility;
+                        result.flexibility = parseInt(result.flexibility) + newStats.flexibility;
+                        result.endurance = parseInt(result.endurance) + newStats.endurance;
+                        result.toughness = parseInt(result.toughness) + newStats.toughness;
+                        client.hmset(newStats.character, result);
+                        fChatLibInstance.sendMessage("Succesfully added the new points!");
+                    }
+                    else {
+                        fChatLibInstance.sendMessage("Are you sure this user is registered?");
+                    }
+                });
+            }
+            else{
+                fChatLibInstance.sendMessage("Invalid syntax. Correct is: !addStats STAT X CHARACTER. Example: !addStats Strength 1 ThatCharacter");
+            }
+
+        }
     }
 
     cmdHandler.stats = function(args,data){
@@ -574,8 +626,8 @@ function checkLifePoints(){
     if (currentFighters[0].lust >= currentFighters[0].endurance) {
         currentFighters[0].lust = 0;
         currentFighters[0].orgasms++;
-        var features = parseStringToIntArray(currentFighters[0].features);
-        if (features.indexOf(1) != -1) {
+        var featuresP0 = parseStringToIntArray(currentFighters[0].featuresP0);
+        if (featuresP0.indexOf(1) != -1) {
             currentFighters[0].endurance = 1;
         }
         else {
@@ -588,18 +640,18 @@ function checkLifePoints(){
     if (currentFighters[1].lust >= currentFighters[1].endurance) {
         currentFighters[1].lust = 0;
         currentFighters[1].orgasms++;
-        var features = parseStringToIntArray(currentFighters[1].features);
-        if (features.indexOf(1) != -1) {
+        var featuresP1 = parseStringToIntArray(currentFighters[1].featuresP1);
+        if (featuresP1.indexOf(1) != -1) {
             currentFighters[1].endurance = 1;
         }
-        else if(features.indexOf(2) != -1 && currentFighters[1].endurance > 1){
+        else if(featuresP1.indexOf(2) != -1 && currentFighters[1].endurance > 1){
             currentFighters[1].endurance--;
         }
         else{
             currentFighters[1].endurance++;
         }
 
-        if(features.indexOf(2) != -1){
+        if(featuresP1.indexOf(2) != -1){
             currentFighters[1].stamina -= Math.floor(0.5*currentFight.staminaPenalty);
             fChatLibInstance.sendMessage(currentFighters[1].character +" is multi-orgasmic! The stamina penalty has been reduced by half, but their endurance has decreased by 1.");
         }
@@ -660,6 +712,16 @@ function findFeatureIdByTitle(title){
         if(features[i].title.toLowerCase() == title.toLowerCase()){ return i};
     };
     return -1;
+}
+
+function getFeaturesListString(rawFeatures){
+    var parsedFeatures = parseStringToIntArray(rawFeatures);
+    var str = "";
+    for (var i = 0; i < parsedFeatures.length; i++){
+        str += ", "+ features[parsedFeatures[i]].title;
+    }
+    str = str.substr(1);
+    return str;
 }
 
 function findBrawlIdByTitle(title){
