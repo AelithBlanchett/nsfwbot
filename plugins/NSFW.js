@@ -1,5 +1,13 @@
 var fChatLibInstance;
 
+Array.prototype.min = function () {
+    return Math.min.apply(Math, this);
+};
+
+Array.prototype.max = function( ){
+    return Math.max.apply(Math, this);
+};
+
 module.exports = function (parent, args) {
     fChatLibInstance = parent;
     var cmdHandler = {};
@@ -349,30 +357,68 @@ module.exports = function (parent, args) {
         }
     }
 
-    //cmdHandler.brawl = function(args,data){
-    //    if (args.length > 0) {
-    //        //if (checkIfFightIsGoingOn()) {
-    //        //    if (currentFighters[0].character == data.character || currentFighters[1].character == data.character) {
-    //        //        fChatLibInstance.sendMessage("You can't remove a feature if you're in a fight.");
-    //        //        return;
-    //        //    }
-    //        //}
-    //        var idBrawl = findBrawlIdByTitle(args);
-    //        if (idBrawl != -1) {
-    //            fChatLibInstance.sendMessage("[b]Brawl move found: " + brawl[idBrawl].title + "[/b].\n" +
-    //                "[b]Brawl move requirements: " + brawl[idBrawl].requirements + "[/b].\n" +
-    //                "[b]Brawl move HP removal: " + eval(brawl[idBrawl].damageHP) + "[/b].");
-    //        }
-    //        else {
-    //            fChatLibInstance.sendMessage("This move has not been found. Check the spelling.");
-    //        }
-    //
-    //    }
-    //    else{
-    //        //available commands
-    //        fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !brawl punch");
-    //    }
-    //}
+    cmdHandler.brawl = function(args,data){
+        if (args.length > 0) {
+            if (checkIfFightIsGoingOn()) {
+                if (data.character == currentFighters[currentFight.whoseturn].character) {
+                    var idBrawl = findBrawlIdByTitle(args);
+                    if (idBrawl != -1) {
+                        var dmg = eval(brawl[idBrawl].damageHP);
+                        if(dmg <= 0){ dmg = 1;}
+                        fChatLibInstance.sendMessage("[b]Brawl move found: " + brawl[idBrawl].title + "[/b].\n" +
+                            "[b]Brawl move requirements: " + JSON.stringify(brawl[idBrawl].requirements) + "[/b].\n" +
+                            "[b]Brawl move HP removal: " + dmg + "[/b].");
+                        client.hgetall(data.character, function (err, result) {
+                            if (result != null) {
+                                var total = [];
+
+                                for(var i = 0; i < brawl[idBrawl].requirements.length; i++){
+                                    var totalDiff = 0;
+                                    for (var attrname in brawl[idBrawl].requirements[i])
+                                    {
+                                        var tempDiff = result[attrname] - brawl[idBrawl].requirements[i][attrname];
+                                        if(tempDiff < 0){ totalDiff += tempDiff;}
+                                    }
+                                    total.push(totalDiff);
+                                    fChatLibInstance.sendMessage("Requirements #"+i+" difference: "+totalDiff);
+                                }
+
+                                if(total.max() < 0){
+                                    fChatLibInstance.sendMessage("Dice penalty: "+total.max());
+                                }
+                                //for (var attrname in test2) { console.log(test[attrname] - test2[attrname]); }
+                            }
+                            else {
+
+                            }
+                        });
+                        //for (var attrname in test2) { test[attrname] = test2[attrname]; }
+                    }
+                    else {
+                        fChatLibInstance.sendMessage("This move has not been found. Check the spelling.");
+                    }
+                    //currentFight.actionTaken = "lust";
+                    //currentFight.actionPoints = parseInt(args);
+                    //if (currentFight.turn > 0) {
+                    //    roll();
+                    //}
+                }
+                else if(data.character == currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character) {
+                    fChatLibInstance.sendMessage("It's not your turn to attack.");
+                }
+                else {
+                    fChatLibInstance.sendMessage("You're not in the fight.");
+                }
+
+            }
+
+
+        }
+        else{
+            //available commands
+            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !brawl punch");
+        }
+    }
 
     cmdHandler.lust = function(args,data){
         if (checkIfFightIsGoingOn()) {
