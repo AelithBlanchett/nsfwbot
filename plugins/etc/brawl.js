@@ -5,8 +5,7 @@ brawl.push(
         id: 0,
         title: "Punch",
         description: "A solid punch!",
-        damageHP: 1,
-        damageLust: 0,
+        damageHP: "1",
         requirements: [{strength: 1},{ agility: 1}, {dexterity: 1}]
     });
 

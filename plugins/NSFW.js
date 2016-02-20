@@ -1,13 +1,5 @@
 var fChatLibInstance;
 
-Array.prototype.min = function () {
-    return Math.min.apply(Math, this);
-};
-
-Array.prototype.max = function( ){
-    return Math.max.apply(Math, this);
-};
-
 module.exports = function (parent, args) {
     fChatLibInstance = parent;
     var cmdHandler = {};
@@ -238,7 +230,7 @@ module.exports = function (parent, args) {
                     return;
                 }
             }
-            var idFeature = findFeatureIdByTitle(args);
+            var idFeature = findItemIdByTitle(features,args);
             if (idFeature != -1) {
                 client.hgetall(data.character, function (err, result) {
                     if (result != null) {
@@ -284,7 +276,7 @@ module.exports = function (parent, args) {
                     return;
                 }
             }
-            var idFeature = findFeatureIdByTitle(args);
+            var idFeature = findItemIdByTitle(features,args);
             if (idFeature != -1) {
                 client.hgetall(data.character, function (err, result) {
                     if (result != null) {
@@ -357,11 +349,11 @@ module.exports = function (parent, args) {
         }
     }
 
-    cmdHandler.brawl = function(args,data){
+    cmdHandler.b = cmdHandler.brawl = function(args,data){
         if (args.length > 0) {
             if (checkIfFightIsGoingOn()) {
                 if (data.character == currentFighters[currentFight.whoseturn].character) {
-                    var idBrawl = findBrawlIdByTitle(args);
+                    var idBrawl = findItemIdByTitle(brawl,args);
                     if (idBrawl != -1) {
                         var dmg = eval(brawl[idBrawl].damageHP);
                         if(dmg <= 0){ dmg = 1;}
@@ -383,20 +375,93 @@ module.exports = function (parent, args) {
                                     fChatLibInstance.sendMessage("Requirements #"+i+" difference: "+totalDiff);
                                 }
 
-                                if(total.max() < 0){
-                                    fChatLibInstance.sendMessage("Dice penalty: "+total.max());
+                                if(max(total) < 0){
+                                    fChatLibInstance.sendMessage("Dice penalty: "+max(total));
                                     if(currentFight.whoseturn == 0){
-                                        currentFight.firstBonusRoll += ""+total.max();
+                                        currentFight.firstBonusRoll += ""+max(total);
                                         fChatLibInstance.sendMessage("bonus added: "+currentFight.firstBonusRoll);
                                     }
                                     else if(currentFight.whoseturn == 1){
-                                        currentFight.secondBonusRoll += ""+ total.max();
+                                        currentFight.secondBonusRoll += ""+ max(total);
                                         fChatLibInstance.sendMessage("bonus added: "+currentFight.secondBonusRoll);
                                     }
                                 }
 
                                 //roll for turn
                                 currentFight.actionTaken = "hit";
+                                currentFight.actionPoints = parseInt(dmg);
+
+
+                                if (currentFight.turn > 0) {
+                                    roll();
+                                }
+                            }
+                            else {
+
+                            }
+                        });
+                    }
+                    else {
+                        fChatLibInstance.sendMessage("This move has not been found. Check the spelling.");
+                    }
+                }
+                else if(data.character == currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character) {
+                    fChatLibInstance.sendMessage("It's not your turn to attack.");
+                }
+                else {
+                    fChatLibInstance.sendMessage("You're not in the fight.");
+                }
+
+            }
+
+
+        }
+        else{
+            //available commands
+            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !brawl punch");
+        }
+    }
+
+    cmdHandler.s = cmdHandler.sex = cmdHandler.sexual = function(args,data){
+        if (args.length > 0) {
+            if (checkIfFightIsGoingOn()) {
+                if (data.character == currentFighters[currentFight.whoseturn].character) {
+                    var idSexual = findItemIdByTitle(sexual, args);
+                    if (idSexual != -1) {
+                        var dmg = eval(sexual[idSexual].damageLust);
+                        if(dmg <= 0){ dmg = 1;}
+                        fChatLibInstance.sendMessage("[b]Sexual move found: " + sexual[idSexual].title + "[/b].\n" +
+                            "[b]Sexual move requirements: " + JSON.stringify(sexual[idSexual].requirements) + "[/b].\n" +
+                            "[b]Sexual move Lust added: " + dmg + "[/b].");
+                        client.hgetall(data.character, function (err, result) {
+                            if (result != null) {
+                                var total = [];
+
+                                for(var i = 0; i < sexual[idSexual].requirements.length; i++){
+                                    var totalDiff = 0;
+                                    for (var attrname in sexual[idSexual].requirements[i])
+                                    {
+                                        var tempDiff = result[attrname] - sexual[idSexual].requirements[i][attrname];
+                                        if(tempDiff < 0){ totalDiff += tempDiff;}
+                                    }
+                                    total.push(totalDiff);
+                                    //fChatLibInstance.sendMessage("Requirements #"+i+" difference: "+totalDiff);
+                                }
+
+                                if(max(total) < 0){
+                                    fChatLibInstance.sendMessage("Dice penalty: "+max(total));
+                                    if(currentFight.whoseturn == 0){
+                                        currentFight.firstBonusRoll += ""+max(total);
+                                        fChatLibInstance.sendMessage("bonus added: "+currentFight.firstBonusRoll);
+                                    }
+                                    else if(currentFight.whoseturn == 1){
+                                        currentFight.secondBonusRoll += ""+ max(total);
+                                        fChatLibInstance.sendMessage("bonus added: "+currentFight.secondBonusRoll);
+                                    }
+                                }
+
+                                //roll for turn
+                                currentFight.actionTaken = "lust";
                                 currentFight.actionPoints = parseInt(dmg);
 
 
@@ -479,6 +544,13 @@ module.exports = function (parent, args) {
     return cmdHandler;
 };
 
+function min(array) {
+    return Math.min.apply(Math, array);
+}
+
+function max(array){
+    return Math.max.apply(Math, array);
+}
 
 var date = getDateTime();
 
@@ -488,6 +560,7 @@ var client = redis.createClient(6379, "127.0.0.1");
 var features = require(__dirname+'/etc/features.js');
 var sextoys = require(__dirname+'/etc/sextoys.js');
 var brawl = require(__dirname+'/etc/brawl.js');
+var sexual = require(__dirname+'/etc/sexual.js');
 var currentFighters = [];
 var currentFight = { turn: -1, whoseturn: -1, isInit: false, orgasms: 0, firstBonusRoll: "", secondBonusRoll: "", staminaPenalty: 5, winner: -1  };
 var diceResults = { first: -1, second: -1 };
@@ -789,13 +862,6 @@ function broadcastOrgasm(id) {
     fChatLibInstance.sendMessage("[b]" + currentFighters[id].character + ": [/b] couldn't take it anymore, seems like someone's going to cum!\n[color=red]Orgasm count:[/color] "+currentFighters[id].orgasms+"\n");
 }
 
-function findFeatureIdByTitle(title){
-    for (var i = 0; i < features.length; i++) {
-        if(features[i].title.toLowerCase() == title.toLowerCase()){ return i};
-    };
-    return -1;
-}
-
 function getFeaturesListString(rawFeatures){
     var parsedFeatures = parseStringToIntArray(rawFeatures);
     var str = "";
@@ -806,12 +872,13 @@ function getFeaturesListString(rawFeatures){
     return str;
 }
 
-function findBrawlIdByTitle(title){
-    for (var i = 0; i < brawl.length; i++) {
-        if(brawl[i].title.toLowerCase() == title.toLowerCase()){ return i};
+function findItemIdByTitle(array, title){
+    for (var i = 0; i < array.length; i++) {
+        if(array[i].title.toLowerCase() == title.toLowerCase()){ return i};
     };
     return -1;
 }
+
 
 function parseStringToIntArray(myString){
     var myArray = myString.split(",");
