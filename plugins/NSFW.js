@@ -128,8 +128,29 @@ module.exports = function (parent, args) {
         });
     }
 
-    cmdHandler.stats = cmdHandler.myStats = function(args,data){
+    cmdHandler.myStats = function(args,data){
         client.hgetall(data.character, function (err, result) {
+            if (result != null) {
+                var stats = result; //Health is (Toughness x 5) while Stamina is (Endurance x 5)
+                fChatLibInstance.sendMessage("[b]" + stats.character + ":[/b]" + "\n" +
+                    "[b][color=red]Strength[/color][/b]: " + stats.strength + "\n" +
+                    "[b][color=orange]Toughness[/color][/b]: " + stats.toughness + "\n" +
+                    "[i][color=green]Dexterity[/color][/i]: " + stats.dexterity + "\n" +
+                    "[i][color=cyan]Agility[/color][/i]: " + stats.agility + "\n" +
+                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" +
+                    "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
+                    "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
+                    "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n\n"+
+                    "[b][color=red]Perks:[/color][/b]: " + stats.features.toString());
+            }
+            else {
+                fChatLibInstance.sendMessage("Are you sure you're registered?");
+            }
+        });
+    }
+
+    cmdHandler.stats = function(args,data){
+        client.hgetall(args, function (err, result) {
             if (result != null) {
                 var stats = result; //Health is (Toughness x 5) while Stamina is (Endurance x 5)
                 fChatLibInstance.sendMessage("[b]" + stats.character + ":[/b]" + "\n" +
@@ -144,7 +165,7 @@ module.exports = function (parent, args) {
                     "[b][color=red]Perks #: [/color][/b]" + stats.features.toString());
             }
             else {
-                fChatLibInstance.sendMessage("Are you sure you're registered?");
+                fChatLibInstance.sendMessage("Are you sure this user is registered?");
             }
         });
     }
