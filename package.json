@@ -1,0 +1,23 @@
+{
+  "name": "nsfwbot",
+  "version": "0.1.0",
+  "description": "A bot with a fighting mechanism plugin for fun times.",
+  "main": "index.js",
+  "dependencies": {
+    "fchatlib": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AelithBlanchett/NSFWBot.git"
+  },
+  "author": "AelithBlanchett",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AelithBlanchett/NSFWBot/issues"
+  },
+  "homepage": "https://github.com/AelithBlanchett/NSFWBot#readme"
+}
