@@ -96,7 +96,7 @@ module.exports = function (parent, args) {
         });
     }
 
-    cmdHandler.leavefight = cmdHandler.forfeit = cmdHandler.unready = cmdHandler.exit = function(args,data){
+    cmdHandler.leaveFight = cmdHandler.leavefight = cmdHandler.forfeit = cmdHandler.unready = cmdHandler.exit = function(args,data){
         if (currentFighters.length > 0) {
             if ((currentFighters.length > 0 && currentFighters[0] != undefined && currentFighters[0].character == data.character) || (currentFighters.length > 1 && currentFighters[1] != undefined && currentFighters[1].character == data.character)) {
                 fChatLibInstance.sendMessage("You have been removed from the next fight.");
@@ -781,8 +781,8 @@ function checkLifePoints(){
     if (currentFighters[0].lust >= currentFighters[0].endurance) {
         currentFighters[0].lust = 0;
         currentFighters[0].orgasms++;
-        var featuresP0 = parseStringToIntArray(currentFighters[0].featuresP0);
-        if (featuresP0.indexOf(1) != -1) {
+        var featuresP0 = parseStringToIntArray(currentFighters[0].features);
+        if (featuresP0.indexOf(0) != -1) {
             currentFighters[0].endurance = 1;
         }
         else {
@@ -795,8 +795,8 @@ function checkLifePoints(){
     if (currentFighters[1].lust >= currentFighters[1].endurance) {
         currentFighters[1].lust = 0;
         currentFighters[1].orgasms++;
-        var featuresP1 = parseStringToIntArray(currentFighters[1].featuresP1);
-        if (featuresP1.indexOf(1) != -1) {
+        var featuresP1 = parseStringToIntArray(currentFighters[1].features);
+        if (featuresP1.indexOf(0) != -1) {
             currentFighters[1].endurance = 1;
         }
         else if(featuresP1.indexOf(2) != -1 && currentFighters[1].endurance > 1){
@@ -922,19 +922,25 @@ function attackHP(hp){
 
             currentFighters[currentFight.whoseturn].lust += hp;
             fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " really likes to inflict pain! Their lust meter has been increased by " + hp);
-            if (hpBeforeAttack > (0.75 * (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp)) && currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp < (0.75 * (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp))) {
+            var isUnder75 = (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp < 0.75 * parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].maxHp));
+            var isUnder50 = (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp < 0.50 * parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].maxHp));
+            var isUnder25 = (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp < 0.25 * parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].maxHp));
+            var wasUpper75 = (hpBeforeAttack >= 0.75 * parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].maxHp));
+            var wasUpper50 = (hpBeforeAttack >= 0.50 * parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].maxHp));
+            var wasUpper25 = (hpBeforeAttack >= 0.25 * parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].maxHp));
+            if (isUnder75 && wasUpper75) {
                 //25% triggered
-                currentFighters[currentFight.whoseturn].endurance += 1;
+                currentFighters[currentFight.whoseturn].endurance = parseInt(result.endurance) + 1;
                 fChatLibInstance.sendMessage(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " has already lost 25% of their HP... " + currentFighters[currentFight.whoseturn].character + "'s endurance has been increased by 1!");
             }
-            if (hpBeforeAttack > (0.5 * (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp)) && currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp < (0.5 * (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp))) {
+            if (isUnder50 && wasUpper50) {
                 //50% triggered
-                currentFighters[currentFight.whoseturn].endurance += 1;
+                currentFighters[currentFight.whoseturn].endurance = parseInt(result.endurance) + 1;
                 fChatLibInstance.sendMessage(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " has already lost 50% of their HP! " + currentFighters[currentFight.whoseturn].character + "'s endurance has been increased by 1!");
             }
-            if (hpBeforeAttack > (0.25 * (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp)) && currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp < (0.25 * (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp))) {
+            if (isUnder25 && wasUpper25) {
                 //75% triggered
-                currentFighters[currentFight.whoseturn].endurance += 1;
+                currentFighters[currentFight.whoseturn].endurance = parseInt(result.endurance) + 1;
                 fChatLibInstance.sendMessage(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " has already lost 75% of their HP! " + currentFighters[currentFight.whoseturn].character + "'s endurance has been increased by 1!");
             }
         }
