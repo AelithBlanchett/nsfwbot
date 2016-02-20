@@ -25,7 +25,7 @@ brawl.push(
             title: "Impossible attack",
             description: "For testing purposes",
             damageHP: "0",
-            requirements: [{strength: 4, agility: 2},]
+            requirements: [{strength: 4, agility: 2},{strength: 5, flexibility: 9}]
     });
 
 module.exports = brawl;
