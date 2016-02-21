@@ -357,9 +357,9 @@ module.exports = function (parent, args) {
                     if (idBrawl != -1) {
                         var dmg = eval(brawl[idBrawl].damageHP);
                         if(dmg <= 0){ dmg = 1;}
-                        fChatLibInstance.sendMessage("[b]Brawl move found: " + brawl[idBrawl].title + "[/b].\n" +
-                            "[b]Brawl move requirements: " + JSON.stringify(brawl[idBrawl].requirements) + "[/b].\n" +
-                            "[b]Brawl move HP removal: " + dmg + "[/b].");
+                        //fChatLibInstance.sendMessage("[b]Brawl move found: " + brawl[idBrawl].title + "[/b].\n" +
+                        //    "[b]Brawl move requirements: " + JSON.stringify(brawl[idBrawl].requirements) + "[/b].\n" +
+                        //    "[b]Brawl move HP removal: " + dmg + "[/b].");
                         client.hgetall(data.character, function (err, result) {
                             if (result != null) {
                                 var total = [];
@@ -376,14 +376,14 @@ module.exports = function (parent, args) {
                                 }
 
                                 if(max(total) < 0){
-                                    fChatLibInstance.sendMessage("Dice penalty: "+max(total));
+                                    //fChatLibInstance.sendMessage("Dice penalty: "+max(total));
                                     if(currentFight.whoseturn == 0){
                                         currentFight.firstBonusRoll += ""+max(total);
-                                        fChatLibInstance.sendMessage("bonus added: "+currentFight.firstBonusRoll);
+                                        //fChatLibInstance.sendMessage("bonus added: "+currentFight.firstBonusRoll);
                                     }
                                     else if(currentFight.whoseturn == 1){
                                         currentFight.secondBonusRoll += ""+ max(total);
-                                        fChatLibInstance.sendMessage("bonus added: "+currentFight.secondBonusRoll);
+                                        //fChatLibInstance.sendMessage("bonus added: "+currentFight.secondBonusRoll);
                                     }
                                 }
 
@@ -430,9 +430,9 @@ module.exports = function (parent, args) {
                     if (idSexual != -1) {
                         var dmg = eval(sexual[idSexual].damageLust);
                         if(dmg <= 0){ dmg = 1;}
-                        fChatLibInstance.sendMessage("[b]Sexual move found: " + sexual[idSexual].title + "[/b].\n" +
-                            "[b]Sexual move requirements: " + JSON.stringify(sexual[idSexual].requirements) + "[/b].\n" +
-                            "[b]Sexual move Lust added: " + dmg + "[/b].");
+                        //fChatLibInstance.sendMessage("[b]Sexual move found: " + sexual[idSexual].title + "[/b].\n" +
+                        //    "[b]Sexual move requirements: " + JSON.stringify(sexual[idSexual].requirements) + "[/b].\n" +
+                        //    "[b]Sexual move Lust added: " + dmg + "[/b].");
                         client.hgetall(data.character, function (err, result) {
                             if (result != null) {
                                 var total = [];
@@ -449,14 +449,14 @@ module.exports = function (parent, args) {
                                 }
 
                                 if(total.length >= 1 && max(total) < 0){
-                                    fChatLibInstance.sendMessage("Dice penalty: "+max(total));
+                                    //fChatLibInstance.sendMessage("Dice penalty: "+max(total));
                                     if(currentFight.whoseturn == 0){
                                         currentFight.firstBonusRoll += ""+max(total);
-                                        fChatLibInstance.sendMessage("bonus added: "+currentFight.firstBonusRoll);
+                                        //fChatLibInstance.sendMessage("bonus added: "+currentFight.firstBonusRoll);
                                     }
                                     else if(currentFight.whoseturn == 1){
                                         currentFight.secondBonusRoll += ""+ max(total);
-                                        fChatLibInstance.sendMessage("bonus added: "+currentFight.secondBonusRoll);
+                                        //fChatLibInstance.sendMessage("bonus added: "+currentFight.secondBonusRoll);
                                     }
                                 }
 
