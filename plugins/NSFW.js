@@ -203,6 +203,60 @@ module.exports = function (parent, args) {
         }
     }
 
+    cmdHandler.removeStats = function(args,data) {
+        if(fChatLibInstance.isUserChatOP(data.channel, data.character)){
+            arr = args.split(' '),
+                result = arr.splice(0,2);
+            result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
+
+            if(result.length == 3 && result[0] != "" && !isNaN(result[1]) && result[2] != ""){
+                fChatLibInstance.sendMessage("Will remove "+parseInt(result[1])+" points of "+result[0]+" to "+result[2]);
+                var newStats = {strength: 0, dexterity: 0, agility: 0, flexibility: 0, endurance: 0, toughness: 0, character: result[2]};
+                switch(result[0].toLowerCase()){
+                    case "strength":
+                        newStats.strength = parseInt(result[1]);
+                        break;
+                    case "dexterity":
+                        newStats.dexterity = parseInt(result[1]);
+                        break;
+                    case "agility":
+                        newStats.agility = parseInt(result[1]);
+                        break;
+                    case "flexibility":
+                        newStats.flexibility = parseInt(result[1]);
+                        break;
+                    case "endurance":
+                        newStats.endurance = parseInt(result[1]);
+                        break;
+                    case "toughness":
+                        newStats.toughness = parseInt(result[1]);
+                        break;
+                }
+                client.hgetall(newStats.character, function (err, result) {
+                    if (result != null) {
+                        result.strength = parseInt(result.strength) - newStats.strength;
+                        result.dexterity = parseInt(result.dexterity) - newStats.dexterity;
+                        result.agility = parseInt(result.agility) - newStats.agility;
+                        result.flexibility = parseInt(result.flexibility) - newStats.flexibility;
+                        result.endurance = parseInt(result.endurance) - newStats.endurance;
+                        result.toughness = parseInt(result.toughness) - newStats.toughness;
+                        result.maxHp = parseInt(result.toughness) * 5;
+                        result.maxStamina = parseInt(result.endurance) * 5;
+                        client.hmset(newStats.character, result);
+                        fChatLibInstance.sendMessage("Succesfully removed the points!");
+                    }
+                    else {
+                        fChatLibInstance.sendMessage("Are you sure this user is registered?");
+                    }
+                });
+            }
+            else{
+                fChatLibInstance.sendMessage("Invalid syntax. Correct is: !removeStats STAT X CHARACTER. Example: !removeStats Strength 1 ThatCharacter");
+            }
+
+        }
+    }
+
     cmdHandler.getStats = function(args,data){
         client.hgetall(args, function (err, result) {
             if (result != null) {
