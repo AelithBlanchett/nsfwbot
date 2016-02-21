@@ -881,7 +881,7 @@ function checkLifePoints(){
 
         if(featuresP0.indexOf(2) != -1){
             currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].stamina -= Math.floor(0.5*currentFight.staminaPenalty);
-            fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character +" is multi-orgasmic! The stamina penalty has been reduced by half, but their endurance has decreased by 1.");
+            fChatLibInstance.sendMessage(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character +" is multi-orgasmic! The stamina penalty has been reduced by half, but their endurance has decreased by 1.");
         }
         else{
             currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].stamina -= currentFight.staminaPenalty;
