@@ -186,6 +186,8 @@ module.exports = function (parent, args) {
                         result.flexibility = parseInt(result.flexibility) + newStats.flexibility;
                         result.endurance = parseInt(result.endurance) + newStats.endurance;
                         result.toughness = parseInt(result.toughness) + newStats.toughness;
+                        result.maxHp = parseInt(result.toughness) * 5;
+                        result.maxStamina = parseInt(result.endurance) * 5;
                         client.hmset(newStats.character, result);
                         fChatLibInstance.sendMessage("Succesfully added the new points!");
                     }
