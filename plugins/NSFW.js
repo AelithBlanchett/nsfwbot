@@ -867,25 +867,38 @@ function checkLifePoints(){
     if (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].lust >= currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance) {
         currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].lust = 0;
         currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].orgasms++;
+
         var featuresP0 = parseStringToIntArray(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].features);
         if (featuresP0.indexOf(0) != -1) {
             currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance = 1;
         }
+        else if(featuresP0.indexOf(2) != -1 && currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance > 1){
+            currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance--;
+        }
         else {
             currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance++;
+        }
+
+        if(featuresP0.indexOf(2) != -1){
+            currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].stamina -= Math.floor(0.5*currentFight.staminaPenalty);
+            fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character +" is multi-orgasmic! The stamina penalty has been reduced by half, but their endurance has decreased by 1.");
+        }
+        else{
+            currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].stamina -= currentFight.staminaPenalty;
         }
 
         var featuresP1 = parseStringToIntArray(currentFighters[currentFight.whoseturn].features);
         if (featuresP1.indexOf(5) != -1) { //cum slut
             currentFighters[currentFight.whoseturn].lust++;
         }
-        currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].stamina -= currentFight.staminaPenalty;
+
         currentFight.orgasms++;
         broadcastOrgasm((currentFight.whoseturn == 0 ? 1 : 0));
     }
     if (currentFighters[currentFight.whoseturn].lust >= currentFighters[currentFight.whoseturn].endurance) {
         currentFighters[currentFight.whoseturn].lust = 0;
         currentFighters[currentFight.whoseturn].orgasms++;
+
         var featuresP1 = parseStringToIntArray(currentFighters[currentFight.whoseturn].features);
         if (featuresP1.indexOf(0) != -1) {
             currentFighters[currentFight.whoseturn].endurance = 1;
@@ -897,11 +910,6 @@ function checkLifePoints(){
             currentFighters[currentFight.whoseturn].endurance++;
         }
 
-        var featuresP0 = parseStringToIntArray(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].features);
-        if (featuresP0.indexOf(5) != -1) { //cum slut
-            currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].lust++;
-        }
-
         if(featuresP1.indexOf(2) != -1){
             currentFighters[currentFight.whoseturn].stamina -= Math.floor(0.5*currentFight.staminaPenalty);
             fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character +" is multi-orgasmic! The stamina penalty has been reduced by half, but their endurance has decreased by 1.");
@@ -909,6 +917,12 @@ function checkLifePoints(){
         else{
             currentFighters[currentFight.whoseturn].stamina -= currentFight.staminaPenalty;
         }
+
+        var featuresP0 = parseStringToIntArray(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].features);
+        if (featuresP0.indexOf(5) != -1) { //cum slut
+            currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].lust++;
+        }
+
         currentFight.orgasms++;
         broadcastOrgasm(currentFight.whoseturn);
     }
