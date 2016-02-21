@@ -32,5 +32,25 @@ features.push(
         title: "Sadist",
         description: "Inflicting health damage from brawling attacks or submission holds increases your lust by the same amount. Your Endurance increases by +1 whenever your opponent loses 25%, 50% and 75% of their maximum health. "
     });
+features.push(
+    {
+        id: 5,
+        title: "Cum Slut",
+        description: "Increase all Lust done by you and done to you by 1. Every time your opponent has a Climax increasing their Orgasm counter, increase your Lust by 1."
+    });
+features.push(
+    {
+        id: 6,
+        title: "Exhibitionist",
+        description: "You're improperly dressed, but damn you love all those eyes ogling at you! Increase your opponent's Lust and your Lust by 1 at the start of each player's respective turn. If hit with a Brawling attack or a Grapple: Throw attack you take 1 extra damage. (Be careful of nipple-slips!). This cannot be taken with \"Stripped Down\".",
+        incompatibility: 7
+    });
+features.push(
+    {
+        id: 7,
+        title: "Stripped Down",
+        description: "Uh Oh! Wardrobe malfunction! Whether you were forcibly stripped in ring or had this forced on you by a bet, you're stuck without clothes now! Increase your opponent's Lust by 1 at the start of each of your opponent's turns. All Brawling and Grapple attacks you attempt have a -1 to Hit because of sheer embarrassment! If hit with a Brawling attack or a Grapple: Throw attack you take 1 extra damage. This cannot be taken with \"Lewd Attire\" as you are not intentionally wearing lewd attire or standing nude for the attention.",
+        incompatibility: 6
+    });
 
 module.exports = features;

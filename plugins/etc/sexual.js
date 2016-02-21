@@ -1,13 +1,14 @@
 var sexual = [];
 
-//sexual.push(
-//    {
-//        id: 0,
-//        title: "Final Fucking",
-//        description: "A solid punch!",
-//        damageLust: 0,
-//        requirements: [{dexterity: 1}]
-//    });
+sexual.push(
+    {
+        id: 0,
+        title: "Final Fucking",
+        description: "A solid punch!",
+        lustPenalty: "2",
+        damageLust: "3",
+        requirements: [{strength: 1, agility: 1, endurance: 1}]
+    });
 
 sexual.push(
     {
@@ -20,7 +21,7 @@ sexual.push(
 
 sexual.push(
     {
-        id: 1,
+        id: 2,
         title: "Forced Cock Sucking",
         description: "A solid punch!",
         damageLust: "1",
@@ -29,7 +30,7 @@ sexual.push(
 
 sexual.push(
     {
-        id: 2,
+        id: 3,
         title: "Forced Face Fucking",
         description: "A solid punch!",
         damageLust: "1",
@@ -38,7 +39,7 @@ sexual.push(
 
 sexual.push(
     {
-        id: 2,
+        id: 4,
         title: "Forced Fingering",
         description: "A solid punch!",
         damageLust: "1",
@@ -47,11 +48,11 @@ sexual.push(
 
 sexual.push(
     {
-        id: 2,
+        id: 5,
         title: "Forced Kissing",
         description: "A solid punch!",
         damageLust: "1",
-        requirements: [{strength: 1, dexterity: 1}]
+        requirements: []
     });
 
 sexual.push(
@@ -60,7 +61,7 @@ sexual.push(
         title: "Forced Licking",
         description: "A solid punch!",
         damageLust: "1",
-        requirements: [{strength: 1, dexterity: 1}]
+        requirements: []
     });
 
 sexual.push(
@@ -69,7 +70,7 @@ sexual.push(
         title: "Forced Pussy Worship",
         description: "A solid punch!",
         damageLust: "1",
-        requirements: [{strength: 1, dexterity: 1}]
+        requirements: [{strength: 1, agility: 1, endurance: 1}]
     });
 
 sexual.push(
@@ -90,14 +91,14 @@ sexual.push(
         requirements: [{strength: 1, dexterity: 1}]
     });
 
-//sexual.push(
-//    {
-//        id: 2,
-//        title: "Ball-Slapping Face-Fuck",
-//        description: "A solid punch!",
-//        damageLust: "2",
-//        requirements: [{strength: 1, dexterity: 1}]
-//    });
+sexual.push(
+    {
+        id: 2,
+        title: "Ball-Slapping Face-Fuck",
+        description: "A solid punch!",
+        damageLust: "2",
+        requirements: [{strength: 4, dexterity: 1}]
+    });
 
 sexual.push(
     {
@@ -105,7 +106,7 @@ sexual.push(
         title: "Deep Throating",
         description: "A solid punch!",
         damageLust: "2",
-        requirements: [{strength: 1, dexterity: 1}]
+        requirements: [{endurance: 4}]
     });
 
 //sexual.push(
@@ -123,7 +124,7 @@ sexual.push(
         title: "Prostate Massage",
         description: "A solid punch!",
         damageLust: "3",
-        requirements: [{strength: 1, dexterity: 1}]
+        requirements: [{dexterity: 6}]
     });
 
 //sexual.push(
