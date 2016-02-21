@@ -863,7 +863,7 @@ function startFight(){
 }
 
 function checkLifePoints(){
-
+    //test
     if (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].lust >= currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance) {
         currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].lust = 0;
         currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].orgasms++;
