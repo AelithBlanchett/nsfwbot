@@ -662,12 +662,12 @@ function checkRollFeatures(bonusRoll){
     if (currentFight.firstBonusRoll == undefined) { currentFight.firstBonusRoll = ""; }
     if (currentFight.secondBonusRoll == undefined) { currentFight.secondBonusRoll = ""; }
 
-    if (featuresP0.indexOf(1) != -1 && featuresP1.indexOf(1) == -1) { //P1 is dom, P2 sub
-        currentFight.secondBonusRoll += "-1";
+    if (featuresP0.indexOf(1) != -1 && featuresP1.indexOf(8) != -1) { //P1 is dom, P2 sub
+        currentFight.secondBonusRoll += "-2";
         dominated = 1;
     }
-    if (featuresP0.indexOf(1) == -1 && featuresP1.indexOf(1) != -1) { //P2 is dom, P1 sub
-        currentFight.firstBonusRoll += "-1";
+    if (featuresP0.indexOf(8) != -1 && featuresP1.indexOf(1) != -1) { //P2 is dom, P1 sub
+        currentFight.firstBonusRoll += "-2";
         dominated = 0;
     }
 
@@ -711,7 +711,8 @@ function checkRollWinner() {
         }
         else if (currentFight.actionTaken == "escape") {
             //success
-            fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!");
+            fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!\nIt's still "+currentFighters[currentFight.whoseturn].character+"'s turn.");
+            currentFight.whoseturn = (currentFight.whoseturn == 0 ? 1 : 0); //We change it now, so it gets changed back just after
         }
         else {
             fChatLibInstance.sendMessage("Was it... lust? a hit?");
@@ -721,8 +722,8 @@ function checkRollWinner() {
             return;
         }
         currentFight.skipRoll = false;
-        fChatLibInstance.sendMessage("[i][b]" + currentFighters[currentFight.whoseturn].character + "[/b] got a free roll (but the roll was made in case you wanted it), and it's now [b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "[/b]'s turn to emote their reaction/attack.[/i]");
         currentFight.whoseturn = (currentFight.whoseturn == 0 ? 1 : 0);
+        fChatLibInstance.sendMessage("[i][b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "[/b] got a free roll (but the roll was made in case you wanted it), and it's now [b]" + currentFighters[currentFight.whoseturn].character + "[/b]'s turn to emote their reaction/attack.[/i]");
         nextTurn();
         return;
     }
@@ -777,6 +778,7 @@ function checkDiceRollWinner(idWinner) {
             else if(currentFight.actionTaken == "escape"){
                 //success
                 fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!");
+                return;
             }
             else {
                 fChatLibInstance.sendMessage("Was it... lust? a hit?");
@@ -872,16 +874,18 @@ function checkLifePoints(){
         if (featuresP0.indexOf(0) != -1) {
             currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance = 1;
         }
-        else if(featuresP0.indexOf(2) != -1 && currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance > 1){
-            currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance--;
+        else if(featuresP0.indexOf(2) != -1){
+            if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance > 1){
+                currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance--;
+            }
         }
         else {
             currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance++;
         }
 
         if(featuresP0.indexOf(2) != -1){
-            currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].stamina -= Math.floor(0.5*currentFight.staminaPenalty);
-            fChatLibInstance.sendMessage(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character +" is multi-orgasmic! The stamina penalty has been reduced by half, but their endurance has decreased by 1.");
+            currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].stamina -= Math.floor(0.8*currentFight.staminaPenalty);
+            fChatLibInstance.sendMessage(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character +" is multi-orgasmic! The stamina penalty has been reduced by one, but their endurance has decreased by one.");
         }
         else{
             currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].stamina -= currentFight.staminaPenalty;
@@ -903,15 +907,17 @@ function checkLifePoints(){
         if (featuresP1.indexOf(0) != -1) {
             currentFighters[currentFight.whoseturn].endurance = 1;
         }
-        else if(featuresP1.indexOf(2) != -1 && currentFighters[currentFight.whoseturn].endurance > 1){
-            currentFighters[currentFight.whoseturn].endurance--;
+        else if(featuresP1.indexOf(2) != -1){
+            if(currentFighters[currentFight.whoseturn].endurance > 1){
+                currentFighters[currentFight.whoseturn].endurance--;
+            }
         }
         else{
             currentFighters[currentFight.whoseturn].endurance++;
         }
 
         if(featuresP1.indexOf(2) != -1){
-            currentFighters[currentFight.whoseturn].stamina -= Math.floor(0.5*currentFight.staminaPenalty);
+            currentFighters[currentFight.whoseturn].stamina -= Math.floor(0.8*currentFight.staminaPenalty);
             fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character +" is multi-orgasmic! The stamina penalty has been reduced by half, but their endurance has decreased by 1.");
         }
         else{

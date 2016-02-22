@@ -4,21 +4,20 @@ features.push(
     {
         id: 0,
         title: "Hair trigger",
-        description: "Your Endurance can never rise above 1 but you gain +1 to another Attribute on character creation (Cannot be taken with Multiple Orgasms)",
-        incompatibility: 2
+        description: "Your Endurance can never rise above 1 but you gain +1 to another Attribute on character creation (Cannot be taken with Multiple Orgasms)"
     });
 features.push(
     {
         id: 1,
         title: "Imposing Dominance",
-        description: "Your dominance is... imposing! Characters who are intimidated by or acknowledge your character's dominance suffer a -1 to all their rolls against you or escaping your holds. Characters who are riled up by your dominant demeanor gain +1 to all their rolls against you."
+        description: "Your dominance is... imposing! Characters who have the \"Sub-Space\" Feature suffer a -2 to all their rolls against you or escaping your holds.",
+        incompatibility: 8
     });
 features.push(
     {
         id: 2,
         title: "Multiple Orgasms",
-        description: "You lose 50% of the agreed upon Stamina penalty after an orgasm but your Endurance decreases by 1 (instead of increasing by 1) after each orgasm as it becomes easier to drive you closer to the next orgasm after the first. (Cannot be taken with Hair Trigger) ",
-        incompatibility: 0
+        description: "You lose 50% of the agreed upon Stamina penalty after an orgasm but your Endurance decreases by 1 (instead of increasing by 1) after each orgasm as it becomes easier to drive you closer to the next orgasm after the first. (Cannot be taken with Hair Trigger) "
     });
 features.push(
     {
@@ -51,6 +50,13 @@ features.push(
         title: "Stripped Down",
         description: "Uh Oh! Wardrobe malfunction! Whether you were forcibly stripped in ring or had this forced on you by a bet, you're stuck without clothes now! Increase your opponent's Lust by 1 at the start of each of your opponent's turns. All Brawling and Grapple attacks you attempt have a -1 to Hit because of sheer embarrassment! If hit with a Brawling attack or a Grapple: Throw attack you take 1 extra damage. This cannot be taken with \"Lewd Attire\" as you are not intentionally wearing lewd attire or standing nude for the attention.",
         incompatibility: 6
+    });
+features.push(
+    {
+        id: 8,
+        title: "Sub-Space",
+        description: "You are easily brought to your knees by a domineering presence! Characters who have the \"Imposing Dominance\" Feature cause your character to suffer a -2 to all their rolls.",
+        incompatibility: 1
     });
 
 module.exports = features;
