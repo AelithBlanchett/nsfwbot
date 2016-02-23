@@ -439,6 +439,13 @@ module.exports = function (parent, args) {
         }
     }
 
+    cmdHandler.getMods = function(args, data){
+        if (checkIfFightIsGoingOn()) {
+            fChatLibInstance.sendMessage("\nFirst player dice mods, permanent: "+currentFighters[0].dice.getModsSum()+" and for the next turn: "+currentFighters[0].dice.getTmpModsSum()+"\n"
+            +"Second player dice mods, permanent: "+currentFighters[1].dice.getModsSum()+" and for the next turn: "+currentFighters[1].dice.getTmpModsSum());
+        }
+    }
+
     cmdHandler.s = cmdHandler.sex = cmdHandler.sexual = function(args,data){
         if (args.length > 0) {
             if (checkIfFightIsGoingOn()) {
@@ -739,15 +746,15 @@ function attackHandler(stringType, id){
 
         var hpBeforeAttack = currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp;
 
-        if (featuresVictim.indexOf(6) != -1 || featuresVictim.indexOf(7) != -1) { //stripped
-            hpRemoved++;
-            fChatLibInstance.sendMessage(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s outfit is a bit too revealing for an attack like that, and takes [b]1[/b] more damage from that attack!");
-        }
-
-        if (featuresAttacker.indexOf(7) != -1) { //stripped
-            hpRemoved--;
-            fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + "'s outfit is a bit too embarrassing! Their attack removes one less HP...");
-        }
+        //if (featuresVictim.indexOf(6) != -1 || featuresVictim.indexOf(7) != -1) { //stripped
+        //    hpRemoved++;
+        //    fChatLibInstance.sendMessage(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s outfit is a bit too revealing for an attack like that, and takes [b]1[/b] more damage from that attack!");
+        //}
+        //
+        //if (featuresAttacker.indexOf(7) != -1) { //stripped
+        //    hpRemoved--;
+        //    fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + "'s outfit is a bit too embarrassing! Their attack removes one less HP...");
+        //}
 
 
 
@@ -848,17 +855,17 @@ function nextTurn() {
     var featuresP0 = parseStringToIntArray(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].features);
     var featuresP1 = parseStringToIntArray(currentFighters[currentFight.whoseturn].features);
 
-    if(featuresP0.indexOf(6) != -1 || featuresP1.indexOf(6) != -1){
-        fChatLibInstance.sendMessage("[i]It looks like we've got an exhibitionist inside the ring...[/i] [b]"+currentFighters[currentFight.whoseturn].character+"[/b] is quite aroused by the scene!");
-        currentFighters[currentFight.whoseturn].lust++;
-        checkLifePoints();
-    }
-
-    if(featuresP0.indexOf(7) != -1){ //stripped down
-        fChatLibInstance.sendMessage("[b]"+currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character+"[/b] is looking quite hot in that 'outfit'! [b]"+currentFighters[currentFight.whoseturn].character+"[/b] can't take their eyes off them!");
-        currentFighters[currentFight.whoseturn].lust++;
-        checkLifePoints();
-    }
+    //if(featuresP0.indexOf(6) != -1 || featuresP1.indexOf(6) != -1){
+    //    fChatLibInstance.sendMessage("[i]It looks like we've got an exhibitionist inside the ring...[/i] [b]"+currentFighters[currentFight.whoseturn].character+"[/b] is quite aroused by the scene!");
+    //    currentFighters[currentFight.whoseturn].lust++;
+    //    checkLifePoints();
+    //}
+    //
+    //if(featuresP0.indexOf(7) != -1){ //stripped down
+    //    fChatLibInstance.sendMessage("[b]"+currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character+"[/b] is looking quite hot in that 'outfit'! [b]"+currentFighters[currentFight.whoseturn].character+"[/b] can't take their eyes off them!");
+    //    currentFighters[currentFight.whoseturn].lust++;
+    //    checkLifePoints();
+    //}
 
     broadcastCombatInfo();
 }
