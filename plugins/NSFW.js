@@ -534,14 +534,16 @@ function getAttackInfo(result, type, id){
     }
 
 
-    for(var i = 0; i < type[id].statRequirements.length; i++){
-        var totalDiff = 0;
-        for (var attrname in type[id].statRequirements[i])
-        {
-            var tempDiff = result[attrname] - type[id].statRequirements[i][attrname];
-            if(tempDiff < 0){ totalDiff += tempDiff;}
+    if(type[id].statRequirements != undefined){
+        for(var i = 0; i < type[id].statRequirements.length; i++){
+            var totalDiff = 0;
+            for (var attrname in type[id].statRequirements[i])
+            {
+                var tempDiff = result[attrname] - type[id].statRequirements[i][attrname];
+                if(tempDiff < 0){ totalDiff += tempDiff;}
+            }
+            total.push(totalDiff);
         }
-        total.push(totalDiff);
     }
 
     if(total.length >= 1 && max(total) < 0){
