@@ -481,8 +481,6 @@ function max(array){
     return Math.max.apply(Math, array);
 }
 
-var date = getDateTime();
-
 var redis = require("redis");
 var client = redis.createClient(6379, "127.0.0.1");
 
@@ -573,7 +571,7 @@ function roll(custom){
 function checkRollWinner() {
     if (currentFight.skipRoll) {
         if (currentFight.actionTaken == "sexual" || currentFight.actionTaken == "brawl" ) {
-            attackHP(currentFight.actionPoints);
+            attackHandler(currentFight.actionTaken, currentFight.actionId);
         }
         else if (currentFight.actionTaken == "escape") {
             //success
@@ -627,7 +625,7 @@ function checkDiceRollWinner(idWinner) {
         if (currentFight.whoseturn == idWinner) { // si c'était deja a lui, alors attaque destructrice et on change pas de tour
             //hit
             if (currentFight.actionTaken == "sexual" || currentFight.actionTaken == "brawl" ) {
-                attackHP(currentFight.actionPoints);
+                attackHandler(currentFight.actionTaken, currentFight.actionId);
             }
             else if(currentFight.actionTaken == "escape"){
                 //success
@@ -683,18 +681,26 @@ function checkDiceRollWinner(idWinner) {
     nextTurn();
 }
 
-function attackHandler(type, id){
+function attackHandler(stringType, id){
     var hpRemoved = 0,
         lustAdded = 0,
         ownLustAdded = 0,
         ownHpRemoved = 0;
+    var type;
 
     var strAttack = "[b]"+currentFighters[currentFight.whoseturn].character+"[/b] has";
 
     var featuresVictim = parseStringToIntArray(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].features);
     var featuresAttacker = parseStringToIntArray(currentFighters[currentFight.whoseturn].features);
 
-
+    switch(stringType){
+        case "sexual":
+            type = sexual;
+            break;
+        case "brawl":
+            type = brawl;
+            break;
+    }
 
     if(type[id].damageHP != undefined){
         hpRemoved = eval(type[id].damageHP);
@@ -970,29 +976,4 @@ function checkIfFightIsGoingOn(){
         return true;
     }
     return false;
-}
-
-function getDateTime() {
-
-    var date = new Date();
-
-    var hour = date.getHours();
-    hour = (hour < 10 ? "0" : "") + hour;
-
-    var min  = date.getMinutes();
-    min = (min < 10 ? "0" : "") + min;
-
-    var sec  = date.getSeconds();
-    sec = (sec < 10 ? "0" : "") + sec;
-
-    var year = date.getFullYear();
-
-    var month = date.getMonth() + 1;
-    month = (month < 10 ? "0" : "") + month;
-
-    var day  = date.getDate();
-    day = (day < 10 ? "0" : "") + day;
-
-    return year + ":" + month + ":" + day + ":" + hour + ":" + min + ":" + sec;
-
 }
