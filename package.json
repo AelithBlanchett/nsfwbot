@@ -4,7 +4,9 @@
   "description": "A bot with a fighting mechanism plugin for fun times.",
   "main": "index.js",
   "dependencies": {
-    "fchatlib": "*"
+    "fchatlib": "*",
+    "redis": "*",
+    "cappu-dice": "*"
   },
   "devDependencies": {},
   "scripts": {
