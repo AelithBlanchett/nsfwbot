@@ -70,6 +70,7 @@ module.exports = function (parent, args) {
                     result.lust = 0;
                     result.orgasms = 0;
                     currentFighters[0] = result;
+                    currentFighters[0].dice = new Dice(10);
                     fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
                 }
                 else if (currentFighters.length == 1) {
@@ -79,6 +80,7 @@ module.exports = function (parent, args) {
                         result.lust = 0;
                         result.orgasms = 0;
                         currentFighters[1] = result;
+                        currentFighters[1].dice = new Dice(10);
                         fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
                         startFight();
                     }
@@ -371,7 +373,12 @@ module.exports = function (parent, args) {
             if (data.character == currentFighters[currentFight.whoseturn].character) {
                 currentFight.actionTaken = "escape";
                 if (currentFight.turn > 0) {
-                    roll();
+                    if(currentFight.skipRoll){
+                        checkRollWinner();
+                    }
+                    else{
+                        roll();
+                    }
                 }
             }
             else {
@@ -398,7 +405,12 @@ module.exports = function (parent, args) {
 
 
                                 if (currentFight.turn > 0) {
-                                    roll();
+                                    if(currentFight.skipRoll){
+                                        checkRollWinner();
+                                    }
+                                    else{
+                                        roll();
+                                    }
                                 }
                             }
                             else {
@@ -436,12 +448,19 @@ module.exports = function (parent, args) {
 
                         client.hgetall(data.character, function (err, result) {
                             if (result != null) {
-                                getAttackInfo(result, sexual, idSexual);
+                                if(!getAttackInfo(result, sexual, idSexual)){
+                                    return;
+                                }
                                 currentFight.actionTaken = "sexual";
                                 currentFight.actionId = idSexual;
 
                                 if (currentFight.turn > 0) {
-                                    roll();
+                                    if(currentFight.skipRoll){
+                                        checkRollWinner();
+                                    }
+                                    else{
+                                        roll();
+                                    }
                                 }
                             }
                             else {
@@ -493,11 +512,7 @@ var currentFight = { turn: -1, whoseturn: -1, isInit: false, orgasms: 0, stamina
 var diceResults = { first: -1, second: -1 };
 
 var Dice = require('cappu-dice');
-var d20first = new Dice(10);
-var d20second = new Dice(10);
-
-var d20firstPlus = new Dice(10);
-var d20secondPlus = new Dice(10);
+var d10Plus = new Dice(10);
 
 function getAttackInfo(result, type, id){
     var total = [];
@@ -506,8 +521,8 @@ function getAttackInfo(result, type, id){
     if(type[id].conditions != undefined){
         var conditionsChecked = eval(type[id].conditions);
         if(conditionsChecked != true){
-            fChatLibInstance.sendMessage("The conditions for this move aren't met: "+type[id].condition);
-            return;
+            fChatLibInstance.sendMessage("The conditions for this move aren't met: "+type[id].conditionsText);
+            return false;
         }
     }
 
@@ -524,46 +539,46 @@ function getAttackInfo(result, type, id){
 
     if(total.length >= 1 && max(total) < 0){
         if(currentFight.whoseturn == 0){
-            d20first.add(max(total));
+            currentFighters[0].dice.addTmpMod(max(total));
         }
         else if(currentFight.whoseturn == 1){
-            d20second.addMod(max(total));
+            currentFighters[1].dice.addTmpMod(max(total));
         }
     }
+
+    return true;
 }
 
 
 function rollInitiation(){
-    fChatLibInstance.sendMessage("[b]Let's start![/b]\n\n[b]"+currentFighters[0].character+"[/b]\n\n[color=red]VS[/color]\n\n[b]"+currentFighters[1].character+"[/b]");
+    fChatLibInstance.sendMessage("\n[b]Let's start![/b]\n\n[b]"+currentFighters[0].character+"[/b]\n\n[color=red]VS[/color]\n\n[b]"+currentFighters[1].character+"[/b]");
+    checkFeaturesInit();
     roll();
 }
 
-function checkRollFeatures(bonusRoll){
+function checkFeaturesInit(){
     var featuresP0 = parseStringToIntArray(currentFighters[0].features);
     var featuresP1 = parseStringToIntArray(currentFighters[1].features);
 
     var dominated = -1;
 
     if (featuresP0.indexOf(1) != -1 && featuresP1.indexOf(8) != -1) { //P1 is dom, P2 sub
-        d20second.addMod(-2);
+        currentFighters[1].dice.addMod(-2);
         dominated = 1;
     }
     if (featuresP0.indexOf(8) != -1 && featuresP1.indexOf(1) != -1) { //P2 is dom, P1 sub
-        d20first.addMod(-2);
+        currentFighters[0].dice.addMod(-2);
         dominated = 0;
     }
 
     if (currentFight.isInit && dominated > -1) {
-        fChatLibInstance.sendMessage("[b]"+currentFighters[(dominated == 0 ? 1 : 0)].character+"[/b] really has an imposing dominance!\n[b]" + currentFighters[dominated].character + "[/b] feels a bit scared...");
+        fChatLibInstance.sendMessage("\n[b]"+currentFighters[(dominated == 0 ? 1 : 0)].character+"[/b] really has an imposing dominance!\n[b]" + currentFighters[dominated].character + "[/b] feels a bit scared...");
     }
-    return bonusRoll;
 }
 
 function roll(custom){
-    checkRollFeatures();
-    //new roll here
-    diceResults.first = d20first.roll() + d20firstPlus.roll();
-    diceResults.second = d20second.roll() + d20secondPlus.roll();
+    diceResults.first = currentFighters[0].dice.roll() + d10Plus.roll();
+    diceResults.second = currentFighters[1].dice.roll() + d10Plus.roll();
     fChatLibInstance.sendMessage("\n[b]"+currentFighters[0].character+"[/b] rolled a [b]"+diceResults.first+"[/b]\n[b]" + currentFighters[1].character + "[/b] rolled a [b]"+diceResults.second+"[/b]");
     checkRollWinner();
 }
@@ -609,12 +624,8 @@ function checkRollWinner() {
 }
 
 function checkDiceRollWinner(idWinner) {
-    d20first.resetMods();
-    d20second.resetMods();
     if (currentFight.isInit) {
         currentFight.isInit = false;
-        d20first.resetMods();
-        d20second.resetMods();
         fChatLibInstance.sendMessage("[i]" + currentFighters[idWinner].character + " emotes the attack first.[/i]");
         currentFight.whoseturn = idWinner;
     }
@@ -639,6 +650,9 @@ function checkDiceRollWinner(idWinner) {
         else { //si ce n'était pas a lui, garde super efficace et on change de tour
             //failed
             fChatLibInstance.sendMessage("[i][b]" + currentFighters[(idWinner == 0 ? 1 : 0)].character + "[/b] missed their attack![/i]");
+            if (currentFight.actionTaken == "sexual" || currentFight.actionTaken == "brawl" ) {
+                failHandler(currentFight.actionTaken, currentFight.actionId);
+            }
         }
         if (currentFight.winner != -1) { // FIGHT GETS RESETED BEFORE ANYTHING
             return;
@@ -668,10 +682,10 @@ function checkDiceRollWinner(idWinner) {
             }
             else { //si ce n'était pas a lui mais qu'il a gagné le roll, !counter! et on lui rend la main
                 if (idWinner == 0) {
-                    d20first.addMod(difference <= 5 ? difference : 5);
+                    currentFighters[0].dice.addTmpMod(difference <= 5 ? difference : 5);
                 }
                 else {
-                    d20second.addMod(difference <= 5 ? difference : 5);
+                    currentFighters[1].dice.addTmpMod(difference <= 5 ? difference : 5);
                 }
                 fChatLibInstance.sendMessage("[i][b]" + currentFighters[idWinner].character + "[/b] successfully blocked/dodged the attack, and gets a +" + (difference <= 5 ? difference : 5) + " advantage on the next roll.[/i]");
                 currentFight.whoseturn = idWinner;
@@ -679,6 +693,24 @@ function checkDiceRollWinner(idWinner) {
         }
     }
     nextTurn();
+}
+
+function failHandler(stringType, id) {
+    var type;
+
+    switch(stringType){
+        case "sexual":
+            type = sexual;
+            break;
+        case "brawl":
+            type = brawl;
+            break;
+    }
+
+    if(type[id].penalty != undefined) {
+        eval(type[id].penalty);
+        fChatLibInstance.sendMessage(type[id].penaltyText);
+    }
 }
 
 function attackHandler(stringType, id){
@@ -786,7 +818,7 @@ function attackHandler(stringType, id){
 
 
 
-    if(type[id].hpPenalty != undefined || type[id].hpPenalty != undefined) {
+    if(type[id].hpPenalty != undefined || type[id].lustPenalty != undefined) {
         strAttack += "\nThey also"
         if (type[id].lustPenalty != undefined) {
             ownLustAdded = eval(type[id].lustPenalty);

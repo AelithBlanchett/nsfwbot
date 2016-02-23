@@ -8,7 +8,7 @@ sexual.push(
         lustPenalty: "2",
         damageLust: "3",
         conditions: "currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].orgasms >= 1",
-        condition: "Opponent must have had at least 1 orgasm",
+        conditionsText: "Opponent must have had at least 1 orgasm",
         statRequirements: [{strength: 1, agility: 1, endurance: 1}]
     });
 
