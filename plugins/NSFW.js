@@ -205,6 +205,21 @@ module.exports = function (parent, args) {
         }
     }
 
+    cmdHandler.reset = function(args,data) {
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
+            if (checkIfFightIsGoingOn()) {
+                resetFight();
+                fChatLibInstance.sendMessage("The ring has been cleared.");
+            }
+            else{
+                fChatLibInstance.sendMessage("The ring isn't occupied.");
+            }
+        }
+        else{
+            fChatLibInstance.sendMessage("You don't have sufficient rights.");
+        }
+    }
+
     cmdHandler.removeStats = function(args,data) {
         if(fChatLibInstance.isUserChatOP(data.channel, data.character)){
             arr = args.split(' '),
@@ -496,6 +511,54 @@ module.exports = function (parent, args) {
         }
     }
 
+    cmdHandler.h = cmdHandler.hold = cmdHandler.holds = cmdHandler.submission = cmdHandler.grapple = cmdHandler.grappling = function(args,data){
+        if (args.length > 0) {
+            if (checkIfFightIsGoingOn()) {
+                if (data.character == currentFighters[currentFight.whoseturn].character) {
+                    var idHold = findItemIdByTitle(holds,args);
+                    if (idHold != -1) {
+                        client.hgetall(data.character, function (err, result) {
+                            if (result != null) {
+                                getAttackInfo(result, holds, idHold);
+
+                                currentFight.actionTaken = "hold";
+                                currentFight.actionId = idHold;
+
+                                if (currentFight.turn > 0) {
+                                    if(currentFight.skipRoll){
+                                        checkRollWinner();
+                                    }
+                                    else{
+                                        roll();
+                                    }
+                                }
+                            }
+                            else {
+
+                            }
+                        });
+                    }
+                    else {
+                        fChatLibInstance.sendMessage("This move has not been found. Check the spelling.");
+                    }
+                }
+                else if(data.character == currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character) {
+                    fChatLibInstance.sendMessage("It's not your turn to attack.");
+                }
+                else {
+                    fChatLibInstance.sendMessage("You're not in the fight.");
+                }
+
+            }
+
+
+        }
+        else{
+            //available commands
+            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !brawl punch");
+        }
+    }
+
     return cmdHandler;
 };
 
@@ -514,6 +577,7 @@ var features = require(__dirname+'/etc/features.js');
 var sextoys = require(__dirname+'/etc/sextoys.js');
 var brawl = require(__dirname+'/etc/brawl.js');
 var sexual = require(__dirname+'/etc/sexual.js');
+var holds = require(__dirname+'/etc/holds.js');
 var currentFighters = [];
 var currentFight = { turn: -1, whoseturn: -1, isInit: false, orgasms: 0, staminaPenalty: 5, winner: -1  };
 var diceResults = { first: -1, second: -1 };
