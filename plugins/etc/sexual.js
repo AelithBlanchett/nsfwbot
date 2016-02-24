@@ -3,6 +3,15 @@ var sexual = [];
 sexual.push(
     {
         id: 0,
+        title: "1",
+        description: "A place-holder value, while everything isn't setup yet.",
+        damageLust: "1",
+        statRequirements: []
+    });
+
+sexual.push(
+    {
+        id: 0,
         title: "Final Fucking",
         description: "A solid punch!",
         lustPenalty: "2",

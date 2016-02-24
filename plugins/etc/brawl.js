@@ -1,5 +1,15 @@
 var brawl = [];
 
+
+brawl.push(
+    {
+        id: 0,
+        title: "1",
+        description: "A place-holder value, while everything isn't setup yet.",
+        damageHP: "1",
+        statRequirements: []
+    });
+
 brawl.push(
     {
         id: 0,
