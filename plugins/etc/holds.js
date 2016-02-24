@@ -123,7 +123,7 @@ holds.push(
         id: 8,
         title: "Double Bridging Chicken Wing",
         description: "The wrestler approaches a prone opponent facing down, lying on his stomach. The wrestler then stands over his back, tucks the opponent's arms under his armpits. From this point, the wrestler then rolls or flips into a bridge, pulling the opponent's arms and applying pressure on them.",
-        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength - Target's flexibility)
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's flexibility)
         holdType: "flexibility",
         maxTurns: "3",
         stanceRequirements: "supine",
@@ -159,7 +159,7 @@ holds.push(
         id: 11,
         title: "Kimura Lock",
         description: "This arm lock sees the wrestler grappling the opponent's wrist with his similar hand (for example, if he uses the right arm, he would grab the opponent's right wrist), and with the opponent's wrist still clutched, the wrestler bend the opponent's arm (of the grappled wrist) it towards or behind the opponent's head (both variations are possible). Then, the wrestler passes his other free arm through the 'hole' formed by the opponent's bent arm under the biceps, and then catches the opponent's grappled wrist. This would result in the opponent's arm to be shaped into a 4. As the opponent's wrist is grabbed by both opponent's hands, along with the bent arm, this applies effective pressure into the opponent.",
-        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness", //(User's Strength - Target's toughness)
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness", //(User's Strength * 2  - Target's toughness)
         // If the user's Flexibility is 4 or greater then they may also apply a "Body Scissors" hold with a +2 to Hit Dice the turn after this technique is used. 
         // The if Flex > 4 check is not implemented yet 
         bonusRoll: "4",
@@ -187,7 +187,7 @@ holds.push(
         id: 13,
         title: "Step-over Arm Lock",
         description: "The standing attacking wrestler grabs the wrist of a face down opponent, pulling it towards themselves, the attacker then steps over the opponents outstretched arm placing one leg either side. From this point, the wrestler would turn 360 degrees, simultaneously bending the arm of the opponent around the attacker's own leg. The wrestler can over-rotate or turn again to apply more pressure on the arm.",
-        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength - Target's flexibility)
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's flexibility)
         holdType: "flexibility",
         maxTurns: "4",
         stanceRequirements: "supine",
