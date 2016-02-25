@@ -8,22 +8,22 @@ module.exports = function (parent, args) {
         console.log("Redis error " + err);
     });
 
-    cmdHandler.hp = cmdHandler.current = cmdHandler.status = cmdHandler.stamina = function(args, data){
+    cmdHandler.hp = cmdHandler.current = cmdHandler.status = cmdHandler.stamina = function(){
         broadcastCombatInfo();
-    }
+    };
 
     cmdHandler.sextoys = cmdHandler.toys = function(){
         var toy = getRandomSextoy();
         fChatLibInstance.sendMessage("Here, take this [b]"+toy+"[/b]!");
-    }
+    };
 
     cmdHandler.fuck = function(){ //debug
         currentFighters[currentFight.whoseturn].dice.addTmpMod(-100,1);
-    }
+    };
 
     cmdHandler.yeah = function(){ //debug
         currentFighters[currentFight.whoseturn].dice.addTmpMod(100,1);
-    }
+    };
 
     cmdHandler.register = function(args,data){
         if (args.length == 6) {
