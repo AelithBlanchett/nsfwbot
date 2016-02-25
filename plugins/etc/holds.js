@@ -758,12 +758,32 @@ holds.push(
     {
         id: 56,
         title: "Muta-Lock",
-        description: "The wrestler first takes the opponent's legs then, bends them at the knees, and crosses them, placing one ankle in the other leg's knee-pit before then turning around so that they are facing away from the opponent and places one of their feet into the triangle created by the opponent's crossed legs. The wrestler then places the opponent's free ankle under their knee-pit and bridges backwards to reach over their head and locks their arms around the opponent's head. .",
+        description: "The wrestler first takes the opponent's legs then, bends them at the knees, and crosses them, placing one ankle in the other leg's knee-pit before then turning around so that they are facing away from the opponent and places one of their feet into the triangle created by the opponent's crossed legs. The wrestler then places the opponent's free ankle under their knee-pit and bridges backwards to reach over their head and locks their arms around the opponent's head.",
         damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's flexibility)
         bonusRoll: "2", //  increases the 'Hit dice' of 'Forced Kissing' by +2. . 
         bonusForAttacks: "sexual:5", // Forced Kissing
         holdType: "flexibility",
         maxTurns: "4",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, flexibility: 7, dexterity: 3, agility: 7}]
+    });
+
+//////////////////////////////////////
+// TRANSITION HOLDS
+//////////////////////////////////////
+
+// Arm Wrench is listed here too but also in Arm Lock. Not going to dublicate it
+
+holds.push(
+    {
+        id: 57,
+        title: "Wrist Lock",
+        description: "the wrestler grasps the opponent's hand and twists backwards, placing pressure on the wrist. While this can inflict pain on its own, it is most often used as a transition hold.",
+        damageHP: "0", // special attack
+        bonusRoll: "2", //  ncrease the Hit dice of any Grapple: Holds - "Arm Lock" technique by +2. . 
+        bonusForAttacks: "holds:1, holds:2, holds:3, holds:4, holds:5, holds:6, holds:7, holds:8, holds:9, holds:10, holds:11, holds:12, holds:13 ,holds:14", // Grapple: Holds - "Arm Lock"
+        holdType: "special",
+        maxTurns: "100",
         stanceRequirements: "supine",
         statRequirements: [{strength: 4, flexibility: 7, dexterity: 3, agility: 7}]
     });
