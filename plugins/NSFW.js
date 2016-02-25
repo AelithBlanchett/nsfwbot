@@ -414,6 +414,9 @@ module.exports = function (parent) {
                 fChatLibInstance.sendMessage("This feature has not been found. Check the spelling.");
             }
         }
+        else{
+            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !addFeature Cum Slut\nAvailable moves: "+getAllItemsTitleInArray(features));
+        }
     };
 
     cmdHandler.removeFeature = function (args, data) {
@@ -566,7 +569,7 @@ module.exports = function (parent) {
         }
         else {
             //available commands
-            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !brawl punch");
+            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !b kick\nAvailable moves: "+getAllItemsTitleInArray(brawl));
         }
     };
     cmdHandler.hit = cmdHandler.brawl;
@@ -618,7 +621,7 @@ module.exports = function (parent) {
         }
         else {
             //available commands
-            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !brawl punch");
+            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !s slap\nAvailable moves: "+getAllItemsTitleInArray(sexual));
         }
     };
     cmdHandler.lust = cmdHandler.sexual;
@@ -668,7 +671,7 @@ module.exports = function (parent) {
         }
         else {
             //available commands
-            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !brawl punch");
+            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !h Arm Bar\nAvailable moves: "+getAllItemsTitleInArray(holds));
         }
     };
     cmdHandler.h = cmdHandler.grapple;
@@ -1300,6 +1303,16 @@ function findItemIdByTitle(array, title) {
     return -1;
 }
 
+function getAllItemsTitleInArray(array) {
+    var str = "";
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] != undefined && array[i].title != undefined) {
+            str += ", " + array[i].title;
+        }
+    }
+    str = str.substr(1);
+    return str;
+}
 
 function parseStringToIntArray(myString) {
     var myArray = myString.split(",");
