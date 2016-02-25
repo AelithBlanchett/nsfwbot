@@ -6,7 +6,8 @@
   "dependencies": {
     "fchatlib": "*",
     "redis": "*",
-    "cappu-dice": "*"
+    "cappu-dice": "*",
+    "didyoumean": "*"
   },
   "devDependencies": {},
   "scripts": {

@@ -24,6 +24,10 @@ module.exports = function (parent) {
     };
     cmdHandler.toys = cmdHandler.sextoys;
 
+    //cmdHandler.test = function(args, data){ //debug
+    //    console.log(didYouMean(args,sexual,"title"));
+    //};
+    //
     //cmdHandler.win = function(){ //debug
     //    if(debug){
     //        currentFighters[currentFight.whoseturn].dice.addTmpMod(-100,1);
@@ -36,32 +40,32 @@ module.exports = function (parent) {
     //    }
     //};
     //
-    //cmdHandler.dbg = function(args,data){
-    //    client.hgetall('Lustful Aelith', function (err, result) {
-    //        if (result != null) {
-    //            result.hp = parseInt(result.maxHp);
-    //            result.stamina = parseInt(result.maxStamina);
-    //            result.lust = 0;
-    //            result.orgasms = 0;
-    //            currentFighters[0] = result;
-    //            currentFighters[0].dice = new Dice(10);
-    //            //fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
-    //            client.hgetall("Bondage Wrestling", function (err, result2) {
-    //                if (result2 != null) {
-    //                    result2.hp = parseInt(result2.maxHp);
-    //                    result2.stamina = parseInt(result2.maxStamina);
-    //                    result2.lust = 0;
-    //                    result2.orgasms = 0;
-    //                    currentFighters[1] = result2;
-    //                    currentFighters[1].dice = new Dice(10);
-    //                    //fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
-    //                    startFight();
-    //                }
-    //            });
-    //        }
-    //    });
-    //
-    //}
+    cmdHandler.dbg = function(args,data){
+        client.hgetall('Lustful Aelith', function (err, result) {
+            if (result != null) {
+                result.hp = parseInt(result.maxHp);
+                result.stamina = parseInt(result.maxStamina);
+                result.lust = 0;
+                result.orgasms = 0;
+                currentFighters[0] = result;
+                currentFighters[0].dice = new Dice(10);
+                //fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
+                client.hgetall("Bondage Wrestling", function (err, result2) {
+                    if (result2 != null) {
+                        result2.hp = parseInt(result2.maxHp);
+                        result2.stamina = parseInt(result2.maxStamina);
+                        result2.lust = 0;
+                        result2.orgasms = 0;
+                        currentFighters[1] = result2;
+                        currentFighters[1].dice = new Dice(10);
+                        //fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
+                        startFight();
+                    }
+                });
+            }
+        });
+
+    }
 
     cmdHandler.register = function (args, data) {
         if (args.length == 6) {
@@ -685,6 +689,7 @@ function max(array) {
     return Math.max.apply(Math, array);
 }
 
+var didYouMean = require('didyoumean');
 var redis = require("redis");
 var client = redis.createClient(6379, "127.0.0.1");
 
@@ -1282,8 +1287,12 @@ function getFeaturesListString(rawFeatures) {
 }
 
 function findItemIdByTitle(array, title) {
+    var realText = didYouMean(title,array,"title");
+    if(realText == null){
+        return -1;
+    }
     for (var i = 0; i < array.length; i++) {
-        if (array[i].title.toLowerCase() == title.toLowerCase()) {
+        if (array[i].title == realText) {
             return i
         }
         ;
