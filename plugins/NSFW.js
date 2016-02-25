@@ -192,14 +192,13 @@ module.exports = function (parent) {
         client.hgetall(data.character, function (err, result) {
             if (result != null) {
                 var stats = result; //Health is (Toughness x 5) while Stamina is (Endurance x 5)
-                fChatLibInstance.sendMessage("[b]" + stats.character + ":[/b]" + "\n" +
-                    "[b][color=red]Strength[/color][/b]: " + stats.strength + "---------------------" + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
-                    "[b][color=orange]Toughness[/color][/b]: " + stats.toughness + "\n" +
-                    "[i][color=green]Dexterity[/color][/i]: " + stats.dexterity + "\n" +
-                    "[i][color=cyan]Agility[/color][/i]: " + stats.agility + "\n" +
-                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" +
+                fChatLibInstance.sendMessage("[b]" + stats.character + "[/b]'s stats" + "\n" +
+                    "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
+                    "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n" +
+                    "[i][color=green]Dexterity[/color][/i]:  " + stats.dexterity + "\n" +
+                    "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + 0 + " - " + 0 + "\n" +
+                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" +
                     "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
-                    "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n\n" +
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
             }
             else {
@@ -352,15 +351,13 @@ module.exports = function (parent) {
         client.hgetall(args, function (err, result) {
             if (result != null) {
                 var stats = result; //Health is (Toughness x 5) while Stamina is (Endurance x 5)
-                fChatLibInstance.sendMessage("[b]" + stats.character + ":[/b]" + "\n" +
-                    "[b][color=red]Strength[/color][/b]: " + stats.strength + "\n" +
-                    "[b][color=orange]Toughness[/color][/b]: " + stats.toughness + "\n" +
-                    "[i][color=green]Dexterity[/color][/i]: " + stats.dexterity + "\n" +
-                    "[i][color=cyan]Agility[/color][/i]: " + stats.agility + "\n" +
-                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" +
+                fChatLibInstance.sendMessage("[b]" + stats.character + "[/b]'s stats" + "\n" +
+                    "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
+                    "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n" +
+                    "[i][color=green]Dexterity[/color][/i]:  " + stats.dexterity + "\n" +
+                    "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + 0 + " - " + 0 + "\n" +
+                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" +
                     "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
-                    "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
-                    "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n\n" +
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
             }
             else {
@@ -1155,7 +1152,6 @@ function tickHold() {
         currentFight.currentHold.turnsLeft--;
         fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is still locked in the " + currentFight.currentHold.holdName + "!  (" + currentFight.currentHold.turnsLeft + " turns remaining)");
         attackHandler(currentFight.currentHold.damageHP, currentFight.currentHold.damageLust, currentFight.currentHold.hpPenalty, currentFight.currentHold.lustPenalty, currentFight.currentHold.attacker, currentFight.currentHold.defender);
-        //fChatLibInstance.sendMessage(JSON.stringify(currentFight.currentHold));
         if (currentFight.currentHold.turnsLeft <= 0) {
             fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is finally out of the " + currentFight.currentHold.holdName + "!");
         }
