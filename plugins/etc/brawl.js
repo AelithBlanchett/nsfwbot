@@ -16,7 +16,7 @@ brawl.push(
         title: "Punch",
         description: "A solid punch!",
         damageHP: "1",
-        statRequirements: [{strength: 1},{ agility: 1}, {dexterity: 1}]
+        statRequirements: [{strength: 1}, {agility: 1}, {dexterity: 1}]
     });
 
 brawl.push(
@@ -25,7 +25,7 @@ brawl.push(
         title: "Kick",
         description: "A swift kick!",
         damageHP: "currentFighters[currentFight.whoseturn].strength - currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].toughness", //(User Strength's - Target's Toughness)
-        statRequirements: [{strength: 1},{ agility: 1}, {flexibility : 1}]
+        statRequirements: [{strength: 1}, {agility: 1}, {flexibility: 1}]
     });
 
 brawl.push(
@@ -38,10 +38,7 @@ brawl.push(
     });
 
 
-
-
 // advanced
-
 
 brawl.push(
     {
