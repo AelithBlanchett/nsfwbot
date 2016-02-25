@@ -455,6 +455,31 @@ module.exports = function (parent, args) {
         }
     }
 
+    cmdHandler.tapout = cmdHandler.surrender = cmdHandler.submit = cmdHandler.giveUp =  function(args,data){
+        if (checkIfFightIsGoingOn()) {
+            if (data.character == currentFighters[currentFight.whoseturn].character) {
+                if(isInHold()){
+                    currentFight.actionTaken = "escape";
+                    if (currentFight.turn > 0) {
+                        currentFight.winner = (currentFight.whoseturn == 0 ? 1 : 0);
+                        fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " is giving up! It must have been too much to handle!");
+                        checkLifePoints();
+                    }
+                }
+                else{
+                    fChatLibInstance.sendMessage("You're not in a hold, you can't escape the void!");
+                }
+            }
+            else {
+                fChatLibInstance.sendMessage("It's not your turn to attack.");
+            }
+
+        }
+        else {
+            fChatLibInstance.sendMessage("There isn't a match going on at the moment.");
+        }
+    }
+
     cmdHandler.hit = cmdHandler.b = cmdHandler.brawl = function(args,data){
         if (args.length > 0) {
             if (checkIfFightIsGoingOn()) {
@@ -850,6 +875,9 @@ function missHandler(idPlayer){
     fChatLibInstance.sendMessage("[i][b]" + currentFighters[idPlayer].character + "[/b] missed their attack![/i]");
     if (currentFight.actionTaken == "sexual" || currentFight.actionTaken == "brawl" ) {
         failHandler(currentFight.actionTaken, currentFight.actionId);
+    }
+    if (currentFight.actionTaken == "escape") {
+        currentFighters[idPlayer].dice.addTmpMod(1)
     }
     currentFighters[idPlayer].dice.addTmpMod(2,10);
     fChatLibInstance.sendMessage("[i][b]" + currentFighters[idPlayer].character + "[/b] got +2 added to their next dice roll.[/i]");
