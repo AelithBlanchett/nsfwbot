@@ -25,7 +25,7 @@ brawl.push(
         title: "Kick",
         description: "A swift kick!",
         damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User Strength's - Target's Toughness)
-        onMiss: "",
+        onMiss: "currentFighters[defender].dice.addTmpMod(1)",
         statRequirements: [{strength: 1}, {agility: 1}, {flexibility: 1}]
     });
 
