@@ -21,7 +21,7 @@ holds.push(
 holds.push(    
     {
         id: 1,
-        title: "Cross Arm Bar ",
+        title: "Cross Arm Bar",
         description: "The wrestler sits on either side of an opponent who is lying either prone or supine on the mat, with the wrestler's legs scissoring one of the opponent's arms. The wrestler then grabs hold of the wrist of that arm and pulls it upwards, causing hyper extension of the shoulder and elbow.",
         damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's Toughness)
         holdType: "strength",
@@ -385,7 +385,7 @@ holds.push(
         {
         id: 27,
         title: "Arm-Trap-Triangle Choke Hold",
-        description: "The technique is done from a position in which the wrestler and the opponent are seated on the mat facing each other. The wrestler sits on one side of the opponent and using his near arm encircles the opponent in a headlock position and grabs the opponent's near wrist, bending the arm upwards. Then, the wrestler maneuvers their other arm through the "hole" created by the opponent's bent wrist, locks their hand upon their own wrist, and then pulls the opponent forward, causing pressure on the opponent's arm and neck.",
+        description: "The technique is done from a position in which the wrestler and the opponent are seated on the mat facing each other. The wrestler sits on one side of the opponent and using his near arm encircles the opponent in a headlock position and grabs the opponent's near wrist, bending the arm upwards. Then, the wrestler maneuvers their other arm through the \"hole\" created by the opponent's bent wrist, locks their hand upon their own wrist, and then pulls the opponent forward, causing pressure on the opponent's arm and neck.",
         damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness", //(User's Strength * 2 - Target's Toughness)
         holdType: "strength",
         maxTurns: "3",
