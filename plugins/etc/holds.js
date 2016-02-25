@@ -350,5 +350,174 @@ holds.push(
         stanceRequirements: "supine",
         statRequirements: [{strength: 4, flexibility: 4, agility: 4}]
     });
-    
+
+//////////////////////////////////////
+// CHOKES
+//////////////////////////////////////
+
+holds.push(    
+        {
+        id: 25,
+        title: "Arm-Hook Sleeper",
+        description: "This choke sees the wrestler kneeling behind a seated opponent before grabbing hold of one of the opponent's arms, bending it backwards overhead, and locking the opponent's wrist into the attacker's armpit. The wrestler then wraps his free arm under the opponent's chin, like in a sleeper hold, puts his other arm through the arch created by the opponent's trapped arm, and locks his hands.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].flexibility", //(User's Strength - Target's Flexibility)
+        holdType: "flexibility",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, dexterity: 3}]
+    });
+
+holds.push(    
+        {
+        id: 26,
+        title: "Arm-Triangle Choke Hold",
+        description: "This choke sees the wrestler wrapping their arm from under the opponent's nearest arm (pit) and across the chest. ",
+        damageHP: "0", // Special attack
+        bonusRoll: "2", // Increase the Hit dice of "Arm-Triangle Reverse STO" or "Arm-Trap-Triangle Choke Hold" by +2 
+        bonusForAttacks: "holds:27", // @INCOMPLETE
+        holdType: "special",
+        maxTurns: "100",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 2, dexterity: 2, flexibility: 2}]
+    });
+
+holds.push(    
+        {
+        id: 27,
+        title: "Arm-Trap-Triangle Choke Hold",
+        description: "The technique is done from a position in which the wrestler and the opponent are seated on the mat facing each other. The wrestler sits on one side of the opponent and using his near arm encircles the opponent in a headlock position and grabs the opponent's near wrist, bending the arm upwards. Then, the wrestler maneuvers their other arm through the "hole" created by the opponent's bent wrist, locks their hand upon their own wrist, and then pulls the opponent forward, causing pressure on the opponent's arm and neck.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness", //(User's Strength * 2 - Target's Toughness)
+        holdType: "strength",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, dexterity: 4, flexibility: 4}]
+    });
+
+holds.push(    
+        {
+        id: 28,
+        title: "Pentagram Choke ",
+        description: " In this variation of the triangle choke, the wrestler sits behind a seated opponent. The wrestler places one of their legs under the chin of the opponent and pushes up. The wrestler then takes hold of their ankle with their opposite arm and pulls their leg up. The wrestler then places their free leg on the instep of the leg which is already being used to choke the opponent. The wrestler finally takes their free arm, hooks the opponent's arm which is in the vise, and holds their opposite leg from the knee. The pressure is applied once the wrestler compresses their knees together. The pentagram choke creates a complete vise around the opponent's neck, and its name comes from using five sides, whereas the triangle choke only uses three.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness", //(User's Strength * 2 - Target's Toughness)
+        onEscape: "currentFighters[defender].dice.addTmpMod(-1)",
+        holdType: "strength",
+        maxTurns: "5",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 5, dexterity: 5, flexibility: 5}]
+    });
+
+holds.push(    
+        {
+        id: 29,
+        title: "Death Star Choke",
+        description: "A variation of the pentagram choke (above), what makes this version different is that usually the wrestler will use their free hand to hold on to their own knee before compressing their knees together to apply the pressure. However, in the death star, the wrestler uses their free hand to maneuver under the leg which is first utilized to create the choke and then take hold of the ankle of their other leg.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness", //(User's Strength * 2 - Target's Toughness)
+        onEscape: "currentFighters[defender].dice.addTmpMod(-2)",
+        holdType: "strength",
+        maxTurns: "5",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 6, dexterity: 6, flexibility: 6, agility: 6}]
+    });
+
+holds.push(    
+        {
+        id: 30,
+        title: "Arm Choke",
+        description: "The wrestler grabs his opponent's throat with both hands and throttles him.",
+        damageHP: "1", // Does 1 Health Damage per turn regardless of the Strength or Toughness stats 
+        onEscape: "currentFighters[defender].dice.addTmpMod(-1)",
+        bonusRoll: "2", // Increase the Hit Dice of "Choke Slam" by +2
+        bonusForAttacks: "", // @INCOMPLETE
+        holdType: "strength",
+        maxTurns: "2",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 5, dexterity: 4, flexibility: 4}]
+    });
+
+holds.push(    
+        {
+        id: 31,
+        title: "Figure Four Neck Lock",
+        description: "This neck lock sees a wrestler sit above a fallen opponent and wrap their legs around the opponent in the form of the figure-four, with one leg crossing under the opponent's chin and under the wrestler's other leg the wrestler squeezes and chokes the opponent.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's Toughness)
+        holdType: "strength",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, flexibility: 3}]
+    });
+
+holds.push(    
+        {
+        id: 32,
+        title: "Hanging Figure Four Neck Lock",
+        description: "The wrestler stands on top of the turnbuckle or over the top rope, wraps their legs around the head of the opponent (who has their back turned against the turnbuckle or rope) in the figure-four and falls backwards, choking the opponent and hanging on the outside of the ring.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness", //(User's Strength * 2 - Target's Toughness)
+        holdType: "strength",
+        maxTurns: "4",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 6, flexibility: 4, agility: 4}]
+    });
+
+holds.push(    
+        {
+        id: 33,
+        title: "Guillotine Choke",
+        description: "The wrestler faces his opponent who is bent over. The attacking wrestler tucks the opponent's head underneath his armpit and wraps his arm around the neck so that the forearm is pressed against the throat as in a front chancery. The attacking wrestler then wraps his legs around the opponents midsection with a body scissors and then arches backwards, pulling the opponent's head forward, stretching the torso and the neck.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's flexibility)
+        holdType: "flexibility",
+        maxTurns: "4",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, flexibility: 6, agility: 4}]
+    });
+
+holds.push(    
+        {
+        id: 34,
+        title: "Head Scissors",
+        description: "This hold sees a wrestler approach a supine opponent and sit next to them before turning onto their side towards the opponent and wrapping their legs around either side of the opponent's head, crossing the top leg after it has gone around the opponent's chin. The wrestler then tightens his grip to choke an opponent by compressing their throat. ",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's toughness)
+        holdType: "strength",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, agility: 3}]
+    });
+
+holds.push(    
+        {
+        id: 35,
+        title: "Standing Head Scissors",
+        description: "The wrestler tucks a bent over opponent's head in between his legs or thighs.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's toughness)
+        bonusRoll: "2", //  Increase the Hit Dice of Pile Driver and Power Bomb by +2. 
+        bonusForAttacks: "", // @INCOMPLETE
+        holdType: "strength",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 6, agility: 5}]
+    });
+
+holds.push(    
+        {
+        id: 36,
+        title: "Sleeper Hold",
+        description: "The wrestler applying the hold positions himself behind his opponent. The wrestler then wraps their arm around the opponent's neck, pressing the biceps against one side of the neck and the inner bone of the forearm against the other side. The neck is squeezed inside the arm very tightly. Additional pressure can be applied by grabbing the left shoulder with the right hand, or grabbing the biceps of the left arm near the elbow, then using the left hand to push the opponent's head towards the crook of the right elbow.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's toughness)
+        holdType: "strength",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements:  [{strength: 4, dexterity: 3},{strength: 4, agility: 3}]
+    });
+
+holds.push(    
+        {
+        id: 37,
+        title: "Straight Jacket",
+        description: "The wrestler sits on the back of an opponent who is lying face down on the mat. The wrestler then grabs hold of the opponent's wrists and crosses their arms under their chin. The wrestler then pulls back on the arms, causing pressure.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].flexibility", //(User's Strength - Target's Flexibility)
+        holdType: "flexibility",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements:  [{strength: 4, dexterity: 3},{strength: 4, agility: 3}]
+    });
+
 module.exports = holds;
