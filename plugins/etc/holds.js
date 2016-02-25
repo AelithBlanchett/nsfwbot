@@ -548,4 +548,224 @@ holds.push(
         statRequirements: [{strength: 4}]
     });
 
+//////////////////////////////////////
+// STRECHED SUBMISSIONS
+//////////////////////////////////////
+
+holds.push(
+    {
+        id: 40,
+        title: "Camel Clutch",
+        description: "A camel clutch can also refer simply to a rear chinlock while seated on the back of an opponent, without placing the arms on the thighs ",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].flexibility", //(User's Strength - Target's Flexibility)
+        holdType: "flexibility",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, dexterity: 3}, {strength: 4, agility: 3}]
+    });
+
+holds.push(
+    {
+        id: 41,
+        title: "Leg Trap: Camel Clutch",
+        description: "The attacking wrestler stands over a face down opponent, facing the same direction. The wrestler first hooks each of the opponent's legs underneath his own armpits as if performing a reverse Boston crab, the wrestler then reaches down and underneath the opponent's chin with both hands applying a chinlock, finally leaning back to pull up the opponent's head and neck.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's Flexibility)
+        holdType: "flexibility",
+        maxTurns: "4",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 6, flexibility: 4, dexterity: 4}, {strength: 4, flexibility: 4, agility: 4}]
+    });
+
+holds.push(
+    {
+        id: 42,
+        title: "Chin Lock",
+        description: "The attacking wrestler crouches down behind a sitting opponent and places their knee into the opponent's upper back, they then reach forward and grasp the opponent's chin with one or both hands.",
+        damageHP: "0", // Special Attack
+        bonusRoll: "2", //  increases the 'Hit dice' of 'Forced Kissing' by +2. . 
+        bonusForAttacks: "sexual:5", // Forced Kissing
+        holdType: "special",
+        maxTurns: "100",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, dexterity: 3}, {strength: 4, agility: 3}]
+    });
+
+holds.push(
+    {
+        id: 43,
+        title: "Claw-Hold",
+        description: "The claw involves the attacker gripping the top of the head of the opponent with one hand and squeezing the tips of their fingers into the opponent's skull, thereby applying five different points of pressure.",
+        damageHP: "5", // Special Attack that does 5
+        holdType: "special",
+        // @INCOMPLETE Missing the dice reduction 
+        maxTurns: "1",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 8}]
+    });
+
+holds.push(
+    {
+        id: 44,
+        title: "Head Vice",
+        description: "The wrestler performing the hold approaches their opponent and grips their head with both hands. While in the vice, the attacking wrestler can control their opponent by squeezing the temples and bring them down to a seated position where more pressure can be exerted.",
+        damageHP: "7", // Special Attack that does 7 dmg
+        holdType: "special",
+        onEscape: "currentFighters[defender].dice.addTmpMod(-3)", // Lower's the 'Hit dice' of all the opponent's next attack by 3. 
+        maxTurns: "1",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 10}]
+        // Not checked if once per match so far
+    });
+
+holds.push(
+    {
+        id: 45,
+        title: "Shoulder Claw-Hold",
+        description: "Similar to a claw-hold, the attacking wrestler applies a nerve lock onto the opponent's shoulder by using their hands and fingers to dig in and compress the top of the shoulder. Usually performed with the attacking wrestler standing behind a seated opponent.",
+        damageHP: "5", // Special Attack that does 5
+        holdType: "special",
+        // @INCOMPLETE Missing the dice reduction 
+        maxTurns: "1",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 6, endurance: 3}]
+    });
+
+holds.push(
+    {
+        id: 46,
+        title: "Cobra Clutch",
+        description: "The wrestler stands behind the opponent and uses one arm to place the opponent in a half nelson. The wrestler then uses his free arm to pull the opponent's arm (the same arm to which the wrestler is applying the half nelson) across the face of the opponent. The wrestler then locks his hand to his wrist behind the opponent's neck to make the opponent submit or lose consciousness.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's Toughness)
+        holdType: "strength",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, dexterity: 3}, {strength: 4, agility: 3}]
+    });
+
+holds.push(
+    {
+        id: 47,
+        title: "Bridging Cobra Clutch",
+        description: "With the opponent lying face down, the wrestler sits beside the opponent, facing the same way, locks on the cobra clutch, and then arches his legs and back, bending the opponent's torso and neck upwards.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's Flexibility)
+        holdType: "flexibility",
+        maxTurns: "4",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 6, flexibility: 4, dexterity: 4}, {strength: 6, flexibility: 4, agility: 4}]
+    });
+
+holds.push(
+    {
+        id: 48,
+        title: "Cross Face",
+        description: "This neck crank sees the wrestler wrap both hands around the opponent's face and pull back, which applies pressure to the neck and shoulder area. The move is performed in several ways, usually involving the wrestler trapping one of the opponent's arms",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's toughness)
+        holdType: "strength",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, flexibility: 3}]
+    });
+
+holds.push(
+    {
+        id: 49,
+        title: "Chicken Wing Cross Face",
+        description: "The wrestler goes to a fallen opponent and places one arm over the wrestler's nearest shoulder before applying the crossface where the attacking wrestler locks his hands around the opponent's chin (or lower face), then pulls back, stretching the opponent's neck and shoulder",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].flexibility", //(User's Strength - Target's flexibility)
+        holdType: "flexibility",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, flexibility: 3}]
+    });
+
+holds.push(
+    {
+        id: 50,
+        title: "Straight Jacket Cross Face",
+        description: "Similar to a cross face this move sees a wrestler standing above a face down opponent. The wrestler then crosses their opponent's arms, keeping them in place with the legs before applying the cross face.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].flexibility", //(User's Strength - Target's flexibility)
+        holdType: "flexibility",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, agility: 2}]
+    });
+
+holds.push(
+    {
+        id: 51,
+        title: "Face Lock",
+        description: "The wrestler faces his opponent who is bent over. The attacking wrestler tucks the opponent's head underneath his armpit and wraps his arm around the head so that the forearm is pressed against the face. The wrestler then grabs his own arm with his free hand to lock in the hold and compress the opponent's face. Similar in execution to a front chancery, the front facelock is often used as a setup for a suplex throw.",
+        damageHP: "0", // Special Attack
+        bonusRoll: "2", //  If the opponent is still trapped on your next turn, gain +2 to 'Hit Dice' for any "Grapple: Throw" attack or "Forced Fingering" or Forced Cock Stroking" attacks and a +1 to 'Hit Dice' to all other attacks except for Grapple: Holds 
+        // @INCOMPLETE Missing bonus stuff
+        bonusForAttacks: "", 
+        holdType: "special",
+        maxTurns: "100",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 1, dexterity: 1}, {strength: 1, agility: 1}]
+    });
+
+holds.push(
+    {
+        id: 52,
+        title: "Bite of the Dragon",
+        description: "This move sees the attacking wrestler behind a standing opponent, pulling them backwards into an inverted facelock and wrapping their legs around the opponent's body with a body scissors. The attacker then arches backwards, putting pressure on the opponents neck and spine.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's flexibility)
+        holdType: "flexibility",
+        maxTurns: "4",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, flexibility: 4, agility: 4}]
+    });
+
+holds.push(
+    {
+        id: 53,
+        title: "Nelson Hold",
+        description: "The wrestler slips either one or both arms underneath the opponent's armpits and locks his hands behind his neck, pushing the opponent's head forward against his chest. ",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness", //(User's Strength * 2 - Target's Toughness)
+        holdType: "strength",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 6, dexterity: 4}]
+    });
+
+holds.push(
+    {
+        id: 54,
+        title: "Step-over Toe hold Face lock (STF)",
+        description: "This hold is performed on an opponent who is lying face down on the mat. A wrestler grabs one of the opponent's legs, and places the opponent's ankle between their thighs. The wrestler then lies on top of the opponent's back and locks his arms around the opponent's head. The wrestler then pulls back stretching the opponent's back, neck, and knee.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's flexibility)
+        holdType: "flexibility",
+        maxTurns: "4",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, flexibility: 4, dexterity: 4, agility: 4}]
+    });
+
+holds.push(
+    {
+        id: 55,
+        title: "Step-over Toe hold Sleeper hold (STS)",
+        description: "This hold is performed on an opponent who is lying face down on the mat. A wrestler grabs one of the opponent's legs, and places the opponent's ankle between their thighs. The wrestler then lies on top of the opponent's back and wraps his arm around the neck of the opponent in a sleeper hold. The wrestler then pulls back stretching the opponent's back, neck, and knee while continuing to apply the sleeper hold.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's flexibility)
+        onEscape: "currentFighters[defender].dice.addTmpMod(-1)",
+        holdType: "flexibility",
+        maxTurns: "4",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 5, flexibility: 5, dexterity: 5, agility: 5}]
+    });
+
+holds.push(
+    {
+        id: 56,
+        title: "Muta-Lock",
+        description: "The wrestler first takes the opponent's legs then, bends them at the knees, and crosses them, placing one ankle in the other leg's knee-pit before then turning around so that they are facing away from the opponent and places one of their feet into the triangle created by the opponent's crossed legs. The wrestler then places the opponent's free ankle under their knee-pit and bridges backwards to reach over their head and locks their arms around the opponent's head. .",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's flexibility)
+        bonusRoll: "2", //  increases the 'Hit dice' of 'Forced Kissing' by +2. . 
+        bonusForAttacks: "sexual:5", // Forced Kissing
+        holdType: "flexibility",
+        maxTurns: "4",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, flexibility: 7, dexterity: 3, agility: 7}]
+    });
+
 module.exports = holds;
