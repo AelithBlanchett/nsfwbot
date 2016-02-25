@@ -520,4 +520,32 @@ holds.push(
         statRequirements: [{strength: 4, dexterity: 3}, {strength: 4, agility: 3}]
     });
 
+//////////////////////////////////////
+// LEG LOCKS
+//////////////////////////////////////
+
+holds.push(
+    {
+        id: 38,
+        title: "Boston Crab",
+        description: "This typically starts with the opponent on his back, and the wrestler standing and facing him. The wrestler hooks each of the opponent's legs in one of his arms, and then turns the opponent face-down, stepping over him in the process. The final position has the wrestler in a semi-sitting position and facing away from his opponent, with the opponent's back and legs bent back toward his face.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].flexibility", //(User's Strength - Target's Flexibility)
+        holdType: "flexibility",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4}]
+    });
+
+holds.push(
+    {
+        id: 39,
+        title: "Rocking Chair",
+        description: " The opponent is face down on the mat, with the attacker bending both of their legs up and tucking their ankles against his armpits. He then reaches down and grabs both of the opponent's arms before sitting down, 'rocking' back and forth and stretching the back.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's Flexibility)
+        holdType: "flexibility",
+        maxTurns: "4",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4}]
+    });
+
 module.exports = holds;
