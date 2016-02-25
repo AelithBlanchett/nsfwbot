@@ -207,5 +207,148 @@ holds.push(
         stanceRequirements: "supine",
         statRequirements: [{strength: 2, dexterity: 2}]
     });
+
+
+//////////////////////////////////////
+// BODY LOCKS
+//////////////////////////////////////
+
+holds.push(    
+        {
+        id: 15,
+        title: "Back-to-back Back-breaker",
+        description: "The wrestler, while behind the opponent, facing away from him in the opposing direction, hooks his arms under the opponent's. From this position, the wrestler lifts the opponent up, usually by bending.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's flexibility)
+        bonusRoll: "2", // Increases Hit dice of the Grapple: Throw techniques Neck Breaker and Face Buster by +2 
+        bonusForAttacks: "", // @INCOMPLETE
+        holdType: "flexibility",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 8}]
+    });
+
+holds.push(    
+        {
+        id: 16,
+        title: "Bear Hug",
+        description: "A wrestler stands in front of an opponent and locks his hands around the opponent, squeezing him. Often he will shake his body from side to side, in order to generate more pain around the ribs and spine. Frequently used by powerhouse style wrestlers. ",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's Toughness)
+        holdType: "strength",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 5}]
+    });
+
+holds.push(    
+        {
+        id: 17,
+        title: "Waist Lock",
+        description: "A wrestler stands behind the opponent and then wraps both of their arms around them in a reverse bear hug, sometimes clutching their hands together by the wrist for added pressure.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's Toughness)
+        bonusRoll: "2", // All "Grapple: Throw" attacks with 'Suplex' in the name gain +2 to Hit. 
+        bonusForAttacks: "", // @INCOMPLETE
+        holdType: "strength",
+        maxTurns: "2",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 5}]
+    });
+
+holds.push(    
+        {
+        id: 18,
+        title: "Body Scissors",
+        description: " A wrestler approaches a sitting opponent from in front, behind, or either sides. The attacking wrestler then sits next to the opponent and wraps her legs around the opponent, crossing her ankles and then tightening her grip by squeezing together her thighs or straightening her legs to choke the wrestler by compressing his torso. ",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's Toughness)
+        holdType: "strength",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, agility: 3}]
+    });
+
+holds.push(    
+        {
+        id: 19,
+        title: "Body Scissors + Chin Lock",
+        description: "Following up the body scissors, the wrestler holds the opponent's chin, drawing them back to stretch the torso while squeezing it between the thighs.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness", //(User's Strength * 2 - Target's Toughness)
+        holdType: "strength",
+        maxTurns: "4",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 6, agility: 4, flexibility: 4}]
+    });
+
+holds.push(    
+        {
+        id: 19,
+        title: "Bow and Arrow",
+        description: "The wrestler kneels on his opponent's back with both knees, hooking the head with one arm and the legs with the other. He then rolls back so that his opponent is suspended on his knees above him, facing up. The wrestler pulls down with both arms while pushing up with the knees to bend the opponent's back.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's Toughness)
+        holdType: "strength",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, flexibility: 4}]
+    });
+
+holds.push(    
+        {
+        id: 20,
+        title: "Cobra Twist",
+        description: "This hold begins with a wrestler facing his opponent's side. The wrestler first straddles one of the opponent's legs, then reaches over the opponent's near arm with the arm close to the opponent's back and locks it. Squatting and twisting to the side, flexes the opponent's back and stretches their abdomen.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].flexibility", //(User's Strength - Target's Flexibility)
+        holdType: "flexibility",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, flexibility: 4}]
+    });
+
+holds.push(    
+        {
+        id: 21,
+        title: "Black Widow",
+        description: "The wrestler stands behind the opponent and hooks a leg over the opponent's opposite leg. The wrestler then forces the opponent to one side, traps one of the opponent's arms with their own arm, and drapes their free leg over the neck of the opponent, forcing it downward. This elevates the wrestler and places all the weight of the wrestler on the opponent. The wrestler has one arm free, which can be used for balance.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].flexibility", //(User's Strength - Target's Flexibility)
+        holdType: "flexibility",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{flexibility: 6}]
+    });
+
+holds.push(    
+        {
+        id: 22,
+        title: "Surfboard",
+        description: "The surfboard hold first sees a wrestler stand behind a fallen opponent, who is lying stomach first to the floor. The wrestler places one foot down just above each of the opponent's knees and bends their legs up, hooking them around their own knees; at this point the wrestler grasps both of their opponent's wrists (usually slapping the opponent's back in an attempt to bring the arms in reach), and falls backwards while compressing the opponent's shoulder-blades and lifting their off the ground. ",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].flexibility", //(User's Strength - Target's Flexibility)
+        holdType: "flexibility",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, flexibility: 4}]
+    });
+
+holds.push(    
+        {
+        id: 23,
+        title: "Seated Surfboard",
+        description: "TThis can see the wrestler fall to a seated position or go onto their back, lifting the opponent skyward, which will increase pressure on the opponent. The wrestler grasp both of his opponent's wrists, while placing their foot or knee on the opponent's upper back, pulling back on the arms to compress the opponent's shoulder blades.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].flexibility", //(User's Strength * 2 - Target's Flexibility)
+        holdType: "flexibility",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 6, flexibility: 4}]
+    });
+
+holds.push(    
+        {
+        id: 24,
+        title: "Lotus Lock",
+        description: "TThe wrestler grabs the opponent's arms and wraps their legs on the outside of them, so the wrestler's feet meet at the back of the neck of the opponent and exert a downward pressure, akin to applying a full nelson but by using the legs.",
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's Toughness)
+        // If the user's Flexibility is 6 or greater, increase the Hit dice of any attack using the arms by +1. f the user's Flexibility is 8 or greater, increase the Hit dice of any attack using the arms by +2 instead. 
+        // > flex 6 condition not implemented 
+        holdType: "strength",
+        maxTurns: "3",
+        stanceRequirements: "supine",
+        statRequirements: [{strength: 4, flexibility: 4, agility: 4}]
+    });
     
 module.exports = holds;
