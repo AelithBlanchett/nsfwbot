@@ -421,14 +421,28 @@ module.exports = function (parent, args) {
     cmdHandler.escape = cmdHandler.escapeHold = function(args,data){
         if (checkIfFightIsGoingOn()) {
             if (data.character == currentFighters[currentFight.whoseturn].character) {
-                currentFight.actionTaken = "escape";
-                if (currentFight.turn > 0) {
-                    if(currentFight.skipRoll){
-                        checkRollWinner();
+                if(isInHold()){
+                    currentFight.actionTaken = "escape";
+                    if (currentFight.turn > 0) {
+                        if(currentFight.skipRoll){
+                            checkRollWinner();
+                        }
+                        else{
+                            if(hold[currentFight.currentHold.holdId].holdType == "flexibility"){ //  For all attacks that do damage based on the flexibility of the victim, the wrestler must use their flexibility to break free and will roll 2d10 + Flexibility v.s the applying wrestler's 2d10 + Strength *or* 2d10 + Flexibility (whichever is higher).
+                                currentFighters[currentFight.currentHold.defender].dice.addTmpMod(currentFighters[currentFight.currentHold.defender].flexibility);
+                                if(currentFighters[currentFight.currentHold.attacker].flexibility > currentFighters[currentFight.currentHold.attacker].strength){
+                                    currentFighters[currentFight.currentHold.attacker].dice.addTmpMod(currentFighters[currentFight.currentHold.attacker].flexibility);
+                                }
+                                else{
+                                    currentFighters[currentFight.currentHold.attacker].dice.addTmpMod(currentFighters[currentFight.currentHold.attacker].strength);
+                                }
+                            }
+                            roll();
+                        }
                     }
-                    else{
-                        roll();
-                    }
+                }
+                else{
+                    fChatLibInstance.sendMessage("You're not in a hold, you can't escape the void!");
                 }
             }
             else {
@@ -445,6 +459,10 @@ module.exports = function (parent, args) {
         if (args.length > 0) {
             if (checkIfFightIsGoingOn()) {
                 if (data.character == currentFighters[currentFight.whoseturn].character) {
+                    if(isInHold()){
+                        fChatLibInstance.sendMessage("You are still in a hold. You can either !escape or !tapout (and lose).");
+                        return;
+                    }
                     var idBrawl = findItemIdByTitle(brawl,args);
                     if (idBrawl != -1) {
                         if(!getAttackInfo(currentFighters[currentFight.whoseturn], brawl, idBrawl)){
@@ -452,7 +470,6 @@ module.exports = function (parent, args) {
                         }
                         currentFight.actionTaken = "brawl";
                         currentFight.actionId = idBrawl;
-
 
                         if (currentFight.turn > 0) {
                             if(currentFight.skipRoll){
@@ -485,10 +502,7 @@ module.exports = function (parent, args) {
     }
 
     cmdHandler.getMods = function(args, data){
-        if (checkIfFightIsGoingOn()) {
-            fChatLibInstance.sendMessage("\nFirst player dice mods, permanent: "+currentFighters[0].dice.getModsSum()+" and for the next turn: "+currentFighters[0].dice.getTmpModsSum()+"\n"
-            +"Second player dice mods, permanent: "+currentFighters[1].dice.getModsSum()+" and for the next turn: "+currentFighters[1].dice.getTmpModsSum());
-        }
+        getMods();
     }
 
     cmdHandler.lust = cmdHandler.s = cmdHandler.sex = cmdHandler.sexual = function(args,data){
@@ -644,9 +658,39 @@ function getAttackInfo(result, type, id){
         }
     }
 
+    var strType = "";
+
+    switch (type){
+        case sexual:
+            strType = "sexual";
+            break;
+        case brawl:
+            strType = "brawl";
+            break;
+        case hold:
+            strType = "holds";
+            break;
+    }
+
+    if(holdInPlace()){
+        if(hold[currentFight.currentHold.holdId].bonusForAttacks != undefined && hold[currentFight.currentHold.holdId].bonusRoll != undefined){
+            if(!isNaN(hold[currentFight.currentHold.holdId].bonusRoll) &&  hold[currentFight.currentHold.holdId].bonusForAttacks.indexOf(type+":"+currentFight.actionId) ){
+                currentFighters[currentFight.whoseturn].dice.addTmpMod(parseInt(hold[currentFight.currentHold.holdId].bonusRoll));
+                fChatLibInstance.sendMessage("Added " + hold[currentFight.currentHold.holdId].bonusRoll+ " to the dice, since the holds buffs this attack.")
+            }
+        }
+    }
+
     return true;
 }
 
+
+function getMods(){
+    if (checkIfFightIsGoingOn()) {
+        fChatLibInstance.sendMessage("\nFirst player dice mods, permanent: "+currentFighters[0].dice.getModsSum()+" and for the next turn: "+currentFighters[0].dice.getTmpModsSum()+"\n"
+            +"Second player dice mods, permanent: "+currentFighters[1].dice.getModsSum()+" and for the next turn: "+currentFighters[1].dice.getTmpModsSum());
+    }
+}
 
 function rollInitiation(){
     fChatLibInstance.sendMessage("\n[b]Let's start![/b]\n\n[b]"+currentFighters[0].character+"[/b]\n\n[color=red]VS[/color]\n\n[b]"+currentFighters[1].character+"[/b]");
@@ -674,10 +718,14 @@ function checkFeaturesInit(){
     }
 }
 
-function roll(custom){
+function roll(){
+    var modFirst = (currentFighters[0].dice.getModsSum()+currentFighters[0].dice.getTmpModsSum());
+    var modSecond = (currentFighters[1].dice.getModsSum()+currentFighters[1].dice.getTmpModsSum());
     diceResults.first = currentFighters[0].dice.roll() + d10Plus.roll();
     diceResults.second = currentFighters[1].dice.roll() + d10Plus.roll();
-    fChatLibInstance.sendMessage("\n[b]"+currentFighters[0].character+"[/b] rolled a [b]"+diceResults.first+"[/b]\n[b]" + currentFighters[1].character + "[/b] rolled a [b]"+diceResults.second+"[/b]");
+    fChatLibInstance.sendMessage("\n[b]"+currentFighters[0].character+"[/b] rolled a [b]"+diceResults.first+"[/b] "+(modFirst != 0 ? "("+((modFirst >= 0 ? "+":"")+modFirst+" applied)") : "" )+"\n[b]"
+        + currentFighters[1].character + "[/b] rolled a [b]"+diceResults.second+"[/b] "+(modSecond != 0 ? "("+((modSecond >= 0 ? "+":"")+modSecond+" applied)") : "" ));
+    // complicated line, but echoes the bonus/malus if present
     checkRollWinner();
 }
 
@@ -693,6 +741,7 @@ function checkRollWinner() {
         else if (currentFight.actionTaken == "escape") {
             //success
             fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!\nIt's still "+currentFighters[currentFight.whoseturn].character+"'s turn.");
+            currentFight.currentHold.turnsLeft = 0;
             currentFight.whoseturn = (currentFight.whoseturn == 0 ? 1 : 0); //We change it now, so it gets changed back just after
         }
         else {
@@ -831,18 +880,29 @@ function holdHandler(id){
     var strAttack = "[b]"+currentFighters[currentFight.whoseturn].character+"[/b] has";
     var type = hold;
     if(type[id].maxTurns != undefined && (type[id].damageHP != undefined || type[id].damageLust != undefined)){
+        if(currentFight.currentHold == undefined){
+            currentFight.currentHold = {};
+        }
         if(currentFight.currentHold.turnsLeft == undefined || isNaN(currentFight.currentHold.turnsLeft) || (!isNaN(currentFight.currentHold.turnsLeft) && parseInt(currentFight.currentHold.turnsLeft) < 0)){
             currentFight.currentHold.turnsLeft = 0;
         }
+        if(currentFight.currentHold.damageHP == undefined || isNaN(currentFight.currentHold.damageHP) || (!isNaN(currentFight.currentHold.damageHP) && parseInt(currentFight.currentHold.damageHP) <= 0)){
+            currentFight.currentHold.damageHP = 0;
+        }
+
+        var attacker = currentFight.whoseturn;
+        var defender = (currentFight.whoseturn == 0 ? 1 : 0);
         var newTurnsLeft = parseInt(currentFight.currentHold.turnsLeft) + parseInt(type[id].maxTurns);
+        var newDamageHP = parseInt(currentFight.currentHold.damageHP) + parseInt(eval(type[id].damageHP));
         currentFight.currentHold={
             holdId: id,
             holdName: type[id].title,
             turnsLeft: newTurnsLeft,
-            damageHP: type[id].damageHP,
-            attacker: currentFight.whoseturn,
-            defender: (currentFight.whoseturn == 0 ? 1 : 0)
+            damageHP: newDamageHP,
+            attacker: attacker,
+            defender: defender
         }
+        //fChatLibInstance.sendMessage("Hold established: "+JSON.stringify(currentFight.currentHold));
         strAttack += " applied "+type[id].title;
         fChatLibInstance.sendMessage(strAttack);
     }
@@ -869,10 +929,17 @@ function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, d
         ownLustAdded = 0,
         ownHpRemoved = 0;
 
-    var strAttack = "[b]"+currentFighters[currentFight.whoseturn].character+"[/b] has";
+    if(attacker == undefined){
+        attacker = currentFight.whoseturn;
+    }
+    if(defender == undefined){
+        defender = (currentFight.whoseturn == 0 ? 1 : 0);
+    }
 
-    var featuresVictim = parseStringToIntArray(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].features);
-    var featuresAttacker = parseStringToIntArray(currentFighters[currentFight.whoseturn].features);
+    var strAttack = "[b]"+currentFighters[attacker].character+"[/b] has";
+
+    var featuresVictim = parseStringToIntArray(currentFighters[defender].features);
+    var featuresAttacker = parseStringToIntArray(currentFighters[attacker].features);
 
 
 
@@ -881,7 +948,7 @@ function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, d
     if(damageHP != undefined){
         hpRemoved = eval(damageHP);
 
-        var hpBeforeAttack = currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp;
+        var hpBeforeAttack = currentFighters[defender].hp;
 
         //if (featuresVictim.indexOf(6) != -1 || featuresVictim.indexOf(7) != -1) { //stripped
         //    hpRemoved++;
@@ -897,36 +964,36 @@ function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, d
 
         //ryona enthusiast
         if (featuresVictim.indexOf(3) != -1) {
-            currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].lust += hpRemoved;
-            fChatLibInstance.sendMessage(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " really likes to suffer... Their lust meter has been increased by " + hpRemoved);
+            currentFighters[defender].lust += hpRemoved;
+            fChatLibInstance.sendMessage(currentFighters[defender].character + " really likes to suffer... Their lust meter has been increased by " + hpRemoved);
         }
 
 
         //sadist
         if (featuresAttacker.indexOf(4) != -1) {
 
-            currentFighters[currentFight.whoseturn].lust += hpRemoved;
-            fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " really likes to inflict pain! Their lust meter has been increased by " + hpRemoved);
-            var isUnder75 = (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp < 0.75 * parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].maxHp));
-            var isUnder50 = (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp < 0.50 * parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].maxHp));
-            var isUnder25 = (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp < 0.25 * parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].maxHp));
-            var wasUpper75 = (hpBeforeAttack >= 0.75 * parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].maxHp));
-            var wasUpper50 = (hpBeforeAttack >= 0.50 * parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].maxHp));
-            var wasUpper25 = (hpBeforeAttack >= 0.25 * parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].maxHp));
+            currentFighters[attacker].lust += hpRemoved;
+            fChatLibInstance.sendMessage(currentFighters[attacker].character + " really likes to inflict pain! Their lust meter has been increased by " + hpRemoved);
+            var isUnder75 = (currentFighters[defender].hp < 0.75 * parseInt(currentFighters[defender].maxHp));
+            var isUnder50 = (currentFighters[defender].hp < 0.50 * parseInt(currentFighters[defender].maxHp));
+            var isUnder25 = (currentFighters[defender].hp < 0.25 * parseInt(currentFighters[defender].maxHp));
+            var wasUpper75 = (hpBeforeAttack >= 0.75 * parseInt(currentFighters[defender].maxHp));
+            var wasUpper50 = (hpBeforeAttack >= 0.50 * parseInt(currentFighters[defender].maxHp));
+            var wasUpper25 = (hpBeforeAttack >= 0.25 * parseInt(currentFighters[defender].maxHp));
             if (isUnder75 && wasUpper75) {
                 //25% triggered
-                currentFighters[currentFight.whoseturn].endurance = parseInt(currentFighters[currentFight.whoseturn].endurance) + 1;
-                fChatLibInstance.sendMessage(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " has already lost 25% of their HP... " + currentFighters[currentFight.whoseturn].character + "'s endurance has been increased by 1!");
+                currentFighters[attacker].endurance = parseInt(currentFighters[attacker].endurance) + 1;
+                fChatLibInstance.sendMessage(currentFighters[defender].character + " has already lost 25% of their HP... " + currentFighters[attacker].character + "'s endurance has been increased by 1!");
             }
             if (isUnder50 && wasUpper50) {
                 //50% triggered
-                currentFighters[currentFight.whoseturn].endurance = parseInt(currentFighters[currentFight.whoseturn].endurance) + 1;
-                fChatLibInstance.sendMessage(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " has already lost 50% of their HP! " + currentFighters[currentFight.whoseturn].character + "'s endurance has been increased by 1!");
+                currentFighters[attacker].endurance = parseInt(currentFighters[attacker].endurance) + 1;
+                fChatLibInstance.sendMessage(currentFighters[defender].character + " has already lost 50% of their HP! " + currentFighters[attacker].character + "'s endurance has been increased by 1!");
             }
             if (isUnder25 && wasUpper25) {
                 //75% triggered
-                currentFighters[currentFight.whoseturn].endurance = parseInt(currentFighters[currentFight.whoseturn].endurance) + 1;
-                fChatLibInstance.sendMessage(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " has already lost 75% of their HP! " + currentFighters[currentFight.whoseturn].character + "'s endurance has been increased by 1!");
+                currentFighters[attacker].endurance = parseInt(currentFighters[attacker].endurance) + 1;
+                fChatLibInstance.sendMessage(currentFighters[defender].character + " has already lost 75% of their HP! " + currentFighters[attacker].character + "'s endurance has been increased by 1!");
             }
         }
 
@@ -934,7 +1001,7 @@ function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, d
         if(hpRemoved <= 0){ //attack can't do 0 dmg
             hpRemoved = 1;
         }
-        currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].hp -= hpRemoved;
+        currentFighters[defender].hp -= hpRemoved;
         strAttack += " removed "+hpRemoved+" HP"
     }
 
@@ -952,11 +1019,11 @@ function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, d
         if(lustAdded <= 0){ //attack can't do 0 dmg
             lustAdded = 1;
         }
-        currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].lust += lustAdded;
+        currentFighters[defender].lust += lustAdded;
         strAttack += " added "+lustAdded+" Lust point"
     }
 
-    strAttack += " to [b]"+currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character+"[/b]";
+    strAttack += " to [b]"+currentFighters[defender].character+"[/b]";
 
 
 
@@ -966,13 +1033,13 @@ function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, d
         strAttack += "\nThey also"
         if (lustPenalty != undefined) {
             ownLustAdded = eval(lustPenalty);
-            currentFighters[currentFight.whoseturn].lust += ownLustAdded;
+            currentFighters[attacker].lust += ownLustAdded;
             strAttack += " gained "+ownLustAdded+" lust point";
         }
 
         if (hpPenalty != undefined) {
             ownHpRemoved = eval(hpPenalty);
-            currentFighters[currentFight.whoseturn].hp -= ownHpRemoved;
+            currentFighters[attacker].hp -= ownHpRemoved;
             strAttack += " lost "+ownHpRemoved+" HP"
         }
         strAttack += " in the process!";
@@ -1009,7 +1076,7 @@ function nextTurn() {
 }
 
 function tickHold(){
-    if(typeof currentFight.currentHold == "object" && currentFight.currentHold.turnsLeft != undefined && currentFight.currentHold.turnsLeft > 0){
+    if(holdInPlace()){
         if(!getAttackInfo(currentFighters[currentFight.whoseturn], hold, currentFight.currentHold.holdId)){
             fChatLibInstance.sendMessage("Hold not found??");
             return;
@@ -1017,15 +1084,19 @@ function tickHold(){
         currentFight.currentHold.turnsLeft--;
         fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is still locked in the "+currentFight.currentHold.holdName+"!  ("+currentFight.currentHold.turnsLeft+" turns remaining)");
         attackHandler(currentFight.currentHold.damageHP, currentFight.currentHold.damageLust, currentFight.currentHold.hpPenalty, currentFight.currentHold.lustPenalty, currentFight.currentHold.attacker, currentFight.currentHold.defender);
-        fChatLibInstance.sendMessage(JSON.stringify(currentFight.currentHold));
+        //fChatLibInstance.sendMessage(JSON.stringify(currentFight.currentHold));
         if(currentFight.currentHold.turnsLeft <= 0){
             fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is finally out of the "+currentFight.currentHold.holdName+"!");
         }
     }
 }
 
+function holdInPlace(){
+    return (typeof currentFight.currentHold == "object" && currentFight.currentHold.turnsLeft != undefined && currentFight.currentHold.turnsLeft > 0);
+}
+
 function isInHold(){
-    if(typeof currentFight.currentHold == "object" && currentFight.currentHold.turnsLeft != undefined && currentFight.currentHold.turnsLeft > 0 && currentFight.currentHold.defender == currentFight.whoseturn){
+    if(holdInPlace() && currentFight.currentHold.defender == currentFight.whoseturn){
         return true;
     }
     return false;
