@@ -39,4 +39,5 @@ For the sextoys: > plugins/etc/sextoys.js
 - Some sexual moves are counted as holds, modify the current hold scheme to adapt it. (if the isInfinite parameter is set, don't count turns)
 - Read the code to fill this TODO
 - Add crossed out moves (some conditions are tricky)
+- Standardize the 'JSON' (not really json) files, with all the different parameters.
 
