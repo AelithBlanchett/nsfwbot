@@ -23,10 +23,15 @@ Some commands are just aliases.
 
 ###Adding, balancing and modifying values
 For the holds: > plugins/etc/holds.js
+
 For the sexual attacks: > plugins/etc/sexual.js
+
 For the brawl attacks: > plugins/etc/brawl.js
+
 For the features: > plugins/etc/features.js
+
 For the sextoys: > plugins/etc/sextoys.js
+
 
 
 #TODO
