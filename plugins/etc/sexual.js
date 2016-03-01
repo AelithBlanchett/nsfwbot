@@ -28,7 +28,7 @@ sexual.push(
 
 sexual.push(
     {
-        id: 1,
+        id: 0,
         title: "Final Ride",
         description: "Claim the cock that is yours! Give that cock a ride it will never forget!",
         lustPenalty: "2",
@@ -132,7 +132,10 @@ sexual.push(
         id: 8,
         title: "Playing with Scissors",
         description: "Pussy v.s. Pussy! Only one shall rule! Other names for this attack included 'Don't run with scissors!'' and 'Terminal Tribbing' ",
+        lustPenalty: "2",
         damageLust: "3",
+        conditions: "currentFighters[defender].orgasms >= 1",
+        conditionsText: "Opponent must have had at least 1 orgasm",
         onSuccess: "",
         onSuccessText: "",
         onFailure: "",
@@ -160,9 +163,10 @@ sexual.push(
         id: 10,
         title: "Ball-Slapping Face-Fuck",
         description: "That's right all the way to the base, bitch! ",
+        lustPenalty: "1",
         damageLust: "2",
-        condition: "!isInHold(defender)",
-        conditionText: "The target must be in a hold.",
+        condition: "isInHold(defender) && currentFight.currentHold.type == 'sexual' && currentFight.currentHold.id == 4",
+        conditionText: "The target must be in a forced face fucking.",
         onSuccess: "",
         onSuccessText: "",
         onFailure: "",
@@ -186,7 +190,7 @@ sexual.push(
         isHold: "True",
         bonusRoll: "2", //Increases the Hit Dice of "Prostate Massage" by +2. 
         bonusForAttacks: "sexual:15", // Prostate Massage
-        statRequirements: [{strength: 3, dexterity: 5, endurance: 4}]
+        statRequirements: [{strength: 3, dexterity: 5, endurance: 3}]
     });
 
 sexual.push(
@@ -201,7 +205,7 @@ sexual.push(
         onSuccessText: "",
         onFailure: "",
         onFailureText: "",
-        isHold: "True",
+        isHold: "False",
         statRequirements: [{endurance: 4}]
     });
 
