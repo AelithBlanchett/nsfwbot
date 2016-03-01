@@ -1010,6 +1010,13 @@ function holdHandler(id, type) {
         if (currentFight.currentHold.damageLust == undefined || isNaN(currentFight.currentHold.damageLust) || (!isNaN(currentFight.currentHold.damageLust) && parseInt(currentFight.currentHold.damageLust) <= 0)) {
             currentFight.currentHold.damageLust = 0;
         }
+        if(currentFight.currentHold.attacker != undefined && currentFight.currentHold.attacker != currentFight.whoseturn){//reset on turn change
+            currentFight.currentHold.turnsLeft = 0;
+            currentFight.currentHold.damageHP = 0;
+            currentFight.currentHold.damageLust = 0;
+            currentFight.currentHold.hpPenalty = 0;
+            currentFight.currentHold.lustPenalty = 0;
+        }
 
         var attacker = currentFight.whoseturn;
         var defender = (currentFight.whoseturn == 0 ? 1 : 0);
@@ -1039,6 +1046,17 @@ function holdHandler(id, type) {
             }
             newDamageLust += dmg;
         }
+        var newLustPenalty;
+        if(type[id].lustPenalty != undefined && !isNaN(eval(type[id].lustPenalty))){
+            newLustPenalty = parseInt(eval(type[id].lustPenalty));
+        }
+        var newHpPenalty;
+        if(type[id].hpPenalty != undefined && !isNaN(eval(type[id].hpPenalty))){
+            newHpPenalty = parseInt(eval(type[id].hpPenalty));
+        }
+
+
+
         currentFight.currentHold = {
             holdId: id,
             holdName: type[id].title,
@@ -1048,6 +1066,8 @@ function holdHandler(id, type) {
             attacker: attacker,
             defender: defender,
             isInfinite: isInfinite,
+            lustPenalty: newLustPenalty,
+            hpPenalty: newHpPenalty,
             type: type
         }
         //fChatLibInstance.sendMessage("Hold established: "+JSON.stringify(currentFight.currentHold));
