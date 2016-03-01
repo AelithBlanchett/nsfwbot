@@ -1,6 +1,7 @@
 #Version 0.2.1
 - Corrected some dice modificators not being correctly parsed
 - If the move is supposed to do damage but the calculation of stats is <= 0, it will at least do 1 damage (like [attacker].strength - [defender].flexibility )
+- It's now correctly reseting the current hold's status when the turn switches
 
 #Version 0.2.0
 

@@ -1046,6 +1046,7 @@ function holdHandler(id, type) {
             }
             newDamageLust += dmg;
         }
+
         var newLustPenalty;
         if(type[id].lustPenalty != undefined && !isNaN(eval(type[id].lustPenalty))){
             newLustPenalty = parseInt(eval(type[id].lustPenalty));
