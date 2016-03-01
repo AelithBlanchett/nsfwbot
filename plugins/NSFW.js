@@ -1254,7 +1254,7 @@ function tickHold() {
 }
 
 function holdInPlace() {
-    return (typeof currentFight.currentHold == "object" && (currentFight.currentHold.turnsLeft != undefined && currentFight.currentHold.turnsLeft > 0) || (currentFight.currentHold.isInfinite != undefined && currentFight.currentHold.isInfinite == true));
+    return (typeof currentFight.currentHold == "object" && currentFight.currentHold != undefined && (currentFight.currentHold.turnsLeft != undefined && currentFight.currentHold.turnsLeft > 0) || (currentFight.currentHold.isInfinite != undefined && currentFight.currentHold.isInfinite == true));
 }
 
 function isInHold(whoseTurn) {
@@ -1269,7 +1269,7 @@ function isInHold(whoseTurn) {
 
 function resetFight() {
     currentFighters = [];
-    currentFight = {turn: -1, whoseturn: -1, isInit: false, orgasms: 0, staminaPenalty: 5, winner: -1};
+    currentFight = {turn: -1, whoseturn: -1, isInit: false, orgasms: 0, staminaPenalty: 5, winner: -1, currentHold: {}};
     diceResults = {first: -1, second: -1};
 }
 
