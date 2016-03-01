@@ -1,6 +1,6 @@
 "use strict";
 var fChatLibInstance;
-var debug = false;
+var debug = true;
 
 module.exports = function (parent) {
     fChatLibInstance = parent;
@@ -28,17 +28,17 @@ module.exports = function (parent) {
     //    console.log(didYouMean(args,sexual,"title"));
     //};
     //
-    //cmdHandler.win = function(){ //debug
-    //    if(debug){
-    //        currentFighters[currentFight.whoseturn].dice.addTmpMod(-100,1);
-    //    }
-    //};
-    //
-    //cmdHandler.lose = function(){ //debug
-    //    if(debug){
-    //        currentFighters[currentFight.whoseturn].dice.addTmpMod(100,1);
-    //    }
-    //};
+    cmdHandler.win = function(){ //debug
+        if(debug){
+            currentFighters[currentFight.whoseturn].dice.addTmpMod(100,1);
+        }
+    };
+
+    cmdHandler.lose = function(){ //debug
+        if(debug){
+            currentFighters[currentFight.whoseturn].dice.addTmpMod(-100,1);
+        }
+    };
     //
     cmdHandler.dbg = function(args,data){
         client.hgetall('Lustful Aelith', function (err, result) {
@@ -498,6 +498,7 @@ module.exports = function (parent) {
         }
     };
     cmdHandler.escapeHold = cmdHandler.escape;
+    cmdHandler.e = cmdHandler.escape;
 
     cmdHandler.giveUp = function (args, data) {
         if (checkIfFightIsGoingOn()) {
@@ -537,11 +538,11 @@ module.exports = function (parent) {
                     }
                     var idBrawl = findItemIdByTitle(brawl, args);
                     if (idBrawl != -1) {
+                        currentFight.actionTaken = "brawl";
+                        currentFight.actionId = idBrawl;
                         if (!getAttackInfo(currentFighters[currentFight.whoseturn], brawl, idBrawl)) {
                             return;
                         }
-                        currentFight.actionTaken = "brawl";
-                        currentFight.actionId = idBrawl;
 
                         if (currentFight.turn > 0) {
                             if (currentFight.skipRoll) {
@@ -575,10 +576,6 @@ module.exports = function (parent) {
     cmdHandler.hit = cmdHandler.brawl;
     cmdHandler.b = cmdHandler.brawl;
 
-    //cmdHandler.getMods = function (args, data) {
-    //    getMods();
-    //};
-
     cmdHandler.sexual = function (args, data) {
         if (args.length > 0) {
             if (checkIfFightIsGoingOn()) {
@@ -589,11 +586,11 @@ module.exports = function (parent) {
                     }
                     var idSexual = findItemIdByTitle(sexual, args);
                     if (idSexual != -1) {
+                        currentFight.actionTaken = "sexual";
+                        currentFight.actionId = idSexual;
                         if (!getAttackInfo(currentFighters[currentFight.whoseturn], sexual, idSexual)) {
                             return;
                         }
-                        currentFight.actionTaken = "sexual";
-                        currentFight.actionId = idSexual;
 
                         if (currentFight.turn > 0) {
                             if (currentFight.skipRoll) {
@@ -638,13 +635,11 @@ module.exports = function (parent) {
                     }
                     var idHold = findItemIdByTitle(hold, args);
                     if (idHold != -1) {
+                        currentFight.actionTaken = "hold";
+                        currentFight.actionId = idHold;
                         if (!getAttackInfo(currentFighters[currentFight.whoseturn], hold, idHold)) {
                             return;
                         }
-
-                        currentFight.actionTaken = "hold";
-                        currentFight.actionId = idHold;
-
                         if (currentFight.turn > 0) {
                             if (currentFight.skipRoll) {
                                 checkRollWinner();
@@ -710,10 +705,12 @@ var d10Plus = new Dice(10);
 
 function getAttackInfo(result, type, id) {
     var total = [];
+    var attacker = currentFight.whoseturn;
+    var defender = (currentFight.whoseturn == 0 ? 1 : 0);
 
     //check conditions first
     if (type[id].conditions != undefined) {
-        var conditionsChecked = 1;//eval(type[id].conditions);
+        var conditionsChecked = eval(type[id].conditions);
         if (conditionsChecked != true) {
             fChatLibInstance.sendMessage("The conditions for this move aren't met: " + type[id].conditionsText);
             return false;
@@ -748,6 +745,9 @@ function getAttackInfo(result, type, id) {
     switch (type) {
         case sexual:
             strType = "sexual";
+            if(sexual[id].isHold == "true"){
+                currentFight.actionTaken = "hold";
+            }
             break;
         case brawl:
             strType = "brawl";
@@ -757,11 +757,20 @@ function getAttackInfo(result, type, id) {
             break;
     }
 
+
+
     if (holdInPlace()) {
-        if (hold[currentFight.currentHold.holdId].bonusForAttacks != undefined && hold[currentFight.currentHold.holdId].bonusRoll != undefined) {
-            if (!isNaN(hold[currentFight.currentHold.holdId].bonusRoll) && hold[currentFight.currentHold.holdId].bonusForAttacks.indexOf(type + ":" + currentFight.actionId)) {
-                currentFighters[currentFight.whoseturn].dice.addTmpMod(parseInt(hold[currentFight.currentHold.holdId].bonusRoll));
-                fChatLibInstance.sendMessage("Added " + hold[currentFight.currentHold.holdId].bonusRoll + " to the dice, since the holds buffs this attack.")
+        var type;
+        if(currentFight.currentHold.type == "sexual"){
+            type = sexual;
+        }
+        else{
+            type = hold
+        }
+        if (type[currentFight.currentHold.holdId].bonusForAttacks != undefined && type[currentFight.currentHold.holdId].bonusRoll != undefined) {
+            if (!isNaN(type[currentFight.currentHold.holdId].bonusRoll) && type[currentFight.currentHold.holdId].bonusForAttacks.indexOf(type + ":" + currentFight.actionId) != -1) {
+                currentFighters[currentFight.whoseturn].dice.addTmpMod(parseInt(type[currentFight.currentHold.holdId].bonusRoll));
+                fChatLibInstance.sendMessage("Added " + type[currentFight.currentHold.holdId].bonusRoll + " to the dice, since the last hold buffs this attack.")
             }
         }
     }
@@ -827,7 +836,8 @@ function checkRollWinner() {
             //success
             fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!\nIt's still " + currentFighters[currentFight.whoseturn].character + "'s turn.");
             currentFight.currentHold.turnsLeft = 0;
-            currentFight.whoseturn = (currentFight.whoseturn == 0 ? 1 : 0); //We change it now, so it gets changed back just after
+            currentFight.currentHold.isInfinite = false;
+            return;
         }
         else {
             fChatLibInstance.sendMessage("Was it... lust? a hit?");
@@ -879,6 +889,8 @@ function checkDiceRollWinner(idWinner) {
             }
             else if (currentFight.actionTaken == "escape") {
                 //success
+                currentFight.currentHold.turnsLeft = 0;
+                currentFight.currentHold.isInfinite = false;
                 fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!");
                 return;
             }
@@ -964,10 +976,22 @@ function failHandler(stringType, id) {
     }
 }
 
-function holdHandler(id) {
+function holdHandler(id, type) {
     var strAttack = "[b]" + currentFighters[currentFight.whoseturn].character + "[/b] has";
-    var type = hold;
-    if (type[id].maxTurns != undefined && (type[id].damageHP != undefined || type[id].damageLust != undefined)) {
+    var type;
+    switch (type) {
+        case "sexual":
+            type = sexual;
+            break;
+        case "hold":
+            type = hold;
+            break;
+        default:
+            type = hold;
+            break;
+    }
+
+    if (type[id].damageHP != undefined || type[id].damageLust != undefined) {
         if (currentFight.currentHold == undefined) {
             currentFight.currentHold = {};
         }
@@ -977,18 +1001,40 @@ function holdHandler(id) {
         if (currentFight.currentHold.damageHP == undefined || isNaN(currentFight.currentHold.damageHP) || (!isNaN(currentFight.currentHold.damageHP) && parseInt(currentFight.currentHold.damageHP) <= 0)) {
             currentFight.currentHold.damageHP = 0;
         }
+        if (currentFight.currentHold.damageLust == undefined || isNaN(currentFight.currentHold.damageLust) || (!isNaN(currentFight.currentHold.damageLust) && parseInt(currentFight.currentHold.damageLust) <= 0)) {
+            currentFight.currentHold.damageLust = 0;
+        }
 
         var attacker = currentFight.whoseturn;
         var defender = (currentFight.whoseturn == 0 ? 1 : 0);
-        var newTurnsLeft = parseInt(currentFight.currentHold.turnsLeft) + parseInt(type[id].maxTurns);
-        var newDamageHP = parseInt(currentFight.currentHold.damageHP) + parseInt(eval(type[id].damageHP));
+        var turns = 0;
+        var isInfinite = false;
+        if(type[id].maxTurns != undefined){
+            turns = type[id].maxTurns;
+        }
+        else{
+            isInfinite = true;
+        }
+
+        var newTurnsLeft = parseInt(currentFight.currentHold.turnsLeft) + parseInt(turns);
+        var newDamageHP = parseInt(currentFight.currentHold.damageHP);
+        if(type[id].damageHP != undefined && !isNaN(type[id].damageHP)){
+            newDamageHP += parseInt(eval(type[id].damageHP));
+        }
+        var newDamageLust = parseInt(currentFight.currentHold.damageLust);
+        if(type[id].damageLust != undefined && !isNaN(type[id].damageLust)){
+            newDamageLust += parseInt(eval(type[id].damageLust));
+        }
         currentFight.currentHold = {
             holdId: id,
             holdName: type[id].title,
             turnsLeft: newTurnsLeft,
             damageHP: newDamageHP,
+            damageLust: newDamageLust,
             attacker: attacker,
-            defender: defender
+            defender: defender,
+            isInfinite: isInfinite,
+            type: type
         }
         //fChatLibInstance.sendMessage("Hold established: "+JSON.stringify(currentFight.currentHold));
         strAttack += " applied " + type[id].title;
@@ -1002,6 +1048,10 @@ function brawlOrSexualGateway(stringType, id) {
     switch (stringType) {
         case "sexual":
             type = sexual;
+            if(type[id].isHold == "True" || type[id].isHold == "true"){
+                holdHandler(id, "sexual");
+                return;
+            }
             break;
         case "brawl":
             type = brawl;
@@ -1030,8 +1080,12 @@ function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, d
     var featuresAttacker = parseStringToIntArray(currentFighters[attacker].features);
 
 
-    if (damageHP != undefined) {
+    if (damageHP != undefined && damageHP != 0) {
         hpRemoved = eval(damageHP);
+        if(hpRemoved <= 0){
+            hpRemoved = 1;
+        }
+
 
         var hpBeforeAttack = currentFighters[defender].hp;
 
@@ -1081,16 +1135,12 @@ function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, d
             }
         }
 
-
-        if (hpRemoved <= 0) { //attack can't do 0 dmg
-            hpRemoved = 1;
-        }
         currentFighters[defender].hp -= hpRemoved;
         strAttack += " removed " + hpRemoved + " HP"
     }
 
 
-    if (damageLust != undefined) {
+    if (damageLust != undefined && damageLust != 0) {
         lustAdded = eval(damageLust);
 
         if (featuresAttacker.indexOf(5) != -1 || featuresVictim.indexOf(5) != -1) { // cum slut
@@ -1107,7 +1157,7 @@ function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, d
     strAttack += " to [b]" + currentFighters[defender].character + "[/b]";
 
 
-    if (hpPenalty != undefined || lustPenalty != undefined) {
+    if ((hpPenalty != undefined && hpPenalty != 0) || (lustPenalty != undefined && lustPenalty != 0)) {
         strAttack += "\nThey also"
         if (lustPenalty != undefined) {
             ownLustAdded = eval(lustPenalty);
@@ -1153,24 +1203,29 @@ function nextTurn() {
 
 function tickHold() {
     if (holdInPlace()) {
-        if (!getAttackInfo(currentFighters[currentFight.whoseturn], hold, currentFight.currentHold.holdId)) {
-            fChatLibInstance.sendMessage("Hold not found??");
-            return;
+        if(currentFight.currentHold.isInfinite == false){
+            currentFight.currentHold.turnsLeft--;
+            fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is still locked in the " + currentFight.currentHold.holdName + "!  (" + currentFight.currentHold.turnsLeft + " turns remaining)");
         }
-        currentFight.currentHold.turnsLeft--;
-        fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is still locked in the " + currentFight.currentHold.holdName + "!  (" + currentFight.currentHold.turnsLeft + " turns remaining)");
+        else{
+            fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is still locked in the " + currentFight.currentHold.holdName + "!");
+        }
+
         attackHandler(currentFight.currentHold.damageHP, currentFight.currentHold.damageLust, currentFight.currentHold.hpPenalty, currentFight.currentHold.lustPenalty, currentFight.currentHold.attacker, currentFight.currentHold.defender);
-        if (currentFight.currentHold.turnsLeft <= 0) {
+        if (currentFight.currentHold.turnsLeft <= 0 && currentFight.currentHold.isInfinite == false) {
             fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is finally out of the " + currentFight.currentHold.holdName + "!");
         }
     }
 }
 
 function holdInPlace() {
-    return (typeof currentFight.currentHold == "object" && currentFight.currentHold.turnsLeft != undefined && currentFight.currentHold.turnsLeft > 0);
+    return (typeof currentFight.currentHold == "object" && (currentFight.currentHold.turnsLeft != undefined && currentFight.currentHold.turnsLeft > 0) || (currentFight.currentHold.isInfinite != undefined && currentFight.currentHold.isInfinite == true));
 }
 
-function isInHold() {
+function isInHold(whoseTurn) {
+    if(whoseTurn == undefined){
+        whoseTurn = currentFight.whoseturn;
+    }
     if (holdInPlace() && currentFight.currentHold.defender == currentFight.whoseturn) {
         return true;
     }

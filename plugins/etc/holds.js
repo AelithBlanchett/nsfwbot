@@ -2,7 +2,7 @@ var holds = [];
 
 //stanceRequirements and holdType not set to final values yet!
 
-// maxTurns: "100", means it has no max turns, dirty workaround
+// maxTurns: "10", means it has no max turns, dirty workaround
 
 // Some special attacks as still lacking bonus attack ids Marked with an @INCOMPLETE comment
 
@@ -51,7 +51,7 @@ holds.push(
         bonusRoll: "1",
         bonusForAttacks: "holds:1, brawl:3", // Arm Bar, Arm-Twist Rope walk chop, Fireman's Carry, Irish Whip, Lariat @INCOMPLETE
         holdType: "special",
-        maxTurns: "100",
+        maxTurns: "10",
         stanceRequirements: "supine",
         statRequirements: [{strength: 1, dexterity: 2, agility: 2}]
     });
@@ -75,7 +75,7 @@ holds.push(
         description: "The wrestler grabs their opponent's arm, pulling it around behind the opponent's back. This stretches the pectorals and shoulder joint, and immobilizes the arm.",
         damageHP: "1", //( Does 1 Health Damage regardless of Strength and Toughness stats. )
         holdType: "strength",
-        maxTurns: "100",
+        maxTurns: "10",
         stanceRequirements: "supine",
         statRequirements: [{strength: 2, dexterity: 2, agility: 2}]
     });
@@ -113,7 +113,7 @@ holds.push(
         bonusRoll: "4",
         bonusForAttacks: " ", // enables use of Tiger Suplex, giving the attack a +4 to Hit. @INCOMPLETE
         holdType: "strength",
-        maxTurns: "100",
+        maxTurns: "10",
         stanceRequirements: "supine",
         statRequirements: [{strength: 4, dexterity: 4, agility: 4}]
     });
@@ -203,7 +203,7 @@ holds.push(
         bonusRoll: "2",
         bonusForAttacks: "holds:1, holds:2, holds:3, holds:4, holds:5, holds:6, holds:7, holds:8, holds:9, holds:10, holds:11, holds:12, holds:13 ,holds:14", // ALL Arm Lock holds
         holdType: "special",
-        maxTurns: "100",
+        maxTurns: "10",
         stanceRequirements: "supine",
         statRequirements: [{strength: 2, dexterity: 2}]
     });
@@ -376,7 +376,7 @@ holds.push(
         bonusRoll: "2", // Increase the Hit dice of "Arm-Triangle Reverse STO" or "Arm-Trap-Triangle Choke Hold" by +2 
         bonusForAttacks: "holds:27", // @INCOMPLETE
         holdType: "special",
-        maxTurns: "100",
+        maxTurns: "10",
         stanceRequirements: "supine",
         statRequirements: [{strength: 2, dexterity: 2, flexibility: 2}]
     });
@@ -585,7 +585,7 @@ holds.push(
         bonusRoll: "2", //  increases the 'Hit dice' of 'Forced Kissing' by +2. . 
         bonusForAttacks: "sexual:5", // Forced Kissing
         holdType: "special",
-        maxTurns: "100",
+        maxTurns: "10",
         stanceRequirements: "supine",
         statRequirements: [{strength: 4, dexterity: 3}, {strength: 4, agility: 3}]
     });
@@ -700,7 +700,7 @@ holds.push(
         // @INCOMPLETE Missing bonus stuff
         bonusForAttacks: "", 
         holdType: "special",
-        maxTurns: "100",
+        maxTurns: "10",
         stanceRequirements: "supine",
         statRequirements: [{strength: 1, dexterity: 1}, {strength: 1, agility: 1}]
     });
@@ -783,7 +783,7 @@ holds.push(
         bonusRoll: "2", //  ncrease the Hit dice of any Grapple: Holds - "Arm Lock" technique by +2. . 
         bonusForAttacks: "holds:1, holds:2, holds:3, holds:4, holds:5, holds:6, holds:7, holds:8, holds:9, holds:10, holds:11, holds:12, holds:13 ,holds:14", // Grapple: Holds - "Arm Lock"
         holdType: "special",
-        maxTurns: "100",
+        maxTurns: "10",
         stanceRequirements: "supine",
         statRequirements: [{strength: 4, flexibility: 7, dexterity: 3, agility: 7}]
     });

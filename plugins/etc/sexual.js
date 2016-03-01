@@ -14,9 +14,9 @@ sexual.push(
         id: 0,
         title: "Final Fucking",
         description: "It's time to penetrate your opponent. Ladies~ Use !sextoys to get the most out of this, newhalfs and gentlemen - we're going in.",
-        lustPenalty: "0", // Used to be 2 but is strike through now
+        lustPenalty: "2",
         damageLust: "3",
-        conditions: "currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].orgasms >= 1",
+        conditions: "currentFighters[defender].orgasms >= 1",
         conditionsText: "Opponent must have had at least 1 orgasm",
         onSuccess: "",
         onSuccessText: "",
@@ -31,9 +31,9 @@ sexual.push(
         id: 1,
         title: "Final Ride",
         description: "Claim the cock that is yours! Give that cock a ride it will never forget!",
-        lustPenalty: "0", // Used to be 2 but is strike through now
+        lustPenalty: "2",
         damageLust: "3",
-        conditions: "currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].orgasms >= 1",
+        conditions: "currentFighters[defender].orgasms >= 1",
         conditionsText: "Opponent must have had at least 1 orgasm",
         onSuccess: "",
         onSuccessText: "",
@@ -161,7 +161,8 @@ sexual.push(
         title: "Ball-Slapping Face-Fuck",
         description: "That's right all the way to the base, bitch! ",
         damageLust: "2",
-        // Requirement that target is in hold missing
+        condition: "!isInHold(defender)",
+        conditionText: "The target must be in a hold.",
         onSuccess: "",
         onSuccessText: "",
         onFailure: "",
@@ -176,12 +177,13 @@ sexual.push(
         title: "Cock Milking",
         description: "That's right, just let it all out~♥ ",
         damageLust: "3",
-        // Requirement forced fingering / forces cock sucking missing
+        condition: "isInHold(defender) && currentFight.currentHold.type == 'sexual' && (currentFight.currentHold.id == 2 || currentFight.currentHold.id == 5)",
+        conditionText: "Opponent must be in either \"Forced Fingering\" or \"Forced Cock Stroking\" to use this move. ",
         onSuccess: "",
         onSuccessText: "",
         onFailure: "",
         onFailureText: "",
-        isHold: "False",
+        isHold: "True",
         bonusRoll: "2", //Increases the Hit Dice of "Prostate Massage" by +2. 
         bonusForAttacks: "sexual:15", // Prostate Massage
         statRequirements: [{strength: 3, dexterity: 5, endurance: 4}]
@@ -193,7 +195,8 @@ sexual.push(
         title: "Deep Throating",
         description: " Starting to go down deep~♥",
         damageLust: 2,
-        // Requirement forces cock sucking missing
+        condition: "isInHold(defender) && currentFight.currentHold.type == 'sexual' && currentFight.currentHold.id == 3",
+        conditionText: "Opponent must be in \"Forced Cock Sucking\" to use this move.",
         onSuccess: "",
         onSuccessText: "",
         onFailure: "",
@@ -204,11 +207,29 @@ sexual.push(
 
 sexual.push(
     {
+        id: 13,
+        title: "Double Climax",
+        description: " Starting to go down deep~♥",
+        damageLust: 1,
+        lustPenalty: 1,
+        condition: "(currentFight[attacker].lust == parseInt(currentFight[attacker].endurance) - 1) && (currentFight[defender].lust == parseInt(currentFight[defender].endurance) - 1)",
+        conditionText: "Opponent must be 1 Lust away from a climax; User must be 1 Lust away from a climax.",
+        onSuccess: "",
+        onSuccessText: "",
+        onFailure: "",
+        onFailureText: "",
+        isHold: "False",
+        statRequirements: [{strength: 1, agility: 1, endurance: 1}]
+    });
+
+sexual.push(
+    {
         id: 14,
         title: "Forced Pussy/Ass Worship",
         description: " Use a combination of fingers and tongue to properly propel your opponent to climax!",
         damageLust: 3,
-        // Requirement forced fingering / forces licking missing
+        condition: "isInHold(defender) && currentFight.currentHold.type == 'sexual' && (currentFight.currentHold.id == 5 || currentFight.currentHold.id == 7)",
+        conditionText: "Opponent must be in \"Forced Cock Sucking\" or \"Forced Licking\" to use this move.",
         onSuccess: "",
         onSuccessText: "",
         onFailure: "",
@@ -223,7 +244,8 @@ sexual.push(
         title: "G-Spot Massage",
         description: "L-Lewd!~♥",
         damageLust: 3,
-        // Requirement forced fingering missing
+        condition: "isInHold(defender) && currentFight.currentHold.type == 'sexual' && currentFight.currentHold.id == 5",
+        conditionText: "Opponent must be in \"Forced Fingering\" to use this move.",
         onSuccess: "",
         onSuccessText: "",
         onFailure: "",
@@ -234,11 +256,12 @@ sexual.push(
 
 sexual.push(
     {
-        id: 15,
+        id: 16,
         title: "Prostate Massage",
         description: "Oh my~♥ ",
         damageLust: 3,
-        // Requirement forced fingering missing
+        condition: "isInHold(defender) && currentFight.currentHold.type == 'sexual' && currentFight.currentHold.id == 5",
+        conditionText: "Opponent must be in \"Forced Fingering\" to use this move.",
         onSuccess: "",
         onSuccessText: "",
         onFailure: "",
@@ -247,5 +270,21 @@ sexual.push(
         statRequirements: [{dexterity: 6}]
     });
 
+sexual.push(
+    {
+        id: 17,
+        title: "Ruined Climax",
+        description: "Aww~ poor baby, did you think you would get to cum?",
+        damageLust: 1,
+        damageHP: "currentFighter[defender].lust",
+        condition: "currentFight[defender].lust == parseInt(currentFight[defender].endurance) - 1", //no sadist feature
+        conditionText: "Opponent must be in ! lust point away from orgasm.",
+        onSuccess: "",
+        onSuccessText: "",
+        onFailure: "",
+        onFailureText: "",
+        isHold: "False",
+        statRequirements: [{strength: 5, agility: 5, endurance: 5}]
+    });
 
 module.exports = sexual;
