@@ -1,3 +1,7 @@
+#Version 0.2.1
+- Corrected some dice modificators not being correctly parsed
+- If the move is supposed to do damage but the calculation of stats is <= 0, it will at least do 1 damage (like [attacker].strength - [defender].flexibility )
+
 #Version 0.2.0
 
 - Added all holds (missing some bonuses, and some conditions), use them with !h or !hold or !holds or !grapple or !grappling or !submission

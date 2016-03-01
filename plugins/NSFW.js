@@ -912,10 +912,10 @@ function checkDiceRollWinner(idWinner) {
 
         var difference;
         if (idWinner == 0) {
-            difference = diceResults.first - diceResults.second;
+            difference = Math.abs(diceResults.first - diceResults.second);
         }
         else {
-            difference = diceResults.second - diceResults.first;
+            difference = Math.abs(diceResults.second - diceResults.first);
         }
         if (difference >= 10) {
             currentFight.skipRoll = true;
@@ -1024,17 +1024,17 @@ function holdHandler(id, type) {
 
         var newTurnsLeft = parseInt(currentFight.currentHold.turnsLeft) + parseInt(turns);
         var newDamageHP = parseInt(currentFight.currentHold.damageHP);
-        if(type[id].damageHP != undefined && !isNaN(type[id].damageHP)){
+        if(type[id].damageHP != undefined && !isNaN(eval(type[id].damageHP))){
             var dmg = parseInt(eval(type[id].damageHP));
-            if(dmg == 0){
+            if(dmg <= 0){
                 dmg = 1;
             }
             newDamageHP += dmg;
         }
         var newDamageLust = parseInt(currentFight.currentHold.damageLust);
-        if(type[id].damageLust != undefined && !isNaN(type[id].damageLust)){
+        if(type[id].damageLust != undefined && !isNaN(eval(type[id].damageLust))){
             var dmg = parseInt(eval(type[id].damageLust));
-            if(dmg == 0){
+            if(dmg <= 0){
                 dmg = 1;
             }
             newDamageLust += dmg;
