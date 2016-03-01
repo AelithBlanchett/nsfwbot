@@ -17,6 +17,8 @@
 - Added the dice modifiers total when rolling
 - All features are implemented, but Stripped down and Exhibitionist features are still disabled
 
+- Added win/loss ratio, but it's only a display. It isn't counted anywhere.
+
 
 Notes:
 
