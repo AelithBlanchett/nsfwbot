@@ -476,12 +476,12 @@ module.exports = function (parent) {
                         }
                         else {
                             if (hold[currentFight.currentHold.holdId].holdType == "flexibility") { //  For all attacks that do damage based on the flexibility of the victim, the wrestler must use their flexibility to break free and will roll 2d10 + Flexibility v.s the applying wrestler's 2d10 + Strength *or* 2d10 + Flexibility (whichever is higher).
-                                currentFighters[currentFight.currentHold.defender].dice.addTmpMod(currentFighters[currentFight.currentHold.defender].flexibility);
+                                currentFighters[currentFight.currentHold.defender].dice.addTmpMod(parseInt(currentFighters[currentFight.currentHold.defender].flexibility));
                                 if (currentFighters[currentFight.currentHold.attacker].flexibility > currentFighters[currentFight.currentHold.attacker].strength) {
-                                    currentFighters[currentFight.currentHold.attacker].dice.addTmpMod(currentFighters[currentFight.currentHold.attacker].flexibility);
+                                    currentFighters[currentFight.currentHold.attacker].dice.addTmpMod(parseInt(currentFighters[currentFight.currentHold.attacker].flexibility));
                                 }
                                 else {
-                                    currentFighters[currentFight.currentHold.attacker].dice.addTmpMod(currentFighters[currentFight.currentHold.attacker].strength);
+                                    currentFighters[currentFight.currentHold.attacker].dice.addTmpMod(parseInt(currentFighters[currentFight.currentHold.attacker].strength));
                                 }
                             }
                             roll();
@@ -737,10 +737,10 @@ function getAttackInfo(result, type, id) {
 
     if (total.length >= 1 && max(total) < 0) {
         if (currentFight.whoseturn == 0) {
-            currentFighters[0].dice.addTmpMod(max(total));
+            currentFighters[0].dice.addTmpMod(parseInt(max(total)));
         }
         else if (currentFight.whoseturn == 1) {
-            currentFighters[1].dice.addTmpMod(max(total));
+            currentFighters[1].dice.addTmpMod(parseInt(max(total)));
         }
     }
 
@@ -803,11 +803,11 @@ function checkFeaturesInit() {
     var dominated = -1;
 
     if (featuresP0.indexOf(1) != -1 && featuresP1.indexOf(8) != -1) { //P1 is dom, P2 sub
-        currentFighters[1].dice.addMod(-2);
+        currentFighters[1].dice.addMod(parseInt(-2));
         dominated = 1;
     }
     if (featuresP0.indexOf(8) != -1 && featuresP1.indexOf(1) != -1) { //P2 is dom, P1 sub
-        currentFighters[0].dice.addMod(-2);
+        currentFighters[0].dice.addMod(parseInt(-2));
         dominated = 0;
     }
 
@@ -934,10 +934,10 @@ function checkDiceRollWinner(idWinner) {
             }
             else { //si ce n'était pas a lui mais qu'il a gagné le roll, !counter! et on lui rend la main
                 if (idWinner == 0) {
-                    currentFighters[0].dice.addTmpMod(difference <= 5 ? difference : 5);
+                    currentFighters[0].dice.addTmpMod(difference <= 5 ? parseInt(difference) : parseInt(5));
                 }
                 else {
-                    currentFighters[1].dice.addTmpMod(difference <= 5 ? difference : 5);
+                    currentFighters[1].dice.addTmpMod(difference <= 5 ? parseInt(difference) : parseInt(5));
                 }
                 fChatLibInstance.sendMessage("[i][b]" + currentFighters[idWinner].character + "[/b] successfully blocked/dodged the attack, and gets a +" + (difference <= 5 ? difference : 5) + " advantage on the next roll.[/i]");
                 currentFight.whoseturn = idWinner;
@@ -953,9 +953,9 @@ function missHandler(idPlayer) {
         failHandler(currentFight.actionTaken, currentFight.actionId);
     }
     if (currentFight.actionTaken == "escape") {
-        currentFighters[idPlayer].dice.addTmpMod(1)
+        currentFighters[idPlayer].dice.addTmpMod(parseInt(1))
     }
-    currentFighters[idPlayer].dice.addTmpMod(2, 10);
+    currentFighters[idPlayer].dice.addTmpMod(parseInt(2), 10);
     fChatLibInstance.sendMessage("[i][b]" + currentFighters[idPlayer].character + "[/b] got +2 added to their next dice roll.[/i]");
 }
 
@@ -982,12 +982,14 @@ function failHandler(stringType, id) {
 
 function holdHandler(id, type) {
     var strAttack = "[b]" + currentFighters[currentFight.whoseturn].character + "[/b] has";
-    var type;
     switch (type) {
         case "sexual":
             type = sexual;
             break;
         case "hold":
+            type = hold;
+            break;
+        case undefined:
             type = hold;
             break;
         default:
@@ -1023,11 +1025,19 @@ function holdHandler(id, type) {
         var newTurnsLeft = parseInt(currentFight.currentHold.turnsLeft) + parseInt(turns);
         var newDamageHP = parseInt(currentFight.currentHold.damageHP);
         if(type[id].damageHP != undefined && !isNaN(type[id].damageHP)){
-            newDamageHP += parseInt(eval(type[id].damageHP));
+            var dmg = parseInt(eval(type[id].damageHP));
+            if(dmg == 0){
+                dmg = 1;
+            }
+            newDamageHP += dmg;
         }
         var newDamageLust = parseInt(currentFight.currentHold.damageLust);
         if(type[id].damageLust != undefined && !isNaN(type[id].damageLust)){
-            newDamageLust += parseInt(eval(type[id].damageLust));
+            var dmg = parseInt(eval(type[id].damageLust));
+            if(dmg == 0){
+                dmg = 1;
+            }
+            newDamageLust += dmg;
         }
         currentFight.currentHold = {
             holdId: id,
