@@ -51,7 +51,7 @@ holds.push(
         bonusRoll: "1",
         bonusForAttacks: "holds:1, brawl:3", // Arm Bar, Arm-Twist Rope walk chop, Fireman's Carry, Irish Whip, Lariat @INCOMPLETE
         holdType: "special",
-        maxTurns: "10",
+        isInfinite: "True",
         stanceRequirements: "supine",
         statRequirements: [{strength: 1, dexterity: 2, agility: 2}]
     });
@@ -597,7 +597,8 @@ holds.push(
         description: "The claw involves the attacker gripping the top of the head of the opponent with one hand and squeezing the tips of their fingers into the opponent's skull, thereby applying five different points of pressure.",
         damageHP: "5", // Special Attack that does 5
         holdType: "special",
-        // @INCOMPLETE Missing the dice reduction 
+        // @INCOMPLETE Missing the dice reduction
+        onSuccess: "currentFight[currentFight.currentHold.defender].dice.addTmpMod(-3)",
         maxTurns: "1",
         stanceRequirements: "supine",
         statRequirements: [{strength: 8}]
@@ -696,9 +697,9 @@ holds.push(
         title: "Face Lock",
         description: "The wrestler faces his opponent who is bent over. The attacking wrestler tucks the opponent's head underneath his armpit and wraps his arm around the head so that the forearm is pressed against the face. The wrestler then grabs his own arm with his free hand to lock in the hold and compress the opponent's face. Similar in execution to a front chancery, the front facelock is often used as a setup for a suplex throw.",
         damageHP: "0", // Special Attack
-        bonusRoll: "2", //  If the opponent is still trapped on your next turn, gain +2 to 'Hit Dice' for any "Grapple: Throw" attack or "Forced Fingering" or Forced Cock Stroking" attacks and a +1 to 'Hit Dice' to all other attacks except for Grapple: Holds 
+        bonusRoll: "2", //  If the opponent is still trapped on your next turn, gain +2 to 'Hit Dice' for any "Grapple: Throw" attack or "Forced Fingering" or Forced Cock Stroking" attacks and a +1 to 'Hit Dice' to all other attacks except for Grapple: Holds
         // @INCOMPLETE Missing bonus stuff
-        bonusForAttacks: "", 
+        bonusForAttacks: "sexual:2, sexual:5",
         holdType: "special",
         maxTurns: "10",
         stanceRequirements: "supine",
