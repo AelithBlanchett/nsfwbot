@@ -895,7 +895,7 @@ function checkDiceRollWinner(idWinner) {
                 //success
                 currentFight.currentHold.turnsLeft = 0;
                 currentFight.currentHold.isInfinite = false;
-                fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!");
+                fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!\nIt's still " + currentFighters[currentFight.whoseturn].character + "'s turn.");
                 return;
             }
             else {
@@ -1010,7 +1010,7 @@ function holdHandler(id, type) {
         if (currentFight.currentHold.damageLust == undefined || isNaN(currentFight.currentHold.damageLust) || (!isNaN(currentFight.currentHold.damageLust) && parseInt(currentFight.currentHold.damageLust) <= 0)) {
             currentFight.currentHold.damageLust = 0;
         }
-        if(currentFight.currentHold.attacker != undefined && currentFight.currentHold.attacker != currentFight.whoseturn){//reset on turn change
+        if((currentFight.currentHold.attacker != undefined && currentFight.currentHold.attacker != currentFight.whoseturn) || !holdInPlace()){//reset on turn change
             currentFight.currentHold.turnsLeft = 0;
             currentFight.currentHold.damageHP = 0;
             currentFight.currentHold.damageLust = 0;
