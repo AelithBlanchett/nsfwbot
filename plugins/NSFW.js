@@ -670,7 +670,7 @@ module.exports = function (parent) {
         }
         else {
             //available commands
-            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !h Arm Bar\nAvailable moves: "+getAllItemsTitleInArray(holds));
+            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !h Arm Bar\nAvailable moves: "+getAllItemsTitleInArray(hold));
         }
     };
     cmdHandler.h = cmdHandler.grapple;
