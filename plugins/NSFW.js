@@ -423,45 +423,34 @@ module.exports = function (parent) {
         }
     };
 
-    cmdHandler.removeFeature = function (args, data) {
+    cmdHandler.removeFeatures = function (args, data) {
         if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
             if (args.length > 0) {
-                if (checkIfFightIsGoingOn()) {
-                    if (currentFighters[0].character == data.character || currentFighters[1].character == data.character) {
-                        fChatLibInstance.sendMessage("You can't remove a feature if you're in a fight.");
+                //if (checkIfFightIsGoingOn()) {
+                //    if (currentFighters[0].character == args || currentFighters[1].character == args) {
+                //        fChatLibInstance.sendMessage("You can't remove a feature if the user is in a fight.");
+                //        return;
+                //    }
+                //}
+                client.hgetall(args, function (err, result) {
+                    if (result != null) {
+                        var currentFeatures = parseStringToIntArray(result.features);
+                        client.hmset(data.character, result);
+                        fChatLibInstance.sendMessage("You've successfully removed the [b]" + features[idFeature].title + "[/b] perk.");
                         return;
                     }
-                }
-                var idFeature = findItemIdByTitle(features, args);
-                if (idFeature != -1) {
-                    client.hgetall(data.character, function (err, result) {
-                        if (result != null) {
-                            var currentFeatures = parseStringToIntArray(result.features);
-                            if (currentFeatures.indexOf(idFeature) != -1) {
-                                currentFeatures.splice(currentFeatures.indexOf(idFeature), 1);
-                                result.features = currentFeatures.toString();
-                                client.hmset(data.character, result);
-                                fChatLibInstance.sendMessage("You've successfully removed the [b]" + features[idFeature].title + "[/b] perk.");
-                                return;
-                            }
-                            fChatLibInstance.sendMessage("You don't have the [b]" + features[idFeature].title + "[/b] perk.");
-                            return false;
-                        }
-                        else {
-                            fChatLibInstance.sendMessage("Are you sure you're registered?");
-                            return false;
-                        }
-                    });
-                }
-                else {
-                    fChatLibInstance.sendMessage("This feature has not been found. Check the spelling.");
-                    return false;
-                }
-
+                    else {
+                        fChatLibInstance.sendMessage("Are you sure this user is registered?");
+                        return false;
+                    }
+                });
             }
-            else {
-                fChatLibInstance.sendMessage("You don't have sufficient rights.");
+            else{
+                fChatLibInstance.sendMessage("Correct syntax: !removeFeatures user");
             }
+        }
+        else {
+            fChatLibInstance.sendMessage("You don't have sufficient rights.");
         }
     };
 
@@ -1307,6 +1296,12 @@ function triggerOrgasm(id) {
     var featuresP1 = parseStringToIntArray(currentFighters[(id == 0 ? 1 : 0)].features);
     if (featuresP1.indexOf(5) != -1) { //cum slut
         currentFighters[(id == 0 ? 1 : 0)].lust++;
+    }
+
+    if(holdInPlace()){
+        fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is finally out of the " + currentFight.currentHold.holdName + "!");
+        currentFight.currentHold.turnsLeft = 0;
+        currentFight.currentHold.isInfinite = false;
     }
 
     currentFight.orgasms++;
