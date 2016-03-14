@@ -230,68 +230,68 @@ module.exports = function (parent) {
         }
     };
 
-    cmdHandler.giveCoins = function (args, data) {
-        var arr = args.split(' ');
-        var result = arr.splice(0, 1);
-        result.push(arr.join(' ')); //split the string (with 2 arguments) only in 2 parts (number, character)
-
-        if (result.length == 2 && !isNaN(result[0]) && result[1] != "") {
-            var amount = parseInt(result[0]);
-            if(amount <= 0){
-                fChatLibInstance.sendMessage("Invalid amount");
-                return;
-            }
-            var amountAfterRemove;
-            client.hgetall(data.character, function (err, result) {
-                if (result != null) {
-                    amountAfterRemove = (parseInt(result.coins) - amount);
-                    if(amountAfterRemove >= 0){
-                        result.coins = amountAfterRemove;
-                        client.hgetall(result[1], function (err1, result1) {
-                            if (result1 != null) {
-                                var amountAfter = (parseInt(result.coins) + amount);
-                                if(amountAfter >= 0){
-                                    result1.coins = amountAfter;
-                                    client.hmset(result1.character, result1);
-                                }
-                                else{
-                                    fChatLibInstance.sendMessage("How is this possible?");
-                                }
-                            }
-                            else {
-                                fChatLibInstance.sendMessage("Are you sure this user is registered?");
-                            }
-                        });
-                        client.hmset(data.character, result);
-                    }
-                    else{
-                        fChatLibInstance.sendMessage("You don't have enough chips.");
-                    }
-                }
-                else {
-                    fChatLibInstance.sendMessage("Are you sure this user is registered?");
-                }
-            });
-        }
-    };
-
-    cmdHandler.resetCoins = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
-            client.hgetall(args, function (err, result) {
-                if (result != null) {
-                    result.coins = 100;
-                    client.hmset(newStats.character, result);
-                    fChatLibInstance.sendMessage("Succesfully reseted the coins count!");
-                }
-                else {
-                    fChatLibInstance.sendMessage("Are you sure this user is registered?");
-                }
-            });
-        }
-        else {
-            fChatLibInstance.sendMessage("You don't have sufficient rights.");
-        }
-    };
+    //cmdHandler.giveCoins = function (args, data) {
+    //    var arr = args.split(' ');
+    //    var result = arr.splice(0, 1);
+    //    result.push(arr.join(' ')); //split the string (with 2 arguments) only in 2 parts (number, character)
+    //
+    //    if (result.length == 2 && !isNaN(result[0]) && result[1] != "") {
+    //        var amount = parseInt(result[0]);
+    //        if(amount <= 0){
+    //            fChatLibInstance.sendMessage("Invalid amount");
+    //            return;
+    //        }
+    //        var amountAfterRemove;
+    //        client.hgetall(data.character, function (err, result) {
+    //            if (result != null) {
+    //                amountAfterRemove = (parseInt(result.coins) - amount);
+    //                if(amountAfterRemove >= 0){
+    //                    result.coins = amountAfterRemove;
+    //                    client.hgetall(result[1], function (err1, result1) {
+    //                        if (result1 != null) {
+    //                            var amountAfter = (parseInt(result.coins) + amount);
+    //                            if(amountAfter >= 0){
+    //                                result1.coins = amountAfter;
+    //                                client.hmset(result1.character, result1);
+    //                            }
+    //                            else{
+    //                                fChatLibInstance.sendMessage("How is this possible?");
+    //                            }
+    //                        }
+    //                        else {
+    //                            fChatLibInstance.sendMessage("Are you sure this user is registered?");
+    //                        }
+    //                    });
+    //                    client.hmset(data.character, result);
+    //                }
+    //                else{
+    //                    fChatLibInstance.sendMessage("You don't have enough chips.");
+    //                }
+    //            }
+    //            else {
+    //                fChatLibInstance.sendMessage("Are you sure this user is registered?");
+    //            }
+    //        });
+    //    }
+    //};
+    //
+    //cmdHandler.resetCoins = function (args, data) {
+    //    if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
+    //        client.hgetall(args, function (err, result) {
+    //            if (result != null) {
+    //                result.coins = 100;
+    //                client.hmset(newStats.character, result);
+    //                fChatLibInstance.sendMessage("Succesfully reseted the coins count!");
+    //            }
+    //            else {
+    //                fChatLibInstance.sendMessage("Are you sure this user is registered?");
+    //            }
+    //        });
+    //    }
+    //    else {
+    //        fChatLibInstance.sendMessage("You don't have sufficient rights.");
+    //    }
+    //};
 
     cmdHandler.myStats = function (args, data) {
         client.hgetall(data.character, function (err, result) {
