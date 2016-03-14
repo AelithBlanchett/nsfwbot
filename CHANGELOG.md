@@ -1,4 +1,5 @@
 #Version 0.3.0
+- Added 3 of the 4 classes, for future implementation (the submission class isn't available yet). You can either do !register Brawler or !register 123455 now.
 - Reworked Diving Bulldog, Springboard Bulldog
 - Added three new throws, Tiger Suplex, Choke Slam and Headscissors Takedown
 - Added check for special events, like OnSuccess, OnFailure, and fixed bonuses events
@@ -8,7 +9,6 @@
 - Wrist Lock: changed bonus for 'Increase the Hit dice of any Grapple: Holds technique by +2.'
 - Arm Wrench bonuses: removed Lariat (some moves are still missing)
 - Fixed last turn displaying after the match has ended
-- Added classes, for future implementation
 - Fixed the counter emote. (It doesn't tell you that you need to !roll anymore)
 
 #Version 0.2.1
