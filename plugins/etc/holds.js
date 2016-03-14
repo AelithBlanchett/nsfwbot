@@ -698,8 +698,7 @@ holds.push(
         description: "The wrestler faces his opponent who is bent over. The attacking wrestler tucks the opponent's head underneath his armpit and wraps his arm around the head so that the forearm is pressed against the face. The wrestler then grabs his own arm with his free hand to lock in the hold and compress the opponent's face. Similar in execution to a front chancery, the front facelock is often used as a setup for a suplex throw.",
         damageHP: "0", // Special Attack
         bonusRoll: "2", //  If the opponent is still trapped on your next turn, gain +2 to 'Hit Dice' for any "Grapple: Throw" attack or "Forced Fingering" or Forced Cock Stroking" attacks and a +1 to 'Hit Dice' to all other attacks except for Grapple: Holds
-        // @INCOMPLETE Missing bonus stuff
-        bonusForAttacks: "sexual:2, sexual:5",
+        bonusForAttacks: "sexual:2, sexual:5, sexual:6, holds:all, brawl:11, brawl:13, brawl:19, brawl:20",
         holdType: "special",
         isInfinite: "True",
         stanceRequirements: "supine",
@@ -788,5 +787,9 @@ holds.push(
         stanceRequirements: "supine",
         statRequirements: [{strength: 4, flexibility: 7, dexterity: 3, agility: 7}]
     });
+
+
+
+
 
 module.exports = holds;

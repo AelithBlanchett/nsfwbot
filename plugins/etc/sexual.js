@@ -282,13 +282,43 @@ sexual.push(
         damageLust: 1,
         damageHP: "currentFighter[defender].lust",
         condition: "currentFight[defender].lust == parseInt(currentFight[defender].endurance) - 1", //no sadist feature
-        conditionText: "Opponent must be in ! lust point away from orgasm.",
+        conditionText: "Opponent must be 1 lust point away from orgasm.",
         onSuccess: "",
         onSuccessText: "",
         onFailure: "",
         onFailureText: "",
         isHold: "False",
         statRequirements: [{strength: 5, agility: 5, endurance: 5}]
+    });
+
+sexual.push(
+    {
+        id: 18,
+        title: "Blue-Balls Wedgie",
+        description: "YOINK",
+        damageLust: 1,
+        damageHP: "1",
+        onSuccess: "",
+        onSuccessText: "",
+        onFailure: "",
+        onFailureText: "",
+        isHold: "True",
+        statRequirements: [{strength: 3, dexterity: 3}]
+    });
+
+sexual.push(
+    {
+        id: 18,
+        title: "Camel Toe Clutch",
+        description: "Also called 'a Minerva' apparently! ",
+        damageLust: 1,
+        damageHP: "1",
+        onSuccess: "",
+        onSuccessText: "",
+        onFailure: "",
+        onFailureText: "",
+        isHold: "True",
+        statRequirements: [{strength: 3, dexterity: 3}]
     });
 
 module.exports = sexual;

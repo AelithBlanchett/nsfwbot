@@ -144,7 +144,8 @@ brawl.push(
         title: "Diving Bulldog",
         description: "A bulldog performed from an elevated position to increase the damage done to both wrestlers from the fall.",
         damageHP: "(2*currentFighters[attacker].agility) - currentFighters[defender].toughness",
-        statRequirements: [{dexterity: 3, agility: 4}]
+        hpPenalty: "3",
+        statRequirements: [{dexterity: 3, agility: 7}]
     });
 
 brawl.push(
@@ -153,6 +154,7 @@ brawl.push(
         title: "Springboard Bulldog",
         description: "While applying a facelock, the wrestler springboards off of the bottom rope, leaping into the air to come crashing down onto the mat with the opponent.",
         damageHP: "(2*currentFighters[attacker].agility) - currentFighters[defender].toughness",
+        hpPenalty: "3",
         onMiss: "currentFighters[attacker].dice.addTmpMod(-1)",
         statRequirements: [{dexterity: 4, agility: 6}]
     });
@@ -164,6 +166,79 @@ brawl.push(
         description: "This is a maneuver in which a wrestler jumps onto his opponent and lands horizontally across the opponent's torso, forcing them to the mat.",
         damageHP: "currentFighters[attacker].agility - currentFighters[defender].toughness",
         statRequirements: [{toughness: 2, agility: 2}]
+    });
+
+brawl.push(
+    {
+            id: 15,
+            title: "Knife Edge Chop",
+            description: "A swift chop with the edge of the palm!",
+            damageHP: "currentFighters[attacker].dexterity - currentFighters[defender].toughness",
+            bonusRoll: "1",
+            bonusForAttacks: "brawl:all",
+            statRequirements: [{strength: 1, dexterity: 3}]
+    });
+
+brawl.push(
+    {
+            id: 16,
+            title: "Pressure Point Penetration",
+            description: "A vicious poke in a sensitive spot to prepare the body for pain or pleasure.",
+            damageHP: "1",
+            bonusRoll: "1",
+            bonusForAttacks: "brawl:all",
+            statRequirements: [{dexterity: 4}]
+    });
+
+brawl.push(
+    {
+        id: 17,
+        title: "Senton Bomb",
+        description: "The attacking wrestler executes a quick front somersault off the top turnbuckle, before landing on the opponent back-first. It can also be performed from a standing position.",
+        damageHP: "(3*currentFighters[attacker].agility) - currentFighters[defender].toughness",
+        hpPenalty: "currentFighters[defender].toughness",
+        onFailure: "currentFighters[attacker].hp -= currentFighters[attacker].agility",
+        onFailureText: "That miss has apparently hurt quite much!",
+        statRequirements: [{toughness: 4, agility: 8}]
+    });
+
+brawl.push(
+    {
+        id: 18,
+        title: "Drop Kick",
+        description: "A swift kick.",
+        damageHP: "currentFighters[attacker].agility - currentFighters[defender].toughness",
+        onFailure: "currentFighters[defender].dice.addTmpMod(2)",
+        onFailureText: "That miss has given the defender a small advantage!",
+        statRequirements: [{strength: 3, agility: 3}]
+    });
+
+/// Throws
+
+brawl.push(
+    {
+        id: 19,
+        title: "Choke Slam",
+        description: "A chokeslam is any body slam in which the wrestler grasps his/her opponent's neck, lifts him/her up, and slams him/her to the mat, causing him/her to land on his/her back.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness",
+        onSuccess: "currentFighters[defender].dice.addTmpMod(-1); releaseHold();",
+        onSuccessText: "What a slam! The defender looks exhausted!",
+        onFailure: "releaseHold();",
+        onFailureText: "The slam didn't hit, but the defender is now out of the hold!",
+        statRequirements: [{strength: 8, dexterity: 3}]
+    });
+
+brawl.push(
+    {
+        id: 20,
+        title: "Headscissors Takedown",
+        description: "A chokeslam is any body slam in which the wrestler grasps his/her opponent's neck, lifts him/her up, and slams him/her to the mat, causing him/her to land on his/her back.",
+        damageHP: "currentFighters[attacker].agility * 2 - currentFighters[defender].toughness",
+        onSuccess: "currentFighters[defender].dice.addTmpMod(-2); releaseHold();",
+        onSuccessText: "What a takedown! The defender looks exhausted, but they're not blocked in the hold anymore!",
+        onFailure: "releaseHold();",
+        onFailureText: "The takedown didn't hit, but the defender is now out of the hold!",
+        statRequirements: [{strength: 4, dexterity: 7}]
     });
 
 module.exports = brawl;

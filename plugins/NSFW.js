@@ -568,6 +568,9 @@ module.exports = function (parent) {
     };
     cmdHandler.hit = cmdHandler.brawl;
     cmdHandler.b = cmdHandler.brawl;
+    cmdHandler.throw = cmdHandler.brawl;
+    cmdHandler.t = cmdHandler.brawl;
+    cmdHandler.throws = cmdHandler.brawl;
 
     cmdHandler.sexual = function (args, data) {
         if (args.length > 0) {
