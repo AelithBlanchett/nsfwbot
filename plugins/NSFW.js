@@ -32,44 +32,44 @@ module.exports = function (parent) {
     //    console.log(didYouMean(args,sexual,"title"));
     //};
     //
-    cmdHandler.win = function(){ //debug
-        if(debug){
-            currentFighters[currentFight.whoseturn].dice.addTmpMod(100,1);
-        }
-    };
-
-    cmdHandler.lose = function(){ //debug
-        if(debug){
-            currentFighters[currentFight.whoseturn].dice.addTmpMod(-100,1);
-        }
-    };
+    //cmdHandler.win = function(){ //debug
+    //    if(debug){
+    //        currentFighters[currentFight.whoseturn].dice.addTmpMod(100,1);
+    //    }
+    //};
     //
-    cmdHandler.dbg = function(args,data){
-        client.hgetall('Lustful Aelith', function (err, result) {
-            if (result != null) {
-                result.hp = parseInt(result.maxHp);
-                result.stamina = parseInt(result.maxStamina);
-                result.lust = 0;
-                result.orgasms = 0;
-                currentFighters[0] = result;
-                currentFighters[0].dice = new Dice(10);
-                //fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
-                client.hgetall("Bondage Wrestling", function (err, result2) {
-                    if (result2 != null) {
-                        result2.hp = parseInt(result2.maxHp);
-                        result2.stamina = parseInt(result2.maxStamina);
-                        result2.lust = 0;
-                        result2.orgasms = 0;
-                        currentFighters[1] = result2;
-                        currentFighters[1].dice = new Dice(10);
-                        //fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
-                        startFight();
-                    }
-                });
-            }
-        });
-
-    }
+    //cmdHandler.lose = function(){ //debug
+    //    if(debug){
+    //        currentFighters[currentFight.whoseturn].dice.addTmpMod(-100,1);
+    //    }
+    //};
+    ////
+    //cmdHandler.dbg = function(args,data){
+    //    client.hgetall('Lustful Aelith', function (err, result) {
+    //        if (result != null) {
+    //            result.hp = parseInt(result.maxHp);
+    //            result.stamina = parseInt(result.maxStamina);
+    //            result.lust = 0;
+    //            result.orgasms = 0;
+    //            currentFighters[0] = result;
+    //            currentFighters[0].dice = new Dice(10);
+    //            //fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
+    //            client.hgetall("Bondage Wrestling", function (err, result2) {
+    //                if (result2 != null) {
+    //                    result2.hp = parseInt(result2.maxHp);
+    //                    result2.stamina = parseInt(result2.maxStamina);
+    //                    result2.lust = 0;
+    //                    result2.orgasms = 0;
+    //                    currentFighters[1] = result2;
+    //                    currentFighters[1].dice = new Dice(10);
+    //                    //fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
+    //                    startFight();
+    //                }
+    //            });
+    //        }
+    //    });
+    //
+    //}
 
     cmdHandler.register = function (args, data) {
         if (isNaN(args)) {
@@ -979,7 +979,7 @@ function checkRollWinner() {
         }
         currentFight.skipRoll = false;
         currentFight.whoseturn = (currentFight.whoseturn == 0 ? 1 : 0);
-        fChatLibInstance.sendMessage("[i][b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "[/b] got a free roll (but the roll was made in case you wanted it), and it's now [b]" + currentFighters[currentFight.whoseturn].character + "[/b]'s turn to emote their reaction/attack.[/i]");
+        fChatLibInstance.sendMessage("[i][b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "[/b] got a free roll and it's now [b]" + currentFighters[currentFight.whoseturn].character + "[/b]'s turn to emote their reaction/attack.[/i]");
         nextTurn();
         return;
     }
@@ -1101,10 +1101,14 @@ function failHandler(stringType, id) {
             break;
     }
 
+    var attacker = currentFight.whoseturn;
+    var defender = (currentFight.whoseturn == 0 ? 1 : 0);
+
     if (type[id].onFailure != undefined) {
         eval(type[id].onFailure);
-        if(type[id].onFailureText != undefined && type[id].onFailureText != "")
-        fChatLibInstance.sendMessage(type[id].onFailureText);
+        if(type[id].onFailureText != undefined && type[id].onFailureText != ""){
+            fChatLibInstance.sendMessage(type[id].onFailureText);
+        }
     }
 }
 
