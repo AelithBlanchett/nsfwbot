@@ -221,9 +221,9 @@ brawl.push(
         title: "Choke Slam",
         description: "A chokeslam is any body slam in which the wrestler grasps his/her opponent's neck, lifts him/her up, and slams him/her to the mat, causing him/her to land on his/her back.",
         damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness",
-        onSuccess: "currentFighters[defender].dice.addTmpMod(-1); releaseHold();",
+        onSuccess: "currentFighters[defender].dice.addTmpMod(-1); if(holdInPlace()){releaseHold();}",
         onSuccessText: "What a slam! The defender looks exhausted!",
-        onFailure: "releaseHold();",
+        onFailure: "if(holdInPlace()){releaseHold();}",
         onFailureText: "The slam didn't hit, but the defender is now out of the hold!",
         statRequirements: [{strength: 8, dexterity: 3}]
     });
@@ -234,9 +234,9 @@ brawl.push(
         title: "Headscissors Takedown",
         description: "A chokeslam is any body slam in which the wrestler grasps his/her opponent's neck, lifts him/her up, and slams him/her to the mat, causing him/her to land on his/her back.",
         damageHP: "currentFighters[attacker].agility * 2 - currentFighters[defender].toughness",
-        onSuccess: "currentFighters[defender].dice.addTmpMod(-2); releaseHold();",
+        onSuccess: "currentFighters[defender].dice.addTmpMod(-2); if(holdInPlace()){releaseHold();}",
         onSuccessText: "What a takedown! The defender looks exhausted, but they're not blocked in the hold anymore!",
-        onFailure: "releaseHold();",
+        onFailure: "if(holdInPlace()){releaseHold();}",
         onFailureText: "The takedown didn't hit, but the defender is now out of the hold!",
         statRequirements: [{strength: 4, dexterity: 7}]
     });
@@ -246,8 +246,8 @@ brawl.push(
         id: 21,
         title: "Tiger Suplex",
         description: "",
-        condition: "isInHold(defender) && currentFight.currentHold.type == 'holds' && currentFight.currentHold.id == 7",
-        conditionText: "Opponent must be in the Double Chicken Wing hold.",
+        conditions: "isInHold(defender) && currentFight.currentHold != null && currentFight.currentHold.type == 'holds' && currentFight.currentHold.id == 7",
+        conditionsText: "Opponent must be in the Double Chicken Wing hold.",
         damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness",
         statRequirements: [{strength: 6, dexterity: 4, agility: 4, flexibility: 4}]
     });

@@ -9,6 +9,7 @@
 - Arm Wrench bonuses: removed Lariat (some moves are still missing)
 - Fixed last turn displaying after the match has ended
 - Added classes, for future implementation
+- Fixed the counter emote. (It doesn't tell you that you need to !roll anymore)
 
 #Version 0.2.1
 - Corrected some dice modificators not being correctly parsed
