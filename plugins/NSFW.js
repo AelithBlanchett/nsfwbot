@@ -89,6 +89,9 @@ module.exports = function (parent) {
                             statsObj.endurance = parseInt(classes[idClass].stats.endurance);
                             statsObj.maxHp = parseInt(classes[idClass].stats.toughness) * 5;
                             statsObj.maxStamina = parseInt(classes[idClass].stats.endurance) * 5;
+                            statsObj.wins = 0;
+                            statsObj.losses = 0;
+                            statsObj.coins = 100;
                             var currentFeatures = parseStringToIntArray("");
                             currentFeatures.push(classes[idClass].stats.feature);
                             statsObj.features = currentFeatures.toString();
@@ -128,6 +131,9 @@ module.exports = function (parent) {
                         statsObj.endurance = parseInt(args[5]);
                         statsObj.maxHp = parseInt(args[1]) * 5;
                         statsObj.maxStamina = parseInt(args[5]) * 5;
+                        statsObj.wins = 0;
+                        statsObj.losses = 0;
+                        statsObj.coins = 100;
                         statsObj.features = "";
                         client.hmset(data.character, statsObj);
                         fChatLibInstance.sendMessage("You've been successfully registered in the list " + data.character);
@@ -224,18 +230,82 @@ module.exports = function (parent) {
         }
     };
 
+    cmdHandler.giveCoins = function (args, data) {
+        var arr = args.split(' ');
+        var result = arr.splice(0, 1);
+        result.push(arr.join(' ')); //split the string (with 2 arguments) only in 2 parts (number, character)
+
+        if (result.length == 2 && !isNaN(result[0]) && result[1] != "") {
+            var amount = parseInt(result[0]);
+            if(amount <= 0){
+                fChatLibInstance.sendMessage("Invalid amount");
+                return;
+            }
+            var amountAfterRemove;
+            client.hgetall(data.character, function (err, result) {
+                if (result != null) {
+                    amountAfterRemove = (parseInt(result.coins) - amount);
+                    if(amountAfterRemove >= 0){
+                        result.coins = amountAfterRemove;
+                        client.hgetall(result[1], function (err1, result1) {
+                            if (result1 != null) {
+                                var amountAfter = (parseInt(result.coins) + amount);
+                                if(amountAfter >= 0){
+                                    result1.coins = amountAfter;
+                                    client.hmset(result1.character, result1);
+                                }
+                                else{
+                                    fChatLibInstance.sendMessage("How is this possible?");
+                                }
+                            }
+                            else {
+                                fChatLibInstance.sendMessage("Are you sure this user is registered?");
+                            }
+                        });
+                        client.hmset(data.character, result);
+                    }
+                    else{
+                        fChatLibInstance.sendMessage("You don't have enough chips.");
+                    }
+                }
+                else {
+                    fChatLibInstance.sendMessage("Are you sure this user is registered?");
+                }
+            });
+        }
+    };
+
+    cmdHandler.resetCoins = function (args, data) {
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
+            client.hgetall(args, function (err, result) {
+                if (result != null) {
+                    result.coins = 100;
+                    client.hmset(newStats.character, result);
+                    fChatLibInstance.sendMessage("Succesfully reseted the coins count!");
+                }
+                else {
+                    fChatLibInstance.sendMessage("Are you sure this user is registered?");
+                }
+            });
+        }
+        else {
+            fChatLibInstance.sendMessage("You don't have sufficient rights.");
+        }
+    };
+
     cmdHandler.myStats = function (args, data) {
         client.hgetall(data.character, function (err, result) {
             if (result != null) {
                 var stats = result; //Health is (Toughness x 5) while Stamina is (Endurance x 5)
                 var wins = stats.wins || 0;
                 var losses = stats.losses || 0;
+                var coins = stats.coins || 0;
                 fChatLibInstance.sendMessage("[b]" + stats.character + "[/b]'s stats" + "\n" +
                     "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
                     "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n" +
                     "[i][color=green]Dexterity[/color][/i]:  " + stats.dexterity + "\n" +
                     "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + wins + " - " + losses + "\n" +
-                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" +
+                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" + "      " + "[b][color=orange]Coins[/color][/b]: " + coins + "\n" +
                     "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
             }
@@ -391,12 +461,13 @@ module.exports = function (parent) {
                 var stats = result; //Health is (Toughness x 5) while Stamina is (Endurance x 5)
                 var wins = stats.wins || 0;
                 var losses = stats.losses || 0;
+                var coins = stats.coins || 0;
                 fChatLibInstance.sendMessage("[b]" + stats.character + "[/b]'s stats" + "\n" +
                     "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
                     "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n" +
                     "[i][color=green]Dexterity[/color][/i]:  " + stats.dexterity + "\n" +
                     "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + wins + " - " + losses + "\n" +
-                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" +
+                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" + "      " + "[b][color=orange]Coins[/color][/b]: " + coins + "\n" +
                     "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
             }
