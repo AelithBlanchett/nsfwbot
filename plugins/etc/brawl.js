@@ -25,7 +25,7 @@ brawl.push(
         title: "Kick",
         description: "A swift kick!",
         damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User Strength's - Target's Toughness)
-        onMiss: "currentFighters[defender].dice.addTmpMod(1)",
+        onFailure: "currentFighters[defender].dice.addTmpMod(1)",
         statRequirements: [{strength: 1}, {agility: 1}, {flexibility: 1}]
     });
 
@@ -49,7 +49,7 @@ brawl.push(
         title: "Arm-Twist Rope walk Chop",
         description: "The wrestler takes hold of one of the opponent's wrists and twists that arm in an arm wrench. The wrestler then climbs up the corner turnbuckles and walks on the top rope, before jumping down and striking the opponent's chest, back or the back of their neck.",
         damageHP: "currentFighters[attacker].agility - currentFighters[defender].flexibility",
-        onMiss: "currentFighters[attacker].dice.addTmpMod(-1)",
+        onFailure: "currentFighters[attacker].dice.addTmpMod(-1)",
         statRequirements: [{agility: 3, dexterity: 3}]
     });
 
@@ -59,7 +59,7 @@ brawl.push(
         title: "Diamond Dust",
         description: "This move involves the attacking wrestler standing on a platform (i.e. the second turnbuckle, or sitting on the top turnbuckle) and facing the back of a standing opponent while applying an inverted facelock. From this position the attacking wrestler leaps forward, somersaulting, to roll the inverted facelock into a three-quarter facelock, as they fall the wrestler drops to a seated position and driving the opponent's jaw into their shoulder for a jawbreaker, or, the wrestler falls back-first forcing the opponent's face into the mat/shoulder for the bulldog.",
         damageHP: "(2*currentFighters[attacker].agility) - currentFighters[defender].toughness",
-        onMiss: "currentFighters[attacker].dice.addTmpMod(-1)",
+        onFailure: "currentFighters[attacker].dice.addTmpMod(-1)",
         statRequirements: [{agility: 6, dexterity: 2}]
     });
 
@@ -69,7 +69,7 @@ brawl.push(
         title: "Diving Elbow Drop",
         description: "A diving elbow drop is executed by diving onto a supine opponent with one's elbow cocked, driving the elbow into the opponent's shoulder, chest, or head.",
         damageHP: "currentFighters[attacker].agility - currentFighters[defender].toughness",
-        onMiss: "currentFighters[attacker].dice.addTmpMod(-1)",
+        onFailure: "currentFighters[attacker].dice.addTmpMod(-1)",
         statRequirements: [{agility: 4, dexterity: 4}]
     });
 
@@ -79,7 +79,7 @@ brawl.push(
         title: "Diving Stomp",
         description: "A diving elbow drop is executed by diving onto a supine opponent with one's elbow cocked, driving the elbow into the opponent's shoulder, chest, or head.",
         damageHP: "currentFighters[attacker].agility - currentFighters[defender].toughness",
-        onMiss: "currentFighters[attacker].dice.addTmpMod(-1)",
+        onFailure: "currentFighters[attacker].dice.addTmpMod(-1)",
         statRequirements: [{agility: 5}]
     });
 
@@ -89,7 +89,7 @@ brawl.push(
         title: "Mushroom Stomp ",
         description: "While situated on the middle rope of a turnbuckle, a wrestler jumps over a charging opponent and drives his feet into the opponent's back in order to push him into the turnbuckle or the ground with greater force, before landing on his feet.",
         damageHP: "(2*currentFighters[attacker].agility) - currentFighters[defender].toughness",
-        onMiss: "currentFighters[attacker].dice.addTmpMod(-1)",
+        onFailure: "currentFighters[attacker].dice.addTmpMod(-1)",
         statRequirements: [{agility: 5}]
     });
 
@@ -113,7 +113,7 @@ brawl.push(
         title: "Flying Spinning Back Kick",
         description: "A move in which the wrestler will jump from an elevated position (usually the top turnbuckle) and strike a standing opponent with spinning heel kick in mid-air.",
         damageHP: "(currentFighters[attacker].agility > currentFighters[defender].agility ? (currentFighters[attacker].strength - currentFighters[defender].toughness) : (2*currentFighters[attacker].strength - currentFighters[defender].toughness))",
-        onMiss: "currentFighters[attacker].dice.addTmpMod(-1)",
+        onFailure: "currentFighters[attacker].dice.addTmpMod(-1)",
         statRequirements: [{strength: 4, agility: 6}]
     });
 
@@ -155,7 +155,7 @@ brawl.push(
         description: "While applying a facelock, the wrestler springboards off of the bottom rope, leaping into the air to come crashing down onto the mat with the opponent.",
         damageHP: "(2*currentFighters[attacker].agility) - currentFighters[defender].toughness",
         hpPenalty: "3",
-        onMiss: "currentFighters[attacker].dice.addTmpMod(-1)",
+        onFailure: "currentFighters[attacker].dice.addTmpMod(-1)",
         statRequirements: [{dexterity: 4, agility: 6}]
     });
 

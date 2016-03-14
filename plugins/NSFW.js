@@ -954,7 +954,7 @@ function checkDiceRollWinner(idWinner) {
 
 function missHandler(idPlayer) {
     fChatLibInstance.sendMessage("[i][b]" + currentFighters[idPlayer].character + "[/b] missed their attack![/i]");
-    if (currentFight.actionTaken == "sexual" || currentFight.actionTaken == "brawl") {
+    if (currentFight.actionTaken == "sexual" || currentFight.actionTaken == "brawl" || currentFight.actionTaken == "hold") {
         failHandler(currentFight.actionTaken, currentFight.actionId);
     }
     if (currentFight.actionTaken == "escape") {
@@ -979,9 +979,10 @@ function failHandler(stringType, id) {
             break;
     }
 
-    if (type[id].penalty != undefined) {
-        eval(type[id].penalty);
-        fChatLibInstance.sendMessage(type[id].penaltyText);
+    if (type[id].onFailure != undefined) {
+        eval(type[id].onFailure);
+        if(type[id].onFailureText != undefined && type[id].onFailureText != "")
+        fChatLibInstance.sendMessage(type[id].onFailureText);
     }
 }
 
@@ -1078,6 +1079,14 @@ function holdHandler(id, type) {
         }
         //fChatLibInstance.sendMessage("Hold established: "+JSON.stringify(currentFight.currentHold));
         strAttack += " applied " + type[id].title;
+
+
+        if (type[id].onSuccess != undefined) {
+            eval(type[id].onSuccess);
+            if(type[id].onSuccessText != undefined && type[id].onSuccessText != "")
+                strAttack += "\n"+type[id].onSuccessText;
+        }
+
         fChatLibInstance.sendMessage(strAttack);
     }
 }
@@ -1098,7 +1107,12 @@ function brawlOrSexualGateway(stringType, id) {
             break;
     }
 
-    attackHandler(type[id].damageHP, type[id].damageLust, type[id].hpPenalty, type[id].lustPenalty)
+    attackHandler(type[id].damageHP, type[id].damageLust, type[id].hpPenalty, type[id].lustPenalty);
+    if (type[id].onSuccess != undefined) {
+        eval(type[id].onSuccess);
+        if(type[id].onSuccessText != undefined && type[id].onSuccessText != "")
+            fChatLibInstance.sendMessage(type[id].onSuccessText);
+    }
 }
 
 function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, defender) {
@@ -1212,7 +1226,6 @@ function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, d
         }
         strAttack += " in the process!";
     }
-
 
     fChatLibInstance.sendMessage(strAttack);
 
