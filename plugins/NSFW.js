@@ -305,7 +305,7 @@ module.exports = function (parent) {
                     "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n" +
                     "[i][color=green]Dexterity[/color][/i]:  " + stats.dexterity + "\n" +
                     "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + wins + " - " + losses + "\n" +
-                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" + "      " + "[b][color=orange]Coins[/color][/b]: " + coins + "\n" +
+                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" + /* "      " + "[b][color=orange]Coins[/color][/b]: " + coins + "\n" + */
                     "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
             }
@@ -467,7 +467,7 @@ module.exports = function (parent) {
                     "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n" +
                     "[i][color=green]Dexterity[/color][/i]:  " + stats.dexterity + "\n" +
                     "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + wins + " - " + losses + "\n" +
-                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" + "      " + "[b][color=orange]Coins[/color][/b]: " + coins + "\n" +
+                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" + /* "      " + "[b][color=orange]Coins[/color][/b]: " + coins + "\n" + */
                     "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
             }
