@@ -761,7 +761,7 @@ function getAttackInfo(result, type, id) {
             type = hold
         }
         if (type[currentFight.currentHold.holdId].bonusForAttacks != undefined && type[currentFight.currentHold.holdId].bonusRoll != undefined) {
-            if (!isNaN(type[currentFight.currentHold.holdId].bonusRoll) && type[currentFight.currentHold.holdId].bonusForAttacks.indexOf(type + ":" + currentFight.actionId) != -1) {
+            if (!isNaN(type[currentFight.currentHold.holdId].bonusRoll) && (type[currentFight.currentHold.holdId].bonusForAttacks.indexOf(type + ":" + currentFight.actionId) != -1 || type[currentFight.currentHold.holdId].bonusForAttacks.indexOf(type + ":all") != -1)) {
                 currentFighters[currentFight.whoseturn].dice.addTmpMod(parseInt(type[currentFight.currentHold.holdId].bonusRoll));
                 fChatLibInstance.sendMessage("Added " + type[currentFight.currentHold.holdId].bonusRoll + " to the dice, since the last hold buffs this attack.")
             }
