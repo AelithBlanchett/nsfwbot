@@ -8,7 +8,7 @@
 - Wrist Lock: changed bonus for 'Increase the Hit dice of any Grapple: Holds technique by +2.'
 - Arm Wrench bonuses: removed Lariat (some moves are still missing)
 - Fixed last turn displaying after the match has ended
-
+- Added classes, for future implementation
 
 #Version 0.2.1
 - Corrected some dice modificators not being correctly parsed

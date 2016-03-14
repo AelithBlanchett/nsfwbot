@@ -74,7 +74,35 @@ module.exports = function (parent) {
     cmdHandler.register = function (args, data) {
         if (args.length == 6) {
             if (isNaN(args)) {
-                fChatLibInstance.sendMessage("This is not a valid number, please try again.");
+                var idClass = findItemIdByTitle(classes, args);
+                if (idClass != -1) {
+                    client.hexists(data.character, "character", function (err, reply) {
+                        if (reply == 0) {
+                            var statsObj = {};
+                            statsObj.character = data.character;
+                            statsObj.stats = classes[idClass].stats;
+                            statsObj.strength = parseInt(classes[idClass].stats.strength);
+                            statsObj.toughness = parseInt(classes[idClass].stats.toughness);
+                            statsObj.dexterity = parseInt(classes[idClass].stats.dexterity);
+                            statsObj.agility = parseInt(classes[idClass].stats.agility);
+                            statsObj.flexibility = parseInt(classes[idClass].stats.flexibility);
+                            statsObj.endurance = parseInt(classes[idClass].stats.endurance);
+                            statsObj.maxHp = parseInt(classes[idClass].stats.toughness) * 5;
+                            statsObj.maxStamina = parseInt(classes[idClass].stats.endurance) * 5;
+                            var currentFeatures = parseStringToIntArray("");
+                            currentFeatures.push(classes[idClass].stats.feature);
+                            statsObj.features = currentFeatures.toString();
+                            client.hmset(data.character, statsObj);
+                            fChatLibInstance.sendMessage("You've been successfully registered in the list as a " + classes[idClass].title + " "  + data.character);
+                        }
+                        else {
+                            fChatLibInstance.sendMessage("You're already registered " + data.character);
+                        }
+                    });
+                }
+                else{
+                    fChatLibInstance.sendMessage("This is not a valid class name, please try again.");
+                }
             }
             else
             {
@@ -111,7 +139,7 @@ module.exports = function (parent) {
             }
         }
         else {
-            fChatLibInstance.sendMessage("The arguments aren't valid.\nExample: '!register 123455' with 1 being your Strength, 2 your toughness, etc., with 20 points distributed over all.");
+            fChatLibInstance.sendMessage("The arguments aren't valid.\nExample: '!register 123455' with 1 being your Strength, 2 your toughness, etc., with 20 points distributed over all.\nYou can also choose a class, like '!register Brawler'");
         }
     };
 
@@ -696,6 +724,8 @@ var sextoys = require(__dirname + '/etc/sextoys.js');
 var brawl = require(__dirname + '/etc/brawl.js');
 var sexual = require(__dirname + '/etc/sexual.js');
 var hold = require(__dirname + '/etc/holds.js');
+var classes = require(__dirname + '/etc/classes.js');
+
 var currentFighters = [];
 var currentFight = {turn: -1, whoseturn: -1, isInit: false, orgasms: 0, staminaPenalty: 5, winner: -1, currentHold: {}};
 var diceResults = {first: -1, second: -1};
