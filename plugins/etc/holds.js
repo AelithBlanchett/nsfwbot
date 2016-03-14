@@ -49,7 +49,7 @@ holds.push(
         description: "The wrestler takes hold of the opponent's arm or wrist and turns around completely while twisting the arm over the wrestler's head, resulting in the opponent's arm being wrenched.",
         damageHP: "0", //(0 Bonus on follow ups)
         bonusRoll: "1",
-        bonusForAttacks: "holds:1, brawl:3", // Arm Bar, Arm-Twist Rope walk chop, Fireman's Carry, Irish Whip, Lariat @INCOMPLETE
+        bonusForAttacks: "brawl:3", // Arm Bar, Arm-Twist Rope walk chop, Fireman's Carry, Irish Whip, Lariat @INCOMPLETE
         holdType: "special",
         isInfinite: "True",
         stanceRequirements: "supine",
@@ -201,7 +201,7 @@ holds.push(
         description: "the wrestler grasps the opponent's hand and twists backwards, placing pressure on the wrist. While this can inflict pain on its own, it is most often used as a transition hold. ",
         damageHP: "0", // Special Attack
         bonusRoll: "2",
-        bonusForAttacks: "holds:1, holds:2, holds:3, holds:4, holds:5, holds:6, holds:7, holds:8, holds:9, holds:10, holds:11, holds:12, holds:13 ,holds:14", // ALL Arm Lock holds
+        bonusForAttacks: "holds:all", // ALL holds
         holdType: "special",
         isInfinite: "True",
         stanceRequirements: "supine",
@@ -476,6 +476,8 @@ holds.push(
         title: "Head Scissors",
         description: "This hold sees a wrestler approach a supine opponent and sit next to them before turning onto their side towards the opponent and wrapping their legs around either side of the opponent's head, crossing the top leg after it has gone around the opponent's chin. The wrestler then tightens his grip to choke an opponent by compressing their throat. ",
         damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's toughness)
+        bonusRoll: "2", //  Increase the Hit Dice of Pile Driver and Power Bomb by +2.
+        bonusForAttacks: "brawl:20",
         holdType: "strength",
         maxTurns: "3",
         stanceRequirements: "supine",
@@ -489,7 +491,7 @@ holds.push(
         description: "The wrestler tucks a bent over opponent's head in between his legs or thighs.",
         damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User's Strength - Target's toughness)
         bonusRoll: "2", //  Increase the Hit Dice of Pile Driver and Power Bomb by +2. 
-        bonusForAttacks: "", // @INCOMPLETE
+        bonusForAttacks: "brawl:20", // @INCOMPLETE
         holdType: "strength",
         maxTurns: "3",
         stanceRequirements: "supine",
@@ -627,6 +629,8 @@ holds.push(
         holdType: "special",
         // @INCOMPLETE Missing the dice reduction 
         maxTurns: "1",
+        onSuccess: "if(currentFighters[defender].dexterity > 1){currentFighters[defender].dexterity--;}",
+        onSuccessText: "That move looked painful! Is their shoulder even able to move? The defender's dexterity has been reduced by one.",
         stanceRequirements: "supine",
         statRequirements: [{strength: 6, endurance: 3}]
     });

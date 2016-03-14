@@ -61,7 +61,7 @@ features.push(
 
 features.push(
     {
-        id: 8,
+        id: 6,
         title: "Sub-Space",
         description: "You are easily brought to your knees by a domineering presence! Characters who have the \"Imposing Dominance\" Feature cause your character to suffer a -2 to all their rolls.",
         incompatibility: 1

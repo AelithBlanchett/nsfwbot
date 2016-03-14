@@ -1,3 +1,15 @@
+#Version 0.3.0
+- Reworked Diving Bulldog, Springboard Bulldog
+- Added three new throws, Tiger Suplex, Choke Slam and Headscissors Takedown
+- Added check for special events, like OnSuccess, OnFailure, and fixed bonuses events
+- Added four brawl moves, Knife Edge Chop, Pressure Point Penetration, Senton Bomb and Drop Kick
+- Added two sexual moves, Blue-Balls Wedgie and Camel Toe Clutch
+- Minimum damage for all holds is set to one
+- Wrist Lock: changed bonus for 'Increase the Hit dice of any Grapple: Holds technique by +2.'
+- Arm Wrench bonuses: removed Lariat (some moves are still missing)
+- Fixed last turn displaying after the match has ended
+
+
 #Version 0.2.1
 - Corrected some dice modificators not being correctly parsed
 - If the move is supposed to do damage but the calculation of stats is <= 0, it will at least do 1 damage (like [attacker].strength - [defender].flexibility )

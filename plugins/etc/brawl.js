@@ -241,4 +241,15 @@ brawl.push(
         statRequirements: [{strength: 4, dexterity: 7}]
     });
 
+brawl.push(
+    {
+        id: 21,
+        title: "Tiger Suplex",
+        description: "",
+        condition: "isInHold(defender) && currentFight.currentHold.type == 'holds' && currentFight.currentHold.id == 7",
+        conditionText: "Opponent must be in the Double Chicken Wing hold.",
+        damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness",
+        statRequirements: [{strength: 6, dexterity: 4, agility: 4, flexibility: 4}]
+    });
+
 module.exports = brawl;

@@ -807,11 +807,11 @@ function checkFeaturesInit() {
 
     var dominated = -1;
 
-    if (featuresP0.indexOf(1) != -1 && featuresP1.indexOf(8) != -1) { //P1 is dom, P2 sub
+    if (featuresP0.indexOf(1) != -1 && featuresP1.indexOf(6) != -1) { //P1 is dom, P2 sub
         currentFighters[1].dice.addMod(parseInt(-2));
         dominated = 1;
     }
-    if (featuresP0.indexOf(8) != -1 && featuresP1.indexOf(1) != -1) { //P2 is dom, P1 sub
+    if (featuresP0.indexOf(6) != -1 && featuresP1.indexOf(1) != -1) { //P2 is dom, P1 sub, check the correct Index in features
         currentFighters[0].dice.addMod(parseInt(-2));
         dominated = 0;
     }
@@ -1251,7 +1251,9 @@ function nextTurn() {
     //    checkLifePoints();
     //}
 
-    broadcastCombatInfo();
+    if(currentFight.winner == -1){
+        broadcastCombatInfo();
+    }
 }
 
 function tickHold() {
