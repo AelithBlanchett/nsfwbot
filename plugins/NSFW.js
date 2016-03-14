@@ -751,19 +751,32 @@ function getAttackInfo(result, type, id) {
     }
 
 
+    var bonusCounted = false;
 
+    //bonus for holds
     if (holdInPlace()) {
-        var type;
+        var typeHold;
         if(currentFight.currentHold.type == "sexual"){
-            type = sexual;
+            typeHold = sexual;
         }
         else{
-            type = hold
+            typeHold = hold
         }
+        if (typeHold[currentFight.currentHold.holdId].bonusForAttacks != undefined && typeHold[currentFight.currentHold.holdId].bonusRoll != undefined) {
+            if (!isNaN(type[currentFight.currentHold.holdId].bonusRoll) && (typeHold[currentFight.currentHold.holdId].bonusForAttacks.indexOf(strType + ":" + currentFight.actionId) != -1 || typeHold[currentFight.currentHold.holdId].bonusForAttacks.indexOf(strType + ":all") != -1)) {
+                currentFighters[currentFight.whoseturn].dice.addTmpMod(parseInt(typeHold[currentFight.currentHold.holdId].bonusRoll));
+                fChatLibInstance.sendMessage("Added " + typeHold[currentFight.currentHold.holdId].bonusRoll + " to the dice, since the last hold buffs this attack.");
+                bonusCounted = true;
+            }
+        }
+    }
+
+    //bonus for moves
+    if(!bonusCounted) {
         if (type[currentFight.currentHold.holdId].bonusForAttacks != undefined && type[currentFight.currentHold.holdId].bonusRoll != undefined) {
-            if (!isNaN(type[currentFight.currentHold.holdId].bonusRoll) && (type[currentFight.currentHold.holdId].bonusForAttacks.indexOf(type + ":" + currentFight.actionId) != -1 || type[currentFight.currentHold.holdId].bonusForAttacks.indexOf(type + ":all") != -1)) {
+            if (!isNaN(type[currentFight.currentHold.holdId].bonusRoll) && (type[currentFight.currentHold.holdId].bonusForAttacks.indexOf(strType + ":" + currentFight.actionId) != -1 || type[currentFight.currentHold.holdId].bonusForAttacks.indexOf(strType + ":all") != -1)) {
                 currentFighters[currentFight.whoseturn].dice.addTmpMod(parseInt(type[currentFight.currentHold.holdId].bonusRoll));
-                fChatLibInstance.sendMessage("Added " + type[currentFight.currentHold.holdId].bonusRoll + " to the dice, since the last hold buffs this attack.")
+                fChatLibInstance.sendMessage("Added " + type[currentFight.currentHold.holdId].bonusRoll + " to the dice, since the last attack buffs this one.")
             }
         }
     }
