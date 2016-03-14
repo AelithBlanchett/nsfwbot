@@ -200,11 +200,13 @@ module.exports = function (parent) {
         client.hgetall(data.character, function (err, result) {
             if (result != null) {
                 var stats = result; //Health is (Toughness x 5) while Stamina is (Endurance x 5)
+                var wins = stats.wins || 0;
+                var losses = stats.losses || 0;
                 fChatLibInstance.sendMessage("[b]" + stats.character + "[/b]'s stats" + "\n" +
                     "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
                     "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n" +
                     "[i][color=green]Dexterity[/color][/i]:  " + stats.dexterity + "\n" +
-                    "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + 0 + " - " + 0 + "\n" +
+                    "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + wins + " - " + losses + "\n" +
                     "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" +
                     "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
@@ -359,11 +361,13 @@ module.exports = function (parent) {
         client.hgetall(args, function (err, result) {
             if (result != null) {
                 var stats = result; //Health is (Toughness x 5) while Stamina is (Endurance x 5)
+                var wins = stats.wins || 0;
+                var losses = stats.losses || 0;
                 fChatLibInstance.sendMessage("[b]" + stats.character + "[/b]'s stats" + "\n" +
                     "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
                     "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n" +
                     "[i][color=green]Dexterity[/color][/i]:  " + stats.dexterity + "\n" +
-                    "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + 0 + " - " + 0 + "\n" +
+                    "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + wins + " - " + losses + "\n" +
                     "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" +
                     "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
@@ -1370,9 +1374,31 @@ function checkLifePoints() {
         fChatLibInstance.sendMessage("[b]After  #" + currentFight.turn + " turns[/b] and [b]" + currentFight.orgasms + " orgasms[/b]\n" +
             "[b]" + currentFighters[currentFight.winner].character + "[/b] has finally took " + currentFighters[(currentFight.winner == 0 ? 1 : 0)].character + " down!\nCongrats to the winner!"
         );
+        addWinsLosses(currentFighters[currentFight.winner].character, currentFighters[(currentFight.winner == 0 ? 1 : 0)].character);
         setTimeout(resetFight, 2500);
     }
 
+}
+
+function addWinsLosses(winnerName, loserName){
+    client.hgetall(winnerName, function (err, result) {
+        if (result != null) {
+            result.wins = parseInt(result.wins) + 1;
+            client.hmset(winnerName, result);
+        }
+        else {
+            fChatLibInstance.sendMessage("Attempt to add the victory point failed.");
+        }
+    });
+    client.hgetall(loserName, function (err, result) {
+        if (result != null) {
+            result.losses = parseInt(result.losses) + 1;
+            client.hmset(winnerName, result);
+        }
+        else {
+            fChatLibInstance.sendMessage("Attempt to add the loss point failed.");
+        }
+    });
 }
 
 function broadcastCombatInfo() {
