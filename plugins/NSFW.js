@@ -554,9 +554,9 @@ module.exports = function (parent) {
                 //}
                 client.hgetall(args, function (err, result) {
                     if (result != null) {
-                        var currentFeatures = parseStringToIntArray(result.features);
+                        result.features = [];
                         client.hmset(data.character, result);
-                        fChatLibInstance.sendMessage("You've successfully removed the [b]" + features[idFeature].title + "[/b] perk.");
+                        fChatLibInstance.sendMessage("You've successfully removed all the features from "+data.character);
                         return;
                     }
                     else {
