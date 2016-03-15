@@ -827,7 +827,8 @@ function getAttackInfo(result, type, id) {
     var defender = (currentFight.whoseturn == 0 ? 1 : 0);
 
     //check conditions first
-    if (type[id].conditions != undefined) {
+    //TODO Rework with IDs
+    if (false && type[id].conditions != undefined) {
         var conditionsChecked = eval(type[id].conditions);
         if (conditionsChecked != true) {
             fChatLibInstance.sendMessage("The conditions for this move aren't met: " + type[id].conditionsText);
