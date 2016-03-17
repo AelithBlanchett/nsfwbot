@@ -281,7 +281,7 @@ sexual.push(
         description: "Aww~ poor baby, did you think you would get to cum?",
         damageLust: 1,
         damageHP: "currentFighters[defender].lust",
-        conditions: "currentFighters[defender].lust == parseInt(currentFight[defender].endurance) - 1", //no sadist feature
+        conditions: "currentFighters[defender].lust == parseInt(currentFighters[defender].endurance) - 1", //no sadist feature
         conditionsText: "Opponent must be 1 lust point away from orgasm.",
         onSuccess: "",
         onSuccessText: "",

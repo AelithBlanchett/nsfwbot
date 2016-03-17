@@ -600,7 +600,7 @@ holds.push(
         damageHP: "5", // Special Attack that does 5
         holdType: "special",
         // @INCOMPLETE Missing the dice reduction
-        onSuccess: "currentFight[currentFight.currentHold.defender].dice.addTmpMod(-3)",
+        onSuccess: "currentFighters[currentFight.currentHold.defender].dice.addTmpMod(-3)",
         maxTurns: "1",
         stanceRequirements: "supine",
         statRequirements: [{strength: 8}]
