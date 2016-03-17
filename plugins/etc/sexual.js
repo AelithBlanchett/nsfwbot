@@ -280,7 +280,7 @@ sexual.push(
         title: "Ruined Climax",
         description: "Aww~ poor baby, did you think you would get to cum?",
         damageLust: 1,
-        damageHP: "currentFighter[defender].lust",
+        damageHP: "currentFighters[defender].lust",
         conditions: "currentFight[defender].lust == parseInt(currentFight[defender].endurance) - 1", //no sadist feature
         conditionsText: "Opponent must be 1 lust point away from orgasm.",
         onSuccess: "",
@@ -308,7 +308,7 @@ sexual.push(
 
 sexual.push(
     {
-        id: 18,
+        id: 19,
         title: "Camel Toe Clutch",
         description: "Also called 'a Minerva' apparently! ",
         damageLust: 1,
