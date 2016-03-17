@@ -28,48 +28,48 @@ module.exports = function (parent) {
     };
     cmdHandler.toys = cmdHandler.sextoys;
 
-    //cmdHandler.test = function(args, data){ //debug
-    //    console.log(didYouMean(args,sexual,"title"));
-    //};
+    cmdHandler.test = function(args, data){ //debug
+        console.log(didYouMean(args,sexual,"id"));
+    };
+
+    cmdHandler.win = function(){ //debug
+        if(debug){
+            currentFighters[currentFight.whoseturn].dice.addTmpMod(100,1);
+        }
+    };
+
+    cmdHandler.lose = function(){ //debug
+        if(debug){
+            currentFighters[currentFight.whoseturn].dice.addTmpMod(-100,1);
+        }
+    };
     //
-    //cmdHandler.win = function(){ //debug
-    //    if(debug){
-    //        currentFighters[currentFight.whoseturn].dice.addTmpMod(100,1);
-    //    }
-    //};
-    //
-    //cmdHandler.lose = function(){ //debug
-    //    if(debug){
-    //        currentFighters[currentFight.whoseturn].dice.addTmpMod(-100,1);
-    //    }
-    //};
-    ////
-    //cmdHandler.dbg = function(args,data){
-    //    client.hgetall('Lustful Aelith', function (err, result) {
-    //        if (result != null) {
-    //            result.hp = parseInt(result.maxHp);
-    //            result.stamina = parseInt(result.maxStamina);
-    //            result.lust = 0;
-    //            result.orgasms = 0;
-    //            currentFighters[0] = result;
-    //            currentFighters[0].dice = new Dice(10);
-    //            //fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
-    //            client.hgetall("Bondage Wrestling", function (err, result2) {
-    //                if (result2 != null) {
-    //                    result2.hp = parseInt(result2.maxHp);
-    //                    result2.stamina = parseInt(result2.maxStamina);
-    //                    result2.lust = 0;
-    //                    result2.orgasms = 0;
-    //                    currentFighters[1] = result2;
-    //                    currentFighters[1].dice = new Dice(10);
-    //                    //fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
-    //                    startFight();
-    //                }
-    //            });
-    //        }
-    //    });
-    //
-    //}
+    cmdHandler.dbg = function(args,data){
+        client.hgetall('Lustful Aelith', function (err, result) {
+            if (result != null) {
+                result.hp = parseInt(result.maxHp);
+                result.stamina = parseInt(result.maxStamina);
+                result.lust = 0;
+                result.orgasms = 0;
+                currentFighters[0] = result;
+                currentFighters[0].dice = new Dice(10);
+                //fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
+                client.hgetall("Bondage Wrestling", function (err, result2) {
+                    if (result2 != null) {
+                        result2.hp = parseInt(result2.maxHp);
+                        result2.stamina = parseInt(result2.maxStamina);
+                        result2.lust = 0;
+                        result2.orgasms = 0;
+                        currentFighters[1] = result2;
+                        currentFighters[1].dice = new Dice(10);
+                        //fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
+                        startFight();
+                    }
+                });
+            }
+        });
+
+    }
 
     cmdHandler.register = function (args, data) {
         if (isNaN(args)) {
@@ -828,7 +828,7 @@ function getAttackInfo(result, type, id) {
 
     //check conditions first
     //TODO Rework with IDs
-    if (false && type[id].conditions != undefined) {
+    if (type[id].conditions != undefined) {
         var conditionsChecked = eval(type[id].conditions);
         if (conditionsChecked != true) {
             fChatLibInstance.sendMessage("The conditions for this move aren't met: " + type[id].conditionsText);
@@ -1115,18 +1115,23 @@ function failHandler(stringType, id) {
 
 function holdHandler(id, type) {
     var strAttack = "[b]" + currentFighters[currentFight.whoseturn].character + "[/b] has";
+    var strType = "";
     switch (type) {
         case "sexual":
             type = sexual;
+            strType = "sexual";
             break;
         case "hold":
             type = hold;
+            strType = "hold";
             break;
         case undefined:
             type = hold;
+            strType = "hold";
             break;
         default:
             type = hold;
+            strType = "hold";
             break;
     }
 
@@ -1203,7 +1208,7 @@ function holdHandler(id, type) {
             isInfinite: isInfinite,
             lustPenalty: newLustPenalty,
             hpPenalty: newHpPenalty,
-            type: type
+            type: strType
         }
         //fChatLibInstance.sendMessage("Hold established: "+JSON.stringify(currentFight.currentHold));
         strAttack += " applied " + type[id].title;
@@ -1363,11 +1368,13 @@ function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, d
 }
 
 function nextTurn() {
-    tickHold();
+    if(currentFight.winner == -1){
+        tickHold();
+    }
     currentFight.turn++;
 
-    var featuresP0 = parseStringToIntArray(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].features);
-    var featuresP1 = parseStringToIntArray(currentFighters[currentFight.whoseturn].features);
+    //var featuresP0 = parseStringToIntArray(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].features);
+    //var featuresP1 = parseStringToIntArray(currentFighters[currentFight.whoseturn].features);
 
     //if(featuresP0.indexOf(6) != -1 || featuresP1.indexOf(6) != -1){
     //    fChatLibInstance.sendMessage("[i]It looks like we've got an exhibitionist inside the ring...[/i] [b]"+currentFighters[currentFight.whoseturn].character+"[/b] is quite aroused by the scene!");
@@ -1404,14 +1411,14 @@ function tickHold() {
 }
 
 function holdInPlace() {
-    return (typeof currentFight.currentHold == "object" && currentFight.currentHold != undefined && (currentFight.currentHold.turnsLeft != undefined && currentFight.currentHold.turnsLeft > 0) || (currentFight.currentHold.isInfinite != undefined && currentFight.currentHold.isInfinite == true));
+    return (typeof currentFight.currentHold == "object" && currentFight.currentHold != undefined && ((currentFight.currentHold.turnsLeft != undefined && currentFight.currentHold.turnsLeft > 0) || (currentFight.currentHold.isInfinite != undefined && currentFight.currentHold.isInfinite == true)));
 }
 
 function isInHold(whoseTurn) {
     if(whoseTurn == undefined){
         whoseTurn = currentFight.whoseturn;
     }
-    if (holdInPlace() && currentFight.currentHold.defender == whoseturn) {
+    if (holdInPlace() && currentFight.currentHold.defender == whoseTurn) {
         return true;
     }
     return false;

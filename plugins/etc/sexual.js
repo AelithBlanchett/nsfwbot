@@ -216,7 +216,7 @@ sexual.push(
         description: " Starting to go down deep~♥",
         damageLust: 1,
         lustPenalty: 1,
-        conditions: "(currentFight[attacker].lust == parseInt(currentFight[attacker].endurance) - 1) && (currentFight[defender].lust == parseInt(currentFight[defender].endurance) - 1)",
+        conditions: "(currentFighters[attacker].lust == parseInt(currentFighters[attacker].endurance) - 1) && (currentFighters[defender].lust == parseInt(currentFighters[defender].endurance) - 1)",
         conditionsText: "Opponent must be 1 Lust away from a climax; User must be 1 Lust away from a climax.",
         onSuccess: "",
         onSuccessText: "",
@@ -281,7 +281,7 @@ sexual.push(
         description: "Aww~ poor baby, did you think you would get to cum?",
         damageLust: 1,
         damageHP: "currentFighters[defender].lust",
-        conditions: "currentFight[defender].lust == parseInt(currentFight[defender].endurance) - 1", //no sadist feature
+        conditions: "currentFighters[defender].lust == parseInt(currentFight[defender].endurance) - 1", //no sadist feature
         conditionsText: "Opponent must be 1 lust point away from orgasm.",
         onSuccess: "",
         onSuccessText: "",
