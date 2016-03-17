@@ -246,7 +246,7 @@ brawl.push(
         id: 21,
         title: "Tiger Suplex",
         description: "",
-        conditions: "isInHold(defender) && currentFight.currentHold != null && currentFight.currentHold.type == 'holds' && currentFight.currentHold.id == 7",
+        conditions: "isInHold(defender) && currentFight.currentHold != null && currentFight.currentHold.type == 'holds' && currentFight.currentHold.aliasId == 7",
         conditionsText: "Opponent must be in the Double Chicken Wing hold.",
         damageHP: "currentFighters[attacker].strength * 2 - currentFighters[defender].toughness",
         statRequirements: [{strength: 6, dexterity: 4, agility: 4, flexibility: 4}]

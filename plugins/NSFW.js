@@ -1193,6 +1193,7 @@ function holdHandler(id, type) {
 
         currentFight.currentHold = {
             holdId: id,
+            aliasId: type[id].id,
             holdName: type[id].title,
             turnsLeft: newTurnsLeft,
             damageHP: newDamageHP,
@@ -1410,7 +1411,7 @@ function isInHold(whoseTurn) {
     if(whoseTurn == undefined){
         whoseTurn = currentFight.whoseturn;
     }
-    if (holdInPlace() && currentFight.currentHold.defender == currentFight.whoseturn) {
+    if (holdInPlace() && currentFight.currentHold.defender == whoseturn) {
         return true;
     }
     return false;
@@ -1576,6 +1577,20 @@ function findItemIdByTitle(array, title) {
     }
     for (var i = 0; i < array.length; i++) {
         if (array[i].title == realText) {
+            return i
+        }
+        ;
+    }
+    return -1;
+}
+
+function findItemIdById(array, id) {
+    var realText = didYouMean(id,array,"id");
+    if(realText == null){
+        return -1;
+    }
+    for (var i = 0; i < array.length; i++) {
+        if (array[i].id == realText) {
             return i
         }
         ;
