@@ -63,7 +63,12 @@ module.exports = function (parent) {
                         currentFighters[1] = result2;
                         currentFighters[1].dice = new Dice(10);
                         //fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
-                        startFight();
+                        //startFight();
+                        for(var i = 0; i < sexual.length; i++){
+                            if (!getAttackInfo(currentFighters[currentFight.whoseturn], sexual, i)) {
+                                console.log("failed to get attack info for sexual move" + i);
+                            }
+                        }
                     }
                 });
             }
