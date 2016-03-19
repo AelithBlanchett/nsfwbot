@@ -1,6 +1,6 @@
 "use strict";
 var fChatLibInstance;
-var debug = true;
+var debug = false;
 
 module.exports = function (parent) {
     fChatLibInstance = parent;
@@ -29,7 +29,9 @@ module.exports = function (parent) {
     cmdHandler.toys = cmdHandler.sextoys;
 
     cmdHandler.test = function(args, data){ //debug
-        console.log(didYouMean(args,sexual,"id"));
+        if(debug) {
+            console.log(didYouMean(args, sexual, "id"));
+        }
     };
 
     cmdHandler.win = function(){ //debug
@@ -45,70 +47,71 @@ module.exports = function (parent) {
     };
     //
     cmdHandler.dbg = function(args,data){
-        client.hgetall('Lustful Aelith', function (err, result) {
-            if (result != null) {
-                result.hp = parseInt(result.maxHp);
-                result.stamina = parseInt(result.maxStamina);
-                result.lust = 0;
-                result.orgasms = 0;
-                currentFighters[0] = result;
-                currentFighters[0].dice = new Dice(10);
-                //fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
-                client.hgetall("Bondage Wrestling", function (err, result2) {
-                    if (result2 != null) {
-                        result2.hp = parseInt(result2.maxHp);
-                        result2.stamina = parseInt(result2.maxStamina);
-                        result2.lust = 0;
-                        result2.orgasms = 0;
-                        currentFighters[1] = result2;
-                        currentFighters[1].dice = new Dice(10);
-                        //fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
-                        //startFight();
-                        currentFight.whoseturn = 0;
-                        for(var i = 0; i < sexual.length; i++){
-                            console.log("Trying sexual move "+i+ "with name "+sexual[i].title);
-                            var attackInfoOK = getAttackInfo(currentFighters[currentFight.whoseturn], sexual, i);
+        if(debug) {
+            client.hgetall('Lustful Aelith', function (err, result) {
+                if (result != null) {
+                    result.hp = parseInt(result.maxHp);
+                    result.stamina = parseInt(result.maxStamina);
+                    result.lust = 0;
+                    result.orgasms = 0;
+                    currentFighters[0] = result;
+                    currentFighters[0].dice = new Dice(10);
+                    //fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
+                    client.hgetall("Bondage Wrestling", function (err, result2) {
+                        if (result2 != null) {
+                            result2.hp = parseInt(result2.maxHp);
+                            result2.stamina = parseInt(result2.maxStamina);
+                            result2.lust = 0;
+                            result2.orgasms = 0;
+                            currentFighters[1] = result2;
+                            currentFighters[1].dice = new Dice(10);
+                            //fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
+                            //startFight();
+                            currentFight.whoseturn = 0;
+                            for (var i = 0; i < sexual.length; i++) {
+                                console.log("Trying sexual move " + i + "with name " + sexual[i].title);
+                                var attackInfoOK = getAttackInfo(currentFighters[currentFight.whoseturn], sexual, i);
 
-                            if (sexual[i].onFailure != undefined) {
-                                eval(sexual[i].onFailure);
-                                if(sexual[i].onFailureText != undefined && sexual[i].onFailureText != ""){
-                                    fChatLibInstance.sendMessage(sexual[i].onFailureText);
+                                if (sexual[i].onFailure != undefined) {
+                                    eval(sexual[i].onFailure);
+                                    if (sexual[i].onFailureText != undefined && sexual[i].onFailureText != "") {
+                                        fChatLibInstance.sendMessage(sexual[i].onFailureText);
+                                    }
+                                }
+
+                                if (!attackInfoOK) {
+                                    console.log("failed to get attack info for sexual move" + i);
+                                    continue;
                                 }
                             }
 
-                            if (!attackInfoOK) {
-                                console.log("failed to get attack info for sexual move" + i);
-                                continue;
+
+                            currentFight.whoseturn = 0;
+                            for (var i = 0; i < brawl.length; i++) {
+                                console.log("Trying brawl move " + i + "with name " + brawl[i].title);
+                                var attackInfoOK = getAttackInfo(currentFighters[currentFight.whoseturn], brawl, i);
+                                if (!attackInfoOK) {
+                                    console.log("failed to get attack info for brawl move" + i);
+                                    continue;
+                                }
                             }
-                        }
 
 
-                        currentFight.whoseturn = 0;
-                        for(var i = 0; i < brawl.length; i++){
-                            console.log("Trying brawl move "+i+ "with name "+brawl[i].title);
-                            var attackInfoOK = getAttackInfo(currentFighters[currentFight.whoseturn], brawl, i);
-                            if (!attackInfoOK) {
-                                console.log("failed to get attack info for brawl move" + i);
-                                continue;
+                            currentFight.whoseturn = 0;
+                            for (var i = 0; i < hold.length; i++) {
+                                console.log("Trying hold move " + i + "with name " + hold[i].title);
+                                var attackInfoOK = getAttackInfo(currentFighters[currentFight.whoseturn], hold, i);
+                                if (!attackInfoOK) {
+                                    console.log("failed to get attack info for hold move" + i);
+                                    continue;
+                                }
                             }
+
                         }
-
-
-                        currentFight.whoseturn = 0;
-                        for(var i = 0; i < hold.length; i++){
-                            console.log("Trying hold move "+i+ "with name "+hold[i].title);
-                            var attackInfoOK = getAttackInfo(currentFighters[currentFight.whoseturn], hold, i);
-                            if (!attackInfoOK) {
-                                console.log("failed to get attack info for hold move" + i);
-                                continue;
-                            }
-                        }
-
-                    }
-                });
-            }
-        });
-
+                    });
+                }
+            });
+        }
     };
 
     cmdHandler.register = function (args, data) {
