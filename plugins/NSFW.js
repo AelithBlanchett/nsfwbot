@@ -21,6 +21,13 @@ module.exports = function (parent) {
         fChatLibInstance.sendMessage("I'm Benikage, version "+parent.config.cversion);
     };
 
+    cmdHandler.triggerDebug = function (args, data) {
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
+            debug = !debug;
+            fChatLibInstance.sendMessage("Debug: "+debug);
+        }
+    };
+
 
     cmdHandler.sextoys = function () {
         var toy = getRandomSextoy();
