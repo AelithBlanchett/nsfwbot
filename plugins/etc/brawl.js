@@ -204,17 +204,17 @@ brawl.push(
             statRequirements: [{dexterity: 4}]
     });
 
-brawl.push(
-    {
-        id: 17,
-        title: "Senton Bomb",
-        description: "The attacking wrestler executes a quick front somersault off the top turnbuckle, before landing on the opponent back-first. It can also be performed from a standing position.",
-        damageHP: "(3*currentFighters[attacker].agility) - currentFighters[defender].toughness",
-        hpPenalty: "currentFighters[defender].toughness",
-        onFailure: "currentFighters[attacker].hp -= currentFighters[attacker].agility",
-        onFailureText: "That miss has apparently hurt quite much!",
-        statRequirements: [{toughness: 4, agility: 8}]
-    });
+//brawl.push(
+//    {
+//        id: 17,
+//        title: "Senton Bomb",
+//        description: "The attacking wrestler executes a quick front somersault off the top turnbuckle, before landing on the opponent back-first. It can also be performed from a standing position.",
+//        damageHP: "(3*currentFighters[attacker].agility) - currentFighters[defender].toughness",
+//        hpPenalty: "currentFighters[defender].toughness",
+//        onFailure: "currentFighters[attacker].hp -= currentFighters[attacker].agility",
+//        onFailureText: "That miss has apparently hurt quite much!",
+//        statRequirements: [{toughness: 4, agility: 8}]
+//    });
 
 brawl.push(
     {
