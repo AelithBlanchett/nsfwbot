@@ -147,7 +147,7 @@ sexual.push(
 sexual.push(
     {
         id: 9,
-        title: "Slap",
+        title: "Spank",
         description: " A spanking galore! ",
         damageLust: "2",
         onSuccess: "",
