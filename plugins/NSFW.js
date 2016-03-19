@@ -1030,7 +1030,7 @@ function checkRollWinner() {
         }
         currentFight.skipRoll = false;
         currentFight.whoseturn = (currentFight.whoseturn == 0 ? 1 : 0);
-        fChatLibInstance.sendMessage("[i][b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "[/b] got a free roll and it's now [b]" + currentFighters[currentFight.whoseturn].character + "[/b]'s turn to emote their reaction/attack.[/i]");
+        fChatLibInstance.sendMessage("[i][b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "[/b] got a free counter and it's now [b]" + currentFighters[currentFight.whoseturn].character + "[/b]'s turn to emote their reaction/attack.[/i]");
         nextTurn();
         return;
     }
@@ -1387,7 +1387,7 @@ function attackHandler(damageHP, damageLust, hpPenalty, lustPenalty, attacker, d
         strAttack += " added " + lustAdded + " Lust point"
     }
 
-    strAttack += " to [b]" + currentFighters[defender].character + "[/b]";
+    strAttack += " from [b]" + currentFighters[defender].character + "[/b]";
 
 
     if ((hpPenalty != undefined && hpPenalty != 0) || (lustPenalty != undefined && lustPenalty != 0)) {
