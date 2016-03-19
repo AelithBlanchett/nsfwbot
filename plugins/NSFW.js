@@ -560,8 +560,8 @@ module.exports = function (parent) {
                 client.hgetall(args, function (err, result) {
                     if (result != null) {
                         result.features = [];
-                        client.hmset(data.character, result);
-                        fChatLibInstance.sendMessage("You've successfully removed all the features from "+data.character);
+                        client.hmset(args, result);
+                        fChatLibInstance.sendMessage("You've successfully removed all the features from "+args);
                         return;
                     }
                     else {
