@@ -864,6 +864,12 @@ function getAttackInfo(result, type, id) {
         }
     }
 
+    checkBonuses();
+
+    return true;
+}
+
+function checkBonuses(type, id){
     var strType = "";
 
     switch (type) {
@@ -894,7 +900,7 @@ function getAttackInfo(result, type, id) {
             typeHold = hold
         }
         if (typeHold[currentFight.currentHold.holdId].bonusForAttacks != undefined && typeHold[currentFight.currentHold.holdId].bonusRoll != undefined) {
-            if (!isNaN(type[currentFight.currentHold.holdId].bonusRoll) && (typeHold[currentFight.currentHold.holdId].bonusForAttacks.indexOf(strType + ":" + currentFight.actionId) != -1 || typeHold[currentFight.currentHold.holdId].bonusForAttacks.indexOf(strType + ":all") != -1)) {
+            if (!isNaN(typeHold[currentFight.currentHold.holdId].bonusRoll) && (typeHold[currentFight.currentHold.holdId].bonusForAttacks.indexOf(strType + ":" + currentFight.actionId) != -1 || typeHold[currentFight.currentHold.holdId].bonusForAttacks.indexOf(strType + ":all") != -1)) {
                 currentFighters[currentFight.whoseturn].dice.addTmpMod(parseInt(typeHold[currentFight.currentHold.holdId].bonusRoll));
                 fChatLibInstance.sendMessage("Added " + typeHold[currentFight.currentHold.holdId].bonusRoll + " to the dice, since the last hold buffs this attack.");
                 bonusCounted = true;
@@ -911,8 +917,6 @@ function getAttackInfo(result, type, id) {
             }
         }
     }
-
-    return true;
 }
 
 
