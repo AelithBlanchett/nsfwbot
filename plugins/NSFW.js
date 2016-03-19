@@ -64,17 +64,52 @@ module.exports = function (parent) {
                         currentFighters[1].dice = new Dice(10);
                         //fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
                         //startFight();
+                        currentFight.whoseturn = 0;
                         for(var i = 0; i < sexual.length; i++){
-                            if (!getAttackInfo(currentFighters[currentFight.whoseturn], sexual, i)) {
+                            console.log("Trying sexual move "+i+ "with name "+sexual[i].title);
+                            var attackInfoOK = getAttackInfo(currentFighters[currentFight.whoseturn], sexual, i);
+
+                            if (sexual[i].onFailure != undefined) {
+                                eval(sexual[i].onFailure);
+                                if(sexual[i].onFailureText != undefined && sexual[i].onFailureText != ""){
+                                    fChatLibInstance.sendMessage(sexual[i].onFailureText);
+                                }
+                            }
+
+                            if (!attackInfoOK) {
                                 console.log("failed to get attack info for sexual move" + i);
+                                continue;
                             }
                         }
+
+
+                        currentFight.whoseturn = 0;
+                        for(var i = 0; i < brawl.length; i++){
+                            console.log("Trying brawl move "+i+ "with name "+brawl[i].title);
+                            var attackInfoOK = getAttackInfo(currentFighters[currentFight.whoseturn], brawl, i);
+                            if (!attackInfoOK) {
+                                console.log("failed to get attack info for brawl move" + i);
+                                continue;
+                            }
+                        }
+
+
+                        currentFight.whoseturn = 0;
+                        for(var i = 0; i < hold.length; i++){
+                            console.log("Trying hold move "+i+ "with name "+hold[i].title);
+                            var attackInfoOK = getAttackInfo(currentFighters[currentFight.whoseturn], hold, i);
+                            if (!attackInfoOK) {
+                                console.log("failed to get attack info for hold move" + i);
+                                continue;
+                            }
+                        }
+
                     }
                 });
             }
         });
 
-    }
+    };
 
     cmdHandler.register = function (args, data) {
         if (isNaN(args)) {
@@ -832,7 +867,7 @@ function getAttackInfo(result, type, id) {
     var defender = (currentFight.whoseturn == 0 ? 1 : 0);
 
     //check conditions first
-    if (!checkConditions()){
+    if (!checkConditions(type, id, attacker, defender)){
         return;
     }
 
@@ -859,12 +894,12 @@ function getAttackInfo(result, type, id) {
         }
     }
 
-    checkBonuses();
+    checkBonuses(type, id, attacker, defender);
 
     return true;
 }
 
-function checkConditions(type, id){
+function checkConditions(type, id, attacker, defender){
     if (type[id].conditions != undefined) {
         var conditionsChecked = eval(type[id].conditions);
         if (conditionsChecked != true) {
@@ -875,7 +910,7 @@ function checkConditions(type, id){
     return true;
 }
 
-function checkBonuses(type, id){
+function checkBonuses(type, id, attacker, defender){
     var strType = "";
 
     switch (type) {
