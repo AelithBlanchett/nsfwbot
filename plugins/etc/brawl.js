@@ -25,6 +25,8 @@ brawl.push(
         title: "Open Palm Strike",
         description: "It's like a forceful shove but more karate!",
         damageHP: "currentFighters[attacker].dexterity - currentFighters[defender].toughness",
+        onFailure: "currentFighters[defender].dice.addTmpMod(1)",
+        onFailureText: "That kick completely missed! It gave a small advantage to their opponent.",
         statRequirements: [{strength: 1}, {dexterity: 1}]
     });
 
@@ -35,6 +37,7 @@ brawl.push(
         description: "A swift kick!",
         damageHP: "currentFighters[attacker].agility - currentFighters[defender].toughness", //(User Strength's - Target's Toughness)
         onFailure: "currentFighters[defender].dice.addTmpMod(1)",
+        onFailureText: "That kick completely missed! It gave a small advantage to their opponent.",
         statRequirements: [{strength: 1}, {agility: 1}, {flexibility: 1}]
     });
 
@@ -44,6 +47,8 @@ brawl.push(
         title: "Spank",
         description: "A spanking galore!",
         damageHP: "2",
+        onFailure: "currentFighters[defender].dice.addTmpMod(1)",
+        onFailureText: "That kick completely missed! It gave a small advantage to their opponent.",
         statRequirements: [{dexterity: 2}]
     });
 
