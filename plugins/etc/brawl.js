@@ -143,7 +143,7 @@ brawl.push(
         id: 10,
         title: "Bulldog",
         description: "A bulldog is a move in which the wrestler applies a headlock or face lock to his opponent and leaps forward, so that the wrestler lands on his back or in a sitting position, driving the opponent’s face into the mat.",
-        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness",
+        damageHP: "currentFighters[attacker].agility - currentFighters[defender].toughness",
         statRequirements: [{dexterity: 2, agility: 2}]
     });
 
