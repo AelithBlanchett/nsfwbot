@@ -832,13 +832,8 @@ function getAttackInfo(result, type, id) {
     var defender = (currentFight.whoseturn == 0 ? 1 : 0);
 
     //check conditions first
-    //TODO Rework with IDs
-    if (type[id].conditions != undefined) {
-        var conditionsChecked = eval(type[id].conditions);
-        if (conditionsChecked != true) {
-            fChatLibInstance.sendMessage("The conditions for this move aren't met: " + type[id].conditionsText);
-            return false;
-        }
+    if (!checkConditions()){
+        return;
     }
 
 
@@ -866,6 +861,17 @@ function getAttackInfo(result, type, id) {
 
     checkBonuses();
 
+    return true;
+}
+
+function checkConditions(type, id){
+    if (type[id].conditions != undefined) {
+        var conditionsChecked = eval(type[id].conditions);
+        if (conditionsChecked != true) {
+            fChatLibInstance.sendMessage("The conditions for this move aren't met: " + type[id].conditionsText);
+            return false;
+        }
+    }
     return true;
 }
 
