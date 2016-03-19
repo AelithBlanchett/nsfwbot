@@ -149,13 +149,13 @@ sexual.push(
         id: 9,
         title: "Slap",
         description: " A spanking galore! ",
-        damageLust: "1",
+        damageLust: "2",
         onSuccess: "",
         onSuccessText: "",
         onFailure: "",
         onFailureText: "",
         isHold: "False",
-        statRequirements: [{strength: 1, dexterity: 1}]
+        statRequirements: [{dexterity: 2}]
     });
 
 sexual.push(

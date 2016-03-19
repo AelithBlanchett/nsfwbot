@@ -15,8 +15,17 @@ brawl.push(
         id: 0,
         title: "Punch",
         description: "A solid punch!",
-        damageHP: "1",
-        statRequirements: [{strength: 1}, {agility: 1}, {dexterity: 1}]
+        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness",
+        statRequirements: [{strength: 1}, {dexterity: 1}]
+    });
+
+brawl.push(
+    {
+        id: 22,
+        title: "Open Palm Strike",
+        description: "It's like a forceful shove but more karate!",
+        damageHP: "currentFighters[attacker].dexterity - currentFighters[defender].toughness",
+        statRequirements: [{strength: 1}, {dexterity: 1}]
     });
 
 brawl.push(
@@ -24,7 +33,7 @@ brawl.push(
         id: 1,
         title: "Kick",
         description: "A swift kick!",
-        damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness", //(User Strength's - Target's Toughness)
+        damageHP: "currentFighters[attacker].agility - currentFighters[defender].toughness", //(User Strength's - Target's Toughness)
         onFailure: "currentFighters[defender].dice.addTmpMod(1)",
         statRequirements: [{strength: 1}, {agility: 1}, {flexibility: 1}]
     });
@@ -32,10 +41,10 @@ brawl.push(
 brawl.push(
     {
         id: 2,
-        title: "Slap",
+        title: "Spank",
         description: "A spanking galore!",
-        damageHP: "1",
-        statRequirements: [{strength: 1, dexterity: 1}]
+        damageHP: "2",
+        statRequirements: [{dexterity: 2}]
     });
 
 
