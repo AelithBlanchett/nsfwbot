@@ -9,6 +9,7 @@ Determination
 >>>> T.E.A.S.E.D.
 
 HP will be some baseline value + toughness
+The starting stats will be 10 and the maximum points will be 24 cap out of a total max of 36
 
 
 Brawler = Pure Strength
@@ -21,7 +22,16 @@ Sex Fiend/Bondage Expert = Pure Expertise
 New attack system:
 
 I need a light, medium and heavy attack combination where light attacks do minimal acceptable damage with some sort of bonus, medium attacks do slightly greater damage at a mild risk and heavy attacks do quite a bit of damage but at great risk
-1d(stat) + 1d10, or if using two stats: 1d(stat1+stat2/2) + 1d10 rounded down (floor)
-if I have 1 strength my roll is 1d1 + 1d10. If I have 6 strength my roll is 1d6+1d10
+
+Light 4
+Medium 6
+Heavy 8
+
+damage: (strength + ((strength - 1)/6)) - toughness
+
+http://i.imgur.com/qnOpmBd.png
+
+
+stat + 1d6, or if using two stats: (stat1+stat2/2) rounded down + 1d6 
 
 All attacks will do fixed damage based on the type of attack used. Brawl Light attacks will be 7 - toughness for example but a medium attack will be 10 - toughness and heavy attacks 12 - toughness
