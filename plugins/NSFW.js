@@ -1,6 +1,6 @@
 "use strict";
 var fChatLibInstance;
-var debug = false;
+var debug = false; //2.0
 
 module.exports = function (parent) {
     fChatLibInstance = parent;
