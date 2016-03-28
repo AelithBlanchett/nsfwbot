@@ -18,7 +18,7 @@ module.exports = function (parent) {
     cmdHandler.current = cmdHandler.status;
 
     cmdHandler.version = function () {
-        fChatLibInstance.sendMessage("I'm Benikage, version "+parent.config.cversion);
+        fChatLibInstance.sendMessage("I'm Benikage, version 0.3.3");
     };
 
     cmdHandler.triggerDebug = function (args, data) {
@@ -904,7 +904,7 @@ function getAttackInfo(result, type, id) {
         }
     }
 
-    checkBonuses(type, id, attacker, defender);
+    //checkBonuses(type, id, attacker, defender);
 
     return true;
 }
