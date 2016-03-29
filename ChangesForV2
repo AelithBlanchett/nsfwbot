@@ -21,6 +21,10 @@ Martial Artist = Agility + Expertise
 Sex Fiend/Bondage Expert = Pure Expertise
 
 
+
+
+
+
 New attack system:
 
 I need a light, medium and heavy attack combination where light attacks do minimal acceptable damage with some sort of bonus, medium attacks do slightly greater damage at a mild risk and heavy attacks do quite a bit of damage but at great risk
@@ -33,7 +37,126 @@ damage: (strength + ((strength - 1)/6)) - toughness
 
 http://i.imgur.com/qnOpmBd.png
 
-
 stat + 1d6, or if using two stats: (stat1+stat2/2) rounded down + 1d6 
 
-All attacks will do fixed damage based on the type of attack used. Brawl Light attacks will be 7 - toughness for example but a medium attack will be 10 - toughness and heavy attacks 12 - toughness
+All attacks will do fixed damage based on the type of attack used.
+
+
+
+
+
+
+
+
+
+
+
+Lust attacks:
+
+[21:35] Nastasya Bates: [21:29] Nastasya Bates: We'll do !f for "fighting" attacks, !h for "holds", !s for "sexual" attacks and !b for "bondage" attacks
+[21:29] Nastasya Bates: Fighting attacks include all of brawl, all of martial arts and all of high flying attacks
+[21:30] Nastasya Bates: Holds will include all submission specialist moves
+[21:30] Nastasya Bates: Sexual will include only sexual attacks that damage the "Lust" bar which will include Humiliation attacks as well as physical sexual attacks
+[21:31] Nastasya Bates: Bondage attacks will do the Light, Medium and Heavy bondage in 3 areas (Torso (including head), Legs and Arms)
+[21:32] Nastasya Bates: So if a fighting attack is !f Light for a light attack a bondage attack will be !b Arms Light
+[21:33] Nastasya Bates: Bondage attacks cannot be escaped once applied
+[21:33] Nastasya Bates: But they must go in the order Light, Medium, Heavy
+[21:33] Nastasya Bates: So you must place 9 successful attacks on your opponent to achieve victory
+[21:36] Kallinx-F: 9 successful bondage attacks or just 9 attacks in general?
+[21:36] Nastasya Bates: 9 Successful bondage attacks
+[21:36] Kallinx-F: ok
+[21:36] Lustful Aelith: which is quite balanced imo
+[21:36] Ashtika giggles, hoping she gets to be a high-flying humiliator. If not, she'll have some tough decisions to make as to how to play Ash!
+[21:37] Miss Ivy Valentine: Whats the difference between light and heavy bondage
+[21:37] Nastasya Bates: As much or as little as you want
+[21:37] Nastasya Bates: There are no 'moves'
+[21:37] Nastasya Bates: that's just the win condition
+[21:37] Miss Ivy Valentine: Ah I see
+[21:37] Kallinx-F is gonna be either a martial artist or all high flying
+[21:37] Nastasya Bates: All attacks are divided as "Light", "Medium" and "Heavy"
+[21:38] Nastasya Bates: So you can use a punch attack as a jab (light), a straight punch (medium) or a hay maker (heavy)
+[21:38] Nastasya Bates: But there are no moves called "punch", "jab", "straight punch" or "hay maker"
+[21:39] Nastasya Bates: You can also use your punch as a martial arts move where it'll be based on agility and expertise or a brawl move where it will be based on strength
+[21:41] Lustful Aelith: What about the lust bar itself?
+[21:41] Kallinx-F: Would a little thing like embellishing potentially add the the attack?
+[21:42] Nastasya Bates: Same as the HP bar.
+[21:42] Nastasya Bates: Nothing in RP adds to the effectiveness of an attack
+[21:42] Kallinx-F: Could we still do it for funsies to make it more action packed for the audience?
+[21:43] Nastasya Bates: HP is the (starting number) + all stats except endurance
+Lust is (starting number) + (Endurance x (modifer))
+[21:43] Miss Ivy Valentine: of course!
+[21:43] Miss Ivy Valentine: Half the fun is the emotes :)
+[21:43] Nastasya Bates: Yes, I have nothing against you doing anything.
+[21:43] Ashtika: Playing up for the crowd is essential! To me, anyway.
+[21:43] Nastasya Bates: We are also adding !pass and !recover to the list of commands
+[21:44] Nastasya Bates: !pass just passes your turn to your opponent if you want to cum or... whatever
+[21:44] Kallinx-F: Oh I want to have an outfit, an entrance and maybe some pre match trash talk to hype the fight up
+[21:44] Nastasya Bates: !recover resets all accrued bonuses and recovers some health and lust to both characters
+[21:46] Nastasya Bates: Okay as for the Lust Bar, it's the exact same thing as the HP bar. No Lust + Stamina or anything
+[21:46] Nastasya Bates: Lust bar starts at 0 and goes up to maximum. HP bar starts at maximum and drops to 0
+[21:47] Nastasya Bates: The roleplayers themselves will determine when they have orgasms. I will set roleplay-only parameters about orgasms
+[21:47] Nastasya Bates: So those have nothing to do with what you need to worry about Aelith
+[21:48] Lustful Aelith: Okie dokie
+[21:48] Nastasya Bates: For example, we can say that a normal person will cum at 25%, 50%, 75% and 100% of their Lust meter for 4 total orgasms
+[21:49] Nastasya Bates: This will not be enforced by the bot but is up to the discretion of the players
+[21:49] Nastasya Bates: If someone's character has a hair trigger they may orgasm every 10% of their Lust bar filling
+[21:49] Kallinx-F: can the players set up themselves what happens during certain points in their bar on an individual basis?
+[21:50] Nastasya Bates: Yes, that's what I said.
+[21:50] Nastasya Bates: Players have individual control of their character's orgasms
+[21:50] Kallinx-F: What I mean is not just orgasm but have other effects on themselves as well
+[21:50] Nastasya Bates: The only thing the bot enforces is that at 100% of the bar being filled, the person can no longer fight
+[21:51] Nastasya Bates: They can either be exhausted or too embarrassed to continue or have a deep 'need' to submit to their opponent or whatever
+[21:51] Kallinx-F: Can individuals set that lower? Like they woudl succumb to the 'need at like 50 or 75% instead of the 100
+[21:52] Nastasya Bates: Technically they can, there is a !submit function in the bot already that causes the person to lose
+[21:52] Nastasya Bates: So they can choose to lose if they so desire
+[21:53] Nastasya Bates: !help
+[21:53] Benikage: Here are the available commands: !addFeature, !addStats, !addfeature, !addstats, !b, !brawl, !current, !dbg, !deleteProfile, !deleteprofile, !e, !escape, !escapeHold, !escapehold, !exit, !fight, !flood, !forfeit, !getStats, !getstats, !giveUp, !giveup, !grapple, !grappling, !h, !help, !hit, !hold, !holds, !hp, !leave, !leaveFight, !leavefight, !list, !listops, !lose, !lust, !myStats, !mystats, !ready, !register, !reloadplugins, !removeFeatures, !removeStats, !removefeatures, !removestats, !reset, !restart, !s, !sex, !sextoys, !sexual, !stamina, !stats, !status, !submission, !submit, !surrender, !t, !tapout, !test, !throw, !throws, !toys, !triggerDebug, !triggerdebug, !unready, !version, !win, !wrestle
+[21:53] Kallinx-F: Okay. Mine will be lower than normal. I don't care if I make myself easier to beat.
+[21:54] Miss Ivy Valentine: Hehe Your endurance is taking care of that for you already Kallinx ;)
+[21:54] Ashtika giggles.
+[21:54] Miss Ivy Valentine: Right now its basically how many orgasms you can have before you submit...for you that is 2
+[21:55] Kallinx-F: but I am talking about the new system. Unless I am understanding that wrong
+[21:55] Nastasya Bates: No, you're understanding it correctly
+[21:55] Miss Ivy Valentine: Oh ok...thought you were talking about the current one
+[21:56] Miss Ivy Valentine: carry on
+[21:56] Kallinx-F: like 50% is when I will end up submitting in the new system
+[22:01] Kallinx-F will be easy to beat probably
+[22:06] Nastasya Bates: GAIZ
+[22:06] Miss Ivy Valentine: SUP!
+[22:06] Kallinx-F: ????
+[22:06] Nastasya Bates: GAIZ
+[22:06] Ashtika: o-o
+[22:06] Miss Ivy Valentine: GURLZ~
+[22:06] Nastasya Bates: Aelith is apparently going to make "Humiliation" holds
+[22:06] Ashtika: Yessssssss
+[22:06] Kallinx-F: Oh?
+[22:06] Miss Ivy Valentine: Are my dreams coming true....
+[22:06] Ashtika dances with Ivy in celebration!
+[22:07] Nastasya Bates: So please tell everyone Aelith and I will no longer be balancing or changing Version 1
+[22:07] Heather Sunderland: Hopefully that involves Smothers and facesitsss?
+[22:07] Miss Ivy Valentine bounces around with the little imp
+[22:07] Nastasya Bates: All inconsistencies and issues will be left alone
+[22:07] Ashtika nods. Roger that.
+[22:07] Kallinx-F dances?
+[22:07] Nastasya Bates: Aelith is only going to work on a prototype for Version 2
+[22:08] Miss Ivy Valentine: Thanks Aelith you da best!
+[22:08] Ashtika: Mhmm! We'll give you all of our spirit energy!
+[22:08] Ashtika: \o/
+[22:08] Kallinx-F: What kind of holds would the be?
+[22:09] Nastasya Bates: We're not describing anything. All 'attacks' will be at the discretion of the roleplayers involved
+[22:09] Lustful Aelith: ༼ つ ◕_◕ ༽つ GIVE MEH ENERGY ༼ つ ◕_◕ ༽つ
+[22:09] Kallinx-F: Ahhh
+[22:09] Ashtika energizes Aelith by sitting on her lap while she works~
+[22:10] Nastasya Bates: Humiliation Holds will use sexual stats and attack "lust" but work the same way as regular submission hold attacks
+[22:10] Miss Ivy Valentine joins in sitting on top of ash
+[22:10] Nastasya Bates: Now an important distinction is going to be made
+[22:10] Nastasya Bates: Lust based fighters can be walled by high endurance levels
+[22:10] Lustful Aelith gropes Ashtika's boobs with her left hand while her right is for Ivy
+[22:11] Nastasya Bates: Just like now
+[22:11] Nastasya Bates: However, players heavily invested in Lust-based combat will have two win conditions. Either raising an opponent's lust to 100% OR using the bondage win condition
+[22:12] Nastasya Bates: Both of those will be using the same stats
+[22:12] Miss Ivy Valentine: Nice :)
+[22:13] Nastasya Bates: Once the prototype is made I will work on an alternative win condition for HP-based fighters not to get walled
+[22:13] Ashtika nods. That's a great idea.
+[22:14] Miss Ivy Valentine ties the little imp up with her whip "I think I got the hang of it..."
+[22:14] Nastasya Bates: For now though that's all. HP reaches 0, Lust reaches 100% OR a fully bound opponent are the three win conditions
