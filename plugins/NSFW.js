@@ -134,7 +134,7 @@ module.exports = function (parent) {
                         statsObj.toughness = parseInt(classes[idClass].stats.toughness);
                         statsObj.dexterity = parseInt(classes[idClass].stats.dexterity);
                         statsObj.agility = parseInt(classes[idClass].stats.agility);
-                        statsObj.flexibility = parseInt(classes[idClass].stats.flexibility);
+                        statsObj.expertise = parseInt(classes[idClass].stats.expertise);
                         statsObj.endurance = parseInt(classes[idClass].stats.endurance);
                         statsObj.maxHp = parseInt(classes[idClass].stats.toughness) * 5;
                         statsObj.maxStamina = parseInt(classes[idClass].stats.endurance) * 5;
@@ -176,7 +176,7 @@ module.exports = function (parent) {
                     statsObj.toughness = parseInt(args[1]);
                     statsObj.dexterity = parseInt(args[2]);
                     statsObj.agility = parseInt(args[3]);
-                    statsObj.flexibility = parseInt(args[4]);
+                    statsObj.expertise = parseInt(args[4]);
                     statsObj.endurance = parseInt(args[5]);
                     statsObj.maxHp = parseInt(args[1]) * 5;
                     statsObj.maxStamina = parseInt(args[5]) * 5;
@@ -361,7 +361,7 @@ module.exports = function (parent) {
                     "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n" +
                     "[i][color=green]Dexterity[/color][/i]:  " + stats.dexterity + "\n" +
                     "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + wins + " - " + losses + "\n" +
-                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" + /* "      " + "[b][color=orange]Coins[/color][/b]: " + coins + "\n" + */
+                    "[b][color=purple]Expertise[/color][/b]: " + stats.expertise + "\n" + /* "      " + "[b][color=orange]Coins[/color][/b]: " + coins + "\n" + */
                     "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
             }
@@ -384,7 +384,7 @@ module.exports = function (parent) {
                     strength: 0,
                     dexterity: 0,
                     agility: 0,
-                    flexibility: 0,
+                    expertise: 0,
                     endurance: 0,
                     toughness: 0,
                     character: result[2]
@@ -399,8 +399,8 @@ module.exports = function (parent) {
                     case "agility":
                         newStats.agility = parseInt(result[1]);
                         break;
-                    case "flexibility":
-                        newStats.flexibility = parseInt(result[1]);
+                    case "expertise":
+                        newStats.expertise = parseInt(result[1]);
                         break;
                     case "endurance":
                         newStats.endurance = parseInt(result[1]);
@@ -414,7 +414,7 @@ module.exports = function (parent) {
                         result.strength = parseInt(result.strength) + newStats.strength;
                         result.dexterity = parseInt(result.dexterity) + newStats.dexterity;
                         result.agility = parseInt(result.agility) + newStats.agility;
-                        result.flexibility = parseInt(result.flexibility) + newStats.flexibility;
+                        result.expertise = parseInt(result.expertise) + newStats.expertise;
                         result.endurance = parseInt(result.endurance) + newStats.endurance;
                         result.toughness = parseInt(result.toughness) + newStats.toughness;
                         result.maxHp = parseInt(result.toughness) * 5;
@@ -461,7 +461,7 @@ module.exports = function (parent) {
                     strength: 0,
                     dexterity: 0,
                     agility: 0,
-                    flexibility: 0,
+                    expertise: 0,
                     endurance: 0,
                     toughness: 0,
                     character: result[2]
@@ -476,8 +476,8 @@ module.exports = function (parent) {
                     case "agility":
                         newStats.agility = parseInt(result[1]);
                         break;
-                    case "flexibility":
-                        newStats.flexibility = parseInt(result[1]);
+                    case "expertise":
+                        newStats.expertise = parseInt(result[1]);
                         break;
                     case "endurance":
                         newStats.endurance = parseInt(result[1]);
@@ -491,7 +491,7 @@ module.exports = function (parent) {
                         result.strength = parseInt(result.strength) - newStats.strength;
                         result.dexterity = parseInt(result.dexterity) - newStats.dexterity;
                         result.agility = parseInt(result.agility) - newStats.agility;
-                        result.flexibility = parseInt(result.flexibility) - newStats.flexibility;
+                        result.expertise = parseInt(result.expertise) - newStats.expertise;
                         result.endurance = parseInt(result.endurance) - newStats.endurance;
                         result.toughness = parseInt(result.toughness) - newStats.toughness;
                         result.maxHp = parseInt(result.toughness) * 5;
@@ -534,7 +534,7 @@ module.exports = function (parent) {
                     "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n" +
                     "[i][color=green]Dexterity[/color][/i]:  " + stats.dexterity + "\n" +
                     "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + wins + " - " + losses + "\n" +
-                    "[b][color=purple]Flexibility[/color][/b]: " + stats.flexibility + "\n" + /* "      " + "[b][color=orange]Coins[/color][/b]: " + coins + "\n" + */
+                    "[b][color=purple]Expertise[/color][/b]: " + stats.expertise + "\n" + /* "      " + "[b][color=orange]Coins[/color][/b]: " + coins + "\n" + */
                     "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
             }
@@ -634,10 +634,10 @@ module.exports = function (parent) {
                             checkRollWinner();
                         }
                         else {
-                            if (hold[currentFight.currentHold.holdId].holdType == "flexibility") { //  For all attacks that do damage based on the flexibility of the victim, the wrestler must use their flexibility to break free and will roll 2d10 + Flexibility v.s the applying wrestler's 2d10 + Strength *or* 2d10 + Flexibility (whichever is higher).
-                                currentFighters[currentFight.currentHold.defender].dice.addTmpMod(parseInt(currentFighters[currentFight.currentHold.defender].flexibility));
-                                if (currentFighters[currentFight.currentHold.attacker].flexibility > currentFighters[currentFight.currentHold.attacker].strength) {
-                                    currentFighters[currentFight.currentHold.attacker].dice.addTmpMod(parseInt(currentFighters[currentFight.currentHold.attacker].flexibility));
+                            if (hold[currentFight.currentHold.holdId].holdType == "expertise") { //  For all attacks that do damage based on the expertise of the victim, the wrestler must use their expertise to break free and will roll 2d10 + expertise v.s the applying wrestler's 2d10 + Strength *or* 2d10 + expertise (whichever is higher).
+                                currentFighters[currentFight.currentHold.defender].dice.addTmpMod(parseInt(currentFighters[currentFight.currentHold.defender].expertise));
+                                if (currentFighters[currentFight.currentHold.attacker].expertise > currentFighters[currentFight.currentHold.attacker].strength) {
+                                    currentFighters[currentFight.currentHold.attacker].dice.addTmpMod(parseInt(currentFighters[currentFight.currentHold.attacker].expertise));
                                 }
                                 else {
                                     currentFighters[currentFight.currentHold.attacker].dice.addTmpMod(parseInt(currentFighters[currentFight.currentHold.attacker].strength));
