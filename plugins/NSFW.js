@@ -58,7 +58,7 @@ module.exports = function (parent) {
             client.hgetall('Lustful Aelith', function (err, result) {
                 if (result != null) {
                     result.hp = parseInt(result.maxHp);
-                    result.stamina = parseInt(result.maxStamina);
+                    result.maxLust = parseInt(result.maxLust);
                     result.lust = 0;
                     result.orgasms = 0;
                     currentFighters[0] = result;
@@ -67,7 +67,7 @@ module.exports = function (parent) {
                     client.hgetall("Bondage Wrestling", function (err, result2) {
                         if (result2 != null) {
                             result2.hp = parseInt(result2.maxHp);
-                            result2.stamina = parseInt(result2.maxStamina);
+                            result2.maxLust = parseInt(result2.maxLust);
                             result2.lust = 0;
                             result2.orgasms = 0;
                             currentFighters[1] = result2;
@@ -136,8 +136,8 @@ module.exports = function (parent) {
                         statsObj.agility = parseInt(classes[idClass].stats.agility);
                         statsObj.expertise = parseInt(classes[idClass].stats.expertise);
                         statsObj.endurance = parseInt(classes[idClass].stats.endurance);
-                        statsObj.maxHp = parseInt(classes[idClass].stats.toughness) * 5;
-                        statsObj.maxStamina = parseInt(classes[idClass].stats.endurance) * 5;
+                        statsObj.maxHp = 10 + (10 - statsObj.endurance);
+                        statsObj.maxLust = 10 + parseInt(classes[idClass].stats.endurance) * 3;
                         statsObj.wins = 0;
                         statsObj.losses = 0;
                         statsObj.coins = 100;
@@ -179,7 +179,7 @@ module.exports = function (parent) {
                     statsObj.expertise = parseInt(args[4]);
                     statsObj.endurance = parseInt(args[5]);
                     statsObj.maxHp = parseInt(args[1]) * 5;
-                    statsObj.maxStamina = parseInt(args[5]) * 5;
+                    statsObj.maxLust = parseInt(args[5]) * 5;
                     statsObj.wins = 0;
                     statsObj.losses = 0;
                     statsObj.coins = 100;
@@ -200,7 +200,7 @@ module.exports = function (parent) {
             if (result != null) {
                 if (currentFighters.length == 0) {
                     result.hp = parseInt(result.maxHp);
-                    result.stamina = parseInt(result.maxStamina);
+                    result.maxLust = parseInt(result.maxLust);
                     result.lust = 0;
                     result.orgasms = 0;
                     currentFighters[0] = result;
@@ -210,7 +210,7 @@ module.exports = function (parent) {
                 else if (currentFighters.length == 1) {
                     if (currentFighters[0].character != data.character) {
                         result.hp = parseInt(result.maxHp);
-                        result.stamina = parseInt(result.maxStamina);
+                        result.maxLust = parseInt(result.maxLust);
                         result.lust = 0;
                         result.orgasms = 0;
                         currentFighters[1] = result;
@@ -358,7 +358,7 @@ module.exports = function (parent) {
                 var coins = stats.coins || 0;
                 fChatLibInstance.sendMessage("[b]" + stats.character + "[/b]'s stats" + "\n" +
                     "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
-                    "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n" +
+                    "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Max Lust[/color][/b]: " + stats.maxLust + "\n" +
                     "[i][color=green]Dexterity[/color][/i]:  " + stats.dexterity + "\n" +
                     "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + wins + " - " + losses + "\n" +
                     "[b][color=purple]Expertise[/color][/b]: " + stats.expertise + "\n" + /* "      " + "[b][color=orange]Coins[/color][/b]: " + coins + "\n" + */
@@ -418,7 +418,7 @@ module.exports = function (parent) {
                         result.endurance = parseInt(result.endurance) + newStats.endurance;
                         result.toughness = parseInt(result.toughness) + newStats.toughness;
                         result.maxHp = parseInt(result.toughness) * 5;
-                        result.maxStamina = parseInt(result.endurance) * 5;
+                        result.maxLust = parseInt(result.endurance) * 5;
                         client.hmset(newStats.character, result);
                         fChatLibInstance.sendMessage("Succesfully added the new points!");
                     }
@@ -495,7 +495,7 @@ module.exports = function (parent) {
                         result.endurance = parseInt(result.endurance) - newStats.endurance;
                         result.toughness = parseInt(result.toughness) - newStats.toughness;
                         result.maxHp = parseInt(result.toughness) * 5;
-                        result.maxStamina = parseInt(result.endurance) * 5;
+                        result.maxLust = parseInt(result.endurance) * 5;
                         client.hmset(newStats.character, result);
                         fChatLibInstance.sendMessage("Succesfully removed the points!");
                     }
@@ -531,7 +531,7 @@ module.exports = function (parent) {
                 var coins = stats.coins || 0;
                 fChatLibInstance.sendMessage("[b]" + stats.character + "[/b]'s stats" + "\n" +
                     "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
-                    "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Stamina[/color][/b]: " + stats.maxStamina + "\n" +
+                    "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Max Lust[/color][/b]: " + stats.maxLust + "\n" +
                     "[i][color=green]Dexterity[/color][/i]:  " + stats.dexterity + "\n" +
                     "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + wins + " - " + losses + "\n" +
                     "[b][color=purple]Expertise[/color][/b]: " + stats.expertise + "\n" + /* "      " + "[b][color=orange]Coins[/color][/b]: " + coins + "\n" + */
@@ -865,7 +865,7 @@ var hold = require(__dirname + '/etc/holds.js');
 var classes = require(__dirname + '/etc/classes.js');
 
 var currentFighters = [];
-var currentFight = {turn: -1, whoseturn: -1, isInit: false, orgasms: 0, staminaPenalty: 5, winner: -1, currentHold: {}};
+var currentFight = {turn: -1, whoseturn: -1, isInit: false, orgasms: 0, winner: -1, currentHold: {}};
 var diceResults = {first: -1, second: -1};
 
 var Dice = require('cappu-dice');
@@ -1431,22 +1431,8 @@ function nextTurn() {
     if(currentFight.winner == -1){
         tickHold();
     }
+
     currentFight.turn++;
-
-    //var featuresP0 = parseStringToIntArray(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].features);
-    //var featuresP1 = parseStringToIntArray(currentFighters[currentFight.whoseturn].features);
-
-    //if(featuresP0.indexOf(6) != -1 || featuresP1.indexOf(6) != -1){
-    //    fChatLibInstance.sendMessage("[i]It looks like we've got an exhibitionist inside the ring...[/i] [b]"+currentFighters[currentFight.whoseturn].character+"[/b] is quite aroused by the scene!");
-    //    currentFighters[currentFight.whoseturn].lust++;
-    //    checkLifePoints();
-    //}
-    //
-    //if(featuresP0.indexOf(7) != -1){ //stripped down
-    //    fChatLibInstance.sendMessage("[b]"+currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character+"[/b] is looking quite hot in that 'outfit'! [b]"+currentFighters[currentFight.whoseturn].character+"[/b] can't take their eyes off them!");
-    //    currentFighters[currentFight.whoseturn].lust++;
-    //    checkLifePoints();
-    //}
 
     if(currentFight.winner == -1){
         broadcastCombatInfo();
@@ -1492,7 +1478,7 @@ function releaseHold() {
 
 function resetFight() {
     currentFighters = [];
-    currentFight = {turn: -1, whoseturn: -1, isInit: false, orgasms: 0, staminaPenalty: 5, winner: -1, currentHold: {}};
+    currentFight = {turn: -1, whoseturn: -1, isInit: false, orgasms: 0, winner: -1, currentHold: {}};
     diceResults = {first: -1, second: -1};
 }
 
@@ -1502,52 +1488,8 @@ function startFight() {
     setTimeout(rollInitiation(), 2500);
 }
 
-function triggerOrgasm(id) {
-    currentFighters[id].lust = 0;
-    currentFighters[id].orgasms++;
-
-    var featuresP0 = parseStringToIntArray(currentFighters[id].features);
-    if (featuresP0.indexOf(0) != -1) {
-        currentFighters[id].endurance = 1;
-    }
-    else if (featuresP0.indexOf(2) != -1) {
-        if (currentFighters[id].endurance > 1) {
-            currentFighters[id].endurance--;
-        }
-    }
-    else {
-        currentFighters[id].endurance++;
-    }
-
-    if (featuresP0.indexOf(2) != -1) {
-        currentFighters[id].stamina -= Math.floor(0.8 * currentFight.staminaPenalty);
-        fChatLibInstance.sendMessage(currentFighters[id].character + " is multi-orgasmic! The stamina penalty has been reduced by one, but their endurance has decreased by 1.");
-    }
-    else {
-        currentFighters[id].stamina -= currentFight.staminaPenalty;
-    }
-
-    var featuresP1 = parseStringToIntArray(currentFighters[(id == 0 ? 1 : 0)].features);
-    if (featuresP1.indexOf(5) != -1) { //cum slut
-        currentFighters[(id == 0 ? 1 : 0)].lust++;
-    }
-
-    if(holdInPlace()){
-        releaseHold();
-    }
-
-    currentFight.orgasms++;
-    broadcastOrgasm(id);
-}
-
 function checkLifePoints() {
     //test
-    if (currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].lust >= currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].endurance) {
-        triggerOrgasm((currentFight.whoseturn == 0 ? 1 : 0));
-    }
-    if (currentFighters[currentFight.whoseturn].lust >= currentFighters[currentFight.whoseturn].endurance) {
-        triggerOrgasm(currentFight.whoseturn);
-    }
     if (currentFighters[0].hp <= 0) {
         currentFighters[0].hp = 0;
         currentFight.winner = 1;
@@ -1556,20 +1498,20 @@ function checkLifePoints() {
         currentFighters[1].hp = 0;
         currentFight.winner = 0;
     }
-    if (currentFighters[0].stamina <= 0) {
-        currentFighters[0].stamina = 0;
+    if (currentFighters[0].lust >= currentFighters[0].maxLust) {
+        currentFighters[0].lust = currentFighters[0].maxLust;
         currentFight.winner = 1;
     }
-    if (currentFighters[1].stamina <= 0) {
-        currentFighters[1].stamina = 0;
+    if (currentFighters[1].lust >= currentFighters[1].maxLust) {
+        currentFighters[1].lust = currentFighters[1].maxLust;
         currentFight.winner = 0;
     }
 
 
     if (currentFight.winner > -1) {
         //winner!
-        fChatLibInstance.sendMessage("[b]After  #" + currentFight.turn + " turns[/b] and [b]" + currentFight.orgasms + " orgasms[/b]\n" +
-            "[b]" + currentFighters[currentFight.winner].character + "[/b] has finally took " + currentFighters[(currentFight.winner == 0 ? 1 : 0)].character + " down!\nCongrats to the winner!"
+        fChatLibInstance.sendMessage("[b]After  #" + currentFight.turn + " turns[/b]\n" +
+            "[b]" + currentFighters[currentFight.winner].character + "[/b] has finally took " + currentFighters[(currentFight.winner == 0 ? 1 : 0)].character + " down!\nCongratulations to the winner!"
         );
         addWinsLosses(currentFighters[currentFight.winner].character, currentFighters[(currentFight.winner == 0 ? 1 : 0)].character);
         setTimeout(resetFight, 2500);
@@ -1612,8 +1554,8 @@ function broadcastCombatInfo() {
         fChatLibInstance.sendMessage(
             "\n" +
             "[b]Turn #" + currentFight.turn + "[/b] --------------- It's [b][u][color=pink]" + currentFighters[currentFight.whoseturn].character + "[/color][/u][/b]'s turn.\n\n" +
-            (currentFighters.length > 0 ? "[b]" + currentFighters[0].character + ": [/b]" + currentFighters[0].hp + "/" + currentFighters[0].maxHp + " HP  |  " + currentFighters[0].stamina + "/" + currentFighters[0].maxStamina + " Stamina  |  " + currentFighters[0].lust + "/" + currentFighters[0].endurance + " Lust  |  " + currentFighters[0].orgasms + " Orgasms\n" : "") +
-            (currentFighters.length > 1 ? "[b]" + currentFighters[1].character + ": [/b]" + currentFighters[1].hp + "/" + currentFighters[1].maxHp + " HP  |  " + currentFighters[1].stamina + "/" + currentFighters[1].maxStamina + " Stamina  |  " + currentFighters[1].lust + "/" + currentFighters[1].endurance + " Lust  |  " + currentFighters[1].orgasms + " Orgasms" : "")
+            (currentFighters.length > 0 ? "[b]" + currentFighters[0].character + ": [/b]" + currentFighters[0].hp + "/" + currentFighters[0].maxHp + " HP  |  " + currentFighters[0].lust + "/" + currentFighters[0].maxLust + " Lust" : "") +
+            (currentFighters.length > 1 ? "[b]" + currentFighters[1].character + ": [/b]" + currentFighters[1].hp + "/" + currentFighters[1].maxHp + " HP  |  " + currentFighters[1].lust + "/" + currentFighters[1].maxLust + " Lust" : "")
         );
     }
     else {
