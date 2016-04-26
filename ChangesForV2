@@ -30,15 +30,17 @@ New attack system:
 
 I need a light, medium and heavy attack combination where light attacks do minimal acceptable damage with some sort of bonus, medium attacks do slightly greater damage at a mild risk and heavy attacks do quite a bit of damage but at great risk
 
-Light 4
-Medium 6
-Heavy 8
+Rolling: All attack rolls are Stat + 1d6, or if using two stats: (stat1+stat2/2) rounded down + 1d6 
 
-damage: (strength + ((strength - 1)/6)) - toughness
+Light 6 dice score required
+Medium 8 dice score
+Heavy 10 dice score
+
+Damage: (strength + ((strength - 1)/6)) - toughness (example for a pure brawl attack)
 
 http://i.imgur.com/qnOpmBd.png
 
-stat + 1d6, or if using two stats: (stat1+stat2/2) rounded down + 1d6 
+
 
 All attacks will do fixed damage based on the type of attack used.
 
