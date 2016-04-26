@@ -796,34 +796,35 @@ function roll(strType) {
     var typeUsed1 = "";
     var typeUsed2 = "";
     currentFight.actionIsHold = false;
+    currentFight.diceResult = 0;
     switch (strType) {
         case "brawl":
             typeUsed1 = "strength";
-            diceResult = parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + dice.roll();
+            currentFight.diceResult = parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + dice.roll();
             break;
         case "submission":
             typeUsed1 = "strength";
             typeUsed2 = "agility";
-            diceResult = Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2]) ) / 2) + dice.roll();
+            currentFight.diceResult = Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2]) ) / 2) + dice.roll();
             currentFight.actionIsHold = true;
             break;
         case "highflyer":
             typeUsed1 = "agility";
-            diceResult = parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + dice.roll();
+            currentFight.diceResult = parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + dice.roll();
             break;
         case "martial":
             typeUsed1 = "agility";
             typeUsed2 = "expertise";
-            diceResult = Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2]) ) / 2) + dice.roll();
+            currentFight.diceResult = Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2]) ) / 2) + dice.roll();
             break;
         case "sexual":
             typeUsed1 = "expertise";
-            diceResult = parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + dice.roll();
+            currentFight.diceResult = parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + dice.roll();
             break;
         case "humiliation":
             typeUsed1 = "expertise";
             typeUsed2 = "strength";
-            diceResult = Math.floor(parseInt(currentFighters[currentFight.whoseturn][typeUsed1] + parseInt(currentFighters[currentFight.whoseturn][typeUsed2])) / 2) + dice.roll();
+            currentFight.diceResult = Math.floor(parseInt(currentFighters[currentFight.whoseturn][typeUsed1] + parseInt(currentFighters[currentFight.whoseturn][typeUsed2])) / 2) + dice.roll();
             currentFight.actionIsHold = true;
             break;
     }
@@ -832,10 +833,15 @@ function roll(strType) {
 }
 
 function checkRollWinner() {
-    if (currentFight.skipRoll) {
-        currentFighters[currentFight.whoseturn].dice.resetTmpMods();
+
+    if (currentFight.isInit) {
+        currentFight.isInit = false;
+        fChatLibInstance.sendMessage("[i]" + currentFighters[idWinner].character + " emotes the attack first.[/i]");
+        currentFight.whoseturn = idWinner;
+    }
+    else if(currentFight.skipRoll){
         if (currentFight.actionTaken == "sexual" || currentFight.actionTaken == "brawl") {
-            brawlOrSexualGateway(currentFight.actionTaken, currentFight.actionId);
+            attackPrepare(currentFight.actionTaken, currentFight.actionId);
         }
         else if (currentFight.actionTaken == "hold") {
             holdHandler(currentFight.actionId);
@@ -860,34 +866,24 @@ function checkRollWinner() {
         nextTurn();
         return;
     }
-
-    currentFight.skipRoll = false;
-
-    if (diceResults.first != -1 && diceResults.second != -1) {
-        if (diceResults.first > diceResults.second) {
-            checkDiceRollWinner(0);
-        }
-        if (diceResults.second > diceResults.first) {
-            checkDiceRollWinner(1);
-        }
-        if (diceResults.first == diceResults.second) {
-            roll();
-        }
-
-    }
-}
-
-function checkDiceRollWinner(idWinner) {
-    if (currentFight.isInit) {
-        currentFight.isInit = false;
-        fChatLibInstance.sendMessage("[i]" + currentFighters[idWinner].character + " emotes the attack first.[/i]");
-        currentFight.whoseturn = idWinner;
-    }
     else {
-        fChatLibInstance.sendMessage("[b]" + currentFighters[idWinner].character + " wins the roll.[/b]");
+        currentFight.skipRoll = false;
+        var success = false;
+        switch (currentFight.actionId) { //TODO dice check
+            case "Light":
+                success = currentFight.diceResult >= 6;
+                break;
+            case "Medium":
+                success = currentFight.diceResult >= 8;
+                break;
+            case "Heavy":
+                success = currentFight.diceResult >= 10;
+                break;
+        }
         //attack process
-        if (currentFight.whoseturn == idWinner) { // si c'était deja a lui, alors attaque destructrice et on change pas de tour
+        if (success) { // si c'était deja a lui, alors attaque destructrice et on change pas de tour
             //hit
+            fChatLibInstance.sendMessage("[b]" + currentFighters[idWinner].character + " wins the roll.[/b]");
             currentFighters[currentFight.whoseturn].dice.resetTmpMods();
             if (currentFight.actionTaken == "sexual" || currentFight.actionTaken == "brawl") {
                 brawlOrSexualGateway(currentFight.actionTaken, currentFight.actionId);
@@ -950,6 +946,7 @@ function checkDiceRollWinner(idWinner) {
     }
     nextTurn();
 }
+
 
 function missHandler(idPlayer) {
     fChatLibInstance.sendMessage("[i][b]" + currentFighters[idPlayer].character + "[/b] missed their attack![/i]");
@@ -1065,14 +1062,14 @@ function holdHandler(id, type) {
     }
 }
 
-function brawlOrSexualGateway(stringType, id) {
+function attackPrepare(actionType, actionId) {
     var typeUsed1 = "";
     var typeUsed2 = "";
     var dmgHp = 0;
     var dmgLust = 0;
     var isHold = false;
 
-    switch (stringType) {
+    switch (actionType) {
         case "brawl":
             typeUsed1 = "strength";
             dmgHp = parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + newDice.roll();
