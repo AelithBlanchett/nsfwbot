@@ -1065,42 +1065,62 @@ function holdHandler(id, type) {
 function attackPrepare(actionType, actionId) {
     var typeUsed1 = "";
     var typeUsed2 = "";
+    var typeDefender = "";
     var dmgHp = 0;
     var dmgLust = 0;
     var isHold = false;
+    var isSexual = 0; // 0 = false, 1 = true, 2 = both
 
     switch (actionType) {
         case "brawl":
             typeUsed1 = "strength";
-            dmgHp = parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + newDice.roll();
+            typeDefender = "toughness";
             break;
         case "submission":
             typeUsed1 = "strength";
             typeUsed2 = "agility";
-            dmgHp = Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2]) ) / 2) + newDice.roll();
+            typeDefender = "determination";
             isHold = true;
             break;
         case "highflyer":
             typeUsed1 = "agility";
-            dmgHp = parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + newDice.roll();
+            typeDefender = "toughness";
             break;
         case "martial":
             typeUsed1 = "agility";
             typeUsed2 = "expertise";
-            dmgHp = Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2]) ) / 2) + newDice.roll();
+            typeDefender = "toughness";
             break;
         case "sexual":
             typeUsed1 = "expertise";
-            dmgLust = parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + newDice.roll();
+            typeDefender = "endurance";
+            isSexual = true;
             break;
         case "humiliation":
             typeUsed1 = "expertise";
             typeUsed2 = "strength";
-            dmgLust = Math.floor(parseInt(currentFighters[currentFight.whoseturn][typeUsed1] / 2)) + newDice.roll();
-            dmgHp = Math.floor(parseInt(currentFighters[currentFight.whoseturn][typeUsed2]) / 2) + newDice.roll();
+            typeDefender = "determination";
             isHold = true;
             break;
     }
+    var total = 1;
+    if(typeUsed2 == ""){
+        total = (currentFighters[currentFight.whoseturn][typeUsed1] + ((currentFighters[currentFight.whoseturn][typeUsed1] - 1)/6)) - currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)][typeDefender]
+    }
+    else{
+        total = Math.floor(((currentFighters[currentFight.whoseturn][typeUsed1] + ((currentFighters[currentFight.whoseturn][typeUsed1] - 1)/6)) + (currentFighters[currentFight.whoseturn][typeUsed2] + ((currentFighters[currentFight.whoseturn][typeUsed2] - 1)/6)) /2))  - currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)][typeDefender];
+    }
+    if(isSexual == 0){
+        dmgHp = total;
+    }
+    else if(isSexual == 1){
+        dmgLust = total;
+    }
+    else{
+        dmgHp = Math.floor(total / 2);
+        dmgLust = Math.floor(total / 2);
+    }
+
 
     if(!isHold){
         attackHandler(dmgHp, dmgLust);
