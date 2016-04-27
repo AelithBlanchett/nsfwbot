@@ -884,9 +884,9 @@ function checkRollWinner() {
         if (success) { // si c'était deja a lui, alors attaque destructrice et on change pas de tour
             //hit
             fChatLibInstance.sendMessage("[b]" + currentFighters[idWinner].character + " wins the roll.[/b]");
-            currentFighters[currentFight.whoseturn].dice.resetTmpMods();
+            //currentFighters[currentFight.whoseturn].dice.resetTmpMods();
             if (currentFight.actionTaken == "sexual" || currentFight.actionTaken == "brawl") {
-                brawlOrSexualGateway(currentFight.actionTaken, currentFight.actionId);
+                attackPrepare(currentFight.actionTaken, currentFight.actionId);
             }
             else if (currentFight.actionTaken == "hold") {
                 holdHandler(currentFight.actionId);
@@ -1070,6 +1070,7 @@ function attackPrepare(actionType, actionId) {
     var dmgLust = 0;
     var isHold = false;
     var isSexual = 0; // 0 = false, 1 = true, 2 = both
+    var divider = 1;
 
     switch (actionType) {
         case "brawl":
@@ -1103,12 +1104,25 @@ function attackPrepare(actionType, actionId) {
             isHold = true;
             break;
     }
+
+    switch(actionId){
+        case "Light":
+            divider = 6;
+            break;
+        case "Medium":
+            divider = 4;
+            break;
+        case "Heavy":
+            divider = 2;
+            break;
+    }
+
     var total = 1;
     if(typeUsed2 == ""){
-        total = (currentFighters[currentFight.whoseturn][typeUsed1] + ((currentFighters[currentFight.whoseturn][typeUsed1] - 1)/6)) - currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)][typeDefender]
+        total = (currentFighters[currentFight.whoseturn][typeUsed1] + ((currentFighters[currentFight.whoseturn][typeUsed1] - 1)/divider)) - currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)][typeDefender]
     }
     else{
-        total = Math.floor(((currentFighters[currentFight.whoseturn][typeUsed1] + ((currentFighters[currentFight.whoseturn][typeUsed1] - 1)/6)) + (currentFighters[currentFight.whoseturn][typeUsed2] + ((currentFighters[currentFight.whoseturn][typeUsed2] - 1)/6)) /2))  - currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)][typeDefender];
+        total = Math.floor(((currentFighters[currentFight.whoseturn][typeUsed1] + ((currentFighters[currentFight.whoseturn][typeUsed1] - 1)/divider)) + (currentFighters[currentFight.whoseturn][typeUsed2] + ((currentFighters[currentFight.whoseturn][typeUsed2] - 1)/divider)) /2))  - currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)][typeDefender];
     }
     if(isSexual == 0){
         dmgHp = total;
