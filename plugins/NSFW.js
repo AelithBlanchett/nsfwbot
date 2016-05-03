@@ -714,7 +714,7 @@ module.exports = function (parent) {
         }
         else {
             //available commands
-            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !brawl light OR !sexual medium OR !hmove Heavy");
+            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !brawl light OR !sexual medium OR !hmove Heavy OR !bondage item");
         }
     };
 
@@ -774,6 +774,9 @@ module.exports = function (parent) {
     cmdHandler.restrain = cmdHandler.bondage;
     cmdHandler.tie = cmdHandler.bondage;
     cmdHandler.tieup = cmdHandler.bondage;
+    cmdHandler.dominate = cmdHandler.bondage;
+    cmdHandler.tame = cmdHandler.bondage;
+    cmdHandler.bd = cmdHandler.bondage;
 
 
     return cmdHandler;
@@ -1411,8 +1414,8 @@ function broadcastCombatInfo() {
         fChatLibInstance.sendMessage(
             "\n" +
             "[b]Turn #" + currentFight.turn + "[/b] --------------- It's [b][u][color=pink]" + currentFighters[currentFight.whoseturn].character + "[/color][/u][/b]'s turn.\n\n" +
-            (currentFighters.length > 0 ? "[b]" + currentFighters[0].character + ": [/b]" + currentFighters[0].hp + "/" + currentFighters[0].maxHp + " HP  |  " + currentFighters[0].lust + "/" + currentFighters[0].maxLust + " Lust\n" : "") +
-            (currentFighters.length > 1 ? "[b]" + currentFighters[1].character + ": [/b]" + currentFighters[1].hp + "/" + currentFighters[1].maxHp + " HP  |  " + currentFighters[1].lust + "/" + currentFighters[1].maxLust + " Lust" : "")
+            (currentFighters.length > 0 ? "[b]" + currentFighters[0].character + ": [/b]" + currentFighters[0].hp + "/" + currentFighters[0].maxHp + " [color=red]HP[/color]  |  " + currentFighters[0].lust + "/" + currentFighters[0].maxLust + " [color=pink]Lust[/color]  |  " + currentFighters[0].ownBondageLevel + "/9 Bondage level\n" : "") +
+            (currentFighters.length > 1 ? "[b]" + currentFighters[1].character + ": [/b]" + currentFighters[1].hp + "/" + currentFighters[1].maxHp + " [color=red]HP[/color]  |  " + currentFighters[1].lust + "/" + currentFighters[1].maxLust + " [color=pink]Lust[/color]  |  " + currentFighters[0].ownBondageLevel + "/9 Bondage level" : "")
         );
     }
     else {
