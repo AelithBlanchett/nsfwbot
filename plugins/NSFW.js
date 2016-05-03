@@ -29,61 +29,71 @@ module.exports = function (parent) {
     };
 
     cmdHandler.sextoys = function () {
-        var toy = getRandomSextoy();
-        fChatLibInstance.sendMessage("Here, take this [b]" + toy + "[/b]!");
+        fChatLibInstance.sendMessage("Here, take this [b]" + getRandomSextoy() + "[/b]!");
     };
     cmdHandler.toys = cmdHandler.sextoys;
 
-    cmdHandler.test = function(args, data){ //debug
-        if(debug) {
-            console.log(didYouMean(args, sexual, "id"));
-        }
-    };
-
     cmdHandler.setHPP1 = function(args,data){ //debug
-        if(debug){
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
             currentFighters[0].hp = parseInt(args);
         }
     };
     cmdHandler.setHPP2 = function(args,data){ //debug
-        if(debug){
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
             currentFighters[1].hp = parseInt(args);
         }
     };
     cmdHandler.setLPP1 = function(args,data){ //debug
-        if(debug){
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
             currentFighters[0].lust = parseInt(args);
         }
     };
     cmdHandler.setLPP2 = function(args,data){ //debug
-        if(debug){
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
             currentFighters[1].lust = parseInt(args);
         }
     };
     cmdHandler.setXP = function(args,data){ //debug
-        if(debug){
-            client.hgetall(args, function (err, result) {
-                if (result != null) {
-                    result.experience += 10;
-                }
-            });
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
+            var arr = args.split(' ');
+            var result = arr.splice(0, 1);
+            result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
+
+            if (result.length == 2 && !isNaN(result[0]) && result[1] != "") {
+                client.hgetall(result[1], function (err, result) {
+                    if (result != null) {
+                        result.experience = args;
+                        client.hmset(result.character, result);
+                        fChatLibInstance.sendMessage("Succesfully set the XP to "+result[0]);
+                    }
+                    else {
+                        fChatLibInstance.sendMessage("Are you sure this user is registered?");
+                    }
+                });
+            }
+            else {
+                fChatLibInstance.sendMessage("Invalid syntax. Correct is: !setXP amount CHARACTER. Example: !setXP 10 ThatCharacter");
+            }
+        }
+        else{
+            fChatLibInstance.sendMessage("You don't have sufficient rights.");
         }
     };
 
-    cmdHandler.win = function(){ //debug
-        if(debug){
+    cmdHandler.forceTurnWin = function(){ //debug
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
             currentFighters[currentFight.whoseturn].dice.addTmpMod(100,1);
         }
     };
 
-    cmdHandler.lose = function(){ //debug
-        if(debug){
+    cmdHandler.forceTurnLose = function(){ //debug
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
             currentFighters[currentFight.whoseturn].dice.addTmpMod(-100,1);
         }
     };
-    //
+
     cmdHandler.dbg = function(args,data){
-        if(debug) {
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
             client.hgetall('Lustful Aelith', function (err, result) {
                 if (result != null) {
                     result.hp = parseInt(result.maxHp);
@@ -126,8 +136,8 @@ module.exports = function (parent) {
                         statsObj.agility = parseInt(classes[idClass].stats.agility);
                         statsObj.expertise = parseInt(classes[idClass].stats.expertise);
                         statsObj.endurance = parseInt(classes[idClass].stats.endurance);
-                        statsObj.maxHp = 10 + (10 - statsObj.endurance);
-                        statsObj.maxLust = 10 + parseInt(classes[idClass].stats.endurance) * 3;
+                        statsObj.maxHp = 10 + parseInt(statsObj.strength) + parseInt(statsObj.determination) + parseInt(statsObj.agility) + parseInt(statsObj.expertise) + parseInt(statsObj.toughness);
+                        statsObj.maxLust = 14 + (3* parseInt(statsObj.endurance));
                         statsObj.wins = 0;
                         statsObj.losses = 0;
                         statsObj.coins = 100;
@@ -170,8 +180,8 @@ module.exports = function (parent) {
                     statsObj.agility = parseInt(args[3]);
                     statsObj.expertise = parseInt(args[4]);
                     statsObj.endurance = parseInt(args[5]);
-                    statsObj.maxHp = 10 + (10 - statsObj.endurance);
-                    statsObj.maxLust = 14;
+                    statsObj.maxHp = 10 + parseInt(statsObj.strength) + parseInt(statsObj.determination) + parseInt(statsObj.agility) + parseInt(statsObj.expertise) + parseInt(statsObj.toughness);
+                    statsObj.maxLust = 14 + (3* parseInt(statsObj.endurance));
                     statsObj.wins = 0;
                     statsObj.losses = 0;
                     statsObj.features = "";
@@ -268,8 +278,8 @@ module.exports = function (parent) {
         }
     };
 
-    cmdHandler.myStats = function (args, data) {
-        client.hgetall(data.character, function (err, result) {
+    var statsGetter = function(args, data, character){
+        client.hgetall(character, function (err, result) {
             if (result != null) {
                 var stats = result; //Health is (Toughness x 5) while Stamina is (Endurance x 5)
                 var wins, losses, experience, experienceSpent;
@@ -307,11 +317,24 @@ module.exports = function (parent) {
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
             }
             else {
-                fChatLibInstance.sendMessage("Are you sure you're registered?");
+                fChatLibInstance.sendMessage("This user hasn't been found in the database.");
             }
         });
     };
+
+    cmdHandler.myStats = function (args, data) {
+        statsGetter(args, data, data.character);
+    };
     cmdHandler.stats = cmdHandler.myStats;
+
+    cmdHandler.getStats = function (args, data) {
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
+            statsGetter(args, data, args);
+        }
+        else{
+            fChatLibInstance.sendMessage("You don't have sufficient rights.");
+        }
+    };
 
     cmdHandler.addStat = function (args, data) {
         client.hgetall(data.character, function (err, result) {
@@ -358,8 +381,8 @@ module.exports = function (parent) {
                 else{
                     result.experience = parseInt(result.experience) - expNeeded;
                     result.experienceSpent = parseInt(result.experienceSpent) + expNeeded;
-                    result.maxHp = 10 + (result.strength + result.determination + result.agility + result.expertise + result.toughness);
-                    result.maxLust = 14 + (result.strength + result.determination + result.agility + result.expertise + result.endurance + result.toughness);
+                    result.maxHp = 10 + parseInt(result.strength) + parseInt(result.determination) + parseInt(result.agility) + parseInt(result.expertise) + parseInt(result.toughness);
+                    result.maxLust = 14 + (3* parseInt(result.endurance));
                     client.hmset(result.character, result);
                     fChatLibInstance.sendMessage("Succesfully added your new point with a total cost of "+expNeeded+ " XP points.");
                 }
@@ -415,8 +438,8 @@ module.exports = function (parent) {
                         result.expertise = parseInt(result.expertise) + newStats.expertise;
                         result.endurance = parseInt(result.endurance) + newStats.endurance;
                         result.toughness = parseInt(result.toughness) + newStats.toughness;
-                        result.maxHp = 10 + (10 - result.endurance);
-                        result.maxLust = 14 + (result.strength + result.determination + result.agility + result.expertise + result.endurance + result.toughness);
+                        result.maxHp = 10 + parseInt(result.strength) + parseInt(result.determination) + parseInt(result.agility) + parseInt(result.expertise) + parseInt(result.toughness);
+                        result.maxLust = 14 + (3* parseInt(result.endurance));
                         client.hmset(newStats.character, result);
                         fChatLibInstance.sendMessage("Succesfully added the new points!");
                     }
@@ -492,8 +515,8 @@ module.exports = function (parent) {
                         result.expertise = parseInt(result.expertise) - newStats.expertise;
                         result.endurance = parseInt(result.endurance) - newStats.endurance;
                         result.toughness = parseInt(result.toughness) - newStats.toughness;
-                        result.maxHp = parseInt(result.toughness) * 5;
-                        result.maxLust = parseInt(result.endurance) * 5;
+                        result.maxHp = 10 + parseInt(result.strength) + parseInt(result.determination) + parseInt(result.agility) + parseInt(result.expertise) + parseInt(result.toughness);
+                        result.maxLust = 14 + (3* parseInt(result.endurance));
                         client.hmset(newStats.character, result);
                         fChatLibInstance.sendMessage("Succesfully removed the points!");
                     }
@@ -509,38 +532,7 @@ module.exports = function (parent) {
         }
     };
 
-    //cmdHandler.getStats = function (args, data) {
-    //    client.hgetall(args, function (err, result) {
-    //        if (result != null) {
-    //            var stats = result; //Health is (Toughness x 5) while Stamina is (Endurance x 5)
-    //            var wins, losses;
-    //            if(isNaN(stats.wins)){
-    //                wins = 0;
-    //            }
-    //            else{
-    //                wins = stats.wins;
-    //            }
-    //            if(isNaN(stats.losses)){
-    //                losses = 0;
-    //            }
-    //            else{
-    //                losses = stats.losses;
-    //            }
-    //            var coins = stats.coins || 0;
-    //            fChatLibInstance.sendMessage("[b]" + stats.character + "[/b]'s stats" + "\n" +
-    //                "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
-    //                "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Max Lust[/color][/b]: " + stats.maxLust + "\n" +
-    //                "[i][color=green]determination[/color][/i]:  " + stats.determination + "\n" +
-    //                "[i][color=cyan]Agility[/color][/i]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + wins + " - " + losses + "\n" +
-    //                "[b][color=purple]Expertise[/color][/b]: " + stats.expertise +  "      " + "[b][color=orange]Experience[/color][/b]: " + stats.experience + "\n" +
-    //                "[b][color=blue]Endurance[/color][/b]: " + stats.endurance + "\n\n" +
-    //                "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
-    //        }
-    //        else {
-    //            fChatLibInstance.sendMessage("Are you sure this user is registered?");
-    //        }
-    //    });
-    //};
+
 
     cmdHandler.addFeature = function (args, data) {
         if (args.length > 0) {
