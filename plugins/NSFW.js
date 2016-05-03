@@ -28,7 +28,6 @@ module.exports = function (parent) {
         }
     };
 
-
     cmdHandler.sextoys = function () {
         var toy = getRandomSextoy();
         fChatLibInstance.sendMessage("Here, take this [b]" + toy + "[/b]!");
@@ -38,6 +37,27 @@ module.exports = function (parent) {
     cmdHandler.test = function(args, data){ //debug
         if(debug) {
             console.log(didYouMean(args, sexual, "id"));
+        }
+    };
+
+    cmdHandler.setHPP1 = function(args,data){ //debug
+        if(debug){
+            currentFighters[0].hp = parseInt(args);
+        }
+    };
+    cmdHandler.setHPP2 = function(args,data){ //debug
+        if(debug){
+            currentFighters[1].hp = parseInt(args);
+        }
+    };
+    cmdHandler.setLPP1 = function(args,data){ //debug
+        if(debug){
+            currentFighters[0].lust = parseInt(args);
+        }
+    };
+    cmdHandler.setLPP2 = function(args,data){ //debug
+        if(debug){
+            currentFighters[1].lust = parseInt(args);
         }
     };
 
@@ -167,7 +187,8 @@ module.exports = function (parent) {
                     result.maxLust = parseInt(result.maxLust);
                     result.lust = 0;
                     currentFighters[0] = result;
-                    currentFighters[0].dice = new Dice(6);
+                    currentFighters[0].dice = new Dice(10);
+                    currentFighters[0].ownBondageLevel = 0;
                     fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
                 }
                 else if (currentFighters.length == 1) {
@@ -177,6 +198,7 @@ module.exports = function (parent) {
                         result.lust = 0;
                         currentFighters[1] = result;
                         currentFighters[1].dice = new Dice(6);
+                        currentFighters[1].ownBondageLevel = 0;
                         fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
                         startFight();
                     }
@@ -578,13 +600,30 @@ module.exports = function (parent) {
         }
     };
 
+    cmdHandler.pass = function (args, data) {
+        if (checkIfFightIsGoingOn()) {
+            if (data.character == currentFighters[currentFight.whoseturn].character) {
+                currentFight.actionType = "pass";
+                checkRollWinner(true);
+            }
+            else {
+                fChatLibInstance.sendMessage("It's not your turn yet.");
+            }
+
+        }
+        else {
+            fChatLibInstance.sendMessage("There isn't a match going on at the moment.");
+        }
+    };
+    cmdHandler.skip = cmdHandler.pass;
+
     cmdHandler.escape = function (args, data) {
         if (checkIfFightIsGoingOn()) {
             if (data.character == currentFighters[currentFight.whoseturn].character) {
                 if (isInHold()) {
                     currentFight.actionType = "escape";
                     if (currentFight.turn > 0) {
-                        roll();
+                        rollBoth();
                     }
                 }
                 else {
@@ -607,7 +646,6 @@ module.exports = function (parent) {
         if (checkIfFightIsGoingOn()) {
             if (data.character == currentFighters[currentFight.whoseturn].character) {
                 if (isInHold()) {
-                    currentFight.actionType = "escape";
                     if (currentFight.turn > 0) {
                         currentFight.winner = (currentFight.whoseturn == 0 ? 1 : 0);
                         fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " is giving up! It must have been too much to handle!");
@@ -653,7 +691,7 @@ module.exports = function (parent) {
 
                     if(currentFight.actionType == "bondage") //then it's maybe a bd attack
                     {
-                        currentFight.actionTier = findBondageTier(args);
+                        currentFight.actionTier = "light";
                     }
 
                     if (currentFight.actionTier != "") {
@@ -749,8 +787,8 @@ var features = require(__dirname + '/etc/features.js');
 var sextoys = require(__dirname + '/etc/sextoys.js');
 var classes = require(__dirname + '/etc/classes.js');
 
-var attackTiers = ['Light', 'Medium', 'Heavy'];
-var bondageTiers = ['Arms', 'Torso', 'Legs'];
+var attackTiers = ['light', 'medium', 'heavy'];
+var bondageTiers = ['arms', 'torso', 'legs'];
 
 var currentFighters = [];
 var currentFight = {turn: -1, whoseturn: -1, isInit: false, orgasms: 0, winner: -1, currentHold: {}, actionTier: "", actionType: "", dmgHp: 0, dmgLust: 0, actionIsHold: false, diceResult: 0, intMovesCount: [0,0], bothPlayerRoll: 0};
@@ -767,10 +805,13 @@ function beginInitiation(){
 
 function rollBoth(){
     currentFight.bothPlayerRoll = true;
+    var mods0 = (currentFighters[0].dice.getModsSum() + currentFighters[0].dice.getTmpModsSum());
+    var mods1 = (currentFighters[1].dice.getModsSum() + currentFighters[1].dice.getTmpModsSum());
     currentFight.diceResultP1 = currentFighters[0].dice.roll();
     currentFight.diceResultP2 = currentFighters[1].dice.roll();
-    fChatLibInstance.sendMessage("\n[b]" + currentFighters[0].character + "[/b] rolled a [b]" + currentFight.diceResultP1 + "[/b] " + "\n" +
-        "[b]" + currentFighters[1].character + "[/b] rolled a [b]" + currentFight.diceResultP2 + "[/b] ");
+    //currentFight.diceResultP1 = currentFight.diceResultP2; TO CHECK FOR STACK OVERFLOW
+    fChatLibInstance.sendMessage("\n[b]" + currentFighters[0].character + "[/b] rolled a [b]" + currentFight.diceResultP1 + "[/b] " + (mods0 != 0 ? "(" + ((mods0 >= 0 ? "+" : "") + mods0 + " applied)") : "" ) + "\n" +
+        "[b]" + currentFighters[1].character + "[/b] rolled a [b]" + currentFight.diceResultP2 + "[/b] " + (mods1 != 0 ? "(" + ((mods1 >= 0 ? "+" : "") + mods1 + " applied)") : "" ));
     checkRollWinner();
 }
 
@@ -799,7 +840,7 @@ function roll() {
     var diceScore = 0;
     if(currentFight.whoseturn == 0){
         mods = (currentFighters[0].dice.getModsSum() + currentFighters[0].dice.getTmpModsSum());
-        diceScore = currentFighters[0].dice;
+        diceScore = currentFighters[0].dice.roll();
     }
     else{
         mods = (currentFighters[1].dice.getModsSum() + currentFighters[1].dice.getTmpModsSum());
@@ -841,6 +882,9 @@ function roll() {
             currentFight.diceResult = parseInt(Math.floor(parseInt(currentFighters[currentFight.whoseturn][typeUsed1] + parseInt(currentFighters[currentFight.whoseturn][typeUsed2])) / 2) + diceScore);
             currentFight.actionIsHold = true;
             break;
+        case "bondage":
+            currentFight.diceResult = diceScore;
+            break;
     }
     fChatLibInstance.sendMessage("\n[b]" + currentFighters[currentFight.whoseturn].character + "[/b] rolled a [b]" + currentFight.diceResult + "[/b] " + (mods != 0 ? "(" + ((mods >= 0 ? "+" : "") + mods + " applied)") : "" ));
     checkRollWinner();
@@ -849,11 +893,11 @@ function roll() {
 function checkRollWinner(blnForceSuccess) {
     if(currentFight.bothPlayerRoll){
         currentFight.bothPlayerRoll = false;
+        if(currentFight.diceResultP1 == currentFight.diceResultP2){
+            rollBoth();
+        }
         var idWinner = (currentFight.diceResultP1 > currentFight.diceResultP2 ? 0 : 1);
         if (currentFight.isInit) {
-            if(currentFight.diceResultP1 == currentFight.diceResultP2){
-                rollBoth();
-            }
             currentFight.isInit = false;
             fChatLibInstance.sendMessage("[i]" + currentFighters[idWinner].character + " emotes the attack first.[/i]");
             currentFight.whoseturn = idWinner;
@@ -867,13 +911,13 @@ function checkRollWinner(blnForceSuccess) {
     else{
         var success = false;
         switch (currentFight.actionTier) {
-            case "Light":
+            case "light":
                 success = currentFight.diceResult >= 6;
                 break;
-            case "Medium":
+            case "medium":
                 success = currentFight.diceResult >= 8;
                 break;
-            case "Heavy":
+            case "heavy":
                 success = currentFight.diceResult >= 10;
                 break;
             default:
@@ -889,14 +933,30 @@ function checkRollWinner(blnForceSuccess) {
         //attack process
         if (success) {
             currentFighters[currentFight.whoseturn].dice.resetTmpMods();
-            if (currentFight.actionType == "Escape") {
+            if (currentFight.actionType == "escape") {
                 currentFight.currentHold.turnsLeft = 0;
                 currentFight.currentHold.isInfinite = false;
                 fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!\nIt's still " + currentFighters[currentFight.whoseturn].character + "'s turn.");
                 return;
             }
-            else if (currentFight.actionType == "Pass") {
+            else if (currentFight.actionType == "pass") {
                 fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has passed this turn.");
+            }
+            else if( currentFight.actionType == "bondage"){
+                currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownBondageLevel++;
+                fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s bondage attack has been [color=green][u]successful![/u][/color][/b]");
+                if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownBondageLevel == 3){
+                    currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].dice.addMod(-1);
+                    fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s bondage items are starting to get in the way! -1 to their dice rolls.[/b]");
+                }
+                else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownBondageLevel == 6){
+                    currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].dice.addMod(-1);
+                    fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + " is looking quite helpless like that! Another -1 to their dice rolls![/b]");
+                }
+                else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownBondageLevel == 9){
+                    currentFight.winner = currentFight.whoseturn;
+                    fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + " is completely bound! The fight is over![/b]");
+                }
             }
             else {
                 fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s attack has [color=green][u]hit![/u][/color][/b]");
@@ -1058,13 +1118,13 @@ function attackPrepare(actionType, actionId) {
     }
 
     switch(actionId){
-        case "Light":
+        case "light":
             divider = 6;
             break;
-        case "Medium":
+        case "medium":
             divider = 4;
             break;
-        case "Heavy":
+        case "heavy":
             divider = 2;
             break;
     }
