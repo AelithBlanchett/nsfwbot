@@ -33,38 +33,22 @@ module.exports = function (parent) {
     };
     cmdHandler.toys = cmdHandler.sextoys;
 
-    cmdHandler.setHPP1 = function(args,data){ //debug
+    cmdHandler.setFight = function(args,data){ //debug
         if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
-            currentFighters[0].hp = parseInt(args);
-        }
-    };
-    cmdHandler.setHPP2 = function(args,data){ //debug
-        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
-            currentFighters[1].hp = parseInt(args);
-        }
-    };
-    cmdHandler.setLPP1 = function(args,data){ //debug
-        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
-            currentFighters[0].lust = parseInt(args);
-        }
-    };
-    cmdHandler.setLPP2 = function(args,data){ //debug
-        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
-            currentFighters[1].lust = parseInt(args);
-        }
-    };
-    cmdHandler.setXP = function(args,data){ //debug
-        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
+            if(!checkIfFightIsGoingOn()){
+                fChatLibInstance.sendMessage("There isn't a fight going on right now.");
+                return;
+            }
             var arr = args.split(' ');
-            var result = arr.splice(0, 1);
+            var result = arr.splice(0, 2);
             result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
 
-            if (result.length == 2 && !isNaN(result[0]) && result[1] != "") {
-                client.hgetall(result[1], function (err, result) {
-                    if (result != null) {
-                        result.experience = args;
-                        client.hmset(result.character, result);
-                        fChatLibInstance.sendMessage("Succesfully set the XP to "+result[0]);
+            if (result.length == 3 && result[0] != "" && !isNaN(result[1]) && !isNaN(result[2])) {
+                client.hgetall(currentFighters[result[2]].character, function (err, char) {
+                    if (char != null) {
+                        char[result[0]] = parseInt(result[1]);
+                        client.hmset(char.character, char);
+                        fChatLibInstance.sendMessage("Succesfully set the "+result[0]+" to "+parseInt(result[1]) + " for the current fight.");
                     }
                     else {
                         fChatLibInstance.sendMessage("Are you sure this user is registered?");
@@ -72,7 +56,34 @@ module.exports = function (parent) {
                 });
             }
             else {
-                fChatLibInstance.sendMessage("Invalid syntax. Correct is: !setXP amount CHARACTER. Example: !setXP 10 ThatCharacter");
+                fChatLibInstance.sendMessage("Invalid syntax. Correct is: !setFight stat amount turn_number. Example: !setFight lust 10 0");
+            }
+        }
+        else{
+            fChatLibInstance.sendMessage("You don't have sufficient rights.");
+        }
+    };
+
+    cmdHandler.set = function(args,data){ //debug
+        if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
+            var arr = args.split(' ');
+            var result = arr.splice(0, 2);
+            result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
+
+            if (result.length == 3 && result[0] != "" && !isNaN(result[1]) && result[2] != "") {
+                client.hgetall(result[2], function (err, char) {
+                    if (char != null) {
+                        char[result[0]] = parseInt(result[1]);
+                        client.hmset(char.character, char);
+                        fChatLibInstance.sendMessage("Succesfully set the "+result[0]+" to "+parseInt(result[1]));
+                    }
+                    else {
+                        fChatLibInstance.sendMessage("Are you sure this user is registered?");
+                    }
+                });
+            }
+            else {
+                fChatLibInstance.sendMessage("Invalid syntax. Correct is: !set stat amount CHARACTER. Example: !set xp 10 ThatCharacter");
             }
         }
         else{
@@ -799,6 +810,8 @@ var classes = require(__dirname + '/etc/classes.js');
 var attackTiers = ['light', 'medium', 'heavy'];
 var bondageTiers = ['arms', 'torso', 'legs'];
 
+var consts = {};
+
 var currentFighters = [];
 var currentFight = {turn: -1, whoseturn: -1, isInit: false, orgasms: 0, winner: -1, currentHold: {}, actionTier: "", actionType: "", dmgHp: 0, dmgLust: 0, actionIsHold: false, diceResult: 0, intMovesCount: [0,0], bothPlayerRoll: 0};
 var Dice = require('cappu-dice');
@@ -1092,6 +1105,7 @@ function attackPrepare(actionType, actionId) {
     var isHold = false;
     var isSexual = 0; // 0 = false, 1 = true, 2 = both
     var divider = 1;
+    var minDmg = 1;
 
     switch (actionType) {
         case "brawl":
@@ -1130,12 +1144,15 @@ function attackPrepare(actionType, actionId) {
     switch(actionId){
         case "light":
             divider = 6;
+            minDmg = 1;
             break;
         case "medium":
             divider = 4;
+            minDmg = 2;
             break;
         case "heavy":
             divider = 2;
+            minDmg = 4;
             break;
     }
 
@@ -1153,13 +1170,25 @@ function attackPrepare(actionType, actionId) {
     }
     if(isSexual == 0){
         dmgHp = total;
+        if(dmgHp < minDmg){
+            dmgHp = minDmg;
+        }
     }
     else if(isSexual == 1){
         dmgLust = total;
+        if(dmgLust < minDmg){
+            dmgLust = minDmg;
+        }
     }
     else{
         dmgHp = Math.floor(total / 2);
         dmgLust = Math.floor(total / 2);
+        if(dmgHp < (minDmg / 2)){
+            dmgHp = minDmg;
+        }
+        if(dmgLust < (minDmg / 2)){
+            dmgLust = minDmg;
+        }
     }
 
     //add xp points
