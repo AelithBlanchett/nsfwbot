@@ -46,7 +46,7 @@ module.exports = function (parent) {
             if (result.length == 3 && result[0] != "" && !isNaN(result[1]) && !isNaN(result[2])) {
                 client.hgetall(currentFighters[result[2]].character, function (err, char) {
                     if (char != null) {
-                        char[result[0]] = parseInt(result[1]);
+                        currentFighters[result[2]][result[0]] = parseInt(result[1]);
                         client.hmset(char.character, char);
                         fChatLibInstance.sendMessage("Succesfully set the "+result[0]+" to "+parseInt(result[1]) + " for the current fight.");
                     }
@@ -91,13 +91,13 @@ module.exports = function (parent) {
         }
     };
 
-    cmdHandler.forceTurnWin = function(){ //debug
+    cmdHandler.forceTurnWin = function(args,data){ //debug
         if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
             currentFighters[currentFight.whoseturn].dice.addTmpMod(100,1);
         }
     };
 
-    cmdHandler.forceTurnLose = function(){ //debug
+    cmdHandler.forceTurnLose = function(args,data){ //debug
         if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
             currentFighters[currentFight.whoseturn].dice.addTmpMod(-100,1);
         }
@@ -133,79 +133,30 @@ module.exports = function (parent) {
     };
 
     cmdHandler.register = function (args, data) {
-        if (isNaN(args)) {
-            var idClass = findItemIdByTitle(classes, args);
-            if (idClass != -1) {
-                client.hexists(data.character, "character", function (err, reply) {
-                    if (reply == 0) {
-                        var statsObj = {};
-                        statsObj.character = data.character;
-                        statsObj.stats = classes[idClass].stats;
-                        statsObj.strength = parseInt(classes[idClass].stats.strength);
-                        statsObj.toughness = parseInt(classes[idClass].stats.toughness);
-                        statsObj.determination = parseInt(classes[idClass].stats.determination);
-                        statsObj.agility = parseInt(classes[idClass].stats.agility);
-                        statsObj.expertise = parseInt(classes[idClass].stats.expertise);
-                        statsObj.endurance = parseInt(classes[idClass].stats.endurance);
-                        statsObj.maxHp = 10 + parseInt(statsObj.strength) + parseInt(statsObj.determination) + parseInt(statsObj.agility) + parseInt(statsObj.expertise) + parseInt(statsObj.toughness);
-                        statsObj.maxLust = 14 + (3* parseInt(statsObj.endurance));
-                        statsObj.wins = 0;
-                        statsObj.losses = 0;
-                        statsObj.coins = 100;
-                        statsObj.experienceSpent = 0;
-                        statsObj.experience = 0;
-                        var currentFeatures = [];
-                        currentFeatures.push(parseInt(classes[idClass].feature));
-                        statsObj.features = currentFeatures.toString();
-                        client.hmset(data.character, statsObj);
-                        fChatLibInstance.sendMessage("You've been successfully registered in the list as a " + classes[idClass].title + " "  + data.character);
-                    }
-                    else {
-                        fChatLibInstance.sendMessage("You're already registered " + data.character);
-                    }
-                });
+        client.hexists(data.character, "character", function (err, reply) {
+            if (reply == 0) {
+                var statsObj = {};
+                statsObj.character = data.character;
+                statsObj.strength = 1;
+                statsObj.toughness = 1;
+                statsObj.determination = 1;
+                statsObj.agility = 1;
+                statsObj.expertise = 1;
+                statsObj.endurance = 1;
+                statsObj.maxHp = 10 + parseInt(statsObj.strength) + parseInt(statsObj.determination) + parseInt(statsObj.agility) + parseInt(statsObj.expertise) + parseInt(statsObj.toughness);
+                statsObj.maxLust = 14 + (3* parseInt(statsObj.endurance));
+                statsObj.wins = 0;
+                statsObj.losses = 0;
+                statsObj.features = "";
+                statsObj.experienceSpent = 0;
+                statsObj.experience = 25;
+                client.hmset(data.character, statsObj);
+                fChatLibInstance.sendMessage("You've been successfully registered as a wrestler " + data.character+ "\nDon't forget to spend your 25 experience points!");
             }
-            else{
-                fChatLibInstance.sendMessage("This is not a valid class name, please try again.");
+            else {
+                fChatLibInstance.sendMessage("You're already registered " + data.character);
             }
-        }
-        else
-        {
-            if (parseInt(args[0]) <= 0 || parseInt(args[1]) <= 0 || parseInt(args[2]) <= 0 || parseInt(args[3]) <= 0 || parseInt(args[4]) <= 0 || parseInt(args[5]) <= 0) {
-                fChatLibInstance.sendMessage("A stat must have a value greater than 0");
-                return;
-            }
-            var totalPoints = parseInt(args[0]) + parseInt(args[1]) + parseInt(args[2]) + parseInt(args[3]) + parseInt(args[4]) + parseInt(args[5]);
-            if (totalPoints != 10) {
-                fChatLibInstance.sendMessage("All your stats combined must be equal to 10. Current value: " + totalPoints);
-                return;
-            }
-            client.hexists(data.character, "character", function (err, reply) {
-                if (reply == 0) {
-                    var statsObj = {};
-                    statsObj.character = data.character;
-                    statsObj.stats = args;
-                    statsObj.strength = parseInt(args[0]);
-                    statsObj.toughness = parseInt(args[1]);
-                    statsObj.determination = parseInt(args[2]);
-                    statsObj.agility = parseInt(args[3]);
-                    statsObj.expertise = parseInt(args[4]);
-                    statsObj.endurance = parseInt(args[5]);
-                    statsObj.maxHp = 10 + parseInt(statsObj.strength) + parseInt(statsObj.determination) + parseInt(statsObj.agility) + parseInt(statsObj.expertise) + parseInt(statsObj.toughness);
-                    statsObj.maxLust = 14 + (3* parseInt(statsObj.endurance));
-                    statsObj.wins = 0;
-                    statsObj.losses = 0;
-                    statsObj.features = "";
-                    statsObj.experienceSpent = 0;
-                    statsObj.experience = 0;
-                    client.hmset(data.character, statsObj);
-                    fChatLibInstance.sendMessage("You've been successfully registered in the list " + data.character);
-                }
-                else {
-                    fChatLibInstance.sendMessage("You're already registered " + data.character);
-                }
-            });
-        }
+        });
     };
 
 
@@ -218,7 +169,7 @@ module.exports = function (parent) {
                     result.lust = 0;
                     currentFighters[0] = result;
                     currentFighters[0].dice = new Dice(10);
-                    currentFighters[0].ownBondageLevel = 0;
+                    currentFighters[0].ownSubmissiveness = 0;
                     fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
                 }
                 else if (currentFighters.length == 1) {
@@ -228,7 +179,7 @@ module.exports = function (parent) {
                         result.lust = 0;
                         currentFighters[1] = result;
                         currentFighters[1].dice = new Dice(6);
-                        currentFighters[1].ownBondageLevel = 0;
+                        currentFighters[1].ownSubmissiveness = 0;
                         fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!");
                         startFight();
                     }
@@ -251,7 +202,9 @@ module.exports = function (parent) {
     cmdHandler.exit = function (args, data) {
         if (currentFighters.length > 0) {
             if ((currentFighters.length > 0 && currentFighters[0] != undefined && currentFighters[0].character == data.character) || (currentFighters.length > 1 && currentFighters[1] != undefined && currentFighters[1].character == data.character)) {
-                fChatLibInstance.sendMessage("You have been removed from the fight.");
+                fChatLibInstance.sendMessage("The fight has been ended.");
+                addExperienceOnPrematureEnd(0);
+                addExperienceOnPrematureEnd(1);
                 resetFight();
             }
             else {
@@ -372,6 +325,7 @@ module.exports = function (parent) {
                         break;
                     default:
                         fChatLibInstance.sendMessage("Unknown stat. Please check your syntax. Example: !addStat endurance");
+                        return;
                         break;
                 }
                 var expNeeded = parseInt((askedPoint*askedPoint)+2*askedPoint-3);
@@ -389,14 +343,13 @@ module.exports = function (parent) {
                     fChatLibInstance.sendMessage("This stat augmentation reaches the maximum experience amount a player can spend. ("+intExpSpentAfterSpend+" but the limit is "+maxExp+")");
                     return;
                 }
-                else{
-                    result.experience = parseInt(result.experience) - expNeeded;
-                    result.experienceSpent = parseInt(result.experienceSpent) + expNeeded;
-                    result.maxHp = 10 + parseInt(result.strength) + parseInt(result.determination) + parseInt(result.agility) + parseInt(result.expertise) + parseInt(result.toughness);
-                    result.maxLust = 14 + (3* parseInt(result.endurance));
-                    client.hmset(result.character, result);
-                    fChatLibInstance.sendMessage("Succesfully added your new point with a total cost of "+expNeeded+ " XP points.");
-                }
+
+                result.experience = parseInt(result.experience) - expNeeded;
+                result.experienceSpent = parseInt(result.experienceSpent) + expNeeded;
+                result.maxHp = 10 + parseInt(result.strength) + parseInt(result.determination) + parseInt(result.agility) + parseInt(result.expertise) + parseInt(result.toughness);
+                result.maxLust = 14 + (3* parseInt(result.endurance));
+                client.hmset(result.character, result);
+                fChatLibInstance.sendMessage("Succesfully added your new point with a total cost of "+expNeeded+ " XP points.");
             }
             else {
                 fChatLibInstance.sendMessage("Are you sure this user is registered?");
@@ -621,6 +574,7 @@ module.exports = function (parent) {
         if (checkIfFightIsGoingOn()) {
             if (data.character == currentFighters[currentFight.whoseturn].character) {
                 currentFight.actionType = "pass";
+                currentFight.actionTier = "";
                 checkRollWinner(true);
             }
             else {
@@ -639,6 +593,7 @@ module.exports = function (parent) {
             if (data.character == currentFighters[currentFight.whoseturn].character) {
                 if (isInHold()) {
                     currentFight.actionType = "escape";
+                    currentFight.actionTier = "";
                     if (currentFight.turn > 0) {
                         rollBoth();
                     }
@@ -711,7 +666,7 @@ module.exports = function (parent) {
                         currentFight.actionTier = "light";
                     }
 
-                    if (currentFight.actionTier != "") {
+                    if (currentFight.actionTier != undefined) {
                         if (currentFight.turn > 0) {
                             roll();
                         }
@@ -827,12 +782,18 @@ function beginInitiation(){
 }
 
 function rollBoth(){
+
     currentFight.bothPlayerRoll = true;
     var mods0 = (currentFighters[0].dice.getModsSum() + currentFighters[0].dice.getTmpModsSum());
     var mods1 = (currentFighters[1].dice.getModsSum() + currentFighters[1].dice.getTmpModsSum());
     currentFight.diceResultP1 = currentFighters[0].dice.roll();
     currentFight.diceResultP2 = currentFighters[1].dice.roll();
     //currentFight.diceResultP1 = currentFight.diceResultP2; TO CHECK FOR STACK OVERFLOW
+    if(debug)
+    {
+        currentFight.diceResultP2 = currentFight.diceResultP1;
+        debug = false;
+    }
     fChatLibInstance.sendMessage("\n[b]" + currentFighters[0].character + "[/b] rolled a [b]" + currentFight.diceResultP1 + "[/b] " + (mods0 != 0 ? "(" + ((mods0 >= 0 ? "+" : "") + mods0 + " applied)") : "" ) + "\n" +
         "[b]" + currentFighters[1].character + "[/b] rolled a [b]" + currentFight.diceResultP2 + "[/b] " + (mods1 != 0 ? "(" + ((mods1 >= 0 ? "+" : "") + mods1 + " applied)") : "" ));
     checkRollWinner();
@@ -883,7 +844,7 @@ function roll() {
         case "submission":
             typeUsed1 = "strength";
             typeUsed2 = "agility";
-            currentFight.diceResult = parseInt(Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2]) ) / 2) + diceScore);
+            currentFight.diceResult = parseInt(Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2])) / 2) + diceScore);
             currentFight.actionIsHold = true;
             break;
         case "highflyer":
@@ -893,7 +854,7 @@ function roll() {
         case "martial":
             typeUsed1 = "agility";
             typeUsed2 = "expertise";
-            currentFight.diceResult = parseInt(Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2]) ) / 2) + diceScore);
+            currentFight.diceResult = parseInt(Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2])) / 2) + diceScore);
             break;
         case "sexual":
             typeUsed1 = "expertise";
@@ -902,7 +863,7 @@ function roll() {
         case "humiliation":
             typeUsed1 = "expertise";
             typeUsed2 = "strength";
-            currentFight.diceResult = parseInt(Math.floor(parseInt(currentFighters[currentFight.whoseturn][typeUsed1] + parseInt(currentFighters[currentFight.whoseturn][typeUsed2])) / 2) + diceScore);
+            currentFight.diceResult = parseInt(Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2])) / 2) + diceScore);
             currentFight.actionIsHold = true;
             break;
         case "bondage":
@@ -918,6 +879,7 @@ function checkRollWinner(blnForceSuccess) {
         currentFight.bothPlayerRoll = false;
         if(currentFight.diceResultP1 == currentFight.diceResultP2){
             rollBoth();
+            return;
         }
         var idWinner = (currentFight.diceResultP1 > currentFight.diceResultP2 ? 0 : 1);
         if (currentFight.isInit) {
@@ -927,7 +889,7 @@ function checkRollWinner(blnForceSuccess) {
             nextTurn(false);
         }
         else{ //case of both players rolling
-            var isPlayerSuccessful = (idWinner == currentFight.whoseturn);
+            var isPlayerSuccessful = (idWinner == currentFight.currentHold.defender);
             checkRollWinner(isPlayerSuccessful);
         }
     }
@@ -935,13 +897,13 @@ function checkRollWinner(blnForceSuccess) {
         var success = false;
         switch (currentFight.actionTier) {
             case "light":
-                success = currentFight.diceResult >= 6;
+                success = currentFight.diceResult >= 4;
                 break;
             case "medium":
                 success = currentFight.diceResult >= 8;
                 break;
             case "heavy":
-                success = currentFight.diceResult >= 10;
+                success = currentFight.diceResult >= 12;
                 break;
             default:
                 success = false;
@@ -966,17 +928,18 @@ function checkRollWinner(blnForceSuccess) {
                 fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has passed this turn.");
             }
             else if( currentFight.actionType == "bondage"){
-                currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownBondageLevel++;
+                currentFight.intMovesCount[currentFight.whoseturn] += 1;
+                currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness++;
                 fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s bondage attack has been [color=green][u]successful![/u][/color][/b]");
-                if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownBondageLevel == 3){
+                if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness == 3){
                     currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].dice.addMod(-1);
                     fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s bondage items are starting to get in the way! -1 to their dice rolls.[/b]");
                 }
-                else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownBondageLevel == 6){
+                else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness == 6){
                     currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].dice.addMod(-1);
                     fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + " is looking quite helpless like that! Another -1 to their dice rolls![/b]");
                 }
-                else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownBondageLevel == 9){
+                else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness == 10){
                     currentFight.winner = currentFight.whoseturn;
                     fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + " is completely bound! The fight is over![/b]");
                 }
@@ -1393,6 +1356,21 @@ function checkLifePoints() {
 
 }
 
+function addExperienceOnPrematureEnd(idPlayer){
+    client.hgetall(currentFighters[idPlayer].character, function (err, result) {
+        var experience = 0;
+        if(!isNaN(currentFight.intMovesCount[idPlayer])){
+            experience += currentFight.intMovesCount[idPlayer];
+        }
+        fChatLibInstance.sendMessage(winnerName+" has gained "+experience+" XP points. ("+currentFight.intMovesCount[idPlayer]+" moves)");
+        if(!isNaN(result.experience)){
+            experience += parseInt(result.experience) ;
+        }
+        result.experience = experience;
+        client.hmset(result.character, result);
+    });
+}
+
 function addWinsLosses(winnerName, loserName){
     client.hgetall(winnerName, function (err, result) {
         if (result != null) {
@@ -1450,8 +1428,8 @@ function broadcastCombatInfo() {
         fChatLibInstance.sendMessage(
             "\n" +
             "[b]Turn #" + currentFight.turn + "[/b] --------------- It's [b][u][color=pink]" + currentFighters[currentFight.whoseturn].character + "[/color][/u][/b]'s turn.\n\n" +
-            (currentFighters.length > 0 ? "[b]" + currentFighters[0].character + ": [/b]" + currentFighters[0].hp + "/" + currentFighters[0].maxHp + " [color=red]HP[/color]  |  " + currentFighters[0].lust + "/" + currentFighters[0].maxLust + " [color=pink]Lust[/color]  |  " + currentFighters[0].ownBondageLevel + "/9 Bondage level\n" : "") +
-            (currentFighters.length > 1 ? "[b]" + currentFighters[1].character + ": [/b]" + currentFighters[1].hp + "/" + currentFighters[1].maxHp + " [color=red]HP[/color]  |  " + currentFighters[1].lust + "/" + currentFighters[1].maxLust + " [color=pink]Lust[/color]  |  " + currentFighters[1].ownBondageLevel + "/9 Bondage level" : "")
+            (currentFighters.length > 0 ? "[b]" + currentFighters[0].character + ": [/b]" + currentFighters[0].hp + "/" + currentFighters[0].maxHp + " [color=red]HP[/color]  |  " + currentFighters[0].lust + "/" + currentFighters[0].maxLust + " [color=pink]Lust[/color]  |  " + currentFighters[0].ownSubmissiveness + "/10 Submissiveness\n" : "") +
+            (currentFighters.length > 1 ? "[b]" + currentFighters[1].character + ": [/b]" + currentFighters[1].hp + "/" + currentFighters[1].maxHp + " [color=red]HP[/color]  |  " + currentFighters[1].lust + "/" + currentFighters[1].maxLust + " [color=pink]Lust[/color]  |  " + currentFighters[1].ownSubmissiveness + "/10 Submissiveness" : "")
         );
     }
     else {
