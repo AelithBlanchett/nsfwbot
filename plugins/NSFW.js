@@ -203,9 +203,8 @@ module.exports = function (parent) {
         if (currentFighters.length > 0) {
             if ((currentFighters.length > 0 && currentFighters[0] != undefined && currentFighters[0].character == data.character) || (currentFighters.length > 1 && currentFighters[1] != undefined && currentFighters[1].character == data.character)) {
                 fChatLibInstance.sendMessage("The fight has been ended.");
-                addExperienceOnPrematureEnd(0);
-                addExperienceOnPrematureEnd(1);
-                resetFight();
+                addExperienceOnPrematureEnd(currentFighters[0].character, currentFight.intMovesCount[0], currentFighters[1].character, currentFight.intMovesCount[1]);
+                setTimeout(resetFight(),2500);
             }
             else {
                 fChatLibInstance.sendMessage("You are not in a fight.");
@@ -719,6 +718,16 @@ module.exports = function (parent) {
     cmdHandler.fuck = cmdHandler.sexual;
     cmdHandler.lick = cmdHandler.sexual;
 
+    cmdHandler.sexualhold = function(args,data){
+        attack(args, data, "sexualhold");
+    };
+    cmdHandler.lusthold = cmdHandler.sexualhold;
+    cmdHandler.shold = cmdHandler.sexualhold;
+    cmdHandler.sexhold = cmdHandler.sexualhold;
+    cmdHandler.strokehold = cmdHandler.sexualhold;
+    cmdHandler.fuckhold = cmdHandler.sexualhold;
+    cmdHandler.lickhold = cmdHandler.sexualhold;
+
 
     cmdHandler.submission = function(args,data){
         attack(args, data, "submission");
@@ -857,6 +866,7 @@ function roll() {
             currentFight.diceResult = parseInt(Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2])) / 2) + diceScore);
             break;
         case "sexual":
+        case "sexualhold":
             typeUsed1 = "expertise";
             currentFight.diceResult = parseInt(parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + diceScore);
             break;
@@ -981,15 +991,15 @@ function holdHandler(damageHP, damageLust, isSexual) {
             currentFight.currentHold.turnsLeft = 0;
         }
         if (currentFight.currentHold.damageHP == undefined || isNaN(currentFight.currentHold.damageHP) || (!isNaN(currentFight.currentHold.damageHP) && parseInt(currentFight.currentHold.damageHP) <= 0)) {
-            currentFight.currentHold.damageHP = 0;
+            currentFight.currentHold.damageHP = -1;
         }
         if (currentFight.currentHold.damageLust == undefined || isNaN(currentFight.currentHold.damageLust) || (!isNaN(currentFight.currentHold.damageLust) && parseInt(currentFight.currentHold.damageLust) <= 0)) {
             currentFight.currentHold.damageLust = 0;
         }
         if((currentFight.currentHold.attacker != undefined && currentFight.currentHold.attacker != currentFight.whoseturn) || !holdInPlace()){//reset on turn change
             currentFight.currentHold.turnsLeft = 0;
-            currentFight.currentHold.damageHP = 0;
-            currentFight.currentHold.damageLust = 0;
+            currentFight.currentHold.damageHP = -1;
+            currentFight.currentHold.damageLust = -1;
             currentFight.currentHold.hpPenalty = 0;
             currentFight.currentHold.lustPenalty = 0;
         }
@@ -1006,6 +1016,9 @@ function holdHandler(damageHP, damageLust, isSexual) {
             if(dmg <= 0){
                 dmg = 1;
             }
+            if(newDamageHP == -1){
+                newDamageHP = 0;
+            }
             newDamageHP += dmg;
         }
         var newDamageLust = parseInt(currentFight.currentHold.damageLust);
@@ -1013,6 +1026,9 @@ function holdHandler(damageHP, damageLust, isSexual) {
             var dmg = parseInt(damageLust);
             if(dmg <= 0){
                 dmg = 1;
+            }
+            if(newDamageLust == -1){
+                newDamageLust = 0;
             }
             newDamageLust += dmg;
         }
@@ -1094,6 +1110,12 @@ function attackPrepare(actionType, actionId) {
             typeUsed1 = "expertise";
             typeDefender = "endurance";
             isSexual = 1;
+            break;
+        case "sexualhold":
+            typeUsed1 = "expertise";
+            typeDefender = "endurance";
+            isSexual = 1;
+            isHold = true;
             break;
         case "humiliation":
             typeUsed1 = "expertise";
@@ -1356,13 +1378,25 @@ function checkLifePoints() {
 
 }
 
-function addExperienceOnPrematureEnd(idPlayer){
-    client.hgetall(currentFighters[idPlayer].character, function (err, result) {
+function addExperienceOnPrematureEnd(char1, intMoves1, char2, intMoves2){
+    client.hgetall(char1, function (err, result) {
         var experience = 0;
-        if(!isNaN(currentFight.intMovesCount[idPlayer])){
-            experience += currentFight.intMovesCount[idPlayer];
+        if(!isNaN(intMoves1)){
+            experience += intMoves1;
         }
-        fChatLibInstance.sendMessage(winnerName+" has gained "+experience+" XP points. ("+currentFight.intMovesCount[idPlayer]+" moves)");
+        fChatLibInstance.sendMessage(char1+" has gained "+experience+" XP points. ("+intMoves1+" moves)");
+        if(!isNaN(result.experience)){
+            experience += parseInt(result.experience) ;
+        }
+        result.experience = experience;
+        client.hmset(result.character, result);
+    });
+    client.hgetall(char2, function (err, result) {
+        var experience = 0;
+        if(!isNaN(intMoves2)){
+            experience += intMoves2;
+        }
+        fChatLibInstance.sendMessage(char2+" has gained "+experience+" XP points. ("+intMoves2+" moves)");
         if(!isNaN(result.experience)){
             experience += parseInt(result.experience) ;
         }
