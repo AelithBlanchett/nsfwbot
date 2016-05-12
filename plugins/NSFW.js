@@ -18,7 +18,7 @@ module.exports = function (parent) {
     cmdHandler.current = cmdHandler.status;
 
     cmdHandler.version = function () {
-        fChatLibInstance.sendMessage("I'm Benikage, version "+parent.config.cversion);
+        fChatLibInstance.sendMessage("I'm Miss_Spencer, version 2.0.0 beta");
     };
 
     cmdHandler.triggerDebug = function (args, data) {
