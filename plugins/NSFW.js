@@ -270,7 +270,7 @@ module.exports = function (parent) {
                 else{
                     experienceSpent = stats.experienceSpent;
                 }
-                fChatLibInstance.sendMessage("[b]" + stats.character + "[/b]'s stats" + "\n" +
+                fChatLibInstance.sendPrivMessage(data.character, "[b]" + stats.character + "[/b]'s stats" + "\n" +
                     "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
                     "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Max Lust[/color][/b]: " + stats.maxLust + "\n" +
                     "[b][color=green]Determination[/color][/b]:  " + stats.determination + "\n" +
@@ -280,7 +280,7 @@ module.exports = function (parent) {
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
             }
             else {
-                fChatLibInstance.sendMessage("This user hasn't been found in the database.");
+                fChatLibInstance.sendPrivMessage(data.character, "You aren't registered yet.");
             }
         });
     };
