@@ -18,7 +18,7 @@ module.exports = function (parent) {
     cmdHandler.current = cmdHandler.status;
 
     cmdHandler.version = function () {
-        fChatLibInstance.sendMessage("I'm Miss_Spencer, version 2.0.0 beta");
+        fChatLibInstance.sendMessage("I'm Miss_Spencer, version 2.0.1 beta");
     };
 
     cmdHandler.triggerDebug = function (args, data) {
@@ -943,15 +943,16 @@ function checkRollWinner(blnForceSuccess) {
                 fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s bondage attack has been [color=green][u]successful![/u][/color][/b]");
                 if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness == 3){
                     currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].dice.addMod(-1);
-                    fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s bondage items are starting to get in the way! -1 to their dice rolls.[/b]");
+                    fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s bondage items are starting to get in the way! -1 to their dice rolls.[/b]");
                 }
                 else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness == 6){
                     currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].dice.addMod(-1);
-                    fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + " is looking quite helpless like that! Another -1 to their dice rolls![/b]");
+                    fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " is looking quite helpless like that! Another -1 to their dice rolls![/b]");
                 }
-                else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness == 10){
+                else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness >= 10){
                     currentFight.winner = currentFight.whoseturn;
-                    fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + " is completely bound! The fight is over![/b]");
+                    fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " is completely bound! The fight is over![/b]");
+                    checkLifePoints();
                 }
             }
             else {
