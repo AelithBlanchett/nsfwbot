@@ -1,3 +1,10 @@
+Changes to implement:
+"the system is subtracting the total cost to upgrade stats and not the upgrade cost. level 3 strength subtracted 5 then 12 for a total of 17 instead of 5 then 7 for the total of 12."
+-The higher the tier, the longer the hold should last/the harder the escape should be
+
+
+
+
 Stat changes:
 
 Toughness
