@@ -327,7 +327,7 @@ module.exports = function (parent) {
                         return;
                         break;
                 }
-                var expNeeded = parseInt(5+(2*(askedPoint-1)));
+                var expNeeded = parseInt(5+(2*(askedPoint-2)));
                 var intExpAfterSpend = parseInt(result.experience) - expNeeded;
                 var intExpSpentAfterSpend = parseInt(result.experienceSpent)+expNeeded;
                 if(askedPoint > 6){
