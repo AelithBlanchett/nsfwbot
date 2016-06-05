@@ -662,7 +662,7 @@ module.exports = function (parent) {
 
                     if(currentFight.actionType == "bondage") //then it's maybe a bd attack
                     {
-                        currentFight.actionTier = "light";
+                        currentFight.actionTier = "bondage";
                     }
 
                     if (currentFight.actionTier != undefined) {
@@ -915,6 +915,9 @@ function checkRollWinner(blnForceSuccess) {
             case "heavy":
                 success = currentFight.diceResult >= 12;
                 break;
+            case "bondage":
+                success = currentFight.diceResult >= 6;
+                break;
             default:
                 success = false;
                 break;
@@ -941,19 +944,20 @@ function checkRollWinner(blnForceSuccess) {
                 currentFight.intMovesCount[currentFight.whoseturn] += 1;
                 currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness++;
                 fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s bondage attack has been [color=green][u]successful![/u][/color][/b]");
-                if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness == 3){
+                if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness == 5){
                     currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].dice.addMod(-1);
-                    fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s bondage items are starting to get in the way! -1 to their dice rolls.[/b]");
-                }
-                else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness == 6){
-                    currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].dice.addMod(-1);
-                    fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " is looking quite helpless like that! Another -1 to their dice rolls![/b]");
+                    fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s submissiveness is starting to be a problem! -1 to their dice rolls.[/b]");
                 }
                 else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness >= 10){
                     currentFight.winner = currentFight.whoseturn;
                     fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " is completely bound! The fight is over![/b]");
                     checkLifePoints();
                 }
+                //else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness == 6){
+                //    currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].dice.addMod(-1);
+                //    fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " is looking quite helpless like that! Another -1 to their dice rolls![/b]");
+                //}
+
             }
             else {
                 fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s attack has [color=green][u]hit![/u][/color][/b]");
