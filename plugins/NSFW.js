@@ -793,6 +793,18 @@ function beginInitiation(){
 function rollBoth(){
 
     currentFight.bothPlayerRoll = true;
+    if(holdInPlace()){
+        switch(currentFight.currentHold.actionTier){
+            case "medium":
+                currentFighters[currentFight.currentHold.defender].dice.addTmpMod(parseInt(-1));
+                break;
+            case "heavy":
+                currentFighters[currentFight.currentHold.defender].dice.addTmpMod(parseInt(-2));
+                break;
+            default:
+                break;
+        }
+    }
     var mods0 = (currentFighters[0].dice.getModsSum() + currentFighters[0].dice.getTmpModsSum());
     var mods1 = (currentFighters[1].dice.getModsSum() + currentFighters[1].dice.getTmpModsSum());
     currentFight.diceResultP1 = currentFighters[0].dice.roll();
@@ -985,7 +997,7 @@ function missHandler(idPlayer) {
     fChatLibInstance.sendMessage("[i][b]" + currentFighters[idPlayer].character + "[/b] has gotten +1 added to their next dice roll.[/i]");
 }
 
-function holdHandler(damageHP, damageLust, isSexual) {
+function holdHandler(damageHP, damageLust, isSexual, actionTier) {
     var strAttack = "[b]" + currentFighters[currentFight.whoseturn].character + "[/b] has";
 
     if (damageHP != undefined || damageLust != undefined) {
@@ -1012,6 +1024,22 @@ function holdHandler(damageHP, damageLust, isSexual) {
         var attacker = currentFight.whoseturn;
         var defender = (currentFight.whoseturn == 0 ? 1 : 0);
         var turns = 3; //3 turns by default
+        switch(actionTier)
+        {
+            case "light":
+                turns = 3;
+                break;
+            case "medium":
+                turns = 5;
+                break;
+            case "heavy":
+                turns = 7;
+                break;
+            default:
+                turns = 3;
+                break;
+        }
+        currentFight.currentHold.actionTier = actionTier;
         var isInfinite = false;
 
         var newTurnsLeft = parseInt(currentFight.currentHold.turnsLeft) + parseInt(turns);
@@ -1188,7 +1216,7 @@ function attackPrepare(actionType, actionId) {
         attackHandler(dmgHp, dmgLust);
     }
     else{
-        holdHandler(dmgHp, dmgLust, isSexual);
+        holdHandler(dmgHp, dmgLust, isSexual, actionId);
     }
 
 
