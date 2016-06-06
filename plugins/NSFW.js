@@ -418,6 +418,36 @@ module.exports = function (parent) {
         }
     };
 
+    cmdHandler.damageOutputs = function (args, data) {
+        if (checkIfFightIsGoingOn() && data.character == currentFighters[currentFight.whoseturn].character) {
+            var strResult = attackPrepare("brawl", "light", true);
+            strResult += attackPrepare("brawl", "medium", true);
+            strResult += attackPrepare("brawl", "heavy", true);
+            strResult += attackPrepare("submission", "light", true);
+            strResult += attackPrepare("submission", "medium", true);
+            strResult += attackPrepare("submission", "heavy", true);
+            strResult += attackPrepare("highflyer", "light", true);
+            strResult += attackPrepare("highflyer", "medium", true);
+            strResult += attackPrepare("highflyer", "heavy", true);
+            strResult += attackPrepare("martial", "light", true);
+            strResult += attackPrepare("martial", "medium", true);
+            strResult += attackPrepare("martial", "heavy", true);
+            strResult += attackPrepare("sexual", "light", true);
+            strResult += attackPrepare("sexual", "medium", true);
+            strResult += attackPrepare("sexual", "heavy", true);
+            strResult += attackPrepare("sexualhold", "light", true);
+            strResult += attackPrepare("sexualhold", "medium", true);
+            strResult += attackPrepare("sexualhold", "heavy", true);
+            strResult += attackPrepare("humiliation", "light", true);
+            strResult += attackPrepare("humiliation", "medium", true);
+            strResult += attackPrepare("humiliation", "heavy", true);
+            fChatLibInstance.sendPrivMessage(data.character, strResult);
+        }
+        else{
+            fChatLibInstance.sendMessage("You can only check your possible damage output during your turn in a match.");
+        }
+    };
+
     cmdHandler.reset = function (args, data) {
         if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
             if (checkIfFightIsGoingOn()) {
@@ -1108,7 +1138,7 @@ function holdHandler(damageHP, damageLust, isSexual, actionTier) {
     }
 }
 
-function attackPrepare(actionType, actionId) {
+function attackPrepare(actionType, actionId, isSimulation) {
     var typeUsed1 = "";
     var typeUsed2 = "";
     var typeDefender = "";
@@ -1209,15 +1239,25 @@ function attackPrepare(actionType, actionId) {
         }
     }
 
-    //add xp points
-    currentFight.intMovesCount[currentFight.whoseturn] += 1;
 
-    if(!isHold){
-        attackHandler(dmgHp, dmgLust);
+    if(isSimulation === undefined) {
+        //add xp points
+        currentFight.intMovesCount[currentFight.whoseturn] += 1;
+        if (!isHold) {
+            attackHandler(dmgHp, dmgLust);
+        }
+        else {
+            holdHandler(dmgHp, dmgLust, isSexual, actionId);
+        }
     }
     else{
-        holdHandler(dmgHp, dmgLust, isSexual, actionId);
+        var strReturnSimulation = "";
+        strReturnSimulation = "Damage output for "+actionId+" "+actionType+":";
+        strReturnSimulation += dmgHp.toString() + " HP and " + dmgLust + " lust\n";
+        return strReturnSimulation;
     }
+
+
 
 
 }
