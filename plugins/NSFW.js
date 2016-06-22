@@ -223,7 +223,7 @@ module.exports = function (parent) {
         if (fChatLibInstance.isUserChatOP(data.channel, data.character)) {
             if (checkIfFightIsGoingOn()) {
                 if (currentFighters[0].character == data.character || currentFighters[1].character == data.character) {
-                    fChatLibInstance.sendMessage("You can't add remove your profile if you're in a fight.");
+                    fChatLibInstance.sendMessage("You can't add remove this profile if it's in a fight.");
                     return;
                 }
             }
@@ -597,6 +597,25 @@ module.exports = function (parent) {
         else {
             fChatLibInstance.sendMessage("You don't have sufficient rights.");
         }
+    };
+
+    cmdHandler.resetProfileStats = function (args, data) {
+        client.hgetall(args, function (err, result) {
+            if (result != null) {
+                if (parseInt(result.experience) + parseInt(result.experienceSpent) < 75) {
+                    fChatLibInstance.sendMessage("You haven't gained 75 points of XP yet to be able to reset your stats.");
+                    return;
+                }
+                result.features = [];
+                result.experience = 50;
+                result.experienceSpent = 0;
+                client.hmset(args, result);
+                fChatLibInstance.sendMessage("You've successfully reset your stats. Don't forget to spend the 50XP!");
+            }
+            else {
+                fChatLibInstance.sendMessage("Are you sure this profile is registered?");
+            }
+        });
     };
 
     cmdHandler.pass = function (args, data) {
