@@ -1,6 +1,20 @@
 Changes to implement:
-"the system is subtracting the total cost to upgrade stats and not the upgrade cost. level 3 strength subtracted 5 then 12 for a total of 17 instead of 5 then 7 for the total of 12."
 -The higher the tier, the longer the hold should last/the harder the escape should be
+- So what we discussed last time was the reset option for exp, Just have it reset them to 50 Exp if they are over 75 Exp
+- All Light attacks when landed can give a +1 accuracy boost to your next attack. All medium attacks do nothing but will reset your bonus if they land and heavy attacks lower your accuracy whether they hit or miss
+
+
+
+Strike (Light) - Min 2 for one strike (No effects)
+Hold (Light) - Min 1 (for 3 turns) (Stun effect as normal) + Chain opportunity
+
+Strike (Medium) - Min 4 for one strike (no effects)
+Hold (Medium) - Min 3 (for 3 turns) (Stun effect as normal) + Chain opportunity
+
+Strike (Heavy) - Min 8 for one strike (no effects)
+Hold (Medium) - Min 6 (for 3 turns) (Stun effect as normal) + Chain opportunity
+
+
 
 
 
