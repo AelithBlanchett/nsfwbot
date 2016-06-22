@@ -1208,54 +1208,42 @@ function attackPrepare(actionType, actionId, isSimulation) {
             break;
     }
 
-    switch(actionId){
-        case "light":
-            divider = 6;
-            minDmg = 1;
-            break;
-        case "medium":
-            divider = 4;
-            minDmg = 2;
-            break;
-        case "heavy":
-            divider = 2;
-            minDmg = 4;
-            break;
+    if(isHold){
+        switch(actionId){
+            case "light":
+                minDmg = 1;
+                break;
+            case "medium":
+                minDmg = 3;
+                break;
+            case "heavy":
+                minDmg = 6;
+                break;
+        }
+    }
+    else {
+        switch(actionId){
+            case "light":
+                minDmg = 2;
+                break;
+            case "medium":
+                minDmg = 4;
+                break;
+            case "heavy":
+                minDmg = 8;
+                break;
+        }
     }
 
-    var total = 1;
-    if(typeUsed2 == ""){
-        var intType1 = parseInt(currentFighters[currentFight.whoseturn][typeUsed1]);
-        var intTypeDef = parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)][typeDefender]);
-        total = Math.floor((intType1 + ((intType1 - 1)/divider)) - intTypeDef);
-    }
-    else{
-        var intType1 = parseInt(currentFighters[currentFight.whoseturn][typeUsed1]);
-        var intType2 = parseInt(currentFighters[currentFight.whoseturn][typeUsed2]);
-        var intTypeDef = parseInt(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)][typeDefender]);
-        total = Math.floor(((intType1 + ((intType1 - 1)/divider)) + (intType2 + ((intType2 - 1)/divider)) /2))  - intTypeDef;
-    }
     if(isSexual == 0){
-        dmgHp = total;
-        if(dmgHp < minDmg){
-            dmgHp = minDmg;
-        }
+        dmgHp = minDmg;
     }
     else if(isSexual == 1){
-        dmgLust = total;
-        if(dmgLust < minDmg){
-            dmgLust = minDmg;
-        }
+        dmgLust = minDmg;
     }
     else{
-        dmgHp = Math.floor(total / 2);
-        dmgLust = Math.floor(total / 2);
-        if(dmgHp < (minDmg / 2)){
-            dmgHp = minDmg;
-        }
-        if(dmgLust < (minDmg / 2)){
-            dmgLust = minDmg;
-        }
+        dmgHp = Math.floor(minDmg / 2);
+        dmgLust = Math.floor(minDmg / 2);
     }
 
 
