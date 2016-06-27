@@ -1273,10 +1273,10 @@ function attackPrepare(actionType, actionId, isSimulation) {
         var strReturnSimulation = "";
         strReturnSimulation = "Damage output for "+actionId+" "+actionType+":";
         if (dmgHp > 0) {
-            strReturnSimulation += "  " + dmgHp.toString() + " HP"
+            strReturnSimulation += "  " + dmgHp.toString() + " HP";
         }
         if(dmgLust > 0){
-            strReturnSimulation += "  " + dmgLust
+            strReturnSimulation += "  " + dmgLust + " Lust";
         }
         strReturnSimulation += "\n";
         return strReturnSimulation;
