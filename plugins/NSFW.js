@@ -205,7 +205,9 @@ module.exports = function (parent, chanName) {
         if (currentFighters.length > 0) {
             if ((currentFighters.length > 0 && currentFighters[0] != undefined && currentFighters[0].character == data.character) || (currentFighters.length > 1 && currentFighters[1] != undefined && currentFighters[1].character == data.character)) {
                 fChatLibInstance.sendMessage("The fight has been ended.", channel);
-                addExperienceOnPrematureEnd(currentFighters[0].character, currentFight.intMovesCount[0], currentFighters[1].character, currentFight.intMovesCount[1]);
+                if(currentFighters.length > 1){
+                    addExperienceOnPrematureEnd(currentFighters[0].character, currentFight.intMovesCount[0], currentFighters[1].character, currentFight.intMovesCount[1]);
+                }
                 setTimeout(resetFight(),2500);
             }
             else {
