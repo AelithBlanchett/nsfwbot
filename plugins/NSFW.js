@@ -600,16 +600,22 @@ module.exports = function (parent) {
     };
 
     cmdHandler.resetProfileStats = function (args, data) {
-        client.hgetall(args, function (err, result) {
+        client.hgetall(data.character, function (err, result) {
             if (result != null) {
                 if (parseInt(result.experience) + parseInt(result.experienceSpent) < 75) {
                     fChatLibInstance.sendMessage("You haven't gained 75 points of XP yet to be able to reset your stats.");
                     return;
                 }
+                result.strength = 1;
+                result.agility = 1;
+                result.determination = 1;
+                result.toughness = 1;
+                result.expertise = 1;
+                result.endurance = 1;
                 result.features = [];
                 result.experience = 50;
                 result.experienceSpent = 0;
-                client.hmset(args, result);
+                client.hmset(data.character, result);
                 fChatLibInstance.sendMessage("You've successfully reset your stats. Don't forget to spend the 50XP!");
             }
             else {
@@ -1244,6 +1250,12 @@ function attackPrepare(actionType, actionId, isSimulation) {
     else{
         dmgHp = Math.floor(minDmg / 2);
         dmgLust = Math.floor(minDmg / 2);
+        if(dmgHp <= 0){
+            dmgHp = 1;
+        }
+        if(dmgLust <= 0){
+            dmgLust = 0;
+        }
     }
 
 
