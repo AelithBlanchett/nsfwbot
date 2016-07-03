@@ -24,7 +24,7 @@ module.exports = function (parent, chanName) {
     };
 
     cmdHandler.triggerDebug = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(channel, data.character)) {
+        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
             debug = !debug;
             fChatLibInstance.sendMessage("Debug: "+debug, channel);
         }
@@ -36,7 +36,7 @@ module.exports = function (parent, chanName) {
     cmdHandler.toys = cmdHandler.sextoys;
 
     cmdHandler.setFight = function(args,data){ //debug
-        if (fChatLibInstance.isUserChatOP(channel, data.character)) {
+        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
             if(!checkIfFightIsGoingOn()){
                 fChatLibInstance.sendMessage("There isn't a fight going on right now.", channel);
                 return;
@@ -67,7 +67,7 @@ module.exports = function (parent, chanName) {
     };
 
     cmdHandler.set = function(args,data){ //debug
-        if (fChatLibInstance.isUserChatOP(channel, data.character)) {
+        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
             var arr = args.split(' ');
             var result = arr.splice(0, 2);
             result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
@@ -94,19 +94,19 @@ module.exports = function (parent, chanName) {
     };
 
     cmdHandler.forceTurnWin = function(args,data){ //debug
-        if (fChatLibInstance.isUserChatOP(channel, data.character)) {
+        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
             currentFighters[currentFight.whoseturn].dice.addTmpMod(100,1);
         }
     };
 
     cmdHandler.forceTurnLose = function(args,data){ //debug
-        if (fChatLibInstance.isUserChatOP(channel, data.character)) {
+        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
             currentFighters[currentFight.whoseturn].dice.addTmpMod(-100,1);
         }
     };
 
     cmdHandler.dbg = function(args,data){
-        if (fChatLibInstance.isUserChatOP(channel, data.character)) {
+        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
             client.hgetall('Lustful Aelith', function (err, result) {
                 if (result != null) {
                     result.hp = parseInt(result.maxHp);
@@ -224,7 +224,7 @@ module.exports = function (parent, chanName) {
     cmdHandler.unready = cmdHandler.exit;
 
     cmdHandler.deleteProfile = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(channel, data.character)) {
+        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
             if (checkIfFightIsGoingOn()) {
                 if (currentFighters[0].character == data.character || currentFighters[1].character == data.character) {
                     fChatLibInstance.sendMessage("You can't add remove this profile if it's in a fight.", channel);
@@ -295,7 +295,7 @@ module.exports = function (parent, chanName) {
     cmdHandler.stats = cmdHandler.myStats;
 
     cmdHandler.getStats = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(channel, data.character)) {
+        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
             statsGetter(args, data, args);
         }
         else{
@@ -361,7 +361,7 @@ module.exports = function (parent, chanName) {
     };
 
     cmdHandler.addStatOP = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(channel, data.character)) {
+        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
             var arr = args.split(' ');
             var result = arr.splice(0, 2);
             result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
@@ -453,7 +453,7 @@ module.exports = function (parent, chanName) {
     };
 
     cmdHandler.reset = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(channel, data.character)) {
+        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
             if (checkIfFightIsGoingOn()) {
                 resetFight();
                 fChatLibInstance.sendMessage("The ring has been cleared.", channel);
@@ -468,7 +468,7 @@ module.exports = function (parent, chanName) {
     };
 
     cmdHandler.removeStats = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(channel, data.character)) {
+        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
             var arr = args.split(' ');
             var result = arr.splice(0, 2);
             result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
@@ -581,7 +581,7 @@ module.exports = function (parent, chanName) {
     };
 
     cmdHandler.removeFeatures = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(channel, data.character)) {
+        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
             if (args.length > 0) {
                 client.hgetall(args, function (err, result) {
                     if (result != null) {
