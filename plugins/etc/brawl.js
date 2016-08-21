@@ -13,7 +13,7 @@ brawl.push(
 brawl.push(
     {
         id: 0,
-        title: "Punch",
+        title: "Punchu",
         description: "A solid punch!",
         damageHP: "currentFighters[attacker].strength - currentFighters[defender].toughness",
         statRequirements: [{strength: 1}, {dexterity: 1}]
