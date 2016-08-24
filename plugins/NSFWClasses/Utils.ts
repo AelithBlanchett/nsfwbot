@@ -1,8 +1,8 @@
 class Utils {
-    MinInArray(arr: Array<Number>) {
+    static MinInArray(arr: Array<Number>) {
         return Math.min.apply(Math, arr);
     }
-    MaxInArray(arr: Array<Number>) {
+    static MaxInArray(arr: Array<Number>) {
         return Math.max.apply(Math, arr);
     }
 }
