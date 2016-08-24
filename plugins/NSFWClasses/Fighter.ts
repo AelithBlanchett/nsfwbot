@@ -1,4 +1,5 @@
 import {BaseModel} from "./Model";
+import {Dice} from "./Dice";
 export class Fighter extends BaseModel {
     id:number;
     name:string;
@@ -18,6 +19,7 @@ export class Fighter extends BaseModel {
     focus:number;
     lastAttack:string;
     usedAttacks:Array<string>;
+    dice: Array<Dice>;
 
     constructor(name:string) {
         super();
