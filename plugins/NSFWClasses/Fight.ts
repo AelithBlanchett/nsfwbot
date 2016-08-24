@@ -1,23 +1,21 @@
-///<reference path="Fighter.ts" />
-class Fight {
-    id: number;
-    turnCounter: number;
-    fighters: Array<Fighter>;
-    stage: string;
+import {Fighter} from "./Model";
+export class Fight {
+    id:number;
+    turnCounter:number;
+    fighters:Array<Fighter>;
+    stage:string;
 
-    constructor(stage: string){
+    public constructor(stage:string) {
         this.stage = stage;
     }
 
-    getFighterCount(){
+    getFighterCount() {
         return this.fighters.length;
     }
 
-    getId(){
+    getId() {
         return this.id;
     }
-
-
 
 
 }

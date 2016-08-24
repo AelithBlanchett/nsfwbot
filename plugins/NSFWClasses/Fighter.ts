@@ -1,42 +1,63 @@
-class Fighter{
-    id: number;
-    name: string;
-    experience: number;
-    experienceSpent: number;
-    power: number;
-    dexterity: number;
-    toughness: number;
-    endurance: number;
-    willpower: number;
+import {BaseModel} from "./Model";
+export class Fighter extends BaseModel {
+    id:number;
+    name:string;
+    experience:number;
+    experienceSpent:number;
+    power:number;
+    dexterity:number;
+    toughness:number;
+    endurance:number;
+    willpower:number;
 
     //during fight
-    hp: number;
-    heartsRemaining: number;
-    lust: number;
-    lustRemaining: number;
-    focus: number;
-    lastAttack: string;
-    usedAttacks: Array<string>;
+    hp:number;
+    heartsRemaining:number;
+    lust:number;
+    lustRemaining:number;
+    focus:number;
+    lastAttack:string;
+    usedAttacks:Array<string>;
 
-    hpPerHeart(){
-        return (10 + this.power + this.dexterity + (this.toughness*2) + this.endurance);
+    constructor(name:string) {
+        super();
+        if (name != undefined) {
+            //load mysql
+            //this.db.query("SELECT 1", function(err, result){
+            //    console.log("hey "+JSON.stringify(result.rows));
+            //});
+        }
+        else {
+            //error
+        }
+        console.log("Hey");
     }
 
-    maxHearts(){
+    trigger() {
+        //_super.db.query("SELECT 1", function(err, result){
+        //    console.log("hey "+JSON.stringify(result.rows));
+        //});
+    }
+
+    hpPerHeart() {
+        return (10 + this.power + this.dexterity + (this.toughness * 2) + this.endurance);
+    }
+
+    maxHearts() {
         return this.toughness;
     }
 
-    lustPerOrgasm(){
-        return (10 + this.power + this.dexterity + this.toughness* + (this.endurance*2));
+    lustPerOrgasm() {
+        return (10 + this.power + this.dexterity + this.toughness * +(this.endurance * 2));
     }
 
-    maxOrgasms(){
+    maxOrgasms() {
         return this.endurance;
     }
 
-    hitHp(hp){
+    hitHp(hp) {
         hp = Math.floor(hp);
-        if(hp < 1){
+        if (hp < 1) {
             hp = 1;
         }
 

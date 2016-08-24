@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "fchatlib": "*",
-    "redis": "*",
+    "mysql": "*",
     "cappu-dice": "*",
     "didyoumean": "*"
   },
