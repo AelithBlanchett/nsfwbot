@@ -1,11 +1,7 @@
 "use strict";
-var fChatLibInstance;
-var didYouMean = require('didyoumean');
-var Dice = require('Dice.ts');
-
-module.exports = function (parent) {
-    fChatLibInstance = parent;
-    var cmdHandler = {};
-
+var CommandHandler_1 = require("./NSFWClasses/CommandHandler");
+module.exports = function (parent, channel) {
+    var cmdHandler = new CommandHandler_1.CommandHandler(parent, channel);
     return cmdHandler;
 };
+//# sourceMappingURL=NSFW.js.map

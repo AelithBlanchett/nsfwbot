@@ -1,6 +1,8 @@
 import {BaseModel} from "./Model";
 import {Dice} from "./Dice";
-export class Fighter extends BaseModel {
+import {Fight} from "./Fight";
+import {IFighter} from "./interfaces/IFighter";
+export class Fighter extends BaseModel implements IFighter{
     id:number = -1;
     name:string = "";
     bronzeTokens:number = 0;
@@ -31,49 +33,48 @@ export class Fighter extends BaseModel {
     usedAttacks:Array<string> = [];
     dice: Dice;
 
-    constructor(name:string, power?:number, dexterity?:number, toughness?:number, endurance?:number, willpower?:number) {
+    constructor() {
         super();
-        let self = this;
-        if (name != undefined) {
-            //load mysql
-            BaseModel.db.query(
-                "SELECT `nsfw_fighters`.`id`, \
-                `nsfw_fighters`.`name`, \
-                `nsfw_fighters`.`bronzeTokens`, \
-                `nsfw_fighters`.`silverTokens`, \
-                `nsfw_fighters`.`goldTokens`, \
-                `nsfw_fighters`.`totalTokens`, \
-                `nsfw_fighters`.`wins`, \
-                `nsfw_fighters`.`losses`, \
-                `nsfw_fighters`.`forfeits`, \
-                `nsfw_fighters`.`quits`, \
-                `nsfw_fighters`.`totalFights`, \
-                `nsfw_fighters`.`winRate`, \
-                `nsfw_fighters`.`power`, \
-                `nsfw_fighters`.`dexterity`, \
-                `nsfw_fighters`.`toughness`, \
-                `nsfw_fighters`.`endurance`, \
-                `nsfw_fighters`.`willpower` \
-                FROM `flistplugins`.`nsfw_fighters` WHERE name = ?", name, function(err, rows: Array<any>){
-                if(rows.length == 0){
-                    //create
-                    if(power != undefined && dexterity != undefined && toughness != undefined && endurance != undefined && willpower != undefined){
-                        self.create(name, power, dexterity, toughness, endurance, willpower);
+    }
+
+    load(name){
+        return new Promise(function(fullfill, reject){
+            let self = this;
+            if (name != undefined) {
+                //load mysql
+                BaseModel.db.query(
+                    "SELECT `nsfw_fighters`.`id`, \
+                    `nsfw_fighters`.`name`, \
+                    `nsfw_fighters`.`bronzeTokens`, \
+                    `nsfw_fighters`.`silverTokens`, \
+                    `nsfw_fighters`.`goldTokens`, \
+                    `nsfw_fighters`.`totalTokens`, \
+                    `nsfw_fighters`.`wins`, \
+                    `nsfw_fighters`.`losses`, \
+                    `nsfw_fighters`.`forfeits`, \
+                    `nsfw_fighters`.`quits`, \
+                    `nsfw_fighters`.`totalFights`, \
+                    `nsfw_fighters`.`winRate`, \
+                    `nsfw_fighters`.`power`, \
+                    `nsfw_fighters`.`dexterity`, \
+                    `nsfw_fighters`.`toughness`, \
+                    `nsfw_fighters`.`endurance`, \
+                    `nsfw_fighters`.`willpower` \
+                    FROM `flistplugins`.`nsfw_fighters` WHERE name = ?", name, function(err, rows: Array<any>){
+                    if (rows != undefined && rows.length != 0) {
+                        self.initFromData(rows);
+                        fullfill(self);
                     }
                     else{
-                        // error
-                        throw new Error("Not expected to get here.");
+                        reject("Fighter not found");
                     }
-                }
-                else{
-                    self.initFromData(rows);
-                }
-            });
-        }
-        else {
-            //error
-            throw new Error("No name passed.");
-        }
+                });
+            }
+            else {
+                //error
+                reject("No name passed.");
+            }
+        });
     }
 
     get hpPerHeart():number {
@@ -124,15 +125,35 @@ export class Fighter extends BaseModel {
         }
     }
 
-    create(name:string, power:number, dexterity:number, toughness:number, endurance:number, willpower:number){
-        let self = this;
-        BaseModel.db.query("INSERT INTO `flistplugins`.`nsfw_fighters`(`name`, `power`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [name, power, dexterity, toughness, endurance, willpower], function(err, result){
-            if(result){
-                console.log(JSON.stringify(result));
-                let data = [{name: name, power: power, dexterity: dexterity, toughness: toughness, endurance: endurance, willpower: willpower}];
-                self.initFromData(data);
+    static create(name:string, power:number, dexterity:number, toughness:number, endurance:number, willpower:number){
+        return new Promise(function(resolve, reject) {
+            let self = this;
+            if (!(power != undefined && dexterity != undefined && toughness != undefined && endurance != undefined && willpower != undefined)) {
+                reject("Wrong stats passed.");
+            }
+            else {
+                BaseModel.db.query("INSERT INTO `flistplugins`.`nsfw_fighters`(`name`, `power`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [name, power, dexterity, toughness, endurance, willpower], function (err, result) {
+                    if (result) {
+                        console.log(JSON.stringify(result));
+                        resolve();
+                    }
+                    else {
+                        reject("Unable to create fighter. " + err);
+                    }
+                });
             }
         });
+    }
+
+    outputStats(){
+        return "[b]" + this.name + "[/b]'s stats" + "\n" +
+            "[b][color=red]Power[/color][/b]:  " + this.power + "      " + "[b][color=red]Hearts[/color][/b]: " + this.maxHearts + " * " + this.hpPerHeart +" [b][color=red]HP[/color] per heart[/b]"+"\n" +
+            "[b][color=orange]Dexterity[/color][/b]:  " + this.dexterity + "      " + "[b][color=pink]Orgasms[/color][/b]: " + this.maxOrgasms + " * " + this.lustPerOrgasm +" [b][color=pink]Lust[/color] per Orgasm[/b]"+"\n" +
+            "[b][color=green]Toughness[/color][/b]:  " + this.toughness + "\n" +
+            "[b][color=cyan]Endurance[/color][/b]:    " + this.endurance + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + this.wins + " - " + this.losses + "\n" +
+            "[b][color=purple]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Bronze tokens[/color][/b]: " + this.bronzeTokens + "\n" +
+            "[b][color=blue]Endurance[/color][/b]: " + this.endurance +  "      " + "[b][color=orange]Total tokens:[/color][/b]: " + this.totalTokens + " / "+"99"+ "\n" /*+ "\n\n"  +
+            "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]"*/
     }
 
     initFromData(data:Array<any>){
@@ -152,8 +173,43 @@ export class Fighter extends BaseModel {
         this.lastAttack = "";
         this.usedAttacks = [];
         this.dice = new Dice(10);
+    }
 
-        console.log(JSON.stringify(this));
+    static exists(name:string){
+        return new Promise(function(resolve, reject) {
+            BaseModel.db.query("SELECT `nsfw_fighters`.`id`, \
+                    `nsfw_fighters`.`name`, \
+                    `nsfw_fighters`.`bronzeTokens`, \
+                    `nsfw_fighters`.`silverTokens`, \
+                    `nsfw_fighters`.`goldTokens`, \
+                    `nsfw_fighters`.`totalTokens`, \
+                    `nsfw_fighters`.`wins`, \
+                    `nsfw_fighters`.`losses`, \
+                    `nsfw_fighters`.`forfeits`, \
+                    `nsfw_fighters`.`quits`, \
+                    `nsfw_fighters`.`totalFights`, \
+                    `nsfw_fighters`.`winRate`, \
+                    `nsfw_fighters`.`power`, \
+                    `nsfw_fighters`.`dexterity`, \
+                    `nsfw_fighters`.`toughness`, \
+                    `nsfw_fighters`.`endurance`, \
+                    `nsfw_fighters`.`willpower` \
+                    FROM `flistplugins`.`nsfw_fighters` WHERE name = ?", name, function (err, rows) {
+                if (rows != undefined && rows.length == 1) {
+                    let myTempWrestler = new Fighter();
+                    myTempWrestler.initFromData(rows);
+                    resolve(myTempWrestler);
+                }
+                else{
+                    if(err){
+                        reject(err);
+                    }
+                    else{
+                        resolve(false);
+                    }
+                }
+            });
+        });
     }
 
 }
