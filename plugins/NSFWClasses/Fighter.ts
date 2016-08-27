@@ -145,7 +145,7 @@ export class Fighter extends BaseModel implements IFighter{
         });
     }
 
-    outputStats(){
+    outputStats():string{
         return "[b]" + this.name + "[/b]'s stats" + "\n" +
             "[b][color=red]Power[/color][/b]:  " + this.power + "      " + "[b][color=red]Hearts[/color][/b]: " + this.maxHearts + " * " + this.hpPerHeart +" [b][color=red]HP[/color] per heart[/b]"+"\n" +
             "[b][color=orange]Dexterity[/color][/b]:  " + this.dexterity + "      " + "[b][color=pink]Orgasms[/color][/b]: " + this.maxOrgasms + " * " + this.lustPerOrgasm +" [b][color=pink]Lust[/color] per Orgasm[/b]"+"\n" +

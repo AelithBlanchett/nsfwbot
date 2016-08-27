@@ -37,9 +37,9 @@ export class CommandHandler implements ICommandHandler{
     };
 
     stats(args:string, data:FChatResponse){
-        Fighter.exists(data.character).then(fighter =>{
-            if(fighter){
-                fighter = <Fighter>fighter;
+        Fighter.exists(data.character).then(data =>{
+            if(data){
+                let fighter:Fighter = data as Fighter;
                 this.fChatLibInstance.sendMessage(fighter.outputStats(), this.channel);
             }
             else{
@@ -51,9 +51,9 @@ export class CommandHandler implements ICommandHandler{
     };
 
     getStats(args:string, data:FChatResponse){
-        Fighter.exists(args).then(fighter =>{
-            if(fighter){
-                fighter = <Fighter>fighter;
+        Fighter.exists(args).then(data =>{
+            if(data){
+                let fighter:Fighter = data as Fighter;
                 this.fChatLibInstance.sendMessage(fighter.outputStats(), this.channel);
             }
             else{
