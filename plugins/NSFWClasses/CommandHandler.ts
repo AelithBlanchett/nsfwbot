@@ -5,6 +5,7 @@ import {Fight} from "./Fight";
 import {IParserResponse} from "./interfaces/IParserResponse";
 import {ICommandHandler} from "./interfaces/ICommandHandler";
 import {IFChatLib} from "./interfaces/IFChatLib";
+import {Team} from "./Fight";
 
 
 export class CommandHandler implements ICommandHandler{
@@ -78,7 +79,8 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(data.character).then(receivedData =>{
             if(receivedData){
                 let fighter:Fighter = receivedData as Fighter;
-                if(this.fight.join(fighter, args)){
+                let chosenTeam = Parser.Commands.join(args);
+                if(this.fight.join(fighter, chosenTeam)){
                     this.fChatLibInstance.sendMessage("[color=red]"+fighter.name+" stepped into the ring! Waiting for everyone to be !ready.[/color]", this.channel);
                 }
                 else{

@@ -50,10 +50,10 @@ export class Fight extends BaseModel{
         return this.id;
     }
 
-    join(fighter:Fighter, team?:Team){
+    join(fighter:Fighter, team:Team){
         if(!this.hasStarted){
             if(!this.findFighter(fighter.name)){ //find fighter by its name property instead of comparing objects, which doesn't work.
-                if(team != undefined){
+                if(team != Team.Unknown){
                     fighter.assignedTeam = team;
                 }
                 else{
@@ -78,7 +78,7 @@ export class Fight extends BaseModel{
     setFighterReady(fighter:Fighter){
         if(!this.hasStarted){
             if(!this.findFighter(fighter.name)){
-                this.join(fighter);
+                this.join(fighter, Team.Unknown);
             }
             var fighterInFight = this.findFighter(fighter.name);
             if(fighterInFight && !fighterInFight.isReady){ //find fighter by its name property instead of comparing objects, which doesn't work.
@@ -102,7 +102,7 @@ export class Fight extends BaseModel{
         return index;
     }
 
-    canStartMatch(){ //TODO: check if teams are even
+    canStartMatch(){
         let isEveryoneReady = false;
         let bluePlayers = 0;
         let redPlayers = 0;
@@ -156,6 +156,7 @@ export class Fight extends BaseModel{
 
     nextTurn(){
         this.addMessage("It's now "+this.getCurrentActor().name+"'s turn.");
+        //TODO: do turns
     }
 
     getCurrentActor(){

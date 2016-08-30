@@ -1,3 +1,4 @@
+import {Team} from "./Fight";
 var _ = require('lodash');
 
 export class Commands{
@@ -14,5 +15,15 @@ export class Commands{
         result.success = true;
 
         return result;
+    }
+
+    public static join(args){
+        if(args.toLowerCase() == "blue"){
+            return Team.Blue;
+        }
+        else if(args.toLowerCase() == "red"){
+            return Team.Red;
+        }
+        return Team.Unknown;
     }
 }
