@@ -21,6 +21,7 @@ export interface IFighter {
 
 
     //during fight
+    isReady:boolean;
     hp:number;
     heartsRemaining:number;
     lust:number;

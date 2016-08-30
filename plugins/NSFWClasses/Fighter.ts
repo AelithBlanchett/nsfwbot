@@ -2,6 +2,7 @@ import {BaseModel} from "./Model";
 import {Dice} from "./Dice";
 import {Fight} from "./Fight";
 import {IFighter} from "./interfaces/IFighter";
+import {Team} from "./Fight";
 export class Fighter extends BaseModel implements IFighter{
     id:number = -1;
     name:string = "";
@@ -13,6 +14,7 @@ export class Fighter extends BaseModel implements IFighter{
     losses: number = 0;
     forfeits: number = 0;
     quits: number = 0;
+    areStatsPrivate:boolean = true;
 
     power:number = 0;
     dexterity:number = 0;
@@ -24,6 +26,9 @@ export class Fighter extends BaseModel implements IFighter{
 
 
     //during fight
+    assignedTeam:Team;
+    teamName:string;
+    isReady:boolean = false;
     hp:number = 0;
     heartsRemaining:number = 0;
     lust:number = 0;
@@ -187,6 +192,7 @@ export class Fighter extends BaseModel implements IFighter{
                     `nsfw_fighters`.`losses`, \
                     `nsfw_fighters`.`forfeits`, \
                     `nsfw_fighters`.`quits`, \
+                    `nsfw_fighters`.`areStatsPrivate`, \
                     `nsfw_fighters`.`totalFights`, \
                     `nsfw_fighters`.`winRate`, \
                     `nsfw_fighters`.`power`, \
