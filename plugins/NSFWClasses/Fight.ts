@@ -19,11 +19,11 @@ export class Fight extends BaseModel{
     stage:string;
 
     //real fighting variables
-    fightActions:Array<FightAction>;
-    intCurrentBlueFighter:number = -1;
-    intCurrentRedFighter:number = -1;
+    arrayCurrentFighterForTeam:Array<number>;
     currentTeamTurn:Team;
-    turnCounter:number = 0;
+    currentTurn:number = 0;
+
+    fightActions:Array<FightAction>;
     attacker:Fighter;
     defender:Fighter;
     holdAttacker:Fighter;
@@ -67,7 +67,9 @@ export class Fight extends BaseModel{
     }
 
     getTeamToAssign(){
-        if((this.blueTeam.length == this.redTeam.length) || (this.blueTeam.length < this.redTeam.length)){
+        let bluePlayers = this.countPlayersInTeam(Team.Blue);
+        let redPlayers = this.countPlayersInTeam(Team.Red);
+        if((bluePlayers == redPlayers) || (bluePlayers < redPlayers)){
             return Team.Blue;
         }
         else{
@@ -83,8 +85,10 @@ export class Fight extends BaseModel{
             var fighterInFight = this.findFighter(fighter.name);
             if(fighterInFight && !fighterInFight.isReady){ //find fighter by its name property instead of comparing objects, which doesn't work.
                 fighterInFight.isReady = true;
+                this.addMessage("[color=red]"+fighter.name+" is now ready to get it on![/color]");
+                this.sendMessage();
                 if(this.canStartMatch()){
-
+                    this.startMatch();
                 }
                 return true;
             }
@@ -103,32 +107,36 @@ export class Fight extends BaseModel{
     }
 
     canStartMatch(){
-        let isEveryoneReady = false;
-        let bluePlayers = 0;
-        let redPlayers = 0;
         let areTeamsBalanced:boolean = false;
-        if(!this.hasStarted && this.fighters.length > 1){
-            isEveryoneReady = true;
-            for(var fighter of this.fighters){
-                if(fighter.assignedTeam == Team.Blue){
-                    bluePlayers++;
-                }
-                else{
-                    redPlayers++;
-                }
-                if(!fighter.isReady){
-                    isEveryoneReady = false;
-                }
-            }
-        }
-        if(bluePlayers == redPlayers){
+        if(this.countPlayersInTeam(Team.Red) == this.countPlayersInTeam(Team.Blue)){
             areTeamsBalanced = true;
         }
-        return (isEveryoneReady && areTeamsBalanced); //only start if everyone's ready and if the teams are balanced
+        return (this.isEveryoneReady() && areTeamsBalanced && !this.hasStarted && this.fighters.length > 1); //only start if everyone's ready and if the teams are balanced
+    }
+
+    isEveryoneReady(){
+        let isEveryoneReady = true;
+        for(var fighter of this.fighters){
+            if(!fighter.isReady){
+                isEveryoneReady = false;
+            }
+        }
+        return isEveryoneReady;
+    }
+
+    countPlayersInTeam(team:Team){
+        let count = 0;
+        for(var fighter of this.fighters){
+            if(fighter.assignedTeam == team){
+                count++;
+            }
+        }
+        return count;
     }
 
     startMatch(){
-        this.addMessage("\n[color=green]Let's start the match![/color]");
+        this.addMessage("\n[color=green]Everyone's ready, let's start the match![/color]");
+        this.hasStarted = true;
 
         this.fighters = this.shuffleArray(this.fighters); //random order for teams
         for(var fighter of this.fighters){
@@ -147,33 +155,51 @@ export class Fight extends BaseModel{
             }
         }
         this.sendMessage();
-        this.currentTeamTurn = this.rollBothDice();
-        this.intCurrentBlueFighter = 0;
-        this.intCurrentRedFighter = 0;
-        this.addMessage(this.currentTeamTurn + " team starts first!");
+        this.currentTeamTurn = this.rollAllDice();
+        for(var team in Team){
+            this.arrayCurrentFighterForTeam[team] = 0;
+        }
+        this.addMessage(`${Team[this.currentTeamTurn]} team starts first!`);
         this.sendMessage();
+        this.nextTurn();
+    }
+
+    outputStatus(){
+        this.addMessage("\n[b]Turn #" + this.currentTurn + "[/b] --------------- It's [b][u][color=pink]P1[/color][/u][/b]'s turn.\n");
+        for(var fighter of this.blueTeam){
+            this.addMessage(this.outputPlayerStatus(fighter, Team.Blue));
+        }
+        for(var fighter of this.redTeam){
+            this.addMessage(this.outputPlayerStatus(fighter, Team.Red));
+        }
+        this.sendMessage();
+    }
+
+    outputPlayerStatus(fighter:Fighter, team?:Team){
+        return `[color=${Team[team]}][b]${fighter.name}: [/b]${fighter.hp}/${fighter.hpPerHeart} [color=red]HP[/color]  |  ${fighter.heartsRemaining}/${fighter.maxHearts} [color=red]Hearts[/color]  |  ${fighter.lust}/${fighter.lustPerOrgasm} [color=pink]Lust[/color]  |  ${fighter.orgasmsRemaining}/${fighter.maxOrgasms} [color=pink]Orgasms[/color]  |  [sub]${fighter.minFocus}[/sub]|[b]${fighter.focus}[/b]|[sub]${fighter.maxFocus}[/sub] Focus[/color]\n`;
     }
 
     nextTurn(){
         this.addMessage("It's now "+this.getCurrentActor().name+"'s turn.");
+        this.outputStatus();
         //TODO: do turns
     }
 
     getCurrentActor(){
         if(this.currentTeamTurn == Team.Blue){
-            return this.blueTeam[this.intCurrentBlueFighter];
+            return this.blueTeam[this.arrayCurrentFighterForTeam[Team.Blue]];
         }
         else{
-            return this.redTeam[this.intCurrentRedFighter];
+            return this.redTeam[this.arrayCurrentFighterForTeam[Team.Red]];
         }
     }
 
     getCurrentTarget(){
         if(this.currentTeamTurn != Team.Blue){
-            return this.blueTeam[this.intCurrentBlueFighter];
+            return this.blueTeam[this.arrayCurrentFighterForTeam[Team.Blue]];
         }
         else{
-            return this.redTeam[this.intCurrentRedFighter];
+            return this.redTeam[this.arrayCurrentFighterForTeam[Team.Red]];
         }
     }
 
@@ -187,7 +213,7 @@ export class Fight extends BaseModel{
         return array;
     }
 
-    rollBothDice(){
+    rollAllDice(){ //make this modular to teams
         let intBlueResult:number = this.blueTeam[0].dice.roll(1);
         let intRedResult:number = this.redTeam[0].dice.roll(1);
         this.addMessage("\nBlue team rolled a "+intBlueResult.toString());
@@ -211,6 +237,7 @@ export class Fight extends BaseModel{
 
     sendMessage(){
         this.fChatLibInstance.sendMessage(this.message, this.channel);
+        this.message = "";
     }
 
 }

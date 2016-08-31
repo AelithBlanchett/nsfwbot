@@ -62,9 +62,9 @@ describe("Fighter testing", () => {
         x.ready("", data);
         data = {character: "test", channel: "here"};
         x.ready("", data);
-        setTimeout(function(){console.log(x.fight.hasStarted);}, 1000);
-        setTimeout(done, 2500);
-    });
+        setTimeout(function(){console.log(x.fight.hasStarted);}, 2000);
+        setTimeout(done, 100000);
+    },1000000);
 
 });
 

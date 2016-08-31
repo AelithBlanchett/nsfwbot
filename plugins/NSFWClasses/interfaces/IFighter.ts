@@ -1,4 +1,5 @@
 import {Dice} from "../Dice";
+import {FightAction} from "../FightAction";
 export interface IFighter {
     id:number;
     name:string;
@@ -27,8 +28,7 @@ export interface IFighter {
     lust:number;
     orgasmsRemaining:number;
     focus:number;
-    lastAttack:string ;
-    usedAttacks:Array<string>;
+    pastActions:Array<FightAction>;
     dice: Dice;
 
 }

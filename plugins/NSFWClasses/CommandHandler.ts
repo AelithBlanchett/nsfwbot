@@ -107,10 +107,7 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(data.character).then(data =>{
             if(data){
                 let fighter:Fighter = data as Fighter;
-                if(this.fight.setFighterReady(fighter)){
-                    this.fChatLibInstance.sendMessage("[color=red]"+fighter.name+" is now ready to get it on! Let's go![/color]", this.channel);
-                }
-                else{
+                if(!this.fight.setFighterReady(fighter)){ //else, the match starts!
                     this.fChatLibInstance.sendMessage("[color=red]You are already ready.[/color]", this.channel);
                 }
             }

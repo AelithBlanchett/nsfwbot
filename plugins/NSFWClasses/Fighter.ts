@@ -3,6 +3,7 @@ import {Dice} from "./Dice";
 import {Fight} from "./Fight";
 import {IFighter} from "./interfaces/IFighter";
 import {Team} from "./Fight";
+import {FightAction} from "./FightAction";
 export class Fighter extends BaseModel implements IFighter{
     id:number = -1;
     name:string = "";
@@ -34,9 +35,9 @@ export class Fighter extends BaseModel implements IFighter{
     lust:number = 0;
     orgasmsRemaining:number = 0;
     focus:number = 0;
-    lastAttack:string = "";
-    usedAttacks:Array<string> = [];
+    pastActions:Array<FightAction> = [];
     dice: Dice;
+    target:Fighter;
 
     constructor() {
         super();
@@ -96,6 +97,14 @@ export class Fighter extends BaseModel implements IFighter{
 
     get maxOrgasms():number {
         return this.endurance;
+    }
+
+    get minFocus():number {
+        return -1-this.willpower;
+    }
+
+    get maxFocus():number {
+        return 1+this.willpower;
     }
 
     hitHp(hp) {
@@ -175,8 +184,7 @@ export class Fighter extends BaseModel implements IFighter{
         this.lust = 0;
         this.orgasmsRemaining = this.maxOrgasms;
         this.focus = this.willpower;
-        this.lastAttack = "";
-        this.usedAttacks = [];
+        this.pastActions = [];
         this.dice = new Dice(10);
     }
 
