@@ -58,9 +58,15 @@ describe("Fighter testing", () => {
 
     it("should start the match", function(done){
         var x = new CommandHandler(fChatLibInstance, "here");
+        //let y = x.fight.getTeamsList();
+        //let z = x.fight.getTeamsIdList();
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.ready("", data);
         data = {character: "test", channel: "here"};
+        x.ready("", data);
+        data = {character: "test3", channel: "here"};
+        x.ready("", data);
+        data = {character: "test4", channel: "here"};
         x.ready("", data);
         setTimeout(function(){console.log(x.fight.hasStarted);}, 2000);
         setTimeout(done, 100000);

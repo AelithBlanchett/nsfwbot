@@ -170,6 +170,10 @@ export class Fighter extends BaseModel implements IFighter{
             "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]"*/
     }
 
+    getStylizedName(){
+        return `[b][color=${Team[this.assignedTeam]}]${this.name}[/color][/b]`;
+    }
+
     initFromData(data:Array<any>){
         let row = data[0];
         for (let attribute in row)
