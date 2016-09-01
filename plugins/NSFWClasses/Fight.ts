@@ -11,9 +11,6 @@ import Team = Constants.Team;
 export class Fight extends BaseModel{
     id:number = -1;
     hasStarted:boolean  = false;
-    fighters:Array<Fighter> = [];
-    blueTeam:Array<Fighter> = [];
-    redTeam:Array<Fighter> = [];
     stage:string;
 
     //real fighting variables
@@ -52,7 +49,6 @@ export class Fight extends BaseModel{
                 else{
                     fighter.assignedTeam = this.getTeamToAssign();
                 }
-                this.fighters.push(fighter);
                 if(!this.arrTeams.containsKey(fighter.assignedTeam)){
                     this.arrTeams.add(fighter.assignedTeam, []);
                 }
@@ -106,9 +102,11 @@ export class Fight extends BaseModel{
 
     isEveryoneReady(){
         let isEveryoneReady = true;
-        for(var fighter of this.fighters){
-            if(!fighter.isReady){
-                isEveryoneReady = false;
+        for(let teamsList of this.arrTeams.values()){
+            for(let fighter of teamsList){
+                if(!fighter.isReady){
+                    isEveryoneReady = false;
+                }
             }
         }
         return isEveryoneReady;
@@ -121,7 +119,7 @@ export class Fight extends BaseModel{
             if(this.arrTeams.values()[i].length !== this.arrTeams.values()[i].length)
                 areTeamsBalanced = false;
         }
-        return (this.isEveryoneReady() && areTeamsBalanced && !this.hasStarted && this.fighters.length > 1 && this.arrTeams.keys().length >= Constants.usedTeams); //only start if everyone's ready and if the teams are balanced
+        return (this.isEveryoneReady() && areTeamsBalanced && !this.hasStarted && this.arrTeams.keys().length >= Constants.usedTeams); //only start if everyone's ready and if the teams are balanced
     }
 
 
@@ -148,7 +146,7 @@ export class Fight extends BaseModel{
             this.arrCurrentFighterForTeam.add(team, 0);
         }
 
-        //this.fighters = Utils.shuffleArray(this.fighters); //random order for teams
+        //random order for teams
 
         for(let i = 0; i < this.playersPerTeam; i++){ //Prints as much names as there are team
             let fullStringVS = "[b]";
@@ -189,28 +187,21 @@ export class Fight extends BaseModel{
         this.sendMessage();
     }
 
-    getPlayerInTeamAtIndex(team:Team, index:number):Fighter{
-        let indexOfTeam = this.arrTeams.keys().indexOf(team);
-        if(indexOfTeam != -1){
-            let teamList = this.arrTeams.getValue(this.arrTeams.keys()[team]);
-            if(teamList[index] != undefined){
-                return teamList[index];
-            }
-        }
-        return;
-    }
-
 
     //Fight helpers
 
     findFighter(name){
-        let index = this.fighters.map(function(e) { return e.name; }).indexOf(name);
-        return this.fighters[index];
-    }
-
-    findFighterId(name){
-        let index = this.fighters.map(function(e) { return e.name; }).indexOf(name);
-        return index;
+        for(let team of this.getUsedTeams()){
+            if(this.arrTeams.getValue(team) != undefined){
+                for(let i = 0; i < this.arrTeams.getValue(team).length; i++){
+                    let tempFighter = this.getPlayerInTeamAtIndex(team, i);
+                    if(tempFighter && tempFighter.name == name){
+                        return tempFighter
+                    }
+                }
+            }
+        }
+        return;
     }
 
     get currentActor():Fighter{
@@ -218,18 +209,26 @@ export class Fight extends BaseModel{
     }
 
     get currentTarget():Fighter{
-        //TODO: Re-do that pls
-        return null;
+        return this.currentActor.target;
     }
 
     getPlayersInTeam(team:Team){
         let count = 0;
-        for(var fighter of this.fighters){
-            if(fighter.assignedTeam == team){
-                count++;
-            }
+        for(let i = 0; i < this.teamsInvolved; i++){
+            count += this.arrTeams.getValue(this.arrTeams.keys()[i]).length;
         }
         return count;
+    }
+
+    getPlayerInTeamAtIndex(team:Team, index:number):Fighter{
+        let indexOfTeam = this.arrTeams.keys().indexOf(team);
+        if(indexOfTeam != -1){
+            let teamList = this.arrTeams.getValue(this.arrTeams.keys()[indexOfTeam]);
+            if(teamList[index] != undefined){
+                return teamList[index];
+            }
+        }
+        return;
     }
 
     getUsedTeams():Array<Team>{
@@ -300,7 +299,7 @@ export class Fight extends BaseModel{
 
     //Misc. shortcuts
     get fighterCount():number {
-        return this.fighters.length;
+        return this.teamsInvolved * this.playersPerTeam;
     }
 
     getTeamsIdList():Array<number>{
