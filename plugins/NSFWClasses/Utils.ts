@@ -36,4 +36,12 @@ export class Utils {
     static getRandomInt(min:number, max:number):number{ //continue
         return Math.floor((Math.random() * max) + min);
     }
+
+    static getAllIndexes(arr, val) {
+        var indexes = [], i;
+        for(i = 0; i < arr.length; i++)
+            if (arr[i] === val)
+                indexes.push(i);
+        return indexes;
+    }
 }

@@ -74,7 +74,7 @@ describe("Fighter testing", () => {
         setTimeout(function(){x.ready("", {character: "test6", channel: "here"})}, 2000);
 
 
-        setTimeout(function(){console.log(x.fight.hasStarted);}, 2000);
+        setTimeout(function(){x.fight.nextTurn()}, 8000);
         setTimeout(done, 100000);
     },1000000);
 
