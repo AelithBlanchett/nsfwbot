@@ -159,7 +159,7 @@ export class Fight extends BaseModel{
     }
 
     nextTurn(){
-        this.addMessage("It's now "+this.currentActor.name+"'s turn.");
+        this.currentTurn++;
         this.outputStatus();
         //TODO: do turns
     }
@@ -167,7 +167,7 @@ export class Fight extends BaseModel{
     //Fighting info displays
 
     outputStatus(){
-        this.addMessage("\n[b]Turn #" + this.currentTurn + "[/b] --------------- It's [b][u][color=pink]P1[/color][/u][/b]'s turn.\n");
+        this.addMessage(`\n[b]Turn #" + this.currentTurn + "[/b] --------------- It's [b][u][color=pink]${this.currentActor.name}[/color][/u][/b]'s turn.\n`);
         for(var fighter of this.blueTeam){
             this.addMessage(this.outputPlayerStatus(fighter, Team.Blue));
         }
@@ -196,21 +196,11 @@ export class Fight extends BaseModel{
     }
 
     get currentActor():Fighter{
-        if(this.currentTeamTurn == Team.Blue){
-            return this.blueTeam[this.arrCurrentFighterForTeam[Team.Blue]];
-        }
-        else{
-            return this.redTeam[this.arrCurrentFighterForTeam[Team.Red]];
-        }
+        return this.arrTeams.getValue(this.currentTeamTurn)[this.arrCurrentFighterForTeam.getValue(this.currentTeamTurn)];
     }
 
     get currentTarget():Fighter{
-        if(this.currentTeamTurn != Team.Blue){
-            return this.blueTeam[this.arrCurrentFighterForTeam[Team.Blue]];
-        }
-        else{
-            return this.redTeam[this.arrCurrentFighterForTeam[Team.Red]];
-        }
+        //TODO: Re-do that pls
     }
 
     getPlayersInTeam(team:Team){
@@ -248,7 +238,7 @@ export class Fight extends BaseModel{
         let theDice = new Dice(10);
         for(var team of this.arrTeams.keys()){
             arrResults.add(team, theDice.roll(1));
-            this.addMessage(`\n[color=${Team[team]}]${Team[team]}[/color] team rolled a ${arrResults[team]}`);
+            this.addMessage(`\n[color=${Team[team]}]${Team[team]}[/color] team rolled a ${arrResults.getValue(team)}`);
         }
 
         let bestScore = Math.max(...arrResults.values());
