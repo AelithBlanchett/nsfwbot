@@ -5,8 +5,8 @@ import {Fight} from "./Fight";
 import {IParserResponse} from "./interfaces/IParserResponse";
 import {ICommandHandler} from "./interfaces/ICommandHandler";
 import {IFChatLib} from "./interfaces/IFChatLib";
-import {Team} from "./Fight";
-
+import {Constants} from "./Constants";
+import Team = Constants.Team;
 
 export class CommandHandler implements ICommandHandler{
     fChatLibInstance:IFChatLib;

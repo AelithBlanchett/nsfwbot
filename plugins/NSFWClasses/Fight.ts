@@ -5,16 +5,8 @@ import {FightAction} from "./FightAction";
 import {IFChatLib} from "./interfaces/IFChatLib";
 import {Utils} from "./Utils";
 import {Dictionary} from "./Dictionary";
-
-export enum Team {
-    Unknown = -1,
-    Blue = 0,
-    Red = 1,
-    Yellow = 2,
-    Orange = 3,
-    Pink = 4,
-    Purple = 5
-}
+import {Constants} from "./Constants";
+import Team = Constants.Team;
 
 export class Fight extends BaseModel{
     id:number = -1;
@@ -23,8 +15,6 @@ export class Fight extends BaseModel{
     blueTeam:Array<Fighter> = [];
     redTeam:Array<Fighter> = [];
     stage:string;
-
-    teamsToAssignTo:number = 2;
 
     //real fighting variables
     arrCurrentFighterForTeam:Dictionary<Team,number>;
@@ -131,11 +121,24 @@ export class Fight extends BaseModel{
             if(this.arrTeams.values()[i].length !== this.arrTeams.values()[i].length)
                 areTeamsBalanced = false;
         }
-        return (this.isEveryoneReady() && areTeamsBalanced && !this.hasStarted && this.fighters.length > 1); //only start if everyone's ready and if the teams are balanced
+        return (this.isEveryoneReady() && areTeamsBalanced && !this.hasStarted && this.fighters.length > 1 && this.arrTeams.keys().length >= Constants.usedTeams); //only start if everyone's ready and if the teams are balanced
     }
 
 
     //Fight logic
+
+    get teamsInvolved():number{
+        return this.arrTeams.keys().length;
+    }
+
+    get playersPerTeam():number{ //returns 0 if there aren't any teams
+        let number = 0;
+        if(this.arrTeams.keys().length > 0){
+            number = this.arrTeams.getValue(this.arrTeams.keys()[0]).length;
+        }
+        return number;
+    }
+
 
     startMatch(){
         this.addMessage("\n[color=green]Everyone's ready, let's start the match![/color]");
@@ -145,12 +148,20 @@ export class Fight extends BaseModel{
             this.arrCurrentFighterForTeam.add(team, 0);
         }
 
-        this.fighters = Utils.shuffleArray(this.fighters); //random order for teams
+        //this.fighters = Utils.shuffleArray(this.fighters); //random order for teams
 
-        //for(var i = 0; i < (this.blueTeam.length) && (i < this.redTeam.length); i++){
-        //    this.addMessage(`[b][color=blue]${this.blueTeam[i].name}[/color] VS [color=blue]${this.redTeam[i].name}[/color][/b]`);
-        //}
-        //TODO: Print as much names as there are teams
+        for(let i = 0; i < this.playersPerTeam; i++){ //Prints as much names as there are team
+            let fullStringVS = "[b]";
+            for(let j = 0; j < this.teamsInvolved; j++){
+                let theFighter=this.arrTeams.getValue(this.arrTeams.keys()[j])[i];
+                fullStringVS = `${fullStringVS} VS ${theFighter.getStylizedName()}`;
+            }
+            fullStringVS = `${fullStringVS}[/b]`;
+            fullStringVS =  fullStringVS.replace(" VS ","");
+            this.addMessage(fullStringVS);
+        }
+
+
         this.sendMessage();
         this.currentTeamTurn = this.rollAllDice();
         this.addMessage(`${Team[this.currentTeamTurn]} team starts first!`);
@@ -167,20 +178,27 @@ export class Fight extends BaseModel{
     //Fighting info displays
 
     outputStatus(){
-        this.addMessage(`\n[b]Turn #" + this.currentTurn + "[/b] --------------- It's [b][u][color=pink]${this.currentActor.name}[/color][/u][/b]'s turn.\n`);
-        for(var fighter of this.blueTeam){
-            this.addMessage(this.outputPlayerStatus(fighter, Team.Blue));
-        }
-        for(var fighter of this.redTeam){
-            this.addMessage(this.outputPlayerStatus(fighter, Team.Red));
+        this.addMessage(`\n[b]Turn #${this.currentTurn}[/b] --------------- It's [u]${this.currentActor.getStylizedName()}[/u]'s turn.\n`);
+
+        for(let i = 0; i < this.teamsInvolved; i++){ //Prints as much names as there are team
+            for(let j = 0; j < this.playersPerTeam; j++){
+                let fighter = this.getPlayerInTeamAtIndex(this.arrTeams.keys()[i], j);
+                this.addMessage(fighter.outputStatus());
+            }
         }
         this.sendMessage();
     }
 
-    outputPlayerStatus(fighter:Fighter, team?:Team){
-        return `[color=${Team[team]}][b]${fighter.name}: [/b]${fighter.hp}/${fighter.hpPerHeart} [color=red]HP[/color]  |  ${fighter.heartsRemaining}/${fighter.maxHearts} [color=red]Hearts[/color]  |  ${fighter.lust}/${fighter.lustPerOrgasm} [color=pink]Lust[/color]  |  ${fighter.orgasmsRemaining}/${fighter.maxOrgasms} [color=pink]Orgasms[/color]  |  [sub]${fighter.minFocus}[/sub]|[b]${fighter.focus}[/b]|[sub]${fighter.maxFocus}[/sub] Focus[/color]\n`;
+    getPlayerInTeamAtIndex(team:Team, index:number):Fighter{
+        let indexOfTeam = this.arrTeams.keys().indexOf(team);
+        if(indexOfTeam != -1){
+            let teamList = this.arrTeams.getValue(this.arrTeams.keys()[team]);
+            if(teamList[index] != undefined){
+                return teamList[index];
+            }
+        }
+        return;
     }
-
 
 
     //Fight helpers
@@ -201,6 +219,7 @@ export class Fight extends BaseModel{
 
     get currentTarget():Fighter{
         //TODO: Re-do that pls
+        return null;
     }
 
     getPlayersInTeam(team:Team){
@@ -218,7 +237,7 @@ export class Fight extends BaseModel{
         let arrUsedTeamOrNot:Array<boolean> = [];
         for(var team of teamsList){
             arrUsedTeamOrNot[team] = false;
-            if((this.getPlayersInTeam(Team[Team[team]]) > 0) || (team < this.teamsToAssignTo)){
+            if((this.getPlayersInTeam(Team[Team[team]]) > 0) || (team < Constants.usedTeams)){
                 arrUsedTeamOrNot[team] = true;
             }
         }

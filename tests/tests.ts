@@ -60,15 +60,20 @@ describe("Fighter testing", () => {
         var x = new CommandHandler(fChatLibInstance, "here");
         //let y = x.fight.getTeamsList();
         //let z = x.fight.getTeamsIdList();
-        var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
-        x.join("Purple", data);
-        x.ready("", data);
-        data = {character: "test", channel: "here"};
-        setTimeout(function(){x.ready("", data)}, 2000);
-        //data = {character: "test3", channel: "here"};
-        //x.ready("", data);
-        //data = {character: "test4", channel: "here"};
-        //x.ready("", data);
+        x.join("Purple", {character: "test1", channel: "here"});
+        setTimeout(function(){x.ready("", {character: "test1", channel: "here"})}, 2000);
+        x.join("Red", {character: "test2", channel: "here"});
+        setTimeout(function(){x.ready("", {character: "test2", channel: "here"})}, 2000);
+        x.join("Blue", {character: "test3", channel: "here"});
+        setTimeout(function(){x.ready("", {character: "test3", channel: "here"})}, 2000);
+        x.join("Yellow", {character: "test4", channel: "here"});
+        setTimeout(function(){x.ready("", {character: "test4", channel: "here"})}, 2000);
+        x.join("Orange", {character: "test5", channel: "here"});
+        setTimeout(function(){x.ready("", {character: "test5", channel: "here"})}, 2000);
+        x.join("Pink", {character: "test6", channel: "here"});
+        setTimeout(function(){x.ready("", {character: "test6", channel: "here"})}, 2000);
+
+
         setTimeout(function(){console.log(x.fight.hasStarted);}, 2000);
         setTimeout(done, 100000);
     },1000000);

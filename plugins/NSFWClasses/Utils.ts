@@ -1,4 +1,5 @@
-import {Team} from "./Fight";
+import {Constants} from "./Constants";
+import Team = Constants.Team;
 export class Utils {
     static minInArray(arr: Array<Number>) {
         return Math.min.apply(Math, arr);

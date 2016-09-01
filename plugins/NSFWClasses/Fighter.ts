@@ -2,8 +2,10 @@ import {BaseModel} from "./Model";
 import {Dice} from "./Dice";
 import {Fight} from "./Fight";
 import {IFighter} from "./interfaces/IFighter";
-import {Team} from "./Fight";
 import {FightAction} from "./FightAction";
+import {Constants} from "./Constants";
+import Team = Constants.Team;
+
 export class Fighter extends BaseModel implements IFighter{
     id:number = -1;
     name:string = "";
@@ -168,6 +170,10 @@ export class Fighter extends BaseModel implements IFighter{
             "[b][color=purple]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Bronze tokens[/color][/b]: " + this.bronzeTokens + "\n" +
             "[b][color=blue]Endurance[/color][/b]: " + this.endurance +  "      " + "[b][color=orange]Total tokens:[/color][/b]: " + this.totalTokens + " / "+"99"+ "\n" /*+ "\n\n"  +
             "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]"*/
+    }
+
+    outputStatus(){
+        return `${this.getStylizedName()} ${this.hp}/${this.hpPerHeart} [color=red]HP[/color]  |  ${this.heartsRemaining}/${this.maxHearts} [color=red]Hearts[/color]  |  ${this.lust}/${this.lustPerOrgasm} [color=pink]Lust[/color]  |  ${this.orgasmsRemaining}/${this.maxOrgasms} [color=pink]Orgasms[/color]  |  [sub]${this.minFocus}[/sub]|[b]${this.focus}[/b]|[sub]${this.maxFocus}[/sub] Focus[/color]\n`;
     }
 
     getStylizedName(){

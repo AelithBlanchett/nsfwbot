@@ -1,19 +1,36 @@
-import {Team} from "./Fight";
 import {Utils} from "./Utils";
+import {Fight} from "./Fight";
+import {Constants} from "./Constants";
+import Team = Constants.Team;
 var _ = require('lodash');
 
 export class Commands{
     public static register(args){
-        let result = {success: false, args: {name: "", power: 0, dexterity: 0, toughness: 0, endurance: 0, willpower: 0}};
-        //TODO: real parse
-        result.args.name = "te";
-        result.args.power = 3;
-        result.args.dexterity = 3;
-        result.args.toughness = 3;
-        result.args.endurance = 3;
-        result.args.willpower = 3;
+        let result = {success: false, args: {power: 0, dexterity: 0, toughness: 0, endurance: 0, willpower: 0}};
 
-        result.success = true;
+        let splittedArgs = args.split(" ");
+        if(splittedArgs.length == 5){
+            result.success = true;
+
+            for(let i of splittedArgs){
+                if(!Number.isInteger(i)){
+                    result.success = false;
+                }
+            }
+
+            if(result.success){ //it means every argument is an integer
+                result.args.power = splittedArgs[0] as number;
+                result.args.dexterity = splittedArgs[1] as number;
+                result.args.toughness = splittedArgs[2] as number;
+                result.args.endurance = splittedArgs[3] as number;
+                result.args.willpower = splittedArgs[4] as number;
+                for(let i in result.args){
+                    if(result.args[i] < Constants.minLevel || result.args[i] > Constants.maxLevel){
+                        result.success = false;
+                    }
+                }
+            }
+        }
 
         return result;
     }
