@@ -81,7 +81,7 @@ export class CommandHandler implements ICommandHandler{
                 let fighter:Fighter = receivedData as Fighter;
                 let chosenTeam = Parser.Commands.join(args);
                 if(this.fight.join(fighter, chosenTeam)){
-                    this.fChatLibInstance.sendMessage("[color=red]"+fighter.name+" stepped into the ring! Waiting for everyone to be !ready.[/color]", this.channel);
+                    this.fChatLibInstance.sendMessage(`[color=red]${fighter.name} stepped into the ring for the [color=${Team[fighter.assignedTeam]}]${Team[fighter.assignedTeam]}[/color] team! Waiting for everyone to be !ready.[/color]`, this.channel);
                 }
                 else{
                     this.fChatLibInstance.sendMessage("[color=red]You have already joined the fight.[/color]", this.channel);

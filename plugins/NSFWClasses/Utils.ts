@@ -1,3 +1,4 @@
+import {Team} from "./Fight";
 export class Utils {
     static minInArray(arr: Array<Number>) {
         return Math.min.apply(Math, arr);
@@ -20,4 +21,14 @@ export class Utils {
         return array;
     }
 
+    static getTeamsList():Array<string>{
+        let arrResult = [];
+        for (var enumMember in Team) {
+            var isValueProperty = parseInt(enumMember, 10) >= 0;
+            if (isValueProperty) {
+                arrResult.push(Team[enumMember]);
+            }
+        }
+        return arrResult;
+    }
 }

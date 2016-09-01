@@ -4,6 +4,7 @@ import {Dice} from "./Dice";
 import {FightAction} from "./FightAction";
 import {IFChatLib} from "./interfaces/IFChatLib";
 import {Utils} from "./Utils";
+import {Dictionary} from "./Dictionary";
 
 export enum Team {
     Unknown = -1,
@@ -23,11 +24,11 @@ export class Fight extends BaseModel{
     redTeam:Array<Fighter> = [];
     stage:string;
 
-    teamsToAssignTo:number = 3;
+    teamsToAssignTo:number = 2;
 
     //real fighting variables
-    arrCurrentFighterForTeam:Array<number> = [];
-    arrTeams:Array<Array<Fighter>> = [];
+    arrCurrentFighterForTeam:Dictionary<Team,number>;
+    arrTeams:Dictionary<Team,Array<Fighter>>;
     currentTeamTurn:Team = Team.Unknown;
     currentTurn:number = 0;
 
@@ -68,23 +69,21 @@ export class Fight extends BaseModel{
 
     getTeamToAssign(){
         let teamToUse:Team = Team.Blue;
-        let arrPlayersCount:Array<number> = [];
+        let arrPlayersCount = new Dictionary<Team, number>();
         let usedTeams= this.getUsedTeams();
-        for(var teamId in usedTeams){
-            if(usedTeams[teamId]){
-                arrPlayersCount[teamId] = this.getPlayersInTeam(Team[Team[teamId]]);
-            }
+        for(var teamId of usedTeams){
+            arrPlayersCount.add(teamId as Team, this.getPlayersInTeam(Team[Team[teamId]]));
         }
 
-        let mostPlayersInTeam = Math.max(...arrPlayersCount);
-        let leastPlayersInTeam = Math.min(...arrPlayersCount);
-        let indexOfEmptiestTeam = arrPlayersCount.indexOf(leastPlayersInTeam);
+        let mostPlayersInTeam = Math.max(...arrPlayersCount.values());
+        let leastPlayersInTeam = Math.min(...arrPlayersCount.values());
+        let indexOfFirstEmptiestTeam = arrPlayersCount.values().indexOf(leastPlayersInTeam);
 
         if(mostPlayersInTeam == leastPlayersInTeam){
             teamToUse = Team.Blue;
         }
         else{
-            teamToUse = Team[Team[indexOfEmptiestTeam]];
+            teamToUse = Team[Team[indexOfFirstEmptiestTeam]];
         }
 
         return teamToUse;
@@ -134,13 +133,16 @@ export class Fight extends BaseModel{
         this.addMessage("\n[color=green]Everyone's ready, let's start the match![/color]");
         this.hasStarted = true;
 
-        for(var team of this.getTeamsIdList()){
-            this.arrTeams[team] = [];
-            this.arrCurrentFighterForTeam[team] = 0;
+        for(var team of this.getUsedTeams()){
+            this.arrCurrentFighterForTeam.add(team, 0);
         }
 
         this.fighters = Utils.shuffleArray(this.fighters); //random order for teams
+
         for(var fighter of this.fighters){
+            if(!this.arrTeams.containsKey(fighter.assignedTeam)){
+                this.arrTeams.add(fighter.assignedTeam, []);
+            }
             this.arrTeams[fighter.assignedTeam].push(fighter);
         }
 
@@ -219,36 +221,59 @@ export class Fight extends BaseModel{
         return count;
     }
 
-    getUsedTeams():Array<boolean>{
+    getUsedTeams():Array<Team>{
         let teamsList:Array<Team> = this.getTeamsIdList();
-        let usedTeamsList:Array<boolean> = [];
+        let arrUsedTeamOrNot:Array<boolean> = [];
         for(var team of teamsList){
-            usedTeamsList[team] = false;
+            arrUsedTeamOrNot[team] = false;
             if((this.getPlayersInTeam(Team[Team[team]]) > 0) || (team < this.teamsToAssignTo)){
-                usedTeamsList[team] = true;
+                arrUsedTeamOrNot[team] = true;
             }
         }
-        return usedTeamsList;
+        let usedTeams:Array<Team> = [];
+        for(var i = 0; i<arrUsedTeamOrNot.length; i++){
+            if(arrUsedTeamOrNot[i]){
+                usedTeams.push(i);
+            }
+        }
+        return usedTeams;
     }
 
     //Dice rolling
 
     rollAllDice(){ //make this modular to teams
-        let intBlueResult:number = this.blueTeam[0].dice.roll(1);
-        let intRedResult:number = this.redTeam[0].dice.roll(1);
-        this.addMessage("\nBlue team rolled a "+intBlueResult.toString());
-        this.addMessage("\nRed team rolled a "+intRedResult.toString());
-        if(intBlueResult == intRedResult){
+        let arrResults:Array<number> = [];
+        let theDice = new Dice(10);
+        for(var team in this.arrTeams){
+            arrResults[team] = theDice.roll(1);
+            this.addMessage(`\nBlue team rolled a ${arrResults[team]}`);
+        }
+
+        let bestScore = Math.max(...arrResults);
+        let indexOfBestTeam = arrResults.indexOf(bestScore);
+        let worstScore = Math.min(...arrResults);
+        let indexOfWorstTeam = arrResults.indexOf(worstScore);
+
+        if(bestScore == worstScore){
             this.rollAllDice();
         }
         let winner:Team = Team.Unknown;
-        if(intBlueResult > intRedResult){
-            winner = Team.Blue;
+        if(this.getAllIndexes(arrResults,bestScore).length == 1){
+            winner = Team[Team[indexOfBestTeam]];
         }
         else{
-            winner = Team.Red;
+            this.addMessage("Tie! Re-rolling.")
+            this.rollAllDice();
         }
         return winner;
+    }
+
+    getAllIndexes(arr, val) {
+        var indexes = [], i;
+        for(i = 0; i < arr.length; i++)
+            if (arr[i] === val)
+                indexes.push(i);
+        return indexes;
     }
 
     //Messaging
@@ -273,17 +298,6 @@ export class Fight extends BaseModel{
             var isValueProperty = parseInt(enumMember, 10) >= 0
             if (isValueProperty) {
                 arrResult.push(enumMember);
-            }
-        }
-        return arrResult;
-    }
-
-    getTeamsList():Array<string>{
-        let arrResult = [];
-        for (var enumMember in Team) {
-            var isValueProperty = parseInt(enumMember, 10) >= 0
-            if (isValueProperty) {
-                arrResult.push(Team[enumMember]);
             }
         }
         return arrResult;

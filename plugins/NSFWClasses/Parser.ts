@@ -1,4 +1,5 @@
 import {Team} from "./Fight";
+import {Utils} from "./Utils";
 var _ = require('lodash');
 
 export class Commands{
@@ -18,11 +19,13 @@ export class Commands{
     }
 
     public static join(args){
-        if(args.toLowerCase() == "blue"){
-            return Team.Blue;
+        let teams = Utils.getTeamsList();
+        for(let teamId in teams){
+            teams[teamId] = teams[teamId].toLowerCase();
         }
-        else if(args.toLowerCase() == "red"){
-            return Team.Red;
+        let indexOfTeam = teams.indexOf(args.toLowerCase());
+        if(indexOfTeam != -1){
+            return Team[Team[indexOfTeam]];
         }
         return Team.Unknown;
     }
