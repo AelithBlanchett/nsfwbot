@@ -47,6 +47,8 @@ export class Fight extends BaseModel{
         this.stage = stage || "Wrestling Ring";
         this.fChatLibInstance = fChatLibInstance;
         this.channel = channel;
+        this.arrTeams = new Dictionary<Team,Array<Fighter>>();
+        this.arrCurrentFighterForTeam = new Dictionary<Team,number>();
     }
 
     //Pre-fight utils
@@ -61,6 +63,10 @@ export class Fight extends BaseModel{
                     fighter.assignedTeam = this.getTeamToAssign();
                 }
                 this.fighters.push(fighter);
+                if(!this.arrTeams.containsKey(fighter.assignedTeam)){
+                    this.arrTeams.add(fighter.assignedTeam, []);
+                }
+                this.arrTeams.getValue(fighter.assignedTeam).push(fighter);
                 return true;
             }
         }
@@ -119,9 +125,11 @@ export class Fight extends BaseModel{
     }
 
     canStartMatch(){
-        let areTeamsBalanced:boolean = false;
-        if(this.getPlayersInTeam(Team.Red) == this.getPlayersInTeam(Team.Blue)){
-            areTeamsBalanced = true;
+        let areTeamsBalanced:boolean = true;
+        for(var i = 1; i < this.arrTeams.keys().length; i++)
+        {
+            if(this.arrTeams.values()[i].length !== this.arrTeams.values()[i].length)
+                areTeamsBalanced = false;
         }
         return (this.isEveryoneReady() && areTeamsBalanced && !this.hasStarted && this.fighters.length > 1); //only start if everyone's ready and if the teams are balanced
     }
@@ -139,16 +147,10 @@ export class Fight extends BaseModel{
 
         this.fighters = Utils.shuffleArray(this.fighters); //random order for teams
 
-        for(var fighter of this.fighters){
-            if(!this.arrTeams.containsKey(fighter.assignedTeam)){
-                this.arrTeams.add(fighter.assignedTeam, []);
-            }
-            this.arrTeams[fighter.assignedTeam].push(fighter);
-        }
-
-        for(var i = 0; i < (this.blueTeam.length) && (i < this.redTeam.length); i++){
-            this.addMessage(`[b][color=blue]${this.blueTeam[i].name}[/color] VS [color=blue]${this.redTeam[i].name}[/color][/b]`);
-        }
+        //for(var i = 0; i < (this.blueTeam.length) && (i < this.redTeam.length); i++){
+        //    this.addMessage(`[b][color=blue]${this.blueTeam[i].name}[/color] VS [color=blue]${this.redTeam[i].name}[/color][/b]`);
+        //}
+        //TODO: Print as much names as there are teams
         this.sendMessage();
         this.currentTeamTurn = this.rollAllDice();
         this.addMessage(`${Team[this.currentTeamTurn]} team starts first!`);
@@ -242,24 +244,24 @@ export class Fight extends BaseModel{
     //Dice rolling
 
     rollAllDice(){ //make this modular to teams
-        let arrResults:Array<number> = [];
+        let arrResults = new Dictionary<Team,number>();
         let theDice = new Dice(10);
-        for(var team in this.arrTeams){
-            arrResults[team] = theDice.roll(1);
-            this.addMessage(`\nBlue team rolled a ${arrResults[team]}`);
+        for(var team of this.arrTeams.keys()){
+            arrResults.add(team, theDice.roll(1));
+            this.addMessage(`\n[color=${Team[team]}]${Team[team]}[/color] team rolled a ${arrResults[team]}`);
         }
 
-        let bestScore = Math.max(...arrResults);
-        let indexOfBestTeam = arrResults.indexOf(bestScore);
-        let worstScore = Math.min(...arrResults);
-        let indexOfWorstTeam = arrResults.indexOf(worstScore);
+        let bestScore = Math.max(...arrResults.values());
+        let indexOfBestTeam = arrResults.values().indexOf(bestScore);
+        let worstScore = Math.min(...arrResults.values());
+        let indexOfWorstTeam = arrResults.values().indexOf(worstScore);
 
         if(bestScore == worstScore){
             this.rollAllDice();
         }
         let winner:Team = Team.Unknown;
-        if(this.getAllIndexes(arrResults,bestScore).length == 1){
-            winner = Team[Team[indexOfBestTeam]];
+        if(this.getAllIndexes(arrResults.values(),bestScore).length == 1){
+            winner = Team[Team[arrResults.keys()[indexOfBestTeam]]];
         }
         else{
             this.addMessage("Tie! Re-rolling.")
