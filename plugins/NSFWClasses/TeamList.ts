@@ -22,10 +22,10 @@ export class TeamList extends Dictionary<Team, Array<Fighter>>{
         if (nextTeam == undefined){
             this.currentTeamTurnIndex = 0;
             nextTeam = this.arrTeamsTurn[this.currentTeamTurnIndex];
-            this.arrCurrentFighterForTeam.values().forEach(x => { //choose the next player in each team
-                x++;
-                if(x >= this.playersPerTeam){
-                    x = 0; //or reset it
+            this.arrCurrentFighterForTeam.keys().forEach(x => { //choose the next player in each team
+                this.arrCurrentFighterForTeam.changeValueForKey(x, this.arrCurrentFighterForTeam.getValue(x)+1);
+                if(this.arrCurrentFighterForTeam.getValue(x) >= this.playersPerTeam){
+                    this.arrCurrentFighterForTeam.changeValueForKey(x, 0);
                 }
             });
         }

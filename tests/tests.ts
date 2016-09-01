@@ -62,19 +62,25 @@ describe("Fighter testing", () => {
         //let z = x.fight.getTeamsIdList();
         x.join("Purple", {character: "test1", channel: "here"});
         setTimeout(function(){x.ready("", {character: "test1", channel: "here"})}, 2000);
-        x.join("Red", {character: "test2", channel: "here"});
+        x.join("Purple", {character: "test2", channel: "here"});
         setTimeout(function(){x.ready("", {character: "test2", channel: "here"})}, 2000);
-        x.join("Blue", {character: "test3", channel: "here"});
+        x.join("Purple", {character: "test3", channel: "here"});
         setTimeout(function(){x.ready("", {character: "test3", channel: "here"})}, 2000);
         x.join("Yellow", {character: "test4", channel: "here"});
         setTimeout(function(){x.ready("", {character: "test4", channel: "here"})}, 2000);
-        x.join("Orange", {character: "test5", channel: "here"});
+        x.join("Yellow", {character: "test5", channel: "here"});
         setTimeout(function(){x.ready("", {character: "test5", channel: "here"})}, 2000);
-        x.join("Pink", {character: "test6", channel: "here"});
+        x.join("Yellow", {character: "test6", channel: "here"});
         setTimeout(function(){x.ready("", {character: "test6", channel: "here"})}, 2000);
 
 
-        setTimeout(function(){x.fight.nextTurn()}, 8000);
+        setTimeout(_ =>{
+            for(let i = 1; i < 10; i++){
+                setTimeout(_ =>{
+                    x.fight.nextTurn();
+                }, i*1000);
+            }
+        }, 6000);
         setTimeout(done, 100000);
     },1000000);
 
