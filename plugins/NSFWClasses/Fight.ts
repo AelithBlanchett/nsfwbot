@@ -64,7 +64,7 @@ export class Fight extends BaseModel{
         let arrPlayersCount = new Dictionary<Team, number>();
         let usedTeams= this.getUsedTeams();
         for(var teamId of usedTeams){
-            arrPlayersCount.add(teamId as Team, this.getPlayersInTeam(Team[Team[teamId]]));
+            arrPlayersCount.add(teamId as Team, this.getNumberOfPlayersInTeam(Team[Team[teamId]]));
         }
 
         let mostPlayersInTeam = Math.max(...arrPlayersCount.values());
@@ -204,6 +204,20 @@ export class Fight extends BaseModel{
         return;
     }
 
+    assignRandomTarget(fighter:Fighter):Fighter{
+        fighter.target = this.getRandomFighter();
+        return;
+    }
+
+    getRandomTeamNumber():Team{
+        return Utils.getRandomInt(0, this.teamsInvolved) as Team;
+    }
+
+    getRandomFighter():Fighter{
+        let randomTeamNumber = this.getRandomTeamNumber();
+        return this.getPlayerInTeamAtIndex(randomTeamNumber, Utils.getRandomInt(0,this.getTeam(randomTeamNumber).length));
+    }
+
     get currentActor():Fighter{
         return this.arrTeams.getValue(this.currentTeamTurn)[this.arrCurrentFighterForTeam.getValue(this.currentTeamTurn)];
     }
@@ -212,7 +226,11 @@ export class Fight extends BaseModel{
         return this.currentActor.target;
     }
 
-    getPlayersInTeam(team:Team){
+    getTeam(team:Team){
+        return this.arrTeams.getValue(team);
+    }
+
+    getNumberOfPlayersInTeam(team:Team){
         let count = 0;
         for(let i = 0; i < this.teamsInvolved; i++){
             count += this.arrTeams.getValue(this.arrTeams.keys()[i]).length;
@@ -236,7 +254,7 @@ export class Fight extends BaseModel{
         let arrUsedTeamOrNot:Array<boolean> = [];
         for(var team of teamsList){
             arrUsedTeamOrNot[team] = false;
-            if((this.getPlayersInTeam(Team[Team[team]]) > 0) || (team < Constants.usedTeams)){
+            if((this.getNumberOfPlayersInTeam(Team[Team[team]]) > 0) || (team < Constants.usedTeams)){
                 arrUsedTeamOrNot[team] = true;
             }
         }

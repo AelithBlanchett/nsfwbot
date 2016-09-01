@@ -32,4 +32,8 @@ export class Utils {
         }
         return arrResult;
     }
+
+    static getRandomInt(min:number, max:number):number{ //continue
+        return Math.floor((Math.random() * max) + min);
+    }
 }
