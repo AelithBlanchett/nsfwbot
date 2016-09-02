@@ -5,6 +5,7 @@ import {IFighter} from "./interfaces/IFighter";
 import {FightAction} from "./FightAction";
 import {Constants} from "./Constants";
 import Team = Constants.Team;
+import {isDate} from "util";
 
 export class Fighter extends BaseModel implements IFighter{
     id:number = -1;
@@ -29,6 +30,7 @@ export class Fighter extends BaseModel implements IFighter{
 
 
     //during fight
+    fight:Fight;
     assignedTeam:Team;
     teamName:string;
     isReady:boolean = false;
@@ -118,10 +120,14 @@ export class Fighter extends BaseModel implements IFighter{
         if(this.hp <= 0){
             this.hp = 0;
             this.heartsRemaining--;
+            this.fight.addMessage(`Heart broken! ${this.name} has ${this.heartsRemaining} hearts left.`);
         }
 
         if(this.heartsRemaining > 0){
             this.hp = this.hpPerHeart;
+        }
+        else if(this.heartsRemaining == 0){
+            this.fight.addMessage(`Last heart for ${this.name}!`);
         }
     }
 
@@ -134,11 +140,39 @@ export class Fighter extends BaseModel implements IFighter{
         if(this.lust >= this.lustPerOrgasm){
             this.lust = 0;
             this.orgasmsRemaining--;
+            this.fight.addMessage(`Orgasm on the mat! ${this.name} has ${this.orgasmsRemaining} orgasms left.`);
         }
 
         if(this.lust > 0){
             this.lust = 0;
         }
+
+        if(this.orgasmsRemaining == 0){
+            this.fight.addMessage(`Last orgasm for ${this.name}!`);
+        }
+    }
+
+    isDead():boolean{
+        if(this.heartsRemaining == -1){
+            this.fight.addMessage(`${this.name} couldn't take it anymore! They're out!`);
+            return true
+        }
+        return false;
+    }
+
+    isSexuallyExhausted():boolean{
+        if(this.orgasmsRemaining == -1){
+            this.fight.addMessage(`${this.name} is too sexually exhausted to continue! They're out!`);
+            return true
+        }
+        return false;
+    }
+
+    isOut():boolean{
+        if(this.isDead() || this.isSexuallyExhausted()){
+            return true;
+        }
+        return false;
     }
 
     static create(name:string, power:number, dexterity:number, toughness:number, endurance:number, willpower:number){

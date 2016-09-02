@@ -213,4 +213,10 @@ export class Fight extends BaseModel{
         this.message = "";
     }
 
+    //attacks
+
+    actionBrawl(){
+
+    }
+
 }
