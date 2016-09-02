@@ -8,6 +8,9 @@ import {Dictionary} from "./Dictionary";
 import {Constants} from "./Constants";
 import Team = Constants.Team;
 import {TeamList} from "./TeamList";
+import BaseDamage = Constants.BaseDamage;
+import Tiers = Constants.Tiers;
+import RequiredRoll = Constants.RequiredRoll;
 
 export class Fight extends BaseModel{
     id:number = -1;
@@ -122,6 +125,9 @@ export class Fight extends BaseModel{
         this.currentTurn++;
         this.teamList.currentTeamTurn = this.teamList.getNextTeam();
         this.outputStatus();
+
+
+        this.actionBrawl(Tiers.Light);
     }
 
     //Fighting info displays
@@ -215,8 +221,27 @@ export class Fight extends BaseModel{
 
     //attacks
 
-    actionBrawl(){
+    attackFormula(tier:Tiers, actorAtk:number, targetDef:number, roll:number):number{
+        return BaseDamage[BaseDamage[tier]]-(actorAtk-targetDef)+roll;
+    }
 
+    actionBrawl(tier:Tiers){//todo
+        let action = new FightAction();
+        action.tier = tier;
+        action.atTurn = this.currentTurn;
+        action.action = "brawl";
+        action.isHold = false;
+        action.attacker = this.currentActor;
+        action.defender = this.currentTarget;
+        let roll = this.currentActor.dice.roll(1);
+        if(roll >= RequiredRoll[Tiers[tier]]){
+            action.missed = false;
+            action.diceScore = roll;
+        }
+
+        if(!action.missed){
+            action.hpDamage = this.attackFormula(tier, this.currentActor.power, this.currentTarget.toughness, action.diceScore);
+        }
     }
 
 }

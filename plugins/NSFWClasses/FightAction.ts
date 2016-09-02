@@ -1,10 +1,11 @@
 import {Fighter} from "./Fighter";
 import {BaseModel} from "./Model";
+import Tiers = Constants.Tiers;
 export class FightAction extends BaseModel{
     id: number;
     atTurn: number;
     action: string;
-    tier: string;
+    tier: Tiers;
     isHold: boolean;
     attacker: Fighter;
     defender: Fighter;
@@ -12,4 +13,5 @@ export class FightAction extends BaseModel{
     lustDamage: number;
     focusDamage: number;
     diceScore: number;
+    missed: boolean;
 }
