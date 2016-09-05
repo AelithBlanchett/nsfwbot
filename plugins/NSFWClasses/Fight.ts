@@ -49,6 +49,7 @@ export class Fight extends BaseModel{
                 }
                 else{
                     fighter.assignedTeam = this.teamList.getAvailableTeam();
+                    console.log(`assigned team ${fighter.assignedTeam} to ${fighter.name}`);
                 }
                 if(!this.teamList.containsKey(fighter.assignedTeam)){
                     this.teamList.add(fighter.assignedTeam, []);
@@ -123,10 +124,8 @@ export class Fight extends BaseModel{
 
     nextTurn(){
         this.currentTurn++;
-        this.teamList.currentTeamTurn = this.teamList.getNextTeam();
+        this.teamList.nextTurn();
         this.outputStatus();
-
-
         this.actionBrawl(Tiers.Light);
     }
 
@@ -166,6 +165,10 @@ export class Fight extends BaseModel{
     }
 
     assignRandomTarget(fighter:Fighter):void{
+        fighter.target = this.teamList.getRandomFighter();
+    }
+
+    assignMatchingTarget(fighter:Fighter):void{
         fighter.target = this.teamList.getRandomFighter();
     }
 
@@ -237,11 +240,24 @@ export class Fight extends BaseModel{
         if(roll >= RequiredRoll[Tiers[tier]]){
             action.missed = false;
             action.diceScore = roll;
+            this.addMessage(`${this.currentActor.name} rolled ${action.diceScore}, the attack [b][color=green]HITS![/color][/b]`);
+        }
+        else{
+            this.addMessage(`${this.currentActor.name} rolled ${action.diceScore}, the attack [b][color=red]MISSED![/color][/b]`);
         }
 
         if(!action.missed){
+            if(this.currentTarget == undefined){
+                this.currentActor.target = this.teamList.getNextPlayer();
+            }
             action.hpDamage = this.attackFormula(tier, this.currentActor.power, this.currentTarget.toughness, action.diceScore);
         }
+        this.currentActor.pastActions.push(action);
+        if(action.hpDamage){
+            this.currentTarget.hitHp(action.hpDamage);
+        }
+
+        this.nextTurn();
     }
 
 }

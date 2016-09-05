@@ -60,22 +60,24 @@ describe("Fighter testing", () => {
         var x = new CommandHandler(fChatLibInstance, "here");
         //let y = x.fight.getTeamsList();
         //let z = x.fight.getTeamsIdList();
-        x.join("Purple", {character: "test1", channel: "here"});
-        setTimeout(function(){x.ready("", {character: "test1", channel: "here"})}, 2000);
-        x.join("Purple", {character: "test2", channel: "here"});
-        setTimeout(function(){x.ready("", {character: "test2", channel: "here"})}, 2000);
-        x.join("Purple", {character: "test3", channel: "here"});
-        setTimeout(function(){x.ready("", {character: "test3", channel: "here"})}, 2000);
-        x.join("Yellow", {character: "test4", channel: "here"});
-        setTimeout(function(){x.ready("", {character: "test4", channel: "here"})}, 2000);
-        x.join("Yellow", {character: "test5", channel: "here"});
-        setTimeout(function(){x.ready("", {character: "test5", channel: "here"})}, 2000);
-        x.join("Yellow", {character: "test6", channel: "here"});
-        setTimeout(function(){x.ready("", {character: "test6", channel: "here"})}, 2000);
+        x.ready("", {character: "Aelith Blanchette", channel: "here"});
+        x.ready("", {character: "TheTinaArmstrong", channel: "here"});
+        //x.join("Purple", {character: "Purple1", channel: "here"});
+        //setTimeout(function(){x.ready("", {character: "Purple1", channel: "here"})}, 2000);
+        //x.join("Purple", {character: "Purple2", channel: "here"});
+        //setTimeout(function(){x.ready("", {character: "Purple2", channel: "here"})}, 2000);
+        //x.join("Purple", {character: "Purple3", channel: "here"});
+        //setTimeout(function(){x.ready("", {character: "Purple3", channel: "here"})}, 2000);
+        //x.join("Yellow", {character: "Yellow1", channel: "here"});
+        //setTimeout(function(){x.ready("", {character: "Yellow1", channel: "here"})}, 2000);
+        //x.join("Yellow", {character: "Yellow2", channel: "here"});
+        //setTimeout(function(){x.ready("", {character: "Yellow2", channel: "here"})}, 2000);
+        //x.join("Yellow", {character: "Yellow3", channel: "here"});
+        //setTimeout(function(){x.ready("", {character: "Yellow3", channel: "here"})}, 2000);
 
 
         setTimeout(_ =>{
-            for(let i = 1; i < 10; i++){
+            for(let i = 1; i < 2; i++){
                 setTimeout(_ =>{
                     x.fight.nextTurn();
                 }, i*1000);

@@ -17,6 +17,26 @@ export class TeamList extends Dictionary<Team, Array<Fighter>>{
     }
 
     getNextTeam():Team{
+        let tempIndex = this.currentTeamTurnIndex + 1;
+        if (tempIndex >= this.arrTeamsTurn.length){
+            tempIndex = 0;
+        }
+        return this.arrTeamsTurn[tempIndex];
+    }
+
+    getNextPlayer(){
+        let nextTeam = this.getNextTeam();
+        let teamIndex = this.arrCurrentFighterForTeam.getValue(nextTeam);;
+        if(this.arrTeamsTurn.indexOf(nextTeam) == 0){
+            teamIndex++;
+            if(teamIndex >= this.playersPerTeam){
+                teamIndex = 0;
+            }
+        }
+        return this.getPlayerInTeamAtIndex(nextTeam, teamIndex);
+    }
+
+    nextTurn():void{
         this.currentTeamTurnIndex++;
         let nextTeam = this.arrTeamsTurn[this.currentTeamTurnIndex];
         if (nextTeam == undefined){
@@ -29,7 +49,7 @@ export class TeamList extends Dictionary<Team, Array<Fighter>>{
                 }
             });
         }
-        return nextTeam;
+        this.currentTeamTurn = nextTeam;
     }
 
     resetCurrentFighters():void{
@@ -40,9 +60,9 @@ export class TeamList extends Dictionary<Team, Array<Fighter>>{
     }
 
     shufflePlayers():void{
-        for(let i of this.values()){
-            i = Utils.shuffleArray(i);
-        }
+        this.arrCurrentFighterForTeam.keys().forEach(x => { //choose the next player in each team
+            this.arrCurrentFighterForTeam.changeValueForKey(x, Utils.shuffleArray(this.arrCurrentFighterForTeam.getValue(x)));
+        });
     }
 
     getTeam(team:Team):Array<Fighter>{
@@ -73,7 +93,7 @@ export class TeamList extends Dictionary<Team, Array<Fighter>>{
         let arrUsedTeamOrNot:Array<boolean> = [];
         for(var team of teamsList){
             arrUsedTeamOrNot[team] = false;
-            if((this.getNumberOfPlayersInTeam(Team[Team[team]]) > 0) || (team < Constants.usedTeams)){
+            if((this.getNumberOfPlayersInTeam(Team[Team[team]]) > 0)){
                 arrUsedTeamOrNot[team] = true;
             }
         }
@@ -82,6 +102,10 @@ export class TeamList extends Dictionary<Team, Array<Fighter>>{
             if(arrUsedTeamOrNot[i]){
                 usedTeams.push(i);
             }
+        }
+
+        if(usedTeams.length == 1){
+            //TODO FIX THIS
         }
         return usedTeams;
     }

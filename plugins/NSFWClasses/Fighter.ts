@@ -32,7 +32,6 @@ export class Fighter extends BaseModel implements IFighter{
     //during fight
     fight:Fight;
     assignedTeam:Team;
-    teamName:string;
     isReady:boolean = false;
     hp:number = 0;
     heartsRemaining:number = 0;
@@ -117,17 +116,18 @@ export class Fighter extends BaseModel implements IFighter{
             hp = 1;
         }
         this.hp -= hp;
+        this.fight.addMessage(`${this.name} [color=red]lost ${hp} HP![/color]`);
         if(this.hp <= 0){
             this.hp = 0;
             this.heartsRemaining--;
-            this.fight.addMessage(`Heart broken! ${this.name} has ${this.heartsRemaining} hearts left.`);
+            this.fight.addMessage(`[b][color=red]Heart broken![/color][/b] ${this.name} has ${this.heartsRemaining} hearts left.`);
         }
 
         if(this.heartsRemaining > 0){
             this.hp = this.hpPerHeart;
         }
         else if(this.heartsRemaining == 0){
-            this.fight.addMessage(`Last heart for ${this.name}!`);
+            this.fight.addMessage(`[b][color=red]Last heart[/color][/b] for ${this.name}!`);
         }
     }
 
@@ -140,7 +140,7 @@ export class Fighter extends BaseModel implements IFighter{
         if(this.lust >= this.lustPerOrgasm){
             this.lust = 0;
             this.orgasmsRemaining--;
-            this.fight.addMessage(`Orgasm on the mat! ${this.name} has ${this.orgasmsRemaining} orgasms left.`);
+            this.fight.addMessage(`[b][color=blue]Orgasm on the mat![/color][/b] ${this.name} has ${this.orgasmsRemaining} orgasms left.`);
         }
 
         if(this.lust > 0){
@@ -148,13 +148,13 @@ export class Fighter extends BaseModel implements IFighter{
         }
 
         if(this.orgasmsRemaining == 0){
-            this.fight.addMessage(`Last orgasm for ${this.name}!`);
+            this.fight.addMessage(`[b][color=blue]Last orgasm[/color][/b] for ${this.name}!`);
         }
     }
 
     isDead():boolean{
         if(this.heartsRemaining == -1){
-            this.fight.addMessage(`${this.name} couldn't take it anymore! They're out!`);
+            this.fight.addMessage(`${this.name} couldn't take it anymore! [b][color=red]They're out![/color][/b]`);
             return true
         }
         return false;
@@ -162,7 +162,7 @@ export class Fighter extends BaseModel implements IFighter{
 
     isSexuallyExhausted():boolean{
         if(this.orgasmsRemaining == -1){
-            this.fight.addMessage(`${this.name} is too sexually exhausted to continue! They're out!`);
+            this.fight.addMessage(`${this.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
             return true
         }
         return false;
