@@ -1,44 +1,45 @@
 "use strict";
-var fChatLibInstance;
 var debug = false; //2.0
-var channel = "";
+var _this;
 
-module.exports = function (parent, chanName) {
-    fChatLibInstance = parent;
-    channel = chanName;
-    var cmdHandler = {};
+var CommandHandler = (function () {
+    function CommandHandler(fChatLib, chan) {
+        this.fChatLibInstance = fChatLib;
+        this.channel = chan;
+        _this = this;
+    }
 
     client.on("error", function (err) {
         console.log("Redis error " + err);
     });
 
-    cmdHandler.hp = function () {
+    CommandHandler.prototype.hp = function () {
         broadcastCombatInfo();
     };
-    cmdHandler.stamina = cmdHandler.hp;
-    cmdHandler.status = cmdHandler.stamina;
-    cmdHandler.current = cmdHandler.status;
+    CommandHandler.prototype.stamina = CommandHandler.prototype.hp;
+    CommandHandler.prototype.status = CommandHandler.prototype.stamina;
+    CommandHandler.prototype.current = CommandHandler.prototype.status;
 
-    cmdHandler.version = function (args, data) {
-        fChatLibInstance.sendMessage("I'm Miss_Spencer, version 2.1.1 beta", channel);
+    CommandHandler.prototype.version = function (args, data) {
+        _this.fChatLibInstance.sendMessage("I'm Miss_Spencer, version 2.1.1 beta", _this.channel);
     };
 
-    cmdHandler.triggerDebug = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
+    CommandHandler.prototype.triggerDebug = function (args, data) {
+        if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
             debug = !debug;
-            fChatLibInstance.sendMessage("Debug: "+debug, channel);
+            _this.fChatLibInstance.sendMessage("Debug: "+debug, _this.channel);
         }
     };
 
-    cmdHandler.sextoys = function (args, data) {
-        fChatLibInstance.sendMessage("Here, take this [b]" + getRandomSextoy() + "[/b]!", channel);
+    CommandHandler.prototype.sextoys = function (args, data) {
+        _this.fChatLibInstance.sendMessage("Here, take this [b]" + getRandomSextoy() + "[/b]!", _this.channel);
     };
-    cmdHandler.toys = cmdHandler.sextoys;
+    CommandHandler.prototype.toys = CommandHandler.prototype.sextoys;
 
-    cmdHandler.setFight = function(args,data){ //debug
-        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
+    CommandHandler.prototype.setFight = function(args,data){ //debug
+        if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
             if(!checkIfFightIsGoingOn()){
-                fChatLibInstance.sendMessage("There isn't a fight going on right now.", channel);
+                _this.fChatLibInstance.sendMessage("There isn't a fight going on right now.", _this.channel);
                 return;
             }
             var arr = args.split(' ');
@@ -50,24 +51,24 @@ module.exports = function (parent, chanName) {
                     if (char != null) {
                         currentFighters[result[2]][result[0]] = parseInt(result[1]);
                         client.hmset(char.character, char);
-                        fChatLibInstance.sendMessage("Succesfully set the "+result[0]+" to "+parseInt(result[1]) + " for the current fight.", channel);
+                        _this.fChatLibInstance.sendMessage("Succesfully set the "+result[0]+" to "+parseInt(result[1]) + " for the current fight.", _this.channel);
                     }
                     else {
-                        fChatLibInstance.sendMessage("Are you sure this user is registered?", channel);
+                        _this.fChatLibInstance.sendMessage("Are you sure this user is registered?", _this.channel);
                     }
                 });
             }
             else {
-                fChatLibInstance.sendMessage("Invalid syntax. Correct is: !setFight stat amount turn_number. Example: !setFight lust 10 0", channel);
+                _this.fChatLibInstance.sendMessage("Invalid syntax. Correct is: !setFight stat amount turn_number. Example: !setFight lust 10 0", _this.channel);
             }
         }
         else{
-            fChatLibInstance.sendMessage("You don't have sufficient rights.", channel);
+            _this.fChatLibInstance.sendMessage("You don't have sufficient rights.", _this.channel);
         }
     };
 
-    cmdHandler.set = function(args,data){ //debug
-        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
+    CommandHandler.prototype.set = function(args,data){ //debug
+        if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
             var arr = args.split(' ');
             var result = arr.splice(0, 2);
             result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
@@ -77,36 +78,36 @@ module.exports = function (parent, chanName) {
                     if (char != null) {
                         char[result[0]] = parseInt(result[1]);
                         client.hmset(char.character, char);
-                        fChatLibInstance.sendMessage("Succesfully set the "+result[0]+" to "+parseInt(result[1]), channel);
+                        _this.fChatLibInstance.sendMessage("Succesfully set the "+result[0]+" to "+parseInt(result[1]), _this.channel);
                     }
                     else {
-                        fChatLibInstance.sendMessage("Are you sure this user is registered?", channel);
+                        _this.fChatLibInstance.sendMessage("Are you sure this user is registered?", _this.channel);
                     }
                 });
             }
             else {
-                fChatLibInstance.sendMessage("Invalid syntax. Correct is: !set stat amount CHARACTER. Example: !set xp 10 ThatCharacter", channel);
+                _this.fChatLibInstance.sendMessage("Invalid syntax. Correct is: !set stat amount CHARACTER. Example: !set xp 10 ThatCharacter", _this.channel);
             }
         }
         else{
-            fChatLibInstance.sendMessage("You don't have sufficient rights.", channel);
+            _this.fChatLibInstance.sendMessage("You don't have sufficient rights.", _this.channel);
         }
     };
 
-    cmdHandler.forceTurnWin = function(args,data){ //debug
-        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
+    CommandHandler.prototype.forceTurnWin = function(args,data){ //debug
+        if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
             currentFighters[currentFight.whoseturn].dice.addTmpMod(100,1);
         }
     };
 
-    cmdHandler.forceTurnLose = function(args,data){ //debug
-        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
+    CommandHandler.prototype.forceTurnLose = function(args,data){ //debug
+        if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
             currentFighters[currentFight.whoseturn].dice.addTmpMod(-100,1);
         }
     };
 
-    cmdHandler.dbg = function(args,data){
-        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
+    CommandHandler.prototype.dbg = function(args,data){
+        if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
             client.hgetall('Lustful Aelith', function (err, result) {
                 if (result != null) {
                     result.hp = parseInt(result.maxHp);
@@ -115,7 +116,7 @@ module.exports = function (parent, chanName) {
                     result.orgasms = 0;
                     currentFighters[0] = result;
                     currentFighters[0].dice = new Dice(10);
-                    //fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
+                    //_this.fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?");
                     client.hgetall("Bondage Wrestling", function (err, result2) {
                         if (result2 != null) {
                             result2.hp = parseInt(result2.maxHp);
@@ -124,7 +125,7 @@ module.exports = function (parent, chanName) {
                             result2.orgasms = 0;
                             currentFighters[1] = result2;
                             currentFighters[1].dice = new Dice(10);
-                            fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!", channel);
+                            _this.fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!", _this.channel);
                             startFight();
 
                         }
@@ -134,7 +135,7 @@ module.exports = function (parent, chanName) {
         }
     };
 
-    cmdHandler.register = function (args, data) {
+    CommandHandler.prototype.register = function (args, data) {
         client.hexists(data.character, "character", function (err, reply) {
             if (reply == 0) {
                 var statsObj = {};
@@ -153,16 +154,16 @@ module.exports = function (parent, chanName) {
                 statsObj.experienceSpent = 0;
                 statsObj.experience = 25;
                 client.hmset(data.character, statsObj);
-                fChatLibInstance.sendMessage("You've been successfully registered as a wrestler " + data.character+ "\nDon't forget to spend your 25 experience points!", channel);
+                _this.fChatLibInstance.sendMessage("You've been successfully registered as a wrestler " + data.character+ "\nDon't forget to spend your 25 experience points!", _this.channel);
             }
             else {
-                fChatLibInstance.sendMessage("You're already registered " + data.character, channel);
+                _this.fChatLibInstance.sendMessage("You're already registered " + data.character, _this.channel);
             }
         });
     };
 
 
-    cmdHandler.wrestle = function (args, data) {
+    CommandHandler.prototype.wrestle = function (args, data) {
         client.hgetall(data.character, function (err, result) {
             if (result != null) {
                 if (currentFighters.length == 0) {
@@ -172,7 +173,7 @@ module.exports = function (parent, chanName) {
                     currentFighters[0] = result;
                     currentFighters[0].dice = new Dice(10);
                     currentFighters[0].ownSubmissiveness = 0;
-                    fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?", channel);
+                    _this.fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?", _this.channel);
                 }
                 else if (currentFighters.length == 1) {
                     if (currentFighters[0].character != data.character) {
@@ -182,66 +183,66 @@ module.exports = function (parent, chanName) {
                         currentFighters[1] = result;
                         currentFighters[1].dice = new Dice(6);
                         currentFighters[1].ownSubmissiveness = 0;
-                        fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!", channel);
+                        _this.fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!", _this.channel);
                         startFight();
                     }
                     else {
-                        fChatLibInstance.sendMessage("You can't register twice!", channel);
+                        _this.fChatLibInstance.sendMessage("You can't register twice!", _this.channel);
                     }
                 }
                 else {
-                    fChatLibInstance.sendMessage("Sorry, our two wrestlers are still in the fight!", channel);
+                    _this.fChatLibInstance.sendMessage("Sorry, our two wrestlers are still in the fight!", _this.channel);
                 }
             }
             else {
-                fChatLibInstance.sendMessage("Apparently, you're not registered yet! Please check the available commands with !help", channel);
+                _this.fChatLibInstance.sendMessage("Apparently, you're not registered yet! Please check the available commands with !help", _this.channel);
             }
         });
     };
-    cmdHandler.ready = cmdHandler.wrestle;
-    cmdHandler.fight = cmdHandler.wrestle;
+    CommandHandler.prototype.ready = CommandHandler.prototype.wrestle;
+    CommandHandler.prototype.fight = CommandHandler.prototype.wrestle;
 
-    cmdHandler.exit = function (args, data) {
+    CommandHandler.prototype.exit = function (args, data) {
         if (currentFighters.length > 0) {
             if ((currentFighters.length > 0 && currentFighters[0] != undefined && currentFighters[0].character == data.character) || (currentFighters.length > 1 && currentFighters[1] != undefined && currentFighters[1].character == data.character)) {
-                fChatLibInstance.sendMessage("The fight has been ended.", channel);
+                _this.fChatLibInstance.sendMessage("The fight has been ended.", _this.channel);
                 if(currentFighters.length > 1){
                     addExperienceOnPrematureEnd(currentFighters[0].character, currentFight.intMovesCount[0], currentFighters[1].character, currentFight.intMovesCount[1]);
                 }
                 setTimeout(resetFight(),2500);
             }
             else {
-                fChatLibInstance.sendMessage("You are not in a fight.", channel);
+                _this.fChatLibInstance.sendMessage("You are not in a fight.", _this.channel);
             }
         }
         else {
-            fChatLibInstance.sendMessage("There isn't any fight going on at the moment.", channel);
+            _this.fChatLibInstance.sendMessage("There isn't any fight going on at the moment.", _this.channel);
         }
     };
-    cmdHandler.leave = cmdHandler.exit;
-    cmdHandler.leaveFight = cmdHandler.exit;
-    cmdHandler.forfeit = cmdHandler.exit;
-    cmdHandler.unready = cmdHandler.exit;
+    CommandHandler.prototype.leave = CommandHandler.prototype.exit;
+    CommandHandler.prototype.leaveFight = CommandHandler.prototype.exit;
+    CommandHandler.prototype.forfeit = CommandHandler.prototype.exit;
+    CommandHandler.prototype.unready = CommandHandler.prototype.exit;
 
-    cmdHandler.deleteProfile = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
+    CommandHandler.prototype.deleteProfile = function (args, data) {
+        if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
             if (checkIfFightIsGoingOn()) {
                 if (currentFighters[0].character == data.character || currentFighters[1].character == data.character) {
-                    fChatLibInstance.sendMessage("You can't add remove this profile if it's in a fight.", channel);
+                    _this.fChatLibInstance.sendMessage("You can't add remove this profile if it's in a fight.", _this.channel);
                     return;
                 }
             }
             client.del(args, function (err, result) {
                 if (result == 1) {
-                    fChatLibInstance.sendMessage(args + "'s stats have been deleted. Thank you for playing!", channel);
+                    _this.fChatLibInstance.sendMessage(args + "'s stats have been deleted. Thank you for playing!", _this.channel);
                 }
                 else {
-                    fChatLibInstance.sendMessage("This profile hasn't been found in the database.", channel);
+                    _this.fChatLibInstance.sendMessage("This profile hasn't been found in the database.", _this.channel);
                 }
             });
         }
         else {
-            fChatLibInstance.sendMessage("You don't have sufficient rights.", channel);
+            _this.fChatLibInstance.sendMessage("You don't have sufficient rights.", _this.channel);
         }
     };
 
@@ -274,7 +275,7 @@ module.exports = function (parent, chanName) {
                 else{
                     experienceSpent = stats.experienceSpent;
                 }
-                fChatLibInstance.sendPrivMessage(data.character, "[b]" + stats.character + "[/b]'s stats" + "\n" +
+                _this.fChatLibInstance.sendPrivMessage(data.character, "[b]" + stats.character + "[/b]'s stats" + "\n" +
                     "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
                     "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Max Lust[/color][/b]: " + stats.maxLust + "\n" +
                     "[b][color=green]Determination[/color][/b]:  " + stats.determination + "\n" +
@@ -284,26 +285,26 @@ module.exports = function (parent, chanName) {
                     "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
             }
             else {
-                fChatLibInstance.sendPrivMessage(data.character, "You aren't registered yet.");
+                _this.fChatLibInstance.sendPrivMessage(data.character, "You aren't registered yet.");
             }
         });
     };
 
-    cmdHandler.myStats = function (args, data) {
+    CommandHandler.prototype.myStats = function (args, data) {
         statsGetter(args, data, data.character);
     };
-    cmdHandler.stats = cmdHandler.myStats;
+    CommandHandler.prototype.stats = CommandHandler.prototype.myStats;
 
-    cmdHandler.getStats = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
+    CommandHandler.prototype.getStats = function (args, data) {
+        if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
             statsGetter(args, data, args);
         }
         else{
-            fChatLibInstance.sendMessage("You don't have sufficient rights.", channel);
+            _this.fChatLibInstance.sendMessage("You don't have sufficient rights.", _this.channel);
         }
     };
 
-    cmdHandler.addStat = function (args, data) {
+    CommandHandler.prototype.addStat = function (args, data) {
         client.hgetall(data.character, function (err, result) {
             if (result != null) {
                 var askedPoint = 0;
@@ -327,7 +328,7 @@ module.exports = function (parent, chanName) {
                         askedPoint = result.toughness = parseInt(result.toughness) + 1;
                         break;
                     default:
-                        fChatLibInstance.sendMessage("Unknown stat. Please check your syntax. Example: !addStat endurance", channel);
+                        _this.fChatLibInstance.sendMessage("Unknown stat. Please check your syntax. Example: !addStat endurance", _this.channel);
                         return;
                         break;
                 }
@@ -335,15 +336,15 @@ module.exports = function (parent, chanName) {
                 var intExpAfterSpend = parseInt(result.experience) - expNeeded;
                 var intExpSpentAfterSpend = parseInt(result.experienceSpent)+expNeeded;
                 if(askedPoint > 6){
-                    fChatLibInstance.sendMessage("You can't go over 6 stat points.", channel);
+                    _this.fChatLibInstance.sendMessage("You can't go over 6 stat points.", _this.channel);
                     return;
                 }
                 if(intExpAfterSpend < 0){
-                    fChatLibInstance.sendMessage("You don't have enough experience points for that. ("+expNeeded+" needed)", channel);
+                    _this.fChatLibInstance.sendMessage("You don't have enough experience points for that. ("+expNeeded+" needed)", _this.channel);
                     return;
                 }
                 if(intExpSpentAfterSpend > maxExp){
-                    fChatLibInstance.sendMessage("This stat augmentation reaches the maximum experience amount a player can spend. ("+intExpSpentAfterSpend+" but the limit is "+maxExp+")", channel);
+                    _this.fChatLibInstance.sendMessage("This stat augmentation reaches the maximum experience amount a player can spend. ("+intExpSpentAfterSpend+" but the limit is "+maxExp+")", _this.channel);
                     return;
                 }
 
@@ -352,22 +353,22 @@ module.exports = function (parent, chanName) {
                 result.maxHp = 10 + parseInt(result.strength) + parseInt(result.determination) + parseInt(result.agility) + parseInt(result.expertise) + parseInt(result.toughness);
                 result.maxLust = 14 + (3* parseInt(result.endurance));
                 client.hmset(result.character, result);
-                fChatLibInstance.sendMessage("Succesfully added your new point with a total cost of "+expNeeded+ " XP points.", channel);
+                _this.fChatLibInstance.sendMessage("Succesfully added your new point with a total cost of "+expNeeded+ " XP points.", _this.channel);
             }
             else {
-                fChatLibInstance.sendMessage("Are you sure this user is registered?", channel);
+                _this.fChatLibInstance.sendMessage("Are you sure this user is registered?", _this.channel);
             }
         });
     };
 
-    cmdHandler.addStatOP = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
+    CommandHandler.prototype.addStatOP = function (args, data) {
+        if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
             var arr = args.split(' ');
             var result = arr.splice(0, 2);
             result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
 
             if (result.length == 3 && result[0] != "" && !isNaN(result[1]) && result[2] != "") {
-                fChatLibInstance.sendMessage("Will add " + parseInt(result[1]) + " points of " + result[0] + " to " + result[2], channel);
+                _this.fChatLibInstance.sendMessage("Will add " + parseInt(result[1]) + " points of " + result[0] + " to " + result[2], _this.channel);
                 var newStats = {
                     strength: 0,
                     agility: 0,
@@ -408,21 +409,21 @@ module.exports = function (parent, chanName) {
                         result.maxHp = 10 + parseInt(result.strength) + parseInt(result.determination) + parseInt(result.agility) + parseInt(result.expertise) + parseInt(result.toughness);
                         result.maxLust = 14 + (3* parseInt(result.endurance));
                         client.hmset(newStats.character, result);
-                        fChatLibInstance.sendMessage("Succesfully added the new points!", channel);
+                        _this.fChatLibInstance.sendMessage("Succesfully added the new points!", _this.channel);
                     }
                     else {
-                        fChatLibInstance.sendMessage("Are you sure this user is registered?", channel);
+                        _this.fChatLibInstance.sendMessage("Are you sure this user is registered?", _this.channel);
                     }
                 });
             }
             else {
-                fChatLibInstance.sendMessage("Invalid syntax. Correct is: !addStats STAT X CHARACTER. Example: !addStats Strength 1 ThatCharacter", channel);
+                _this.fChatLibInstance.sendMessage("Invalid syntax. Correct is: !addStats STAT X CHARACTER. Example: !addStats Strength 1 ThatCharacter", _this.channel);
             }
 
         }
     };
 
-    cmdHandler.damageOutputs = function (args, data) {
+    CommandHandler.prototype.damageOutputs = function (args, data) {
         if (checkIfFightIsGoingOn() && data.character == currentFighters[currentFight.whoseturn].character) {
             var strResult = attackPrepare("brawl", "light", true);
             strResult += attackPrepare("brawl", "medium", true);
@@ -445,36 +446,36 @@ module.exports = function (parent, chanName) {
             strResult += attackPrepare("humiliation", "light", true);
             strResult += attackPrepare("humiliation", "medium", true);
             strResult += attackPrepare("humiliation", "heavy", true);
-            fChatLibInstance.sendPrivMessage(data.character, strResult);
+            _this.fChatLibInstance.sendPrivMessage(data.character, strResult);
         }
         else{
-            fChatLibInstance.sendMessage("You can only check your possible damage output during your turn in a match.", channel);
+            _this.fChatLibInstance.sendMessage("You can only check your possible damage output during your turn in a match.", _this.channel);
         }
     };
 
-    cmdHandler.reset = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
+    CommandHandler.prototype.reset = function (args, data) {
+        if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
             if (checkIfFightIsGoingOn()) {
                 resetFight();
-                fChatLibInstance.sendMessage("The ring has been cleared.", channel);
+                _this.fChatLibInstance.sendMessage("The ring has been cleared.", _this.channel);
             }
             else {
-                fChatLibInstance.sendMessage("The ring isn't occupied.", channel);
+                _this.fChatLibInstance.sendMessage("The ring isn't occupied.", _this.channel);
             }
         }
         else {
-            fChatLibInstance.sendMessage("You don't have sufficient rights.", channel);
+            _this.fChatLibInstance.sendMessage("You don't have sufficient rights.", _this.channel);
         }
     };
 
-    cmdHandler.removeStats = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
+    CommandHandler.prototype.removeStats = function (args, data) {
+        if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
             var arr = args.split(' ');
             var result = arr.splice(0, 2);
             result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
 
             if (result.length == 3 && result[0] != "" && !isNaN(result[1]) && result[2] != "") {
-                fChatLibInstance.sendMessage("Will remove " + parseInt(result[1]) + " points of " + result[0] + " to " + result[2], channel);
+                _this.fChatLibInstance.sendMessage("Will remove " + parseInt(result[1]) + " points of " + result[0] + " to " + result[2], _this.channel);
                 var newStats = {
                     strength: 0,
                     determination: 0,
@@ -515,15 +516,15 @@ module.exports = function (parent, chanName) {
                         result.maxHp = 10 + parseInt(result.strength) + parseInt(result.determination) + parseInt(result.agility) + parseInt(result.expertise) + parseInt(result.toughness);
                         result.maxLust = 14 + (3* parseInt(result.endurance));
                         client.hmset(newStats.character, result);
-                        fChatLibInstance.sendMessage("Succesfully removed the points!", channel);
+                        _this.fChatLibInstance.sendMessage("Succesfully removed the points!", _this.channel);
                     }
                     else {
-                        fChatLibInstance.sendMessage("Are you sure this user is registered?", channel);
+                        _this.fChatLibInstance.sendMessage("Are you sure this user is registered?", _this.channel);
                     }
                 });
             }
             else {
-                fChatLibInstance.sendMessage("Invalid syntax. Correct is: !removeStats STAT X CHARACTER. Example: !removeStats Strength 1 ThatCharacter", channel);
+                _this.fChatLibInstance.sendMessage("Invalid syntax. Correct is: !removeStats STAT X CHARACTER. Example: !removeStats Strength 1 ThatCharacter", _this.channel);
             }
 
         }
@@ -531,11 +532,11 @@ module.exports = function (parent, chanName) {
 
 
 
-    cmdHandler.addFeature = function (args, data) {
+    CommandHandler.prototype.addFeature = function (args, data) {
         if (args.length > 0) {
             if (checkIfFightIsGoingOn()) {
                 if (currentFighters[0].character == data.character || currentFighters[1].character == data.character) {
-                    fChatLibInstance.sendMessage("You can't add a feature if you're in a fight.", channel);
+                    _this.fChatLibInstance.sendMessage("You can't add a feature if you're in a fight.", _this.channel);
                     return;
                 }
             }
@@ -548,7 +549,7 @@ module.exports = function (parent, chanName) {
                             if (currentFeatures.indexOf(idFeature) == -1) {
                                 if (features[idFeature].incompatibility != undefined) {
                                     if (currentFeatures.indexOf(features[idFeature].incompatibility) != -1) {
-                                        fChatLibInstance.sendMessage("You cannot add this feature if you've already got [b]" + features[features[idFeature].incompatibility].title + "[/b]", channel);
+                                        _this.fChatLibInstance.sendMessage("You cannot add this feature if you've already got [b]" + features[features[idFeature].incompatibility].title + "[/b]", _this.channel);
                                         return;
                                     }
                                 }
@@ -558,56 +559,56 @@ module.exports = function (parent, chanName) {
                                 currentFeatures.push(idFeature);
                                 result.features = currentFeatures.toString();
                                 client.hmset(data.character, result);
-                                fChatLibInstance.sendMessage("You've successfully added the [b]" + features[idFeature].title + "[/b] perk.", channel);
+                                _this.fChatLibInstance.sendMessage("You've successfully added the [b]" + features[idFeature].title + "[/b] perk.", _this.channel);
                                 return;
                             }
-                            fChatLibInstance.sendMessage("You already have the [b]" + features[idFeature].title + "[/b] perk.", channel);
+                            _this.fChatLibInstance.sendMessage("You already have the [b]" + features[idFeature].title + "[/b] perk.", _this.channel);
                             return;
                         }
-                        fChatLibInstance.sendMessage("You can't have more than 2 features.", channel);
+                        _this.fChatLibInstance.sendMessage("You can't have more than 2 features.", _this.channel);
                     }
                     else {
-                        fChatLibInstance.sendMessage("Are you sure you're registered?", channel);
+                        _this.fChatLibInstance.sendMessage("Are you sure you're registered?", _this.channel);
                     }
                 });
             }
             else {
-                fChatLibInstance.sendMessage("This feature has not been found. Check the spelling.", channel);
+                _this.fChatLibInstance.sendMessage("This feature has not been found. Check the spelling.", _this.channel);
             }
         }
         else{
-            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !addFeature Cum Slut\nAvailable moves: "+getAllItemsTitleInArray(features), channel);
+            _this.fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !addFeature Cum Slut\nAvailable moves: "+getAllItemsTitleInArray(features), _this.channel);
         }
     };
 
-    cmdHandler.removeFeatures = function (args, data) {
-        if (fChatLibInstance.isUserChatOP(data.character, channel)) {
+    CommandHandler.prototype.removeFeatures = function (args, data) {
+        if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
             if (args.length > 0) {
                 client.hgetall(args, function (err, result) {
                     if (result != null) {
                         result.features = [];
                         client.hmset(args, result);
-                        fChatLibInstance.sendMessage("You've successfully removed all the features from "+args, channel);
+                        _this.fChatLibInstance.sendMessage("You've successfully removed all the features from "+args, _this.channel);
                     }
                     else {
-                        fChatLibInstance.sendMessage("Are you sure this user is registered?", channel);
+                        _this.fChatLibInstance.sendMessage("Are you sure this user is registered?", _this.channel);
                     }
                 });
             }
             else{
-                fChatLibInstance.sendMessage("Correct syntax: !removeFeatures user", channel);
+                _this.fChatLibInstance.sendMessage("Correct syntax: !removeFeatures user", _this.channel);
             }
         }
         else {
-            fChatLibInstance.sendMessage("You don't have sufficient rights.", channel);
+            _this.fChatLibInstance.sendMessage("You don't have sufficient rights.", _this.channel);
         }
     };
 
-    cmdHandler.resetProfileStats = function (args, data) {
+    CommandHandler.prototype.resetProfileStats = function (args, data) {
         client.hgetall(data.character, function (err, result) {
             if (result != null) {
                 if (parseInt(result.experience) + parseInt(result.experienceSpent) < 75) {
-                    fChatLibInstance.sendMessage("You haven't gained 75 points of XP yet to be able to reset your stats.", channel);
+                    _this.fChatLibInstance.sendMessage("You haven't gained 75 points of XP yet to be able to reset your stats.", _this.channel);
                     return;
                 }
                 result.strength = 1;
@@ -620,15 +621,15 @@ module.exports = function (parent, chanName) {
                 result.experience = 50;
                 result.experienceSpent = 0;
                 client.hmset(data.character, result);
-                fChatLibInstance.sendMessage("You've successfully reset your stats. Don't forget to spend the 50XP!", channel);
+                _this.fChatLibInstance.sendMessage("You've successfully reset your stats. Don't forget to spend the 50XP!", _this.channel);
             }
             else {
-                fChatLibInstance.sendMessage("Are you sure this profile is registered?", channel);
+                _this.fChatLibInstance.sendMessage("Are you sure this profile is registered?", _this.channel);
             }
         });
     };
 
-    cmdHandler.pass = function (args, data) {
+    CommandHandler.prototype.pass = function (args, data) {
         if (checkIfFightIsGoingOn()) {
             if (data.character == currentFighters[currentFight.whoseturn].character) {
                 currentFight.actionType = "pass";
@@ -636,17 +637,17 @@ module.exports = function (parent, chanName) {
                 checkRollWinner(true);
             }
             else {
-                fChatLibInstance.sendMessage("It's not your turn yet.", channel);
+                _this.fChatLibInstance.sendMessage("It's not your turn yet.", _this.channel);
             }
 
         }
         else {
-            fChatLibInstance.sendMessage("There isn't a match going on at the moment.", channel);
+            _this.fChatLibInstance.sendMessage("There isn't a match going on at the moment.", _this.channel);
         }
     };
-    cmdHandler.skip = cmdHandler.pass;
+    CommandHandler.prototype.skip = CommandHandler.prototype.pass;
 
-    cmdHandler.escape = function (args, data) {
+    CommandHandler.prototype.escape = function (args, data) {
         if (checkIfFightIsGoingOn()) {
             if (data.character == currentFighters[currentFight.whoseturn].character) {
                 if (isInHold()) {
@@ -657,47 +658,47 @@ module.exports = function (parent, chanName) {
                     }
                 }
                 else {
-                    fChatLibInstance.sendMessage("You're not in a hold, you can't escape the void!", channel);
+                    _this.fChatLibInstance.sendMessage("You're not in a hold, you can't escape the void!", _this.channel);
                 }
             }
             else {
-                fChatLibInstance.sendMessage("It's not your turn to attack.", channel);
+                _this.fChatLibInstance.sendMessage("It's not your turn to attack.", _this.channel);
             }
 
         }
         else {
-            fChatLibInstance.sendMessage("There isn't a match going on at the moment.", channel);
+            _this.fChatLibInstance.sendMessage("There isn't a match going on at the moment.", _this.channel);
         }
     };
-    cmdHandler.escapeHold = cmdHandler.escape;
-    cmdHandler.e = cmdHandler.escape;
+    CommandHandler.prototype.escapeHold = CommandHandler.prototype.escape;
+    CommandHandler.prototype.e = CommandHandler.prototype.escape;
 
-    cmdHandler.giveUp = function (args, data) {
+    CommandHandler.prototype.giveUp = function (args, data) {
         if (checkIfFightIsGoingOn()) {
             if (data.character == currentFighters[currentFight.whoseturn].character) {
                 if (isInHold()) {
                     if (currentFight.turn > 0) {
                         currentFight.winner = (currentFight.whoseturn == 0 ? 1 : 0);
-                        fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " is giving up! It must have been too much to handle!", channel);
+                        _this.fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " is giving up! It must have been too much to handle!", _this.channel);
                         checkLifePoints();
                     }
                 }
                 else {
-                    fChatLibInstance.sendMessage("You're not in a hold, you can't escape the void!", channel);
+                    _this.fChatLibInstance.sendMessage("You're not in a hold, you can't escape the void!", _this.channel);
                 }
             }
             else {
-                fChatLibInstance.sendMessage("It's not your turn to attack.", channel);
+                _this.fChatLibInstance.sendMessage("It's not your turn to attack.", _this.channel);
             }
 
         }
         else {
-            fChatLibInstance.sendMessage("There isn't a match going on at the moment.", channel);
+            _this.fChatLibInstance.sendMessage("There isn't a match going on at the moment.", _this.channel);
         }
     };
-    cmdHandler.tapout = cmdHandler.giveUp;
-    cmdHandler.surrender = cmdHandler.giveUp;
-    cmdHandler.submit = cmdHandler.giveUp;
+    CommandHandler.prototype.tapout = CommandHandler.prototype.giveUp;
+    CommandHandler.prototype.surrender = CommandHandler.prototype.giveUp;
+    CommandHandler.prototype.submit = CommandHandler.prototype.giveUp;
 
 
 
@@ -711,7 +712,7 @@ module.exports = function (parent, chanName) {
             if (checkIfFightIsGoingOn()) {
                 if (data.character == currentFighters[currentFight.whoseturn].character) {
                     if (isInHold()) {
-                        fChatLibInstance.sendMessage("You are still in a hold. You can either !escape or !tapout (and lose).", channel);
+                        _this.fChatLibInstance.sendMessage("You are still in a hold. You can either !escape or !tapout (and lose).", _this.channel);
                         return;
                     }
 
@@ -730,95 +731,100 @@ module.exports = function (parent, chanName) {
                         }
                     }
                     else {
-                        fChatLibInstance.sendMessage("This tier has not been found. Check the spelling.", channel);
+                        _this.fChatLibInstance.sendMessage("This tier has not been found. Check the spelling.", _this.channel);
                     }
                 }
                 else if (data.character == currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character) {
-                    fChatLibInstance.sendMessage("It's not your turn to attack.", channel);
+                    _this.fChatLibInstance.sendMessage("It's not your turn to attack.", _this.channel);
                 }
                 else {
-                    fChatLibInstance.sendMessage("You're not in the fight.", channel);
+                    _this.fChatLibInstance.sendMessage("You're not in the fight.", _this.channel);
                 }
 
             }
         }
         else {
             //available commands
-            fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !brawl light OR !sexual medium OR !hmove Heavy OR !bondage item", channel);
+            _this.fChatLibInstance.sendMessage("This command requires one argument. Check the page for more information. Example: !brawl light OR !sexual medium OR !hmove Heavy OR !bondage item", _this.channel);
         }
     };
 
-    cmdHandler.brawl = function(args,data){
+    CommandHandler.prototype.brawl = function(args,data){
         attack(args, data, "brawl");
     };
-    cmdHandler.hit = cmdHandler.brawl;
+    CommandHandler.prototype.hit = CommandHandler.prototype.brawl;
 
 
-    cmdHandler.martial = function(args,data){
+    CommandHandler.prototype.martial = function(args,data){
         attack(args, data, "martial");
     };
-    cmdHandler.acrobat = cmdHandler.martial;
+    CommandHandler.prototype.acrobat = CommandHandler.prototype.martial;
 
-    cmdHandler.highflyer = function(args,data){
+    CommandHandler.prototype.highflyer = function(args,data){
         attack(args, data, "highflyer");
     };
-    cmdHandler.tackle = cmdHandler.highflyer;
-    cmdHandler.hf = cmdHandler.highflyer;
-    cmdHandler.aerial = cmdHandler.highflyer;
+    CommandHandler.prototype.tackle = CommandHandler.prototype.highflyer;
+    CommandHandler.prototype.hf = CommandHandler.prototype.highflyer;
+    CommandHandler.prototype.aerial = CommandHandler.prototype.highflyer;
 
 
-    cmdHandler.sexual = function(args,data){
+    CommandHandler.prototype.sexual = function(args,data){
         attack(args, data, "sexual");
     };
-    cmdHandler.lust = cmdHandler.sexual;
-    cmdHandler.s = cmdHandler.sexual;
-    cmdHandler.sex = cmdHandler.sexual;
-    cmdHandler.stroke = cmdHandler.sexual;
-    cmdHandler.fuck = cmdHandler.sexual;
-    cmdHandler.lick = cmdHandler.sexual;
+    CommandHandler.prototype.lust = CommandHandler.prototype.sexual;
+    CommandHandler.prototype.s = CommandHandler.prototype.sexual;
+    CommandHandler.prototype.sex = CommandHandler.prototype.sexual;
+    CommandHandler.prototype.stroke = CommandHandler.prototype.sexual;
+    CommandHandler.prototype.fuck = CommandHandler.prototype.sexual;
+    CommandHandler.prototype.lick = CommandHandler.prototype.sexual;
 
-    cmdHandler.sexualhold = function(args,data){
+    CommandHandler.prototype.sexualhold = function(args,data){
         attack(args, data, "sexualhold");
     };
-    cmdHandler.lusthold = cmdHandler.sexualhold;
-    cmdHandler.shold = cmdHandler.sexualhold;
-    cmdHandler.sexhold = cmdHandler.sexualhold;
-    cmdHandler.strokehold = cmdHandler.sexualhold;
-    cmdHandler.fuckhold = cmdHandler.sexualhold;
-    cmdHandler.lickhold = cmdHandler.sexualhold;
+    CommandHandler.prototype.lusthold = CommandHandler.prototype.sexualhold;
+    CommandHandler.prototype.shold = CommandHandler.prototype.sexualhold;
+    CommandHandler.prototype.sexhold = CommandHandler.prototype.sexualhold;
+    CommandHandler.prototype.strokehold = CommandHandler.prototype.sexualhold;
+    CommandHandler.prototype.fuckhold = CommandHandler.prototype.sexualhold;
+    CommandHandler.prototype.lickhold = CommandHandler.prototype.sexualhold;
 
 
-    cmdHandler.submission = function(args,data){
+    CommandHandler.prototype.submission = function(args,data){
         attack(args, data, "submission");
     };
-    cmdHandler.grab = cmdHandler.submission;
-    cmdHandler.hold = cmdHandler.submission;
-    cmdHandler.grapple = cmdHandler.submission;
-    cmdHandler.grappling = cmdHandler.submission;
+    CommandHandler.prototype.grab = CommandHandler.prototype.submission;
+    CommandHandler.prototype.hold = CommandHandler.prototype.submission;
+    CommandHandler.prototype.grapple = CommandHandler.prototype.submission;
+    CommandHandler.prototype.grappling = CommandHandler.prototype.submission;
 
 
-    cmdHandler.humiliation = function(args,data){
+    CommandHandler.prototype.humiliation = function(args,data){
         attack(args, data, "humiliation");
     };
-    cmdHandler.hmove = cmdHandler.humiliation;
-    cmdHandler.hummove = cmdHandler.humiliation;
-    cmdHandler.humiliate = cmdHandler.humiliation;
-    cmdHandler.humiliatinghold = cmdHandler.humiliation;
-    cmdHandler.smother = cmdHandler.humiliation;
+    CommandHandler.prototype.hmove = CommandHandler.prototype.humiliation;
+    CommandHandler.prototype.hummove = CommandHandler.prototype.humiliation;
+    CommandHandler.prototype.humiliate = CommandHandler.prototype.humiliation;
+    CommandHandler.prototype.humiliatinghold = CommandHandler.prototype.humiliation;
+    CommandHandler.prototype.smother = CommandHandler.prototype.humiliation;
 
-    cmdHandler.bondage = function(args,data){
+    CommandHandler.prototype.bondage = function(args,data){
         attack(args, data, "bondage");
     };
-    cmdHandler.bdsm = cmdHandler.bondage;
-    cmdHandler.bind = cmdHandler.bondage;
-    cmdHandler.restrain = cmdHandler.bondage;
-    cmdHandler.tie = cmdHandler.bondage;
-    cmdHandler.tieup = cmdHandler.bondage;
-    cmdHandler.dominate = cmdHandler.bondage;
-    cmdHandler.tame = cmdHandler.bondage;
-    cmdHandler.bd = cmdHandler.bondage;
+    CommandHandler.prototype.bdsm = CommandHandler.prototype.bondage;
+    CommandHandler.prototype.bind = CommandHandler.prototype.bondage;
+    CommandHandler.prototype.restrain = CommandHandler.prototype.bondage;
+    CommandHandler.prototype.tie = CommandHandler.prototype.bondage;
+    CommandHandler.prototype.tieup = CommandHandler.prototype.bondage;
+    CommandHandler.prototype.dominate = CommandHandler.prototype.bondage;
+    CommandHandler.prototype.tame = CommandHandler.prototype.bondage;
+    CommandHandler.prototype.bd = CommandHandler.prototype.bondage;
 
 
+    return CommandHandler;
+}());
+
+module.exports = function (parent, channel) {
+    var cmdHandler = new CommandHandler(parent, channel);
     return cmdHandler;
 };
 
@@ -844,7 +850,7 @@ function beginInitiation(){
     currentFight.turn = 0;
     currentFight.isInit = true;
     currentFight.bothPlayerRoll = true;
-    fChatLibInstance.sendMessage("\n[b]Let's start![/b]\n\n[b]" + currentFighters[0].character + "[/b]\n\n[color=red]VS[/color]\n\n[b]" + currentFighters[1].character + "[/b]", channel);
+    _this.fChatLibInstance.sendMessage("\n[b]Let's start![/b]\n\n[b]" + currentFighters[0].character + "[/b]\n\n[color=red]VS[/color]\n\n[b]" + currentFighters[1].character + "[/b]", _this.channel);
     checkFeaturesInit();
     rollBoth();
 }
@@ -874,8 +880,8 @@ function rollBoth(){
         currentFight.diceResultP2 = currentFight.diceResultP1;
         debug = false;
     }
-    fChatLibInstance.sendMessage("\n[b]" + currentFighters[0].character + "[/b] rolled a [b]" + currentFight.diceResultP1 + "[/b] " + (mods0 != 0 ? "(" + ((mods0 >= 0 ? "+" : "") + mods0 + " applied)") : "" ) + "\n" +
-        "[b]" + currentFighters[1].character + "[/b] rolled a [b]" + currentFight.diceResultP2 + "[/b] " + (mods1 != 0 ? "(" + ((mods1 >= 0 ? "+" : "") + mods1 + " applied)") : "" ), channel);
+    _this.fChatLibInstance.sendMessage("\n[b]" + currentFighters[0].character + "[/b] rolled a [b]" + currentFight.diceResultP1 + "[/b] " + (mods0 != 0 ? "(" + ((mods0 >= 0 ? "+" : "") + mods0 + " applied)") : "" ) + "\n" +
+        "[b]" + currentFighters[1].character + "[/b] rolled a [b]" + currentFight.diceResultP2 + "[/b] " + (mods1 != 0 ? "(" + ((mods1 >= 0 ? "+" : "") + mods1 + " applied)") : "" ), _this.channel);
     checkRollWinner();
 }
 
@@ -895,7 +901,7 @@ function checkFeaturesInit() {
     }
 
     if (currentFight.isInit && dominated > -1) {
-        fChatLibInstance.sendMessage("\n[b]" + currentFighters[(dominated == 0 ? 1 : 0)].character + "[/b] really has an imposing dominance!\n[b]" + currentFighters[dominated].character + "[/b] feels a bit scared...", channel);
+        _this.fChatLibInstance.sendMessage("\n[b]" + currentFighters[(dominated == 0 ? 1 : 0)].character + "[/b] really has an imposing dominance!\n[b]" + currentFighters[dominated].character + "[/b] feels a bit scared...", _this.channel);
     }
 }
 
@@ -951,7 +957,7 @@ function roll() {
             currentFight.diceResult = diceScore;
             break;
     }
-    fChatLibInstance.sendMessage("\n[b]" + currentFighters[currentFight.whoseturn].character + "[/b] rolled a [b]" + currentFight.diceResult + "[/b] " + (mods != 0 ? "(" + ((mods >= 0 ? "+" : "") + mods + " applied)") : "" ), channel);
+    _this.fChatLibInstance.sendMessage("\n[b]" + currentFighters[currentFight.whoseturn].character + "[/b] rolled a [b]" + currentFight.diceResult + "[/b] " + (mods != 0 ? "(" + ((mods >= 0 ? "+" : "") + mods + " applied)") : "" ), _this.channel);
     checkRollWinner();
 }
 
@@ -965,7 +971,7 @@ function checkRollWinner(blnForceSuccess) {
         var idWinner = (currentFight.diceResultP1 > currentFight.diceResultP2 ? 0 : 1);
         if (currentFight.isInit) {
             currentFight.isInit = false;
-            fChatLibInstance.sendMessage("[i]" + currentFighters[idWinner].character + " emotes the attack first.[/i]", channel);
+            _this.fChatLibInstance.sendMessage("[i]" + currentFighters[idWinner].character + " emotes the attack first.[/i]", _this.channel);
             currentFight.whoseturn = idWinner;
             nextTurn(false);
         }
@@ -1005,33 +1011,33 @@ function checkRollWinner(blnForceSuccess) {
             if (currentFight.actionType == "escape") {
                 currentFight.currentHold.turnsLeft = 0;
                 currentFight.currentHold.isInfinite = false;
-                fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!\nIt's still " + currentFighters[currentFight.whoseturn].character + "'s turn.", channel);
+                _this.fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has escaped " + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s hold!\nIt's still " + currentFighters[currentFight.whoseturn].character + "'s turn.", _this.channel);
                 return;
             }
             else if (currentFight.actionType == "pass") {
-                fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has passed this turn.", channel);
+                _this.fChatLibInstance.sendMessage(currentFighters[currentFight.whoseturn].character + " has passed this turn.", _this.channel);
             }
             else if( currentFight.actionType == "bondage"){
                 currentFight.intMovesCount[currentFight.whoseturn] += 1;
                 currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness++;
-                fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s bondage attack has been [color=green][u]successful![/u][/color][/b]", channel);
+                _this.fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s bondage attack has been [color=green][u]successful![/u][/color][/b]", _this.channel);
                 if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness == 5){
                     currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].dice.addMod(-1);
-                    fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s submissiveness is starting to be a problem! -1 to their dice rolls.[/b]", channel);
+                    _this.fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + "'s submissiveness is starting to be a problem! -1 to their dice rolls.[/b]", _this.channel);
                 }
                 else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness >= 10){
                     currentFight.winner = currentFight.whoseturn;
-                    fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " is completely bound! The fight is over![/b]", channel);
+                    _this.fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " is completely bound! The fight is over![/b]", _this.channel);
                     checkLifePoints();
                 }
                 //else if(currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].ownSubmissiveness == 6){
                 //    currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].dice.addMod(-1);
-                //    fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " is looking quite helpless like that! Another -1 to their dice rolls![/b]");
+                //    _this.fChatLibInstance.sendMessage("[b]" + currentFighters[(currentFight.whoseturn == 0 ? 1 : 0)].character + " is looking quite helpless like that! Another -1 to their dice rolls![/b]");
                 //}
 
             }
             else {
-                fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s attack has [color=green][u]hit![/u][/color][/b]", channel);
+                _this.fChatLibInstance.sendMessage("[b]" + currentFighters[currentFight.whoseturn].character + "'s attack has [color=green][u]hit![/u][/color][/b]", _this.channel);
                 attackPrepare(currentFight.actionType, currentFight.actionTier);
             }
         }
@@ -1048,12 +1054,12 @@ function checkRollWinner(blnForceSuccess) {
 
 
 function missHandler(idPlayer) {
-    fChatLibInstance.sendMessage("[i][b]" + currentFighters[idPlayer].character + "[/b] missed![/i]", channel);
+    _this.fChatLibInstance.sendMessage("[i][b]" + currentFighters[idPlayer].character + "[/b] missed![/i]", _this.channel);
     if (currentFight.actionType == "escape") {
         currentFighters[idPlayer].dice.addTmpMod(parseInt(1))
     }
     currentFighters[idPlayer].dice.addTmpMod(parseInt(1), 3);
-    fChatLibInstance.sendMessage("[i][b]" + currentFighters[idPlayer].character + "[/b] has gotten +1 added to their next dice roll.[/i]", channel);
+    _this.fChatLibInstance.sendMessage("[i][b]" + currentFighters[idPlayer].character + "[/b] has gotten +1 added to their next dice roll.[/i]", _this.channel);
 }
 
 function holdHandler(damageHP, damageLust, isSexual, actionTier) {
@@ -1163,7 +1169,7 @@ function holdHandler(damageHP, damageLust, isSexual, actionTier) {
             strAttack += " applied a humiliation hold!";
         }
 
-        fChatLibInstance.sendMessage(strAttack, channel);
+        _this.fChatLibInstance.sendMessage(strAttack, _this.channel);
     }
 }
 
@@ -1320,7 +1326,7 @@ function attackHandler(damageHP, damageLust, attacker, defender) {
         //ryona enthusiast
         if (featuresVictim.indexOf(3) != -1) {
             currentFighters[defender].lust += hpRemoved;
-            fChatLibInstance.sendMessage(currentFighters[defender].character + " really likes to suffer... Their lust meter has been increased by " + hpRemoved, channel);
+            _this.fChatLibInstance.sendMessage(currentFighters[defender].character + " really likes to suffer... Their lust meter has been increased by " + hpRemoved, _this.channel);
         }
 
 
@@ -1328,7 +1334,7 @@ function attackHandler(damageHP, damageLust, attacker, defender) {
         if (featuresAttacker.indexOf(4) != -1) {
 
             currentFighters[attacker].lust += hpRemoved;
-            fChatLibInstance.sendMessage(currentFighters[attacker].character + " really likes to inflict pain! Their lust meter has been increased by " + hpRemoved, channel);
+            _this.fChatLibInstance.sendMessage(currentFighters[attacker].character + " really likes to inflict pain! Their lust meter has been increased by " + hpRemoved, _this.channel);
             var isUnder75 = (currentFighters[defender].hp < 0.75 * parseInt(currentFighters[defender].maxHp));
             var isUnder50 = (currentFighters[defender].hp < 0.50 * parseInt(currentFighters[defender].maxHp));
             var isUnder25 = (currentFighters[defender].hp < 0.25 * parseInt(currentFighters[defender].maxHp));
@@ -1338,17 +1344,17 @@ function attackHandler(damageHP, damageLust, attacker, defender) {
             if (isUnder75 && wasUpper75) {
                 //25% triggered
                 currentFighters[attacker].endurance = parseInt(currentFighters[attacker].endurance) + 1;
-                fChatLibInstance.sendMessage(currentFighters[defender].character + " has already lost 25% of their HP... " + currentFighters[attacker].character + "'s endurance has been increased by 1!", channel);
+                _this.fChatLibInstance.sendMessage(currentFighters[defender].character + " has already lost 25% of their HP... " + currentFighters[attacker].character + "'s endurance has been increased by 1!", _this.channel);
             }
             if (isUnder50 && wasUpper50) {
                 //50% triggered
                 currentFighters[attacker].endurance = parseInt(currentFighters[attacker].endurance) + 1;
-                fChatLibInstance.sendMessage(currentFighters[defender].character + " has already lost 50% of their HP! " + currentFighters[attacker].character + "'s endurance has been increased by 1!", channel);
+                _this.fChatLibInstance.sendMessage(currentFighters[defender].character + " has already lost 50% of their HP! " + currentFighters[attacker].character + "'s endurance has been increased by 1!", _this.channel);
             }
             if (isUnder25 && wasUpper25) {
                 //75% triggered
                 currentFighters[attacker].endurance = parseInt(currentFighters[attacker].endurance) + 1;
-                fChatLibInstance.sendMessage(currentFighters[defender].character + " has already lost 75% of their HP! " + currentFighters[attacker].character + "'s endurance has been increased by 1!", channel);
+                _this.fChatLibInstance.sendMessage(currentFighters[defender].character + " has already lost 75% of their HP! " + currentFighters[attacker].character + "'s endurance has been increased by 1!", _this.channel);
             }
         }
 
@@ -1381,7 +1387,7 @@ function attackHandler(damageHP, damageLust, attacker, defender) {
     }
 
 
-    fChatLibInstance.sendMessage(strAttack, channel);
+    _this.fChatLibInstance.sendMessage(strAttack, _this.channel);
 
     checkLifePoints();
 }
@@ -1407,10 +1413,10 @@ function tickHold() {
     if (holdInPlace()) {
         if(currentFight.currentHold.isInfinite == false){
             currentFight.currentHold.turnsLeft--;
-            fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is still locked in the " + currentFight.currentHold.holdName + "!  (" + currentFight.currentHold.turnsLeft + " turns remaining)", channel);
+            _this.fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is still locked in the " + currentFight.currentHold.holdName + "!  (" + currentFight.currentHold.turnsLeft + " turns remaining)", _this.channel);
         }
         else{
-            fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is still locked in the " + currentFight.currentHold.holdName + "!", channel);
+            _this.fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is still locked in the " + currentFight.currentHold.holdName + "!", _this.channel);
         }
 
         attackHandler(currentFight.currentHold.damageHP, currentFight.currentHold.damageLust, currentFight.currentHold.attacker, currentFight.currentHold.defender);
@@ -1435,7 +1441,7 @@ function isInHold(whoseTurn) {
 }
 
 function releaseHold() {
-    fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is finally out of the " + currentFight.currentHold.holdName + "!", channel);
+    _this.fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is finally out of the " + currentFight.currentHold.holdName + "!", _this.channel);
     currentFight.currentHold.turnsLeft = 0;
     currentFight.currentHold.isInfinite = false;
 }
@@ -1471,9 +1477,9 @@ function checkLifePoints() {
 
     if (currentFight.winner > -1) {
         //winner!
-        fChatLibInstance.sendMessage("[b]After  #" + currentFight.turn + " turns[/b]\n" +
+        _this.fChatLibInstance.sendMessage("[b]After  #" + currentFight.turn + " turns[/b]\n" +
             "[b]" + currentFighters[currentFight.winner].character + "[/b] has finally taken " + currentFighters[(currentFight.winner == 0 ? 1 : 0)].character + " down!\nCongratulations to the winner!"
-            , channel);
+            , _this.channel);
         addWinsLosses(currentFighters[currentFight.winner].character, currentFighters[(currentFight.winner == 0 ? 1 : 0)].character);
         setTimeout(resetFight, 2500);
     }
@@ -1486,7 +1492,7 @@ function addExperienceOnPrematureEnd(char1, intMoves1, char2, intMoves2){
         if(!isNaN(intMoves1)){
             experience += intMoves1;
         }
-        fChatLibInstance.sendMessage(char1+" has gained "+experience+" XP points. ("+intMoves1+" moves)", channel);
+        _this.fChatLibInstance.sendMessage(char1+" has gained "+experience+" XP points. ("+intMoves1+" moves)", _this.channel);
         if(!isNaN(result.experience)){
             experience += parseInt(result.experience) ;
         }
@@ -1498,7 +1504,7 @@ function addExperienceOnPrematureEnd(char1, intMoves1, char2, intMoves2){
         if(!isNaN(intMoves2)){
             experience += intMoves2;
         }
-        fChatLibInstance.sendMessage(char2+" has gained "+experience+" XP points. ("+intMoves2+" moves)", channel);
+        _this.fChatLibInstance.sendMessage(char2+" has gained "+experience+" XP points. ("+intMoves2+" moves)", _this.channel);
         if(!isNaN(result.experience)){
             experience += parseInt(result.experience) ;
         }
@@ -1520,7 +1526,7 @@ function addWinsLosses(winnerName, loserName){
             if(!isNaN(currentFight.intMovesCount[currentFight.winner])){
                 experience += currentFight.intMovesCount[currentFight.winner];
             }
-            fChatLibInstance.sendMessage(winnerName+" has gained "+experience+" XP points. ("+currentFight.intMovesCount[currentFight.winner]+" moves, +2XP for completing a fight.)", channel);
+            _this.fChatLibInstance.sendMessage(winnerName+" has gained "+experience+" XP points. ("+currentFight.intMovesCount[currentFight.winner]+" moves, +2XP for completing a fight.)", _this.channel);
             if(!isNaN(result.experience)){
                 experience += parseInt(result.experience) ;
             }
@@ -1528,7 +1534,7 @@ function addWinsLosses(winnerName, loserName){
             client.hmset(winnerName, result);
         }
         else {
-            fChatLibInstance.sendMessage("Attempt to add the victory point failed.", channel);
+            _this.fChatLibInstance.sendMessage("Attempt to add the victory point failed.", _this.channel);
         }
     });
 
@@ -1545,7 +1551,7 @@ function addWinsLosses(winnerName, loserName){
             if(!isNaN(currentFight.intMovesCount[(currentFight.winner == 0 ? 1 : 0)])){
                 experience += currentFight.intMovesCount[(currentFight.winner == 0 ? 1 : 0)];
             }
-            fChatLibInstance.sendMessage(loserName+" has gained "+experience+" XP points. ("+currentFight.intMovesCount[(currentFight.winner == 0 ? 1 : 0)]+" moves, +2XP for completing a fight.)", channel);
+            _this.fChatLibInstance.sendMessage(loserName+" has gained "+experience+" XP points. ("+currentFight.intMovesCount[(currentFight.winner == 0 ? 1 : 0)]+" moves, +2XP for completing a fight.)", _this.channel);
             if(!isNaN(result.experience)){
                 experience += parseInt(result.experience) ;
             }
@@ -1554,22 +1560,22 @@ function addWinsLosses(winnerName, loserName){
             client.hmset(loserName, result);
         }
         else {
-            fChatLibInstance.sendMessage("Attempt to add the loss point failed.", channel);
+            _this.fChatLibInstance.sendMessage("Attempt to add the loss point failed.", _this.channel);
         }
     });
 }
 
 function broadcastCombatInfo() {
     if (checkIfFightIsGoingOn()) {
-        fChatLibInstance.sendMessage(
+        _this.fChatLibInstance.sendMessage(
             "\n" +
             "[b]Turn #" + currentFight.turn + "[/b] --------------- It's [b][u][color=pink]" + currentFighters[currentFight.whoseturn].character + "[/color][/u][/b]'s turn.\n\n" +
             (currentFighters.length > 0 ? "[b]" + currentFighters[0].character + ": [/b]" + currentFighters[0].hp + "/" + currentFighters[0].maxHp + " [color=red]HP[/color]  |  " + currentFighters[0].lust + "/" + currentFighters[0].maxLust + " [color=pink]Lust[/color]  |  " + currentFighters[0].ownSubmissiveness + "/10 Submissiveness\n" : "") +
             (currentFighters.length > 1 ? "[b]" + currentFighters[1].character + ": [/b]" + currentFighters[1].hp + "/" + currentFighters[1].maxHp + " [color=red]HP[/color]  |  " + currentFighters[1].lust + "/" + currentFighters[1].maxLust + " [color=pink]Lust[/color]  |  " + currentFighters[1].ownSubmissiveness + "/10 Submissiveness" : "")
-            , channel);
+            , _this.channel);
     }
     else {
-        fChatLibInstance.sendMessage("There is no match going on at the moment.", channel);
+        _this.fChatLibInstance.sendMessage("There is no match going on at the moment.", _this.channel);
     }
 }
 
