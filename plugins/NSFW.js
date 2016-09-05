@@ -1,6 +1,8 @@
 "use strict";
 var debug = false; //2.0
 var _this;
+var redis = require("redis");
+var client = redis.createClient(6379, "127.0.0.1");
 
 var CommandHandler = (function () {
     function CommandHandler(fChatLib, chan) {
@@ -829,8 +831,6 @@ module.exports = function (parent, channel) {
 };
 
 var didYouMean = require('didyoumean');
-var redis = require("redis");
-var client = redis.createClient(6379, "127.0.0.1");
 
 var features = require(__dirname + '/etc/features.js');
 var sextoys = require(__dirname + '/etc/sextoys.js');
