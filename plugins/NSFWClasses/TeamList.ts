@@ -3,6 +3,7 @@ import {Dictionary} from "./Dictionary";
 import {Constants} from "./Constants";
 import Team = Constants.Team;
 import {Utils} from "./Utils";
+import {Fight} from "./Fight";
 
 export class TeamList extends Dictionary<Team, Array<Fighter>>{
     arrCurrentFighterForTeam:Dictionary<Team,number>;
@@ -66,10 +67,21 @@ export class TeamList extends Dictionary<Team, Array<Fighter>>{
     }
 
     getTeam(team:Team):Array<Fighter>{
-        return this.getValue(team);
+        if(this.keys().indexOf(team) != -1){
+            return this.getValue(team);
+        }
+        else{
+            return new Array<Fighter>();
+        }
     }
 
-    getNumberOfPlayersInTeam(team:Team):number{
+    getNumberOfPlayersInTeam(team:Team):number{ // TODO: fix this
+        let count = 0;
+        let fullTeamList = this.getTeam(team);
+        return fullTeamList.length;
+    }
+
+    getNumberOfPlayersTotal(team:Team):number{
         let count = 0;
         for(let i = 0; i < this.teamsInvolved; i++){
             count += this.getValue(this.keys()[i]).length;
@@ -104,8 +116,16 @@ export class TeamList extends Dictionary<Team, Array<Fighter>>{
             }
         }
 
+        if(usedTeams.length == 0){
+            usedTeams.push(Team.Blue);
+        }
         if(usedTeams.length == 1){
-            //TODO FIX THIS
+            if(usedTeams.indexOf(Team.Red) == -1){
+                usedTeams.push(Team.Red);
+            }
+            else{
+                usedTeams.push(Team.Blue);
+            }
         }
         return usedTeams;
     }
