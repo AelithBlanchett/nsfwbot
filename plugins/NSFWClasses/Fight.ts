@@ -54,6 +54,7 @@ export class Fight extends BaseModel{
                 if(!this.teamList.containsKey(fighter.assignedTeam)){
                     this.teamList.add(fighter.assignedTeam, []);
                 }
+                fighter.fight = this;
                 this.teamList.getValue(fighter.assignedTeam).push(fighter);
                 return true;
             }
@@ -126,7 +127,7 @@ export class Fight extends BaseModel{
         this.currentTurn++;
         this.teamList.nextTurn();
         this.outputStatus();
-        this.actionBrawl(Tiers.Light);
+        setTimeout(_ => {this.actionBrawl(Tiers.Light);}, 1000);
     }
 
     //Fighting info displays
@@ -225,7 +226,7 @@ export class Fight extends BaseModel{
     //attacks
 
     attackFormula(tier:Tiers, actorAtk:number, targetDef:number, roll:number):number{
-        return BaseDamage[BaseDamage[tier]]-(actorAtk-targetDef)+roll;
+        return BaseDamage[Tiers[tier]]-(actorAtk-targetDef)+roll;
     }
 
     actionBrawl(tier:Tiers){//todo
@@ -236,10 +237,13 @@ export class Fight extends BaseModel{
         action.isHold = false;
         action.attacker = this.currentActor;
         action.defender = this.currentTarget;
+        action.missed = true;
+        action.hpDamage = 0;
+        action.lustDamage = 0;
         let roll = this.currentActor.dice.roll(1);
+        action.diceScore = roll;
         if(roll >= RequiredRoll[Tiers[tier]]){
             action.missed = false;
-            action.diceScore = roll;
             this.addMessage(`${this.currentActor.name} rolled ${action.diceScore}, the attack [b][color=green]HITS![/color][/b]`);
         }
         else{
@@ -253,7 +257,7 @@ export class Fight extends BaseModel{
             action.hpDamage = this.attackFormula(tier, this.currentActor.power, this.currentTarget.toughness, action.diceScore);
         }
         this.currentActor.pastActions.push(action);
-        if(action.hpDamage){
+        if(action.hpDamage > 0){
             this.currentTarget.hitHp(action.hpDamage);
         }
 

@@ -121,13 +121,12 @@ export class Fighter extends BaseModel implements IFighter{
             this.hp = 0;
             this.heartsRemaining--;
             this.fight.addMessage(`[b][color=red]Heart broken![/color][/b] ${this.name} has ${this.heartsRemaining} hearts left.`);
-        }
-
-        if(this.heartsRemaining > 0){
-            this.hp = this.hpPerHeart;
-        }
-        else if(this.heartsRemaining == 0){
-            this.fight.addMessage(`[b][color=red]Last heart[/color][/b] for ${this.name}!`);
+            if(this.heartsRemaining > 0){
+                this.hp = this.hpPerHeart;
+            }
+            else if(this.heartsRemaining == 1){
+                this.fight.addMessage(`[b][color=red]Last heart[/color][/b] for ${this.name}!`);
+            }
         }
     }
 
@@ -141,19 +140,17 @@ export class Fighter extends BaseModel implements IFighter{
             this.lust = 0;
             this.orgasmsRemaining--;
             this.fight.addMessage(`[b][color=blue]Orgasm on the mat![/color][/b] ${this.name} has ${this.orgasmsRemaining} orgasms left.`);
-        }
-
-        if(this.lust > 0){
             this.lust = 0;
+            if(this.orgasmsRemaining == 1){
+                this.fight.addMessage(`[b][color=blue]Last orgasm[/color][/b] for ${this.name}!`);
+            }
         }
 
-        if(this.orgasmsRemaining == 0){
-            this.fight.addMessage(`[b][color=blue]Last orgasm[/color][/b] for ${this.name}!`);
-        }
+
     }
 
     isDead():boolean{
-        if(this.heartsRemaining == -1){
+        if(this.heartsRemaining == 0){
             this.fight.addMessage(`${this.name} couldn't take it anymore! [b][color=red]They're out![/color][/b]`);
             return true
         }
@@ -161,7 +158,7 @@ export class Fighter extends BaseModel implements IFighter{
     }
 
     isSexuallyExhausted():boolean{
-        if(this.orgasmsRemaining == -1){
+        if(this.orgasmsRemaining == 0){
             this.fight.addMessage(`${this.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
             return true
         }

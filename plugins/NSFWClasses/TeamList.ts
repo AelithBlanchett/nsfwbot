@@ -75,7 +75,7 @@ export class TeamList extends Dictionary<Team, Array<Fighter>>{
         }
     }
 
-    getNumberOfPlayersInTeam(team:Team):number{ // TODO: fix this
+    getNumberOfPlayersInTeam(team:Team):number{
         let count = 0;
         let fullTeamList = this.getTeam(team);
         return fullTeamList.length;
