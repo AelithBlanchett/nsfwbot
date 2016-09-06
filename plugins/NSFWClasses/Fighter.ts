@@ -208,7 +208,12 @@ export class Fighter extends BaseModel implements IFighter{
     }
 
     getStylizedName(){
-        return `[b][color=${Team[this.assignedTeam]}]${this.name}[/color][/b]`;
+        if(this.isDead()){
+            return `[s][b][color=${Team[this.assignedTeam]}]${this.name}[/color][/b][/s]`;
+        }
+        else{
+            return `[b][color=${Team[this.assignedTeam]}]${this.name}[/color][/b]`;
+        }
     }
 
     initFromData(data:Array<any>){
