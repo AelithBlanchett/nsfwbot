@@ -148,11 +148,11 @@ export class Fight extends BaseModel{
 
     //Fight helpers
     get currentTeamName(){
-        return Team[this.teamList.currentTeamTurn];
+        return Team[this.teamList.getCurrentTeam()];
     }
 
     get currentActor():Fighter{
-        return this.teamList.getValue(this.teamList.currentTeamTurn)[this.teamList.arrCurrentFighterForTeam.getValue(this.teamList.currentTeamTurn)];
+        return this.teamList.getCurrentPlayer();
     }
 
     get currentTarget():Fighter{

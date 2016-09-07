@@ -60,8 +60,14 @@ describe("Fighter testing", () => {
         var x = new CommandHandler(fChatLibInstance, "here");
         //let y = x.fight.getTeamsList();
         //let z = x.fight.getTeamsIdList();
-        x.ready("", {character: "Aelith Blanchette", channel: "here"});
-        x.ready("", {character: "TheTinaArmstrong", channel: "here"});
+        x.join("Red", {character: "Aelith Blanchette", channel: "here"});
+        x.join("Purple", {character: "Purple1", channel: "here"});
+        x.join("Purple", {character: "Purple2", channel: "here"});
+        x.join("Red", {character: "TheTinaArmstrong", channel: "here"});
+        setTimeout(function(){x.ready("", {character: "Aelith Blanchette", channel: "here"})}, 1000);
+        setTimeout(function(){x.ready("", {character: "Purple1", channel: "here"})}, 1500);
+        setTimeout(function(){x.ready("", {character: "Purple2", channel: "here"})}, 2000);
+        setTimeout(function(){x.ready("", {character: "TheTinaArmstrong", channel: "here"})}, 2500);
         //x.join("Purple", {character: "Purple1", channel: "here"});
         //setTimeout(function(){x.ready("", {character: "Purple1", channel: "here"})}, 2000);
         //x.join("Purple", {character: "Purple2", channel: "here"});

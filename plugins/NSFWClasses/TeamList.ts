@@ -4,21 +4,30 @@ import {Constants} from "./Constants";
 import Team = Constants.Team;
 import {Utils} from "./Utils";
 import {Fight} from "./Fight";
+import {TurnTable} from "./TurnTable";
+import {TeamPlayerId} from "./TurnTable";
 
 export class TeamList extends Dictionary<Team, Array<Fighter>>{
-    arrCurrentFighterForTeam:Dictionary<Team,number>;
+    arrCurrentFighterForTeam:TurnTable;
     arrTeamsTurn:Array<Team>;
 
-    currentTeamTurnIndex:number = 0;
-    currentTeamTurn:Team;
+    currentTurn:number = 0;
 
     public constructor() {
         super();
-        this.arrCurrentFighterForTeam = new Dictionary<Team,number>();
+        this.arrCurrentFighterForTeam = new TurnTable();
+    }
+
+    getCurrentTeam():Team{
+        return this.arrCurrentFighterForTeam[this.currentTurn % this.getNumberOfAllAlivePlayers()].team;
+    }
+
+    getCurrentPlayer():Fighter{
+        return this.getTeam(this.getCurrentTeam())[this.arrCurrentFighterForTeam[this.currentTurn % this.getNumberOfAllAlivePlayers()].playerId];
     }
 
     getNextTeam():Team{
-        let tempIndex = this.currentTeamTurnIndex + 1;
+        let tempIndex = this.currentTurn + 1;
         if (tempIndex >= this.arrTeamsTurn.length){
             tempIndex = 0;
         }
@@ -26,44 +35,47 @@ export class TeamList extends Dictionary<Team, Array<Fighter>>{
     }
 
     getNextPlayer(){
-        let nextTeam = this.getNextTeam();
-        let teamIndex = this.arrCurrentFighterForTeam.getValue(nextTeam);;
-        if(this.arrTeamsTurn.indexOf(nextTeam) == 0){
-            teamIndex++;
-            if(teamIndex >= this.playersPerTeam){
-                teamIndex = 0;
+        let player;
+        let teamPlayerID;
+        if(this.arrCurrentFighterForTeam[this.currentTurn % this.getNumberOfAllAlivePlayers()]){
+            teamPlayerID = this.arrCurrentFighterForTeam[this.currentTurn % this.getNumberOfAllAlivePlayers()];
+            player = this.getPlayerInTeamAtIndex(teamPlayerID.team, teamPlayerID.playerId);
+            if(player.isDead()){
+                this.arrCurrentFighterForTeam.splice(this.currentTurn % this.getNumberOfAllAlivePlayers(), 1);
+                this.getNextPlayer();
             }
         }
-        return this.getPlayerInTeamAtIndex(nextTeam, teamIndex);
+        return player;
+    }
+
+    getFirstPlayerIDAliveInTeam(team:Team, afterIndex:number = 0):number{
+        let fullTeam = this.getTeam(team);
+        var index = -1;
+        for(let i = afterIndex; i < fullTeam.length; i++){
+            if(fullTeam[i] != undefined && !fullTeam[i].isDead()){
+                index = i;
+            }
+        }
+        return index;
     }
 
     nextTurn():void{
-        this.currentTeamTurnIndex++;
-        let nextTeam = this.arrTeamsTurn[this.currentTeamTurnIndex];
-        if (nextTeam == undefined){
-            this.currentTeamTurnIndex = 0;
-            nextTeam = this.arrTeamsTurn[this.currentTeamTurnIndex];
-            this.arrCurrentFighterForTeam.keys().forEach(x => { //choose the next player in each team
-                this.arrCurrentFighterForTeam.changeValueForKey(x, this.arrCurrentFighterForTeam.getValue(x)+1);
-                if(this.arrCurrentFighterForTeam.getValue(x) >= this.playersPerTeam){
-                    this.arrCurrentFighterForTeam.changeValueForKey(x, 0);
-                }
-            });
-        }
-        this.currentTeamTurn = nextTeam;
+        this.currentTurn++;
     }
 
     resetCurrentFighters():void{
-        this.arrCurrentFighterForTeam = new Dictionary<Team,number>();
+        this.arrCurrentFighterForTeam = new TurnTable();
         for(var team of this.getUsedTeams()){
-            this.arrCurrentFighterForTeam.add(team, 0);
+            for(let nbInTeam = 0; nbInTeam < this.getNumberOfPlayersInTeam(team); nbInTeam++){
+                this.arrCurrentFighterForTeam.push(new TeamPlayerId(team, nbInTeam));
+            }
         }
     }
 
     shufflePlayers():void{
-        this.arrCurrentFighterForTeam.keys().forEach(x => { //choose the next player in each team
-            this.arrCurrentFighterForTeam.changeValueForKey(x, Utils.shuffleArray(this.arrCurrentFighterForTeam.getValue(x)));
-        });
+        //this.arrCurrentFighterForTeam.keys().forEach(x => { //choose the next player in each team
+        //    this.arrCurrentFighterForTeam.changeValueForKey(x, Utils.shuffleArray(this.arrCurrentFighterForTeam.getValue(x)));
+        //});
     }
 
     getTeam(team:Team):Array<Fighter>{
@@ -85,6 +97,19 @@ export class TeamList extends Dictionary<Team, Array<Fighter>>{
         let count = 0;
         for(let i = 0; i < this.teamsInvolved; i++){
             count += this.getValue(this.keys()[i]).length;
+        }
+        return count;
+    }
+
+    getNumberOfAllAlivePlayers():number{
+        let count = 0;
+        for(let i = 0; i < this.teamsInvolved; i++){
+            let team = this.getValue(this.keys()[i]);
+            for(let j = 0; j < team.length; j++){
+                if(!team[j].isDead()){
+                    count++;
+                }
+            }
         }
         return count;
     }
