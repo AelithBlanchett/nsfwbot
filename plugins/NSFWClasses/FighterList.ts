@@ -6,7 +6,6 @@ import {Utils} from "./Utils";
 import {Fight} from "./Fight";
 
 export class FighterList extends Array<Fighter>{
-    currentTurn:number = 0;
 
     public constructor() {
         super();

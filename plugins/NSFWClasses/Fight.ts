@@ -93,7 +93,26 @@ export class Fight{
     }
 
     loadState(fightId:number){
+        var sql = "SELECT `nsfw_fights`.`idFight`,`nsfw_fights`.`idFightType`,`nsfw_fights`.`idStage`,`nsfw_fights`.`usedTeams`,`nsfw_fights`.`currentTurn`,`nsfw_fights`.`fighterList` FROM `flistplugins`.`nsfw_fights` WHERE idFight = ?;";
+        sql = Data.db.format(sql, [fightId]);
+        Data.db.query(sql, (err, results) => {
+            if (err) {
+            }
+            else {
+                this.id = fightId;
+                this.fightType = results[0].idFightType;
+                this.stage = "Virtual Arena";
+                this.usedTeams = results[0].usedTeams;
+                this.currentTurn = results[0].currentTurn;
+                this.fighterList = new FighterList();
+                let tempFighterList = JSON.parse(results[0].fighterList);
+                for(let fighter of tempFighterList){
+                    this.fighterList.push(fighter);
+                }
 
+                console.log("Successfully loaded  fight " + this.id + " from database.");
+            }
+        });
     }
 
     //Pre-fight utils

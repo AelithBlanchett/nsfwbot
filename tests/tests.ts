@@ -58,31 +58,51 @@ describe("Fighter testing", () => {
     //    setTimeout(done, 1000);
     //});
 
+    //it("should start the match", function(done){
+    //    var x = new CommandHandler(fChatLibInstance, "here");
+    //    //let y = x.fight.getTeamsList();
+    //    //let z = x.fight.getTeamsIdList();
+    //    x.join("Red", {character: "Aelith Blanchette", channel: "here"});
+    //    x.join("Purple", {character: "Purple1", channel: "here"});
+    //    x.join("Purple", {character: "Purple2", channel: "here"});
+    //    x.join("Red", {character: "TheTinaArmstrong", channel: "here"});
+    //    setTimeout(function(){x.ready("", {character: "Aelith Blanchette", channel: "here"})}, 1000);
+    //    setTimeout(function(){x.ready("", {character: "Purple1", channel: "here"})}, 1500);
+    //    setTimeout(function(){x.ready("", {character: "Purple2", channel: "here"})}, 2000);
+    //    setTimeout(function(){x.ready("", {character: "TheTinaArmstrong", channel: "here"})}, 2500);
+    //    //x.join("Purple", {character: "Purple1", channel: "here"});
+    //    //setTimeout(function(){x.ready("", {character: "Purple1", channel: "here"})}, 2000);
+    //    //x.join("Purple", {character: "Purple2", channel: "here"});
+    //    //setTimeout(function(){x.ready("", {character: "Purple2", channel: "here"})}, 2000);
+    //    //x.join("Purple", {character: "Purple3", channel: "here"});
+    //    //setTimeout(function(){x.ready("", {character: "Purple3", channel: "here"})}, 2000);
+    //    //x.join("Yellow", {character: "Yellow1", channel: "here"});
+    //    //setTimeout(function(){x.ready("", {character: "Yellow1", channel: "here"})}, 2000);
+    //    //x.join("Yellow", {character: "Yellow2", channel: "here"});
+    //    //setTimeout(function(){x.ready("", {character: "Yellow2", channel: "here"})}, 2000);
+    //    //x.join("Yellow", {character: "Yellow3", channel: "here"});
+    //    //setTimeout(function(){x.ready("", {character: "Yellow3", channel: "here"})}, 2000);
+    //
+    //
+    //    setTimeout(_ =>{
+    //        for(let i = 1; i <= 1; i++){
+    //            setTimeout(_ =>{
+    //                x.fight.doAction(x.fight.currentPlayer.id, "brawl", Tier.Light);
+    //            }, i*1000);
+    //        }
+    //    }, 6000);
+    //
+    //    setTimeout(_ =>{
+    //        x.fight.saveState();
+    //    }, 8000);
+    //    setTimeout(done, 10000000);
+    //},100000000);
+
+
+
     it("should start the match", function(done){
         var x = new CommandHandler(fChatLibInstance, "here");
-        //let y = x.fight.getTeamsList();
-        //let z = x.fight.getTeamsIdList();
-        x.join("Red", {character: "Aelith Blanchette", channel: "here"});
-        x.join("Purple", {character: "Purple1", channel: "here"});
-        x.join("Purple", {character: "Purple2", channel: "here"});
-        x.join("Red", {character: "TheTinaArmstrong", channel: "here"});
-        setTimeout(function(){x.ready("", {character: "Aelith Blanchette", channel: "here"})}, 1000);
-        setTimeout(function(){x.ready("", {character: "Purple1", channel: "here"})}, 1500);
-        setTimeout(function(){x.ready("", {character: "Purple2", channel: "here"})}, 2000);
-        setTimeout(function(){x.ready("", {character: "TheTinaArmstrong", channel: "here"})}, 2500);
-        //x.join("Purple", {character: "Purple1", channel: "here"});
-        //setTimeout(function(){x.ready("", {character: "Purple1", channel: "here"})}, 2000);
-        //x.join("Purple", {character: "Purple2", channel: "here"});
-        //setTimeout(function(){x.ready("", {character: "Purple2", channel: "here"})}, 2000);
-        //x.join("Purple", {character: "Purple3", channel: "here"});
-        //setTimeout(function(){x.ready("", {character: "Purple3", channel: "here"})}, 2000);
-        //x.join("Yellow", {character: "Yellow1", channel: "here"});
-        //setTimeout(function(){x.ready("", {character: "Yellow1", channel: "here"})}, 2000);
-        //x.join("Yellow", {character: "Yellow2", channel: "here"});
-        //setTimeout(function(){x.ready("", {character: "Yellow2", channel: "here"})}, 2000);
-        //x.join("Yellow", {character: "Yellow3", channel: "here"});
-        //setTimeout(function(){x.ready("", {character: "Yellow3", channel: "here"})}, 2000);
-
+        x.fight.loadState(1);
 
         setTimeout(_ =>{
             for(let i = 1; i <= 1; i++){
