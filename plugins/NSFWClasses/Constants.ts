@@ -2,6 +2,7 @@ import Tiers = Constants.Tier;
 export class Constants{
     static minLevel:number = 0;
     static maxLevel:number = 6;
+    static tokensPerLossMultiplier:number = 0.5; //needs to be < 1 of course
 }
 
 export module Constants{
@@ -21,6 +22,12 @@ export module Constants{
         Heavy = 2
     }
 
+    export enum FightTier {
+        Bronze = 0,
+        Silver = 1,
+        Gold = 2
+    }
+
     export enum BaseDamage {
         Light = 6,
         Medium = 12,
@@ -34,9 +41,9 @@ export module Constants{
     }
 
     export enum TokensPerWin {
-        BronzeTier = 12.5,
-        SilverTier = 20,
-        GoldTier = 50
+        Bronze = 12.5,
+        Silver = 20,
+        Gold = 50
     }
 
     export enum TokensWorth {

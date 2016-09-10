@@ -5,6 +5,8 @@ import {FightAction} from "./FightAction";
 import {Constants} from "./Constants";
 import Team = Constants.Team;
 import {Data} from "./Model";
+import FightTier = Constants.FightTier;
+import TokensWorth = Constants.TokensWorth;
 
 export class Fighter implements IFighter{
     id:number = -1;
@@ -195,15 +197,15 @@ export class Fighter implements IFighter{
     }
 
     get bronzeTokens():number{
-        return Math.floor(this.tokens/100);
+        return Math.floor(this.tokens/TokensWorth.Bronze);
     }
 
     get silverTokens():number{
-        return Math.floor(this.tokens/200);
+        return Math.floor(this.tokens/TokensWorth.Silver);
     }
 
     get goldTokens():number{
-        return Math.floor(this.tokens/600);
+        return Math.floor(this.tokens/TokensWorth.Gold);
     }
 
     outputStatus(){
@@ -272,6 +274,19 @@ export class Fighter implements IFighter{
                 }
             });
         });
+    }
+
+    get tier():FightTier{
+        if(this.power <= 2 && this.dexterity <= 2 && this.toughness <= 2 && this.endurance <= 2 && this.willpower <= 2){
+            return FightTier.Bronze;
+        }
+        else if(this.power <= 4 && this.dexterity <= 4 && this.toughness <= 4 && this.endurance <= 4 && this.willpower <= 4){
+            return FightTier.Silver;
+        }
+        else if(this.power <= 6 && this.dexterity <= 6 && this.toughness <= 6 && this.endurance <= 6 && this.willpower <= 6){
+            return FightTier.Gold;
+        }
+        return;
     }
 
     static exists(name:string){

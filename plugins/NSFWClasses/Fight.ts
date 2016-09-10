@@ -12,6 +12,8 @@ import Tier = Constants.Tier;
 import RequiredRoll = Constants.RequiredRoll;
 import FightType = Constants.FightType;
 import {Data} from "./Model";
+import FightTier = Constants.FightTier;
+import TokensPerWin = Constants.TokensPerWin;
 var CircularJSON = require('circular-json');
 
 export class Fight{
@@ -208,7 +210,7 @@ export class Fight{
     nextTurn(){
         this.currentTurn++;
         this.outputStatus();
-        this.saveState();
+        //this.saveState();
     }
 
     //Fighting info displays
@@ -328,7 +330,7 @@ export class Fight{
     }
 
     validateTarget(){
-        if(this.currentTarget == undefined){
+        if(this.currentTarget == undefined || this.currentTarget.isOut()){
             if(this.fightType == FightType.Classic){
                 this.currentPlayer.target = this.fighterList.getRandomFighterNotInTeam(this.currentPlayer.assignedTeam);
             }
@@ -361,7 +363,7 @@ export class Fight{
         action.type = "brawl";
         action.attacker = this.currentPlayer;
         action.defender = this.currentTarget;
-        action.diceScore = this.currentPlayer.dice.roll(1);
+        action.diceScore = this.currentPlayer.dice.roll(1) + action.attacker.power;
         if(action.diceScore >= RequiredRoll[Tier[action.tier]]){
             action.missed = false;
             action.hpDamage = this.attackFormula(action.tier, this.currentPlayer.power, this.currentTarget.toughness, action.diceScore);
@@ -386,11 +388,11 @@ export class Fight{
             action.defender.hitLust(action.lustDamage);
         }
 
-        if(this.currentTarget.isDead()){
+        if(action.defender.isDead()){
             this.addMessage(`${action.defender.name} couldn't take the hits anymore! [b][color=red]They're out![/color][/b]`);
             action.defender.triggerOutsideRing();
         }
-        else if(this.currentTarget.isSexuallyExhausted()){
+        else if(action.defender.isSexuallyExhausted()){
             this.addMessage(`${action.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
             action.defender.triggerOutsideRing();
         }
@@ -399,32 +401,52 @@ export class Fight{
         action.commitDb();
 
         //check for fight ending status
-        if(this.fighterList.getUsedTeams().length == 1){ //if there's only one team left in the fight, then we're sure it's over
-            //end the fight
-        }
-        else{
+        if (this.fighterList.getUsedTeams().length != 1) {
             this.nextTurn();
+        } else { //if there's only one team left in the fight, then we're sure it's over
+            this.outputStatus();
+            this.endFight();
         }
+    }
+
+    getFightTier(winnerTeam){
+        var highestWinnerTier = FightTier.Bronze;
+        for(let fighter of this.fighterList.getTeam(winnerTeam)){
+            if(fighter.tier > highestWinnerTier){
+                highestWinnerTier = fighter.tier;
+            }
+        }
+
+        var lowestLoserTier;
+        for(let fighter of this.fighterList){
+            if(fighter.assignedTeam != winnerTeam){
+                if(lowestLoserTier == undefined){
+                    lowestLoserTier = fighter.tier;
+                }
+                else if(lowestLoserTier > fighter.tier){
+                    lowestLoserTier = fighter.tier;
+                }
+            }
+        }
+
+        var fightTier;
+
+        if(lowestLoserTier >= highestWinnerTier){ //if the weakest wrestler was equal or more powerful, the fight tier matches the loser's tier
+            fightTier = lowestLoserTier;
+        }
+        else{ //If the loser was weaker, the fight tier matches the winner's tier
+            fightTier = highestWinnerTier;
+        }
+
+        return fightTier;
     }
 
     endFight(){
         this.winnerTeam = this.fighterList.getUsedTeams()[0];
-
-        var mysqlTokensGiver = function(fighter){
-            new Promise((resolve, reject) => {
-                //Do the db
-                var sql = "INSERT INTO `flistplugins`.`nsfw_fightfighters` (`idFight`, `idFighter`) VALUES (?,?);";
-                sql = Data.db.format(sql, [idFight, idFighter]);
-                Data.db.query(sql, function(err, results) {
-                    if(err){
-                        reject(err);
-                    }
-                    else{
-                        resolve();
-                    }
-                });
-            });
-        };
+        this.addMessage(`${Team[this.winnerTeam]} team wins the fight!`);
+        this.sendMessage();
+        var tokensToGiveToWinners:number = TokensPerWin[FightTier[this.getFightTier(this.winnerTeam)]];
+        var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.tokensPerLossMultiplier;
 
         Data.db.beginTransaction(err =>{
             var sql = "UPDATE `flistplugins`.`nsfw_fights` SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
@@ -438,27 +460,29 @@ export class Fight{
                 else{
                     var callsToMake = [];
                     for(let fighter of this.fighterList){
-                        callsToMake.push(mysqlDataUpdate(results.insertId, fighter.id));
+                        if(fighter.assignedTeam == this.winnerTeam){
+                            this.addMessage(`Awarded ${tokensToGiveToWinners} tokens to ${fighter.getStylizedName()}`);
+                            callsToMake.push(fighter.giveTokens(tokensToGiveToWinners));
+                        }
+                        else{
+                            this.addMessage(`Awarded ${tokensToGiveToLosers} tokens to ${fighter.getStylizedName()}`);
+                            callsToMake.push(fighter.giveTokens(tokensToGiveToLosers));
+                        }
                     }
                     Promise.all(callsToMake)
-                        .then(_ => Data.db.commit(_ => {}))
+                        .then(_ => {
+                            Data.db.commit(_ => {
+                                console.log(`Finished fight ${this.id} and given all the according tokens successfully`);
+                                this.sendMessage(); //send tokens message and everything
+                            });
+                        })
                         .catch((err) => {
+                            console.log("There was an error during the fight ending:"+err);
                             Data.db.rollback(function(){
-
                             });
                         });
                 }
             });
-        });
-
-        var sql = "UPDATE `flistplugins`.`nsfw_fights` SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ? WHERE `idFight` = ?;";
-        sql = Data.db.format(sql, [this.currentTurn, "", true, this.id]);
-        Data.db.query(sql, (err, results) => {
-            if (err) {
-            }
-            else {
-                console.log("Successfully updated fight " + this.id + " to database.");
-            }
         });
     }
 
