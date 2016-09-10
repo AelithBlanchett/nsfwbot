@@ -40,6 +40,31 @@ export class Fight{
         this.fighterList = new FighterList();
     }
 
+    setFightType(type:string){
+        if(!this.hasStarted && !this.hasEnded){
+            switch(type.toLowerCase()){
+                case "classic":
+                    this.fightType = FightType.Classic;
+                    this.addMessage("Fight type successfully set to Classic.");
+                    break;
+                case "tag":
+                case "tagteam":
+                case "tag-team":
+                    this.fightType = FightType.Tag;
+                    this.addMessage("Fight type successfully set to Tag-Team.");
+                    break;
+                default:
+                    this.fightType = FightType.Classic;
+                    this.addMessage("Type not found. Fight type resetted to Classic.");
+                    break;
+            }
+        }
+        else{
+            this.addMessage("Can't change the fight type if the fight has already started or is already finished.");
+        }
+        this.sendMessage();
+    }
+
     saveState(){
         if(this.id == -1){
             var mysqlDataUpdate = function(idFight, idFighter){
