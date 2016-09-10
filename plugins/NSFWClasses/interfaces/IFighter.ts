@@ -3,10 +3,7 @@ import {FightAction} from "../FightAction";
 export interface IFighter {
     id:number;
     name:string;
-    bronzeTokens:number;
-    silverTokens: number;
-    goldTokens: number;
-    totalTokens: number;
+    tokens: number;
     wins: number;
     losses: number;
     forfeits: number;

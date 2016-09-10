@@ -25,6 +25,7 @@ export class Fight{
     currentTurn:number = 0;
     fightType:FightType = FightType.Classic;
     pastActions:Array<FightAction> = [];
+    winnerTeam:Team = Team.Unknown;
 
     message:string = "";
     fChatLibInstance:IFChatLib;
@@ -107,6 +108,8 @@ export class Fight{
                 this.usedTeams = results[0].usedTeams;
                 this.currentTurn = results[0].currentTurn;
                 this.fighterList = new FighterList();
+                //TODO: LOAD FORMER ACTIONS
+
                 var oldParsedList = CircularJSON.parse(results[0].fighterList);
                 for(let nonParsedPlayer of oldParsedList){
                     let player = new Fighter();
@@ -393,10 +396,70 @@ export class Fight{
         }
 
         //Save it to the DB
-
         action.commitDb();
 
-        this.nextTurn();
+        //check for fight ending status
+        if(this.fighterList.getUsedTeams().length == 1){ //if there's only one team left in the fight, then we're sure it's over
+            //end the fight
+        }
+        else{
+            this.nextTurn();
+        }
+    }
+
+    endFight(){
+        this.winnerTeam = this.fighterList.getUsedTeams()[0];
+
+        var mysqlTokensGiver = function(fighter){
+            new Promise((resolve, reject) => {
+                //Do the db
+                var sql = "INSERT INTO `flistplugins`.`nsfw_fightfighters` (`idFight`, `idFighter`) VALUES (?,?);";
+                sql = Data.db.format(sql, [idFight, idFighter]);
+                Data.db.query(sql, function(err, results) {
+                    if(err){
+                        reject(err);
+                    }
+                    else{
+                        resolve();
+                    }
+                });
+            });
+        };
+
+        Data.db.beginTransaction(err =>{
+            var sql = "UPDATE `flistplugins`.`nsfw_fights` SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
+            sql = Data.db.format(sql, [this.currentTurn, "", true, this.winnerTeam, this.id]);
+            Data.db.query(sql, (err, results) => {
+                if(err){
+                    Data.db.rollback(function(){
+
+                    });
+                }
+                else{
+                    var callsToMake = [];
+                    for(let fighter of this.fighterList){
+                        callsToMake.push(mysqlDataUpdate(results.insertId, fighter.id));
+                    }
+                    Promise.all(callsToMake)
+                        .then(_ => Data.db.commit(_ => {}))
+                        .catch((err) => {
+                            Data.db.rollback(function(){
+
+                            });
+                        });
+                }
+            });
+        });
+
+        var sql = "UPDATE `flistplugins`.`nsfw_fights` SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ? WHERE `idFight` = ?;";
+        sql = Data.db.format(sql, [this.currentTurn, "", true, this.id]);
+        Data.db.query(sql, (err, results) => {
+            if (err) {
+            }
+            else {
+                console.log("Successfully updated fight " + this.id + " to database.");
+            }
+        });
     }
 
 }

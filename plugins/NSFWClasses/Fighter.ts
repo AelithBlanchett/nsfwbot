@@ -9,10 +9,7 @@ import {Data} from "./Model";
 export class Fighter implements IFighter{
     id:number = -1;
     name:string = "";
-    bronzeTokens:number = 0;
-    silverTokens: number = 0;
-    goldTokens: number = 0;
-    totalTokens: number = 0;
+    tokens: number = 0;
     wins: number = 0;
     losses: number = 0;
     forfeits: number = 0;
@@ -54,10 +51,7 @@ export class Fighter implements IFighter{
                 Data.db.query(
                     "SELECT `nsfw_fighters`.`id`, \
                     `nsfw_fighters`.`name`, \
-                    `nsfw_fighters`.`bronzeTokens`, \
-                    `nsfw_fighters`.`silverTokens`, \
-                    `nsfw_fighters`.`goldTokens`, \
-                    `nsfw_fighters`.`totalTokens`, \
+                    `nsfw_fighters`.`tokens`, \
                     `nsfw_fighters`.`wins`, \
                     `nsfw_fighters`.`losses`, \
                     `nsfw_fighters`.`forfeits`, \
@@ -158,24 +152,15 @@ export class Fighter implements IFighter{
     }
 
     isDead():boolean{
-        if(this.heartsRemaining == 0){
-            return true
-        }
-        return false;
+        return this.heartsRemaining == 0;
     }
 
     isSexuallyExhausted():boolean{
-        if(this.orgasmsRemaining == 0){
-            return true
-        }
-        return false;
+        return this.orgasmsRemaining == 0;
     }
 
     isOut():boolean{
-        if(this.isDead() || this.isSexuallyExhausted() || !this.isInTheRing){
-            return true;
-        }
-        return false;
+        return !this.isInTheRing || this.isSexuallyExhausted() || this.isDead();
     }
 
     static create(name:string, power:number, dexterity:number, toughness:number, endurance:number, willpower:number){
@@ -204,9 +189,21 @@ export class Fighter implements IFighter{
             "[b][color=orange]Dexterity[/color][/b]:  " + this.dexterity + "      " + "[b][color=pink]Orgasms[/color][/b]: " + this.maxOrgasms + " * " + this.lustPerOrgasm +" [b][color=pink]Lust[/color] per Orgasm[/b]"+"\n" +
             "[b][color=green]Toughness[/color][/b]:  " + this.toughness + "\n" +
             "[b][color=cyan]Endurance[/color][/b]:    " + this.endurance + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + this.wins + " - " + this.losses + "\n" +
-            "[b][color=purple]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Bronze tokens[/color][/b]: " + this.bronzeTokens + "\n" +
-            "[b][color=blue]Endurance[/color][/b]: " + this.endurance +  "      " + "[b][color=orange]Total tokens:[/color][/b]: " + this.totalTokens + " / "+"99"+ "\n" /*+ "\n\n"  +
+            "[b][color=purple]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Bronze tokens available[/color][/b]: " + this.bronzeTokens + "\n" +
+            "[b][color=blue]Endurance[/color][/b]: " + this.endurance +  "      " + "[b][color=orange]Total tokens:[/color][/b]: " + this.tokens + "\n";/*+ "\n\n"  +
             "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]"*/
+    }
+
+    get bronzeTokens():number{
+        return Math.floor(this.tokens/100);
+    }
+
+    get silverTokens():number{
+        return Math.floor(this.tokens/200);
+    }
+
+    get goldTokens():number{
+        return Math.floor(this.tokens/600);
     }
 
     outputStatus(){
@@ -245,14 +242,43 @@ export class Fighter implements IFighter{
         this.dice = new Dice(10);
     }
 
+    giveTokens(amount){
+        return new Promise((resolve, reject) => {
+            //Do the db
+            var sql = "UPDATE `flistplugins`.`nsfw_fighters` SET `tokens` = `tokens`+? WHERE `id` = ?;";
+            sql = Data.db.format(sql, [amount,this.id]);
+            Data.db.query(sql, function(err, results) {
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve();
+                }
+            });
+        });
+    }
+
+    removeTokens(amount){
+        return new Promise((resolve, reject) => {
+            //Do the db
+            var sql = "UPDATE `flistplugins`.`nsfw_fighters` SET `tokens` = `tokens`-? WHERE `id` = ?;";
+            sql = Data.db.format(sql, [amount,this.id]);
+            Data.db.query(sql, function(err, results) {
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve();
+                }
+            });
+        });
+    }
+
     static exists(name:string){
         return new Promise(function(resolve, reject) {
             Data.db.query("SELECT `nsfw_fighters`.`id`, \
                     `nsfw_fighters`.`name`, \
-                    `nsfw_fighters`.`bronzeTokens`, \
-                    `nsfw_fighters`.`silverTokens`, \
-                    `nsfw_fighters`.`goldTokens`, \
-                    `nsfw_fighters`.`totalTokens`, \
+                    `nsfw_fighters`.`tokens`, \
                     `nsfw_fighters`.`wins`, \
                     `nsfw_fighters`.`losses`, \
                     `nsfw_fighters`.`forfeits`, \

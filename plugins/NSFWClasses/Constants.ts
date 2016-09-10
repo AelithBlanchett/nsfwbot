@@ -2,7 +2,6 @@ import Tiers = Constants.Tier;
 export class Constants{
     static minLevel:number = 0;
     static maxLevel:number = 6;
-
 }
 
 export module Constants{
