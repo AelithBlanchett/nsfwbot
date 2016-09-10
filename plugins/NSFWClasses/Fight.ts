@@ -104,11 +104,7 @@ export class Fight{
                 this.stage = "Virtual Arena";
                 this.usedTeams = results[0].usedTeams;
                 this.currentTurn = results[0].currentTurn;
-                this.fighterList = new FighterList();
-                let tempFighterList = JSON.parse(results[0].fighterList);
-                for(let fighter of tempFighterList){
-                    this.fighterList.push(fighter);
-                }
+                this.fighterList = CircularJSON.parse(results[0].fighterList);
 
                 console.log("Successfully loaded  fight " + this.id + " from database.");
             }
