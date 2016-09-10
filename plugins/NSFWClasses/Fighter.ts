@@ -1,13 +1,12 @@
-import {BaseModel} from "./Model";
 import {Dice} from "./Dice";
 import {Fight} from "./Fight";
 import {IFighter} from "./interfaces/IFighter";
 import {FightAction} from "./FightAction";
 import {Constants} from "./Constants";
 import Team = Constants.Team;
-import {isDate} from "util";
+import {Data} from "./Model";
 
-export class Fighter extends BaseModel implements IFighter{
+export class Fighter implements IFighter{
     id:number = -1;
     name:string = "";
     bronzeTokens:number = 0;
@@ -42,9 +41,9 @@ export class Fighter extends BaseModel implements IFighter{
     dice: Dice;
     target:Fighter;
     lastDiceRoll:number;
+    isInTheRing:boolean = true;
 
     constructor() {
-        super();
     }
 
     load(name){
@@ -52,7 +51,7 @@ export class Fighter extends BaseModel implements IFighter{
             let self = this;
             if (name != undefined) {
                 //load mysql
-                BaseModel.db.query(
+                Data.db.query(
                     "SELECT `nsfw_fighters`.`id`, \
                     `nsfw_fighters`.`name`, \
                     `nsfw_fighters`.`bronzeTokens`, \
@@ -150,6 +149,14 @@ export class Fighter extends BaseModel implements IFighter{
 
     }
 
+    triggerInsideRing(){
+        this.isInTheRing = true;
+    }
+
+    triggerOutsideRing(){
+        this.isInTheRing = false;
+    }
+
     isDead():boolean{
         if(this.heartsRemaining == 0){
             return true
@@ -165,7 +172,7 @@ export class Fighter extends BaseModel implements IFighter{
     }
 
     isOut():boolean{
-        if(this.isDead() || this.isSexuallyExhausted()){
+        if(this.isDead() || this.isSexuallyExhausted() || !this.isInTheRing){
             return true;
         }
         return false;
@@ -178,7 +185,7 @@ export class Fighter extends BaseModel implements IFighter{
                 reject("Wrong stats passed.");
             }
             else {
-                BaseModel.db.query("INSERT INTO `flistplugins`.`nsfw_fighters`(`name`, `power`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [name, power, dexterity, toughness, endurance, willpower], function (err, result) {
+                Data.db.query("INSERT INTO `flistplugins`.`nsfw_fighters`(`name`, `power`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [name, power, dexterity, toughness, endurance, willpower], function (err, result) {
                     if (result) {
                         console.log(JSON.stringify(result));
                         resolve();
@@ -241,7 +248,7 @@ export class Fighter extends BaseModel implements IFighter{
 
     static exists(name:string){
         return new Promise(function(resolve, reject) {
-            BaseModel.db.query("SELECT `nsfw_fighters`.`id`, \
+            Data.db.query("SELECT `nsfw_fighters`.`id`, \
                     `nsfw_fighters`.`name`, \
                     `nsfw_fighters`.`bronzeTokens`, \
                     `nsfw_fighters`.`silverTokens`, \

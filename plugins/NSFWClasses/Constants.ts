@@ -1,4 +1,4 @@
-import Tiers = Constants.Tiers;
+import Tiers = Constants.Tier;
 export class Constants{
     static minLevel:number = 0;
     static maxLevel:number = 6;
@@ -16,7 +16,7 @@ export module Constants{
         Purple = 5
     }
 
-    export enum Tiers {
+    export enum Tier {
         Light = 0,
         Medium = 1,
         Heavy = 2
@@ -44,6 +44,11 @@ export module Constants{
         BronzeToken = 100,
         SilverToken = 200,
         GoldToken = 600
+    }
+
+    export enum FightType {
+        Classic = 0,
+        Tag = 1
     }
 }
 

@@ -19,13 +19,14 @@ export class FighterList extends Array<Fighter>{
             var temp = this[index];
             this[index] = this[indexToMoveInFront];
             this[indexToMoveInFront] = temp;
+            index++;
         }
     }
 
     getAlivePlayers():Array<Fighter>{
         let arrPlayers = new Array<Fighter>();
         for(let player of this){
-            if(!player.isDead()){
+            if(!player.isOut()){
                 arrPlayers.push(player);
             }
         }
@@ -66,7 +67,7 @@ export class FighterList extends Array<Fighter>{
         let fullTeam = this.getTeam(team);
         var index = -1;
         for(let i = afterIndex; i < fullTeam.length; i++){
-            if(fullTeam[i] != undefined && !fullTeam[i].isDead()){
+            if(fullTeam[i] != undefined && !fullTeam[i].isOut()){
                 index = i;
             }
         }
@@ -206,7 +207,7 @@ export class FighterList extends Array<Fighter>{
         return this.getAlivePlayers().length;
     }
 
-    getAllPlayers():Array<Fighter>{
-        return this;
-    }
+    //getAllPlayers():Array<Fighter>{
+    //    return this;
+    //}
 }

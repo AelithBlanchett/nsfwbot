@@ -1,13 +1,13 @@
 import {Fighter} from "./Fighter";
-import {BaseModel} from "./Model";
 import {Constants} from "./Constants";
-import Tiers = Constants.Tiers;
+import Tier = Constants.Tier;
 
-export class FightAction extends BaseModel{
+export class FightAction{
     id: number;
+    fightId: number;
     atTurn: number;
-    action: string;
-    tier: Tiers;
+    type: string;
+    tier: Tier;
     isHold: boolean;
     attacker: Fighter;
     defender: Fighter;
@@ -16,4 +16,18 @@ export class FightAction extends BaseModel{
     focusDamage: number;
     diceScore: number;
     missed: boolean;
+
+    constructor(fightId:number) {
+        this.fightId = fightId;
+        this.type = "";
+        this.isHold = false;
+        this.missed = true;
+        this.hpDamage = 0;
+        this.lustDamage = 0;
+        this.diceScore = 0;
+    }
+
+    commitDb(){
+
+    }
 }
