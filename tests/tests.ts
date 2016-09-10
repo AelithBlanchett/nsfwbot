@@ -112,9 +112,9 @@ describe("Fighter testing", () => {
             }
         }, 6000);
 
-        setTimeout(_ =>{
-            x.fight.saveState();
-        }, 8000);
+        //setTimeout(_ =>{
+        //    x.fight.saveState();
+        //}, 8000);
         setTimeout(done, 10000000);
     },100000000);
 

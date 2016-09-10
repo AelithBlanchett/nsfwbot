@@ -23,6 +23,7 @@ export class Fight{
     fighterList:FighterList;
     currentTurn:number = 0;
     fightType:FightType = FightType.Classic;
+    pastActions:Array<FightAction> = [];
 
     message:string = "";
     fChatLibInstance:IFChatLib;
@@ -80,13 +81,13 @@ export class Fight{
             });
         }
         else{
-            var sql = "UPDATE `flistplugins`.`nsfw_fights` SET `currentTurn`= ? AND `fighterList` = ? WHERE `idFight` = ?;";
+            var sql = "UPDATE `flistplugins`.`nsfw_fights` SET `currentTurn` = ?, `fighterList` = ? WHERE `idFight` = ?;";
             sql = Data.db.format(sql, [this.currentTurn, CircularJSON.stringify(this.fighterList), this.id]);
             Data.db.query(sql, (err, results) => {
                 if (err) {
                 }
                 else {
-                    console.log("Successfully saved fight " + this.id + " to database.");
+                    console.log("Successfully updated fight " + this.id + " to database.");
                 }
             });
         }
@@ -104,9 +105,21 @@ export class Fight{
                 this.stage = "Virtual Arena";
                 this.usedTeams = results[0].usedTeams;
                 this.currentTurn = results[0].currentTurn;
-                this.fighterList = CircularJSON.parse(results[0].fighterList);
+                this.fighterList = new FighterList();
+                var oldParsedList = CircularJSON.parse(results[0].fighterList);
+                for(let nonParsedPlayer of oldParsedList){
+                    let player = new Fighter();
+                    for(let attrname in nonParsedPlayer){
+                        player[attrname] = nonParsedPlayer[attrname];
+                    }
+                    player.dice = new Dice(10);
+                    player.fight = this;
+                    player.target = null;
+                    this.fighterList.push(player);
+                }
 
                 console.log("Successfully loaded  fight " + this.id + " from database.");
+                this.outputStatus();
             }
         });
     }
@@ -207,19 +220,19 @@ export class Fight{
     }
 
     get currentTeam():Team{
-        return this.fighterList.getAlivePlayers()[this.currentTurn-1 % this.fighterList.aliveFighterCount].assignedTeam;
+        return this.fighterList.getAlivePlayers()[(this.currentTurn-1) % this.fighterList.aliveFighterCount].assignedTeam;
     }
 
     get nextTeamToPlay():Team{
-        return this.fighterList.getAlivePlayers()[this.currentTurn-1 % this.fighterList.aliveFighterCount].assignedTeam;
+        return this.fighterList.getAlivePlayers()[(this.currentTurn-1) % this.fighterList.aliveFighterCount].assignedTeam;
     }
 
     get currentPlayer():Fighter{
-        return this.fighterList.getAlivePlayers()[this.currentTurn-1 % this.fighterList.aliveFighterCount];
+        return this.fighterList.getAlivePlayers()[(this.currentTurn-1) % this.fighterList.aliveFighterCount];
     }
 
     get nextPlayer():Fighter{
-        return this.fighterList.getAlivePlayers()[this.currentTurn-1 % this.fighterList.aliveFighterCount];
+        return this.fighterList.getAlivePlayers()[(this.currentTurn-1) % this.fighterList.aliveFighterCount];
     }
 
     //Fight helpers
@@ -351,28 +364,28 @@ export class Fight{
 
     commitAction(action:FightAction){
         if(action.missed = false){
-            this.addMessage(`${this.currentPlayer.name} rolled ${action.diceScore}, the ${action.type} attack [b][color=green]HITS![/color][/b]`);
+            this.addMessage(`${action.attacker.name} rolled ${action.diceScore}, the ${action.type} attack [b][color=green]HITS![/color][/b]`);
         }
         else{
-            this.addMessage(`${this.currentPlayer.name} rolled ${action.diceScore}, the ${action.type} attack [b][color=red]MISSED![/color][/b]`);
+            this.addMessage(`${action.attacker.name} rolled ${action.diceScore}, the ${action.type} attack [b][color=red]MISSED![/color][/b]`);
         }
 
-        this.currentPlayer.pastActions.push(action);
+        this.pastActions.push(action);
 
         if(action.hpDamage > 0){
-            this.currentTarget.hitHp(action.hpDamage);
+            action.defender.hitHp(action.hpDamage);
         }
         if(action.lustDamage > 0){
-            this.currentTarget.hitLust(action.lustDamage);
+            action.defender.hitLust(action.lustDamage);
         }
 
         if(this.currentTarget.isDead()){
-            this.addMessage(`${this.currentTarget.name} couldn't take the hits anymore! [b][color=red]They're out![/color][/b]`);
-            this.currentTarget.triggerOutsideRing();
+            this.addMessage(`${action.defender.name} couldn't take the hits anymore! [b][color=red]They're out![/color][/b]`);
+            action.defender.triggerOutsideRing();
         }
         else if(this.currentTarget.isSexuallyExhausted()){
-            this.addMessage(`${this.currentTarget.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
-            this.currentTarget.triggerOutsideRing();
+            this.addMessage(`${action.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
+            action.defender.triggerOutsideRing();
         }
 
         //Save it to the DB

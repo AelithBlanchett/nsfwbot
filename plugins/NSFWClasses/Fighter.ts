@@ -30,6 +30,9 @@ export class Fighter implements IFighter{
 
     //during fight
     fight:Fight;
+    dice: Dice;
+    target:Fighter;
+
     assignedTeam:Team;
     isReady:boolean = false;
     hp:number = 0;
@@ -37,9 +40,6 @@ export class Fighter implements IFighter{
     lust:number = 0;
     orgasmsRemaining:number = 0;
     focus:number = 0;
-    pastActions:Array<FightAction> = [];
-    dice: Dice;
-    target:Fighter;
     lastDiceRoll:number;
     isInTheRing:boolean = true;
 
@@ -242,7 +242,6 @@ export class Fighter implements IFighter{
         this.lust = 0;
         this.orgasmsRemaining = this.maxOrgasms;
         this.focus = this.willpower;
-        this.pastActions = [];
         this.dice = new Dice(10);
     }
 

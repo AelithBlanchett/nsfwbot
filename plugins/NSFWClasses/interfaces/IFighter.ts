@@ -28,7 +28,6 @@ export interface IFighter {
     lust:number;
     orgasmsRemaining:number;
     focus:number;
-    pastActions:Array<FightAction>;
     dice: Dice;
 
 }
