@@ -19,6 +19,7 @@ export class Fight{
     usedTeams:number = 2;
 
     hasStarted:boolean = false;
+    hasEnded:boolean = false;
     stage:string;
     fighterList:FighterList;
     currentTurn:number = 0;
@@ -193,7 +194,10 @@ export class Fight{
         this.sendMessage();
         this.fighterList.reorderFightersByInitiative(this.rollAllDice());
         this.currentTurn = 1;
-        this.addMessage(`${this.currentTeamName} team starts first!`);
+        this.addMessage(`${this.currentPlayer.getStylizedName()} starts first for the ${this.currentTeamName} team!`);
+        for(let i = 1; i < this.fighterList.length; i++){
+            this.addMessage(`${this.fighterList[i].getStylizedName()} will follow for the ${Team[this.fighterList[i].assignedTeam]} team.`);
+        }
         this.sendMessage();
         this.outputStatus();
     }
@@ -259,7 +263,7 @@ export class Fight{
     rollAllDice():Array<Fighter>{
         let arrSortedFightersByInitiative = new Array<Fighter>();
         for(let player of this.fighterList.getAlivePlayers()){
-            player.lastDiceRoll = player.dice.roll(1);
+            player.lastDiceRoll = player.dice.roll(10).reduce(function(a, b){return a+b;});
             arrSortedFightersByInitiative.push(player);
             this.addMessage(`[color=${Team[player.assignedTeam]}]${player.name}[/color] rolled a ${player.lastDiceRoll}`);
         }
