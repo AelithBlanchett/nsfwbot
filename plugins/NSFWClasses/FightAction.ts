@@ -28,6 +28,6 @@ export class FightAction{
     }
 
     commitDb(){
-
+        //TODO Create table and insert things
     }
 }

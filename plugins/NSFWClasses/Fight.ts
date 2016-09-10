@@ -188,6 +188,7 @@ export class Fight{
     nextTurn(){
         this.currentTurn++;
         this.outputStatus();
+        this.saveState();
     }
 
     //Fighting info displays
