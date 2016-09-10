@@ -2,6 +2,8 @@ import {Fighter} from "../plugins/NSFWClasses/Fighter";
 import {Fight} from "../plugins/NSFWClasses/Fight";
 import {IFChatLib} from "../plugins/NSFWClasses/interfaces/IFChatLib";
 import {CommandHandler} from "../plugins/NSFWClasses/CommandHandler";
+import {Constants} from "../plugins/NSFWClasses/Constants";
+import Tiers = Constants.Tiers;
 //let myFighter = new Fighter("test", 0, 0 ,0 ,0 ,0);
 
 var Jasmine = require('jasmine');
@@ -82,15 +84,15 @@ describe("Fighter testing", () => {
         //setTimeout(function(){x.ready("", {character: "Yellow3", channel: "here"})}, 2000);
 
 
-        setTimeout(_ =>{
-            for(let i = 1; i < 2; i++){
-                setTimeout(_ =>{
-                    x.fight.nextTurn();
-                }, i*1000);
-            }
-        }, 6000);
-        setTimeout(done, 100000);
-    },1000000);
+        //setTimeout(_ =>{
+        //    for(let i = 1; i <= 1; i++){
+        //        setTimeout(_ =>{
+        //            x.fight.actionBrawl(Tiers.Light);
+        //        }, i*1000);
+        //    }
+        //}, 6000);
+        setTimeout(done, 10000000);
+    },100000000);
 
 });
 

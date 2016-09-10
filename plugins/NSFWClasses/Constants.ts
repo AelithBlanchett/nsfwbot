@@ -2,8 +2,6 @@ import Tiers = Constants.Tiers;
 export class Constants{
     static minLevel:number = 0;
     static maxLevel:number = 6;
-    static usedTeams:number = 2;
-
 
 }
 

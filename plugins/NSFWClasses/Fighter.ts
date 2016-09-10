@@ -41,6 +41,7 @@ export class Fighter extends BaseModel implements IFighter{
     pastActions:Array<FightAction> = [];
     dice: Dice;
     target:Fighter;
+    lastDiceRoll:number;
 
     constructor() {
         super();
@@ -151,7 +152,6 @@ export class Fighter extends BaseModel implements IFighter{
 
     isDead():boolean{
         if(this.heartsRemaining == 0){
-            this.fight.addMessage(`${this.name} couldn't take it anymore! [b][color=red]They're out![/color][/b]`);
             return true
         }
         return false;
@@ -159,7 +159,6 @@ export class Fighter extends BaseModel implements IFighter{
 
     isSexuallyExhausted():boolean{
         if(this.orgasmsRemaining == 0){
-            this.fight.addMessage(`${this.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
             return true
         }
         return false;
@@ -204,7 +203,13 @@ export class Fighter extends BaseModel implements IFighter{
     }
 
     outputStatus(){
-        return `${this.getStylizedName()} ${this.hp}/${this.hpPerHeart} [color=red]HP[/color]  |  ${this.heartsRemaining}/${this.maxHearts} [color=red]Hearts[/color]  |  ${this.lust}/${this.lustPerOrgasm} [color=pink]Lust[/color]  |  ${this.orgasmsRemaining}/${this.maxOrgasms} [color=pink]Orgasms[/color]  |  [sub]${this.minFocus}[/sub]|[b]${this.focus}[/b]|[sub]${this.maxFocus}[/sub] Focus[/color]\n`;
+        return `${this.getStylizedName()} ${this.hp}/${this.hpPerHeart} [color=red]HP[/color]  |`+
+                `  ${this.heartsRemaining}/${this.maxHearts} [color=red]Hearts[/color]  |`+
+                `  ${this.lust}/${this.lustPerOrgasm} [color=pink]Lust[/color]  |`+
+                `  ${this.orgasmsRemaining}/${this.maxOrgasms} [color=pink]Orgasms[/color]  |`+
+                `  [sub]${this.minFocus}[/sub]|[b]${this.focus}[/b]|[sub]${this.maxFocus}[/sub] Focus[/color]`+
+                (this.target != undefined ? `  [color=red]Target:[/color] ${this.target.getStylizedName()}` : "")+
+                "\n";
     }
 
     getStylizedName(){
