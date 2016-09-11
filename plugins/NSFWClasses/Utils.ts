@@ -1,5 +1,6 @@
 import {Constants} from "./Constants";
 import Team = Constants.Team;
+import StatTier = Constants.StatTier;
 export class Utils {
     static minInArray(arr: Array<Number>) {
         return Math.min.apply(Math, arr);

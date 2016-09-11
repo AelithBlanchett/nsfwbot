@@ -32,6 +32,8 @@ export class Fighter implements IFighter{
     endurance:number = 0;
     willpower:number = 0;
 
+    modifiers:Array<any>;
+
 
 
 
@@ -132,7 +134,7 @@ export class Fighter implements IFighter{
         return 1+this.willpower;
     }
 
-    hitHp(hp) {
+    hitHp(hp:number) {
         hp = Math.floor(hp);
         if (hp < 1) {
             hp = 1;
@@ -152,7 +154,7 @@ export class Fighter implements IFighter{
         }
     }
 
-    hitLust(lust) {
+    hitLust(lust:number) {
         lust = Math.floor(lust);
         if (lust < 1) {
             lust = 1;
@@ -167,8 +169,20 @@ export class Fighter implements IFighter{
                 this.fight.addMessage(`[b][color=blue]Last orgasm[/color][/b] for ${this.name}!`);
             }
         }
+    }
 
-
+    hitFocus(amount:number) {
+        amount = Math.floor(amount);
+        if(amount == 0){
+            return;
+        }
+        this.focus -= amount;
+        if(this.focus >= this.maxFocus) {
+            this.focus = this.maxFocus;
+        }
+        if(this.focus == this.minFocus) {
+            this.fight.addMessage(`${this.getStylizedName()} seems way too distracted to possibly continue the fight! Is it their submissiveness? Their morale? One thing's sure, they'll be soon too broken to continue fighting!`);
+        }
     }
 
     triggerInsideRing(){
@@ -187,8 +201,12 @@ export class Fighter implements IFighter{
         return this.orgasmsRemaining == 0;
     }
 
-    isOut():boolean{
-        return (!this.isInTheRing || this.isSexuallyExhausted() || this.isDead());
+    isBroken():boolean{
+        return this.focus < this.minFocus;
+    }
+
+    isTechnicallyOut():boolean{
+        return (this.isSexuallyExhausted() || this.isDead() || this.isBroken());
     }
 
     static create(name:string, affinity:Affinity){
@@ -261,7 +279,7 @@ export class Fighter implements IFighter{
     getStylizedName(){
         let modifierBeginning = "";
         let modifierEnding = "";
-        if(this.isDead() || this.isSexuallyExhausted()){
+        if(this.isTechnicallyOut()){
             modifierBeginning = `[s]`;
             modifierEnding = `[/s]`;
         }

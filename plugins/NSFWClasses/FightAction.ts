@@ -100,6 +100,9 @@ export class FightAction{
             if (this.lustDamage > 0) {
                 this.defender.hitLust(this.lustDamage);
             }
+            if(this.focusDamage != 0){
+                this.defender.hitFocus(this.focusDamage);
+            }
         }
 
         if(this.type == "tag"){
@@ -111,6 +114,10 @@ export class FightAction{
             this.defender.triggerOutsideRing();
         }
         else if(this.defender.isSexuallyExhausted()){
+            fight.addMessage(`${this.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
+            this.defender.triggerOutsideRing();
+        }
+        else if(this.defender.isBroken()){
             fight.addMessage(`${this.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
             this.defender.triggerOutsideRing();
         }

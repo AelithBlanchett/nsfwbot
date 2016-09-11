@@ -359,7 +359,7 @@ export class Fight{
             flag = false;
             this.addMessage(`[b][color=red]The last action hasn't been processed yet.[/color][/b]`);
         }
-        if(this.currentPlayer.isOut()){
+        if(this.currentPlayer.isTechnicallyOut()){
             flag = false;
             this.addMessage(`[b][color=red]You are out of this fight.[/color][/b]`);
         }
@@ -371,7 +371,7 @@ export class Fight{
             flag = false;
             this.addMessage(`[b][color=red]Your target isn't inside the ring.[/color][/b]`);
         }
-        if(this.currentTarget.isOut()){
+        if(this.currentTarget.isTechnicallyOut()){
             flag = false;
             this.addMessage(`[b][color=red]Your target is out of this fight.[/color][/b]`);
         }
@@ -382,7 +382,7 @@ export class Fight{
     }
 
     validateTarget(){
-        if(this.currentTarget == undefined || this.currentTarget.isOut()){
+        if(this.currentTarget == undefined || this.currentTarget.isTechnicallyOut() || !this.currentTarget.isInTheRing){
             if(this.fightType == FightType.Classic){
                 this.currentPlayer.target = this.fighterList.getRandomFighterNotInTeam(this.currentPlayer.assignedTeam);
             }

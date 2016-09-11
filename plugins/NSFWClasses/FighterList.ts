@@ -25,7 +25,7 @@ export class FighterList extends Array<Fighter>{
     getAlivePlayers():Array<Fighter>{
         let arrPlayers = new Array<Fighter>();
         for(let player of this){
-            if(!player.isOut()){
+            if(!player.isTechnicallyOut() && player.isInTheRing){
                 arrPlayers.push(player);
             }
         }
@@ -66,7 +66,7 @@ export class FighterList extends Array<Fighter>{
         let fullTeam = this.getTeam(team);
         var index = -1;
         for(let i = afterIndex; i < fullTeam.length; i++){
-            if(fullTeam[i] != undefined && !fullTeam[i].isOut()){
+            if(fullTeam[i] != undefined && !fullTeam[i].isTechnicallyOut() && fullTeam[i].isInTheRing){
                 index = i;
             }
         }
