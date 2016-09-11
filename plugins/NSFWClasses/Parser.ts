@@ -4,6 +4,8 @@ import {Constants} from "./Constants";
 import Team = Constants.Team;
 import Tier = Constants.Tier;
 import Affinity = Constants.Affinity;
+import Stats = Constants.Stats;
+import StatTier = Constants.StatTier;
 var _ = require('lodash');
 
 export class Commands{

@@ -31,6 +31,14 @@ export module Constants{
         Purple = 5
     }
 
+    export enum Stats {
+        Power = 0,
+        Finesse = 1,
+        Toughness = 2,
+        Endurance = 3,
+        Willpower = 4
+    }
+
     export enum Affinity {
         Power = 0,
         Finesse = 1
@@ -47,6 +55,12 @@ export module Constants{
         Bronze = 0,
         Silver = 1,
         Gold = 2
+    }
+
+    export enum StatTier {
+        Bronze = 2,
+        Silver = 4,
+        Gold = 6
     }
 
     export enum BaseDamage {

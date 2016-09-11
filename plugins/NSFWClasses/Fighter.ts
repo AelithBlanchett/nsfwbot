@@ -8,6 +8,10 @@ import {Data} from "./Model";
 import FightTier = Constants.FightTier;
 import TokensWorth = Constants.TokensWorth;
 import Affinity = Constants.Affinity;
+import Stats = Constants.Stats;
+import {Utils} from "./Utils";
+import StatTier = Constants.StatTier;
+import TokensWorth = Constants.TokensWorth;
 
 export class Fighter implements IFighter{
     id:number = -1;
@@ -283,6 +287,54 @@ export class Fighter implements IFighter{
         this.orgasmsRemaining = this.maxOrgasms;
         this.focus = this.willpower;
         this.dice = new Dice(10);
+    }
+
+    addStat(stat:Stats):any{
+        let theStat = this[stat];
+        let statTier = Utils.getStatTier(theStat);
+        let amountToRemove = 0;
+        if(statTier == StatTier.Bronze){
+            amountToRemove = TokensWorth.Bronze;
+        }
+        else if(statTier == StatTier.Silver){
+            amountToRemove = TokensWorth.Silver;
+        }
+        else if(statTier == StatTier.Gold){
+            amountToRemove = TokensWorth.Gold;
+        }
+
+        if(amountToRemove != 0 && (this.tokens - amountToRemove >= 0)){
+            this.tokens -= amountToRemove;
+            this[stat]++;
+            return this.updateInDb();
+        }
+        else{
+            return false;
+        }
+    }
+
+    removeStat(stat:Stats):any{
+        let theStat = this[stat];
+        let statTier = Utils.getStatTier(theStat);
+        let amountToGive = 0;
+        if(statTier == StatTier.Bronze){
+            amountToGive = TokensWorth.Bronze;
+        }
+        else if(statTier == StatTier.Silver){
+            amountToGive = TokensWorth.Silver;
+        }
+        else if(statTier == StatTier.Gold){
+            amountToGive = TokensWorth.Gold;
+        }
+
+        if(amountToGive != 0){
+            this.tokens += amountToGive;
+            this[stat]--;
+            return this.updateInDb();
+        }
+        else{
+            return false;
+        }
     }
 
     giveTokens(amount){

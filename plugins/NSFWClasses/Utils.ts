@@ -60,4 +60,18 @@ export class Utils {
         }
         return -1;
     }
+
+    static getStatTier(arg:number){
+        let tier = -1;
+        if(arg <= 2){
+            tier = StatTier.Bronze;
+        }
+        else if(arg <= 4){
+            tier = StatTier.Silver;
+        }
+        else if(arg <= 6){
+            tier = StatTier.Gold;
+        }
+        return tier;
+    }
 }
