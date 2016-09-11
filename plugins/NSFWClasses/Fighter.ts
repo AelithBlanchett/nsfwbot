@@ -7,6 +7,7 @@ import Team = Constants.Team;
 import {Data} from "./Model";
 import FightTier = Constants.FightTier;
 import TokensWorth = Constants.TokensWorth;
+import Affinity = Constants.Affinity;
 
 export class Fighter implements IFighter{
     id:number = -1;
@@ -17,6 +18,7 @@ export class Fighter implements IFighter{
     forfeits: number = 0;
     quits: number = 0;
     areStatsPrivate:boolean = true;
+    affinity:Affinity = Affinity.Power;
 
     power:number = 0;
     dexterity:number = 0;
@@ -81,6 +83,10 @@ export class Fighter implements IFighter{
                 reject("No name passed.");
             }
         });
+    }
+
+    update(){
+
     }
 
     get hpPerHeart():number {
@@ -166,28 +172,22 @@ export class Fighter implements IFighter{
         return (!this.isInTheRing || this.isSexuallyExhausted() || this.isDead());
     }
 
-    static create(name:string, power:number, dexterity:number, toughness:number, endurance:number, willpower:number){
+    static create(name:string, affinity:Affinity){
         return new Promise(function(resolve, reject) {
-            let self = this;
-            if (!(power != undefined && dexterity != undefined && toughness != undefined && endurance != undefined && willpower != undefined)) {
-                reject("Wrong stats passed.");
-            }
-            else {
-                Data.db.query("INSERT INTO `flistplugins`.??(`name`, `power`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [Constants.fightersTableName, name, power, dexterity, toughness, endurance, willpower], function (err, result) {
-                    if (result) {
-                        console.log(JSON.stringify(result));
-                        resolve();
-                    }
-                    else {
-                        reject("Unable to create fighter. " + err);
-                    }
-                });
-            }
+            Data.db.query("INSERT INTO `flistplugins`.??(`name`, `affinity`) VALUES (?,?)", [Constants.fightersTableName, name, affinity], function (err, result) {
+                if (result) {
+                    console.log("Added "+name+" to the roster: "+JSON.stringify(result));
+                    resolve();
+                }
+                else {
+                    reject("Unable to create fighter. " + err);
+                }
+            });
         });
     }
 
     outputStats():string{
-        return "[b]" + this.name + "[/b]'s stats" + "\n" +
+        return "[b]" + this.name + "[/b]'s stats" + "              [i]Affinity:[/i] [b]" + Affinity[this.affinity] + "[/b]" + "\n" +
             "[b][color=red]Power[/color][/b]:  " + this.power + "      " + "[b][color=red]Hearts[/color][/b]: " + this.maxHearts + " * " + this.hpPerHeart +" [b][color=red]HP[/color] per heart[/b]"+"\n" +
             "[b][color=orange]Dexterity[/color][/b]:  " + this.dexterity + "      " + "[b][color=pink]Orgasms[/color][/b]: " + this.maxOrgasms + " * " + this.lustPerOrgasm +" [b][color=pink]Lust[/color] per Orgasm[/b]"+"\n" +
             "[b][color=green]Toughness[/color][/b]:  " + this.toughness + "\n" +

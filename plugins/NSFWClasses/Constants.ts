@@ -1,6 +1,7 @@
 import Tiers = Constants.Tier;
 export class Constants{
     static minLevel:number = 0;
+    static maxLevelInit:number = 6;
     static maxLevel:number = 6;
     static maxTagBonus:number = 3;
     static tokensPerLossMultiplier:number = 0.5; //needs to be < 1 of course
@@ -11,6 +12,10 @@ export class Constants{
     public static get fightFightersTableName(): string    { return "nsfw_fightfighters"; }
     public static get fightersTableName(): string    { return "nsfw_fighters"; }
     public static get actionTableName(): string    { return "nsfw_actions"; }
+    public static get finesseBonusAccuracy(): number    { return 1; }
+    public static get finesseBonusText(): string    { return "+1 accuracy to all your attacks"; }
+    public static get brawlerBonusDamage(): number    { return 2; }
+    public static get brawlerBonusText(): string    { return "+2 HP damage to all your attacks"; }
 }
 
 export module Constants{
@@ -24,6 +29,11 @@ export module Constants{
         Orange = 3,
         Pink = 4,
         Purple = 5
+    }
+
+    export enum Affinity {
+        Power = 0,
+        Finesse = 1
     }
 
     export enum Tier {
@@ -52,7 +62,7 @@ export module Constants{
     }
 
     export enum TokensPerWin {
-        Bronze = 12.5,
+        Bronze = 13,
         Silver = 20,
         Gold = 50
     }

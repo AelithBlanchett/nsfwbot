@@ -9,6 +9,7 @@ import {Constants} from "./Constants";
 import Team = Constants.Team;
 import {Utils} from "./Utils";
 import Tier = Constants.Tier;
+import Affinity = Constants.Affinity;
 
 export class CommandHandler implements ICommandHandler{
     fChatLibInstance:IFChatLib;
@@ -22,23 +23,25 @@ export class CommandHandler implements ICommandHandler{
     }
 
     register(args:string, data:FChatResponse){
-        let parsedResult:IParserResponse = Parser.Commands.register(args);
-        if(parsedResult.success){
-            Fighter.exists(data.character).then(doesExist =>{
-                if(!doesExist){
-                    Fighter.create(data.character, parsedResult.args.power, parsedResult.args.dexterity, parsedResult.args.toughness, parsedResult.args.endurance, parsedResult.args.willpower).then(()=>{
-                        this.fChatLibInstance.sendMessage("You are now registered! Welcome!", this.channel);
-                    }).catch(err => {
-                        this.fChatLibInstance.throwError(err);
-                    });
-                }
-                else{
-                    this.fChatLibInstance.sendMessage("[color=red]You are already registered.[/color]", this.channel);
-                }
-            }).catch(err =>{
-                console.log(err);
-            });
+        let parsedAffinity:Affinity = Parser.Commands.register(args);
+        if(parsedAffinity == -1){
+            this.fChatLibInstance.sendMessage("This type of affinity hasn't been found. Please try again with either Power or Finesse.", this.channel);
+            return;
         }
+        Fighter.exists(data.character).then(doesExist =>{
+            if(!doesExist){
+                Fighter.create(data.character, parsedAffinity).then(()=>{
+                    this.fChatLibInstance.sendMessage("You are now registered! Welcome!", this.channel);
+                }).catch(err => {
+                    this.fChatLibInstance.throwError(err);
+                });
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]You are already registered.[/color]", this.channel);
+            }
+        }).catch(err =>{
+            console.log(err);
+        });
     };
 
     stats(args:string, data:FChatResponse){
