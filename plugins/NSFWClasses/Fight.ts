@@ -337,10 +337,6 @@ export class Fight{
 
     //attacks
 
-    attackFormula(tier:Tier, actorAtk:number, targetDef:number, roll:number):number{
-        return BaseDamage[Tier[tier]]-(actorAtk-targetDef)+roll;
-    }
-
     canAttack(){
         let flag = true;
         if(this.currentPlayer.isOut()){
@@ -387,62 +383,10 @@ export class Fight{
                 if(!this.canAttack()){
                     return;
                 }
-                let theAction = this["action"+Utils.toTitleCase(action)](tier);
-                this.commitAction(theAction);
+                let theAction = new FightAction(this.id, this.currentTurn, tier, this.currentPlayer, this.currentTarget);
+                theAction["action"+Utils.toTitleCase(action)]();
+                theAction.commit(this);
             }
-        }
-    }
-
-    actionBrawl(tier:Tier):FightAction{
-        let action = new FightAction(this.id);
-        action.tier = tier;
-        action.atTurn = this.currentTurn;
-        action.type = "brawl";
-        action.attacker = this.currentPlayer;
-        action.defender = this.currentTarget;
-        action.diceScore = this.currentPlayer.dice.roll(1) + action.attacker.power;
-        if(action.diceScore >= RequiredRoll[Tier[action.tier]]){
-            action.missed = false;
-            action.hpDamage = this.attackFormula(action.tier, this.currentPlayer.power, this.currentTarget.toughness, action.diceScore);
-        }
-        return action;
-    }
-
-    commitAction(action:FightAction){
-        if(action.missed = false){
-            this.addMessage(`${action.attacker.name} rolled ${action.diceScore}, the ${action.type} attack [b][color=green]HITS![/color][/b]`);
-        }
-        else{
-            this.addMessage(`${action.attacker.name} rolled ${action.diceScore}, the ${action.type} attack [b][color=red]MISSED![/color][/b]`);
-        }
-
-        this.pastActions.push(action);
-
-        if(action.hpDamage > 0){
-            action.defender.hitHp(action.hpDamage);
-        }
-        if(action.lustDamage > 0){
-            action.defender.hitLust(action.lustDamage);
-        }
-
-        if(action.defender.isDead()){
-            this.addMessage(`${action.defender.name} couldn't take the hits anymore! [b][color=red]They're out![/color][/b]`);
-            action.defender.triggerOutsideRing();
-        }
-        else if(action.defender.isSexuallyExhausted()){
-            this.addMessage(`${action.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
-            action.defender.triggerOutsideRing();
-        }
-
-        //Save it to the DB
-        action.commitDb();
-
-        //check for fight ending status
-        if (this.fighterList.getUsedTeams().length != 1) {
-            this.nextTurn();
-        } else { //if there's only one team left in the fight, then we're sure it's over
-            this.outputStatus();
-            this.endFight();
         }
     }
 

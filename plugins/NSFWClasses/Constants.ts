@@ -7,6 +7,7 @@ export class Constants{
     static fightTableName = "nsfw_fights";
     static fightFightersTableName = "nsfw_fightfighters";
     static fightersTableName = "nsfw_fighters";
+    static actionTableName = "nsfw_actions";
 }
 
 export module Constants{
