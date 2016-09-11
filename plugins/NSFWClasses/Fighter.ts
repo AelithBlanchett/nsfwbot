@@ -17,6 +17,8 @@ export class Fighter implements IFighter{
     losses: number = 0;
     forfeits: number = 0;
     quits: number = 0;
+    totalFights: number = 0;
+    winRate: number = 0;
     areStatsPrivate:boolean = true;
     affinity:Affinity = Affinity.Power;
 
@@ -85,8 +87,21 @@ export class Fighter implements IFighter{
         });
     }
 
-    update(){
-
+    updateInDb(){
+        return new Promise(function(resolve, reject) {
+            var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`dexterity` = ?,\
+                `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ?,`affinity` = ? WHERE `id` = ?;";
+            sql = Data.db.format(sql, [Constants.fightersTableName, this.tokens, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate, this.power, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, this.affinity, this.id]);
+            Data.db.query(sql, function (err, result) {
+                if (result) {
+                    console.log("Updated "+this.name+"'s entry in the db.");
+                    resolve();
+                }
+                else {
+                    reject("Unable to update fighter "+this.name+ " " + err);
+                }
+            });
+        });
     }
 
     get hpPerHeart():number {
@@ -186,6 +201,26 @@ export class Fighter implements IFighter{
         });
     }
 
+    static createRaw(name:string, power:number, dexterity:number, toughness:number, endurance:number, willpower:number){
+        return new Promise(function(resolve, reject) {
+            let self = this;
+            if (!(power != undefined && dexterity != undefined && toughness != undefined && endurance != undefined && willpower != undefined)) {
+                reject("Wrong stats passed.");
+            }
+            else {
+                Data.db.query("INSERT INTO `flistplugins`.??(`name`, `power`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [Constants.fightersTableName, name, power, dexterity, toughness, endurance, willpower], function (err, result) {
+                    if (result) {
+                        console.log(JSON.stringify(result));
+                        resolve();
+                    }
+                    else {
+                        reject("Unable to create fighter. " + err);
+                    }
+                });
+            }
+        });
+    }
+
     outputStats():string{
         return "[b]" + this.name + "[/b]'s stats" + "              [i]Affinity:[/i] [b]" + Affinity[this.affinity] + "[/b]" + "\n" +
             "[b][color=red]Power[/color][/b]:  " + this.power + "      " + "[b][color=red]Hearts[/color][/b]: " + this.maxHearts + " * " + this.hpPerHeart +" [b][color=red]HP[/color] per heart[/b]"+"\n" +
@@ -251,35 +286,16 @@ export class Fighter implements IFighter{
     }
 
     giveTokens(amount){
-        return new Promise((resolve, reject) => {
-            //Do the db
-            var sql = "UPDATE `flistplugins`.?? SET `tokens` = `tokens`+? WHERE `id` = ?;";
-            sql = Data.db.format(sql, [Constants.fightersTableName, amount,this.id]);
-            Data.db.query(sql, function(err, results) {
-                if(err){
-                    reject(err);
-                }
-                else{
-                    resolve();
-                }
-            });
-        });
+        this.tokens += amount;
+        return this.updateInDb();
     }
 
     removeTokens(amount){
-        return new Promise((resolve, reject) => {
-            //Do the db
-            var sql = "UPDATE `flistplugins`.?? SET `tokens` = `tokens`-? WHERE `id` = ?;";
-            sql = Data.db.format(sql, [Constants.fightersTableName, amount,this.id]);
-            Data.db.query(sql, function(err, results) {
-                if(err){
-                    reject(err);
-                }
-                else{
-                    resolve();
-                }
-            });
-        });
+        this.tokens -= amount;
+        if(this.tokens < 0){
+            this.tokens = 0;
+        }
+        return this.updateInDb();
     }
 
     get tier():FightTier{
