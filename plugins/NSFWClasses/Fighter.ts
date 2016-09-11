@@ -3,15 +3,15 @@ import {Fight} from "./Fight";
 import {IFighter} from "./interfaces/IFighter";
 import {FightAction} from "./FightAction";
 import {Constants} from "./Constants";
-import Team = Constants.Team;
 import {Data} from "./Model";
+import {Utils} from "./Utils";
+
+import Team = Constants.Team;
 import FightTier = Constants.FightTier;
 import TokensWorth = Constants.TokensWorth;
 import Affinity = Constants.Affinity;
 import Stats = Constants.Stats;
-import {Utils} from "./Utils";
 import StatTier = Constants.StatTier;
-import TokensWorth = Constants.TokensWorth;
 
 export class Fighter implements IFighter{
     id:number = -1;
