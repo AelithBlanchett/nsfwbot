@@ -65,7 +65,7 @@ export class Fighter implements IFighter{
                     `toughness`, \
                     `endurance`, \
                     `willpower` \
-                    FROM `flistplugins`.`??` WHERE name = ?", [Constants.fightersTableName, name], function(err, rows: Array<any>){
+                    FROM `flistplugins`.?? WHERE name = ?", [Constants.fightersTableName, name], function(err, rows: Array<any>){
                     if (rows != undefined && rows.length != 0) {
                         self.initFromData(rows);
                         fullfill(self);
@@ -172,7 +172,7 @@ export class Fighter implements IFighter{
                 reject("Wrong stats passed.");
             }
             else {
-                Data.db.query("INSERT INTO `flistplugins`.`??`(`name`, `power`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [Constants.fightersTableName, name, power, dexterity, toughness, endurance, willpower], function (err, result) {
+                Data.db.query("INSERT INTO `flistplugins`.??(`name`, `power`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [Constants.fightersTableName, name, power, dexterity, toughness, endurance, willpower], function (err, result) {
                     if (result) {
                         console.log(JSON.stringify(result));
                         resolve();
@@ -252,7 +252,7 @@ export class Fighter implements IFighter{
     giveTokens(amount){
         return new Promise((resolve, reject) => {
             //Do the db
-            var sql = "UPDATE `flistplugins`.`??` SET `tokens` = `tokens`+? WHERE `id` = ?;";
+            var sql = "UPDATE `flistplugins`.?? SET `tokens` = `tokens`+? WHERE `id` = ?;";
             sql = Data.db.format(sql, [Constants.fightersTableName, amount,this.id]);
             Data.db.query(sql, function(err, results) {
                 if(err){
@@ -268,7 +268,7 @@ export class Fighter implements IFighter{
     removeTokens(amount){
         return new Promise((resolve, reject) => {
             //Do the db
-            var sql = "UPDATE `flistplugins`.`??` SET `tokens` = `tokens`-? WHERE `id` = ?;";
+            var sql = "UPDATE `flistplugins`.?? SET `tokens` = `tokens`-? WHERE `id` = ?;";
             sql = Data.db.format(sql, [Constants.fightersTableName, amount,this.id]);
             Data.db.query(sql, function(err, results) {
                 if(err){
@@ -311,7 +311,7 @@ export class Fighter implements IFighter{
                     `toughness`, \
                     `endurance`, \
                     `willpower` \
-                    FROM `flistplugins`.`??` WHERE name = ?", [Constants.fightersTableName, name], function (err, rows) {
+                    FROM `flistplugins`.?? WHERE name = ?", [Constants.fightersTableName, name], function (err, rows) {
                 if (rows != undefined && rows.length == 1) {
                     let myTempWrestler = new Fighter();
                     myTempWrestler.initFromData(rows);

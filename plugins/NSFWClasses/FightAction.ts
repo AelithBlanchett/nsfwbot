@@ -52,7 +52,7 @@ export class FightAction{
     commitDb(){
         let attackerId = this.attacker.id || null;
         let defenderId = this.defender.id || null;
-        var sql = "INSERT INTO `flistplugins`.`??` (`idFight`,`atTurn`,`type`,`tier`,`isHold`,`idAttacker`,`idDefender`,`hpDamage`,`lustDamage`,`focusDamage`,`diceScore`,`missed`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
+        var sql = "INSERT INTO `flistplugins`.?? (`idFight`,`atTurn`,`type`,`tier`,`isHold`,`idAttacker`,`idDefender`,`hpDamage`,`lustDamage`,`focusDamage`,`diceScore`,`missed`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
         sql = Data.db.format(sql, [Constants.actionTableName, this.fightId, this.atTurn, this.type, this.tier, this.isHold, attackerId, defenderId, this.hpDamage, this.lustDamage, this.focusDamage, this.diceScore, this.missed]);
         Data.db.query(sql, (err, results) => {
             if (err) {
@@ -65,7 +65,7 @@ export class FightAction{
     }
 
     commit(fight:Fight){
-        if(this.missed = false){
+        if(this.missed == false){
             fight.addMessage(`${this.attacker.name} rolled ${this.diceScore}, the ${this.type} attack [b][color=green]HITS![/color][/b]`);
         }
         else{
@@ -74,11 +74,13 @@ export class FightAction{
 
         fight.pastActions.push(this);
 
-        if(this.hpDamage > 0){
-            this.defender.hitHp(this.hpDamage);
-        }
-        if(this.lustDamage > 0){
-            this.defender.hitLust(this.lustDamage);
+        if(this.missed == false) {
+            if (this.hpDamage > 0) {
+                this.defender.hitHp(this.hpDamage);
+            }
+            if (this.lustDamage > 0) {
+                this.defender.hitLust(this.lustDamage);
+            }
         }
 
         if(this.defender.isDead()){

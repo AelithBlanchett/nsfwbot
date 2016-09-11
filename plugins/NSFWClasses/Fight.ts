@@ -70,7 +70,7 @@ export class Fight{
             var mysqlDataUpdate = function(idFight, idFighter){
                 new Promise((resolve, reject) => {
                     //Do the db
-                    var sql = "INSERT INTO `flistplugins`.`??` (`idFight`, `idFighter`) VALUES (?,?);";
+                    var sql = "INSERT INTO `flistplugins`.?? (`idFight`, `idFighter`) VALUES (?,?);";
                     sql = Data.db.format(sql, [Constants.fightFightersTableName,idFight, idFighter]);
                     Data.db.query(sql, function(err, results) {
                         if(err){
@@ -84,7 +84,7 @@ export class Fight{
             };
 
             Data.db.beginTransaction(err =>{
-                var sql = "INSERT INTO `flistplugins`.`??` (`idFightType`, `idStage`, `usedTeams`, `currentTurn`, `fighterList`) VALUES (?,?,?,?,?)";
+                var sql = "INSERT INTO `flistplugins`.?? (`idFightType`, `idStage`, `usedTeams`, `currentTurn`, `fighterList`) VALUES (?,?,?,?,?)";
                 sql = Data.db.format(sql, [Constants.fightTableName, this.fightType, 1, this.usedTeams, this.currentTurn, CircularJSON.stringify(this.fighterList)]);
                 Data.db.query(sql, (err, results) => {
                     if(err){
@@ -110,7 +110,7 @@ export class Fight{
             });
         }
         else{
-            var sql = "UPDATE `flistplugins`.`??` SET `currentTurn` = ?, `fighterList` = ? WHERE `idFight` = ?;";
+            var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ? WHERE `idFight` = ?;";
             sql = Data.db.format(sql, [Constants.fightTableName, this.currentTurn, CircularJSON.stringify(this.fighterList), this.id]);
             Data.db.query(sql, (err, results) => {
                 if (err) {
@@ -123,7 +123,7 @@ export class Fight{
     }
 
     loadState(fightId:number){
-        var sql = "SELECT `idFight`,`idFightType`,`idStage`,`usedTeams`,`currentTurn`,`fighterList` FROM `flistplugins`.`??` WHERE idFight = ?;";
+        var sql = "SELECT `idFight`,`idFightType`,`idStage`,`usedTeams`,`currentTurn`,`fighterList` FROM `flistplugins`.?? WHERE idFight = ?;";
         sql = Data.db.format(sql, [Constants.fightTableName, fightId]);
         Data.db.query(sql, (err, results) => {
             if (err) {
@@ -435,7 +435,7 @@ export class Fight{
         var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.tokensPerLossMultiplier;
 
         Data.db.beginTransaction(err =>{
-            var sql = "UPDATE `flistplugins`.`??` SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
+            var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
             sql = Data.db.format(sql, [Constants.fightTableName, this.currentTurn, "", true, this.winnerTeam, this.id]);
             Data.db.query(sql, (err, results) => {
                 if(err){
