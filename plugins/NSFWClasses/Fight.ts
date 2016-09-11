@@ -28,6 +28,7 @@ export class Fight{
     fightType:FightType = FightType.Classic;
     pastActions:Array<FightAction> = [];
     winnerTeam:Team = Team.Unknown;
+    waitingForAction:boolean = true;
 
     message:string = "";
     fChatLibInstance:IFChatLib;
@@ -207,6 +208,8 @@ export class Fight{
         this.hasStarted = true;
         this.fighterList.shufflePlayers(); //random order for teams
 
+        this.addMessage(`The fighters will meet in the... [color=red][b]${this.stage}![/b][/color`);
+
         for(let i = 0; i < this.fighterList.maxPlayersPerTeam; i++){ //Prints as much names as there are team
             let fullStringVS = "[b]";
             for(let j of this.fighterList.getUsedTeams()){
@@ -246,7 +249,8 @@ export class Fight{
     nextTurn(){
         this.currentTurn++;
         this.outputStatus();
-        //this.saveState();
+        this.saveState();
+        this.waitingForAction = true;
     }
 
     //Fighting info displays
@@ -339,6 +343,10 @@ export class Fight{
 
     canAttack(){
         let flag = true;
+        if(!this.waitingForAction){
+            flag = false;
+            this.addMessage(`[b][color=red]The last action hasn't been processed yet.[/color][/b]`);
+        }
         if(this.currentPlayer.isOut()){
             flag = false;
             this.addMessage(`[b][color=red]You are out of this fight.[/color][/b]`);
@@ -383,6 +391,7 @@ export class Fight{
                 if(!this.canAttack()){
                     return;
                 }
+                this.waitingForAction = false;
                 let theAction = new FightAction(this.id, this.currentTurn, tier, this.currentPlayer, this.currentTarget);
                 theAction["action"+Utils.toTitleCase(action)]();
                 theAction.commit(this);

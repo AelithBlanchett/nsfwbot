@@ -2,6 +2,7 @@ import Tiers = Constants.Tier;
 export class Constants{
     static minLevel:number = 0;
     static maxLevel:number = 6;
+    static maxTagBonus:number = 3;
     static tokensPerLossMultiplier:number = 0.5; //needs to be < 1 of course
 
     public static get pluginName(): string    { return "nsfw"; }

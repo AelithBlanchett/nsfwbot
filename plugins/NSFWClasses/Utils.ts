@@ -22,12 +22,12 @@ export class Utils {
         return array;
     }
 
-    static getTeamsList():Array<string>{
+    static getEnumList(myEnum):Array<string>{
         let arrResult = [];
-        for (var enumMember in Team) {
+        for (var enumMember in myEnum) {
             var isValueProperty = parseInt(enumMember, 10) >= 0;
             if (isValueProperty) {
-                arrResult.push(Team[enumMember]);
+                arrResult.push(myEnum[enumMember]);
             }
         }
         return arrResult;
@@ -47,5 +47,17 @@ export class Utils {
 
     static toTitleCase(str){
         return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+    }
+
+    static stringToEnum(myEnum, args){
+        let enumChildren = Utils.getEnumList(myEnum);
+        for(let tierId in enumChildren){
+            enumChildren[tierId] = enumChildren[tierId].toLowerCase();
+        }
+        let indexOfChild = enumChildren.indexOf(args.toLowerCase());
+        if(indexOfChild != -1){
+            return myEnum[myEnum[indexOfChild]];
+        }
+        return -1;
     }
 }

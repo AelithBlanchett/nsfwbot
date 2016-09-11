@@ -88,8 +88,9 @@ describe("Fighter testing", () => {
         setTimeout(_ =>{
             for(let i = 1; i <= 100; i++){
                 setTimeout(_ =>{
-                    x.fight.doAction(x.fight.currentPlayer.id, "brawl", Tier.Light);
-                }, i*500);
+                    x.brawl("light", {character: x.fight.currentPlayer.name, channel: "here"});
+                    //x.fight.doAction(x.fight.currentPlayer.id, "brawl", Tier.Light);
+                }, i*50);
             }
         }, 6000);
 

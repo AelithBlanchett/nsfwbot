@@ -2,6 +2,7 @@ import {Utils} from "./Utils";
 import {Fight} from "./Fight";
 import {Constants} from "./Constants";
 import Team = Constants.Team;
+import Tier = Constants.Tier;
 var _ = require('lodash');
 
 export class Commands{
@@ -36,7 +37,7 @@ export class Commands{
     }
 
     public static join(args){
-        let teams = Utils.getTeamsList();
+        let teams = Utils.getEnumList(Team);
         for(let teamId in teams){
             teams[teamId] = teams[teamId].toLowerCase();
         }

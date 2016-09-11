@@ -7,6 +7,8 @@ import {ICommandHandler} from "./interfaces/ICommandHandler";
 import {IFChatLib} from "./interfaces/IFChatLib";
 import {Constants} from "./Constants";
 import Team = Constants.Team;
+import {Utils} from "./Utils";
+import Tier = Constants.Tier;
 
 export class CommandHandler implements ICommandHandler{
     fChatLibInstance:IFChatLib;
@@ -110,6 +112,29 @@ export class CommandHandler implements ICommandHandler{
                 if(!this.fight.setFighterReady(fighter)){ //else, the match starts!
                     this.fChatLibInstance.sendMessage("[color=red]You are already ready.[/color]", this.channel);
                 }
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
+    brawl(args:string, data:FChatResponse){
+        if(this.fight == undefined || !this.fight.hasStarted){
+            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
+            return false;
+        }
+        let tier = Utils.stringToEnum(Tier, args);
+        if(tier == -1){
+            this.fChatLibInstance.sendMessage("[color=red]The tier is required, and neither Light, Medium or Heavy was specified.[/color]", this.channel);
+            return false;
+        }
+        Fighter.exists(data.character).then(data =>{
+            if(data){
+                let fighter:Fighter = data as Fighter;
+                this.fight.doAction(fighter.id, "brawl", tier as Tier);
             }
             else{
                 this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);

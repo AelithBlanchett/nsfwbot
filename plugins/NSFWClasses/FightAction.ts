@@ -5,6 +5,7 @@ import {Data} from "./Model";
 import RequiredRoll = Constants.RequiredRoll;
 import BaseDamage = Constants.BaseDamage;
 import {Fight} from "./Fight";
+import {Dice} from "./Dice";
 
 export class FightAction{
     id: number;
@@ -49,6 +50,22 @@ export class FightAction{
         return this;
     }
 
+    actionTag():FightAction{ //"skips" a turn
+        this.type = "tag";
+        this.diceScore = 0;
+        this.attacker.isInTheRing = false;
+        this.defender.isInTheRing = true;
+        this.missed = false;
+        return this;
+    }
+
+    actionPass():FightAction{ //"skips" a turn
+        this.type = "pass";
+        this.diceScore = 0;
+        this.missed = false;
+        return this;
+    }
+
     commitDb(){
         let attackerId = this.attacker.id || null;
         let defenderId = this.defender.id || null;
@@ -81,6 +98,10 @@ export class FightAction{
             if (this.lustDamage > 0) {
                 this.defender.hitLust(this.lustDamage);
             }
+        }
+
+        if(this.type == "tag"){
+            fight.addMessage(`[b][color=red]TAG![/color][/b] ${this.defender.name} enters inside the ring!`);
         }
 
         if(this.defender.isDead()){
