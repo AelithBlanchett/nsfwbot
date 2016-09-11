@@ -3,14 +3,17 @@ export class Constants{
     static minLevel:number = 0;
     static maxLevel:number = 6;
     static tokensPerLossMultiplier:number = 0.5; //needs to be < 1 of course
-    static pluginName = "nsfw";
-    static fightTableName = "nsfw_fights";
-    static fightFightersTableName = "nsfw_fightfighters";
-    static fightersTableName = "nsfw_fighters";
-    static actionTableName = "nsfw_actions";
+
+    public static get pluginName(): string    { return "nsfw"; }
+    public static get fightTableName(): string    { return "nsfw_fights"; }
+    public static get fightFightersTableName(): string    { return "nsfw_fightfighters"; }
+    public static get fightersTableName(): string    { return "nsfw_fighters"; }
+    public static get actionTableName(): string    { return "nsfw_actions"; }
 }
 
 export module Constants{
+
+
     export enum Team {
         Unknown = -1,
         Blue = 0,
@@ -61,5 +64,38 @@ export module Constants{
         Classic = 0,
         Tag = 1
     }
+
+    export const Arenas = [
+        "The Pit",
+        "Wrestling Ring",
+        "Arena",
+        "Subway",
+        "Skyscraper Roof",
+        "Forest",
+        "Cafe",
+        "Street road",
+        "Alley",
+        "Park",
+        "MMA Hexagonal Cage",
+        "Hangar",
+        "Swamp",
+        "Glass Box",
+        "Free Space",
+        "Magic Shop",
+        "Public Restroom",
+        "School",
+        "Pirate Ship",
+        "Baazar",
+        "Supermarket",
+        "Night Club",
+        "Docks",
+        "Hospital",
+        "Dark Temple",
+        "Restaurant Kitchen",
+        "Graveyard",
+        "Zoo",
+        "Slaughterhouse",
+        "Junkyard"
+    ];
 }
 

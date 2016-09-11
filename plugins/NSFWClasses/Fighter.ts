@@ -51,21 +51,21 @@ export class Fighter implements IFighter{
             if (name != undefined) {
                 //load mysql
                 Data.db.query(
-                    "SELECT `nsfw_fighters`.`id`, \
-                    `nsfw_fighters`.`name`, \
-                    `nsfw_fighters`.`tokens`, \
-                    `nsfw_fighters`.`wins`, \
-                    `nsfw_fighters`.`losses`, \
-                    `nsfw_fighters`.`forfeits`, \
-                    `nsfw_fighters`.`quits`, \
-                    `nsfw_fighters`.`totalFights`, \
-                    `nsfw_fighters`.`winRate`, \
-                    `nsfw_fighters`.`power`, \
-                    `nsfw_fighters`.`dexterity`, \
-                    `nsfw_fighters`.`toughness`, \
-                    `nsfw_fighters`.`endurance`, \
-                    `nsfw_fighters`.`willpower` \
-                    FROM `flistplugins`.`nsfw_fighters` WHERE name = ?", name, function(err, rows: Array<any>){
+                    "SELECT `id`, \
+                    `name`, \
+                    `tokens`, \
+                    `wins`, \
+                    `losses`, \
+                    `forfeits`, \
+                    `quits`, \
+                    `totalFights`, \
+                    `winRate`, \
+                    `power`, \
+                    `dexterity`, \
+                    `toughness`, \
+                    `endurance`, \
+                    `willpower` \
+                    FROM `flistplugins`.`??` WHERE name = ?", [Constants.fightersTableName, name], function(err, rows: Array<any>){
                     if (rows != undefined && rows.length != 0) {
                         self.initFromData(rows);
                         fullfill(self);
@@ -172,7 +172,7 @@ export class Fighter implements IFighter{
                 reject("Wrong stats passed.");
             }
             else {
-                Data.db.query("INSERT INTO `flistplugins`.`nsfw_fighters`(`name`, `power`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [name, power, dexterity, toughness, endurance, willpower], function (err, result) {
+                Data.db.query("INSERT INTO `flistplugins`.`??`(`name`, `power`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [Constants.fightersTableName, name, power, dexterity, toughness, endurance, willpower], function (err, result) {
                     if (result) {
                         console.log(JSON.stringify(result));
                         resolve();
@@ -252,8 +252,8 @@ export class Fighter implements IFighter{
     giveTokens(amount){
         return new Promise((resolve, reject) => {
             //Do the db
-            var sql = "UPDATE `flistplugins`.`nsfw_fighters` SET `tokens` = `tokens`+? WHERE `id` = ?;";
-            sql = Data.db.format(sql, [amount,this.id]);
+            var sql = "UPDATE `flistplugins`.`??` SET `tokens` = `tokens`+? WHERE `id` = ?;";
+            sql = Data.db.format(sql, [Constants.fightersTableName, amount,this.id]);
             Data.db.query(sql, function(err, results) {
                 if(err){
                     reject(err);
@@ -268,8 +268,8 @@ export class Fighter implements IFighter{
     removeTokens(amount){
         return new Promise((resolve, reject) => {
             //Do the db
-            var sql = "UPDATE `flistplugins`.`nsfw_fighters` SET `tokens` = `tokens`-? WHERE `id` = ?;";
-            sql = Data.db.format(sql, [amount,this.id]);
+            var sql = "UPDATE `flistplugins`.`??` SET `tokens` = `tokens`-? WHERE `id` = ?;";
+            sql = Data.db.format(sql, [Constants.fightersTableName, amount,this.id]);
             Data.db.query(sql, function(err, results) {
                 if(err){
                     reject(err);
@@ -296,22 +296,22 @@ export class Fighter implements IFighter{
 
     static exists(name:string){
         return new Promise(function(resolve, reject) {
-            Data.db.query("SELECT `nsfw_fighters`.`id`, \
-                    `nsfw_fighters`.`name`, \
-                    `nsfw_fighters`.`tokens`, \
-                    `nsfw_fighters`.`wins`, \
-                    `nsfw_fighters`.`losses`, \
-                    `nsfw_fighters`.`forfeits`, \
-                    `nsfw_fighters`.`quits`, \
-                    `nsfw_fighters`.`areStatsPrivate`, \
-                    `nsfw_fighters`.`totalFights`, \
-                    `nsfw_fighters`.`winRate`, \
-                    `nsfw_fighters`.`power`, \
-                    `nsfw_fighters`.`dexterity`, \
-                    `nsfw_fighters`.`toughness`, \
-                    `nsfw_fighters`.`endurance`, \
-                    `nsfw_fighters`.`willpower` \
-                    FROM `flistplugins`.`nsfw_fighters` WHERE name = ?", name, function (err, rows) {
+            Data.db.query("SELECT `id`, \
+                    `name`, \
+                    `tokens`, \
+                    `wins`, \
+                    `losses`, \
+                    `forfeits`, \
+                    `quits`, \
+                    `areStatsPrivate`, \
+                    `totalFights`, \
+                    `winRate`, \
+                    `power`, \
+                    `dexterity`, \
+                    `toughness`, \
+                    `endurance`, \
+                    `willpower` \
+                    FROM `flistplugins`.`??` WHERE name = ?", [Constants.fightersTableName, name], function (err, rows) {
                 if (rows != undefined && rows.length == 1) {
                     let myTempWrestler = new Fighter();
                     myTempWrestler.initFromData(rows);

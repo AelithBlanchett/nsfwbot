@@ -34,7 +34,7 @@ export class Fight{
     channel:string;
 
     public constructor(fChatLibInstance:IFChatLib, channel:string, stage?:string) {
-        this.stage = stage || "Wrestling Ring";
+        this.stage = stage || this.pickStage();
         this.fChatLibInstance = fChatLibInstance;
         this.channel = channel;
         this.fighterList = new FighterList();
@@ -420,6 +420,10 @@ export class Fight{
         }
 
         return fightTier;
+    }
+
+    pickStage(){
+        return Constants.Arenas[Math.floor(Math.random() * Constants.Arenas.length)];
     }
 
     endFight(){
