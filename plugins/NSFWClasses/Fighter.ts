@@ -41,6 +41,7 @@ export class Fighter implements IFighter{
     focus:number = 0;
     lastDiceRoll:number;
     isInTheRing:boolean = true;
+    lastTagTurn:number = 9999999;
 
     constructor() {
     }

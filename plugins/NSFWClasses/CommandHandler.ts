@@ -144,5 +144,28 @@ export class CommandHandler implements ICommandHandler{
         });
     };
 
+    tag(args:string, data:FChatResponse){
+        if(this.fight == undefined || !this.fight.hasStarted){
+            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
+            return false;
+        }
+        Fighter.exists(data.character).then(data =>{
+            if(data){
+                let fighter:Fighter = data as Fighter;
+                let fighterToTagWith = this.fight.fighterList.getFighterByName(args);
+                if(fighterToTagWith == null){
+                    this.fChatLibInstance.sendMessage("[color=red]The character to tag with is required.[/color]", this.channel);
+                    return false;
+                }
+                this.fight.doAction(fighter.id, "tag", Tier.None, fighterToTagWith);
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
 
 }

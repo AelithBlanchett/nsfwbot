@@ -4,6 +4,7 @@ export class Constants{
     static maxLevel:number = 6;
     static maxTagBonus:number = 3;
     static tokensPerLossMultiplier:number = 0.5; //needs to be < 1 of course
+    static turnsToWaitBetweenTwoTags:number = 4;
 
     public static get pluginName(): string    { return "nsfw"; }
     public static get fightTableName(): string    { return "nsfw_fights"; }
@@ -26,6 +27,7 @@ export module Constants{
     }
 
     export enum Tier {
+        None = -1,
         Light = 0,
         Medium = 1,
         Heavy = 2

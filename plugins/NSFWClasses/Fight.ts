@@ -341,6 +341,18 @@ export class Fight{
 
     //attacks
 
+    canTag(){
+        let flag = true;
+        let turnsSinceLastTag = (this.currentPlayer.lastTagTurn - this.currentTurn);
+        let turnsToWait = (Constants.turnsToWaitBetweenTwoTags * 2) - turnsSinceLastTag; // *2 because there are two fighters
+        if(turnsToWait > 0){
+            flag = false;
+            this.addMessage(`[b][color=red]You can't tag yet. Turns left: ${turnsToWait}[/color][/b]`);
+            this.sendMessage();
+        }
+        return flag;
+    }
+
     canAttack(){
         let flag = true;
         if(!this.waitingForAction){
@@ -380,7 +392,7 @@ export class Fight{
         }
     }
 
-    doAction(idFighter:number, action:string, tier:Tier){
+    doAction(idFighter:number, action:string, tier:Tier, customTarget?:Fighter){
         if(this.hasStarted && !this.hasEnded){
             if(this.currentPlayer == undefined || idFighter != this.currentPlayer.id){
                 this.addMessage(`[b][color=red]This isn't your turn.[/color][/b]`);
@@ -390,6 +402,25 @@ export class Fight{
                 this.validateTarget();
                 if(!this.canAttack()){
                     return;
+                }
+                if(action == "tag"){
+                    if(!this.canTag())
+                        return;
+                    if(customTarget != undefined && customTarget.assignedTeam == this.currentPlayer.assignedTeam){
+                        this.currentPlayer.target = customTarget;
+                    }
+                }
+                else{
+                    if(customTarget != undefined){
+                        if(customTarget.assignedTeam != this.currentPlayer.assignedTeam){
+                            this.currentPlayer.target = customTarget;
+                        }
+                        else{
+                            this.addMessage(`[b][color=red]The target for this attack can't be in your team.[/color][/b]`);
+                            this.sendMessage();
+                            return;
+                        }
+                    }
                 }
                 this.waitingForAction = false;
                 let theAction = new FightAction(this.id, this.currentTurn, tier, this.currentPlayer, this.currentTarget);

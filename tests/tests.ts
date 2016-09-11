@@ -71,6 +71,8 @@ describe("Fighter testing", () => {
         setTimeout(function(){x.ready("", {character: "Purple1", channel: "here"})}, 1500);
         setTimeout(function(){x.ready("", {character: "Purple2", channel: "here"})}, 2000);
         setTimeout(function(){x.ready("", {character: "TheTinaArmstrong", channel: "here"})}, 2500);
+        setTimeout(function(){x.fight.fighterList.getFighterByName("TheTinaArmstrong").dice.addMod(50);}, 2500);
+
         //x.join("Purple", {character: "Purple1", channel: "here"});
         //setTimeout(function(){x.ready("", {character: "Purple1", channel: "here"})}, 2000);
         //x.join("Purple", {character: "Purple2", channel: "here"});
@@ -85,14 +87,18 @@ describe("Fighter testing", () => {
         //setTimeout(function(){x.ready("", {character: "Yellow3", channel: "here"})}, 2000);
 
 
+        //setTimeout(_ =>{
+        //    for(let i = 1; i <= 100; i++){
+        //        setTimeout(_ =>{
+        //            x.brawl("light", {character: x.fight.currentPlayer.name, channel: "here"});
+        //            //x.fight.doAction(x.fight.currentPlayer.id, "brawl", Tier.Light);
+        //        }, i*50);
+        //    }
+        //}, 6000);
+
         setTimeout(_ =>{
-            for(let i = 1; i <= 100; i++){
-                setTimeout(_ =>{
-                    x.brawl("light", {character: x.fight.currentPlayer.name, channel: "here"});
-                    //x.fight.doAction(x.fight.currentPlayer.id, "brawl", Tier.Light);
-                }, i*50);
-            }
-        }, 6000);
+                    x.tag("Aelith Blanchette", {character: "TheTinaArmstrong", channel: "here"});
+        }, 4000);
 
         setTimeout(_ =>{
             x.fight.saveState();

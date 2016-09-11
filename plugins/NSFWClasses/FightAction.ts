@@ -53,6 +53,8 @@ export class FightAction{
     actionTag():FightAction{ //"skips" a turn
         this.type = "tag";
         this.diceScore = 0;
+        this.attacker.lastTagTurn = this.atTurn;
+        this.defender.lastTagTurn = this.atTurn;
         this.attacker.isInTheRing = false;
         this.defender.isInTheRing = true;
         this.missed = false;
