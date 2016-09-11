@@ -162,7 +162,7 @@ export class Fighter implements IFighter{
     }
 
     isOut():boolean{
-        return !this.isInTheRing || this.isSexuallyExhausted() || this.isDead();
+        return (!this.isInTheRing || this.isSexuallyExhausted() || this.isDead());
     }
 
     static create(name:string, power:number, dexterity:number, toughness:number, endurance:number, willpower:number){
@@ -219,12 +219,17 @@ export class Fighter implements IFighter{
     }
 
     getStylizedName(){
-        if(this.isDead()){
-            return `[s][b][color=${Team[this.assignedTeam]}]${this.name}[/color][/b][/s]`;
+        let modifierBeginning = "";
+        let modifierEnding = "";
+        if(this.isDead() || this.isSexuallyExhausted()){
+            modifierBeginning = `[s]`;
+            modifierEnding = `[/s]`;
         }
-        else{
-            return `[b][color=${Team[this.assignedTeam]}]${this.name}[/color][/b]`;
+        else if(!this.isInTheRing){
+            modifierBeginning = `[i]`;
+            modifierEnding = `[/i]`;
         }
+        return `${modifierBeginning}[b][color=${Team[this.assignedTeam]}]${this.name}[/color][/b]${modifierEnding}`;
     }
 
     initFromData(data:Array<any>){

@@ -70,8 +70,8 @@ export class Fight{
             var mysqlDataUpdate = function(idFight, idFighter){
                 new Promise((resolve, reject) => {
                     //Do the db
-                    var sql = "INSERT INTO `flistplugins`.`nsfw_fightfighters` (`idFight`, `idFighter`) VALUES (?,?);";
-                    sql = Data.db.format(sql, [idFight, idFighter]);
+                    var sql = "INSERT INTO `flistplugins`.`??` (`idFight`, `idFighter`) VALUES (?,?);";
+                    sql = Data.db.format(sql, [Constants.fightFightersTableName,idFight, idFighter]);
                     Data.db.query(sql, function(err, results) {
                         if(err){
                             reject(err);
@@ -84,8 +84,8 @@ export class Fight{
             };
 
             Data.db.beginTransaction(err =>{
-                var sql = "INSERT INTO `flistplugins`.`nsfw_fights` (`idFightType`, `idStage`, `usedTeams`, `currentTurn`, `fighterList`) VALUES (?,?,?,?,?)";
-                sql = Data.db.format(sql, [this.fightType, 1, this.usedTeams, this.currentTurn, CircularJSON.stringify(this.fighterList)]);
+                var sql = "INSERT INTO `flistplugins`.`??` (`idFightType`, `idStage`, `usedTeams`, `currentTurn`, `fighterList`) VALUES (?,?,?,?,?)";
+                sql = Data.db.format(sql, [Constants.fightTableName, this.fightType, 1, this.usedTeams, this.currentTurn, CircularJSON.stringify(this.fighterList)]);
                 Data.db.query(sql, (err, results) => {
                     if(err){
                         Data.db.rollback(function(){
@@ -110,8 +110,8 @@ export class Fight{
             });
         }
         else{
-            var sql = "UPDATE `flistplugins`.`nsfw_fights` SET `currentTurn` = ?, `fighterList` = ? WHERE `idFight` = ?;";
-            sql = Data.db.format(sql, [this.currentTurn, CircularJSON.stringify(this.fighterList), this.id]);
+            var sql = "UPDATE `flistplugins`.`??` SET `currentTurn` = ?, `fighterList` = ? WHERE `idFight` = ?;";
+            sql = Data.db.format(sql, [Constants.fightTableName, this.currentTurn, CircularJSON.stringify(this.fighterList), this.id]);
             Data.db.query(sql, (err, results) => {
                 if (err) {
                 }
@@ -123,8 +123,8 @@ export class Fight{
     }
 
     loadState(fightId:number){
-        var sql = "SELECT `nsfw_fights`.`idFight`,`nsfw_fights`.`idFightType`,`nsfw_fights`.`idStage`,`nsfw_fights`.`usedTeams`,`nsfw_fights`.`currentTurn`,`nsfw_fights`.`fighterList` FROM `flistplugins`.`nsfw_fights` WHERE idFight = ?;";
-        sql = Data.db.format(sql, [fightId]);
+        var sql = "SELECT `idFight`,`idFightType`,`idStage`,`usedTeams`,`currentTurn`,`fighterList` FROM `flistplugins`.`??` WHERE idFight = ?;";
+        sql = Data.db.format(sql, [Constants.fightTableName, fightId]);
         Data.db.query(sql, (err, results) => {
             if (err) {
             }
@@ -204,7 +204,7 @@ export class Fight{
 
     startMatch(){
         this.addMessage("\n[color=green]Everyone's ready, let's start the match![/color]");
-
+        this.hasStarted = true;
         this.fighterList.shufflePlayers(); //random order for teams
 
         for(let i = 0; i < this.fighterList.maxPlayersPerTeam; i++){ //Prints as much names as there are team
@@ -227,6 +227,17 @@ export class Fight{
         this.addMessage(`${this.currentPlayer.getStylizedName()} starts first for the ${this.currentTeamName} team!`);
         for(let i = 1; i < this.fighterList.length; i++){
             this.addMessage(`${this.fighterList[i].getStylizedName()} will follow for the ${Team[this.fighterList[i].assignedTeam]} team.`);
+            if(this.fightType == FightType.Tag) {
+                this.fighterList[i].isInTheRing = false;
+            }
+        }
+        if(this.fightType == FightType.Tag){ //if it's a tag match, only allow the first player of the next team
+            for(let i = 1; i < this.fighterList.length; i++){
+                if(this.currentPlayer.assignedTeam != this.fighterList[i].assignedTeam){
+                    this.fighterList[i].isInTheRing = true;
+                    break;
+                }
+            }
         }
         this.sendMessage();
         this.outputStatus();
@@ -258,7 +269,7 @@ export class Fight{
     }
 
     get nextTeamToPlay():Team{
-        return this.fighterList.getAlivePlayers()[(this.currentTurn-1) % this.fighterList.aliveFighterCount].assignedTeam;
+        return this.fighterList.getAlivePlayers()[this.currentTurn % this.fighterList.aliveFighterCount].assignedTeam;
     }
 
     get currentPlayer():Fighter{
@@ -266,7 +277,7 @@ export class Fight{
     }
 
     get nextPlayer():Fighter{
-        return this.fighterList.getAlivePlayers()[(this.currentTurn-1) % this.fighterList.aliveFighterCount];
+        return this.fighterList.getAlivePlayers()[this.currentTurn % this.fighterList.aliveFighterCount];
     }
 
     //Fight helpers
@@ -366,19 +377,20 @@ export class Fight{
     }
 
     doAction(idFighter:number, action:string, tier:Tier){
-        if(this.currentPlayer == undefined || idFighter != this.currentPlayer.id){
-            this.addMessage(`[b][color=red]This isn't your turn.[/color][/b]`);
-            this.sendMessage();
-        }
-        else{
-            this.validateTarget();
-            if(!this.canAttack()){
-                return;
+        if(this.hasStarted && !this.hasEnded){
+            if(this.currentPlayer == undefined || idFighter != this.currentPlayer.id){
+                this.addMessage(`[b][color=red]This isn't your turn.[/color][/b]`);
+                this.sendMessage();
             }
-            let theAction = this["action"+Utils.toTitleCase(action)](tier);
-            this.commitAction(theAction);
+            else{
+                this.validateTarget();
+                if(!this.canAttack()){
+                    return;
+                }
+                let theAction = this["action"+Utils.toTitleCase(action)](tier);
+                this.commitAction(theAction);
+            }
         }
-
     }
 
     actionBrawl(tier:Tier):FightAction{
@@ -467,6 +479,7 @@ export class Fight{
     }
 
     endFight(){
+        this.hasEnded = true;
         this.winnerTeam = this.fighterList.getUsedTeams()[0];
         this.addMessage(`${Team[this.winnerTeam]} team wins the fight!`);
         this.sendMessage();
@@ -474,8 +487,8 @@ export class Fight{
         var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.tokensPerLossMultiplier;
 
         Data.db.beginTransaction(err =>{
-            var sql = "UPDATE `flistplugins`.`nsfw_fights` SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
-            sql = Data.db.format(sql, [this.currentTurn, "", true, this.winnerTeam, this.id]);
+            var sql = "UPDATE `flistplugins`.`??` SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
+            sql = Data.db.format(sql, [Constants.fightTableName, this.currentTurn, "", true, this.winnerTeam, this.id]);
             Data.db.query(sql, (err, results) => {
                 if(err){
                     Data.db.rollback(function(){

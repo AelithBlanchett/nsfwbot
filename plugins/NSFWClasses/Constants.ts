@@ -3,6 +3,10 @@ export class Constants{
     static minLevel:number = 0;
     static maxLevel:number = 6;
     static tokensPerLossMultiplier:number = 0.5; //needs to be < 1 of course
+    static pluginName = "nsfw";
+    static fightTableName = "nsfw_fights";
+    static fightFightersTableName = "nsfw_fightfighters";
+    static fightersTableName = "nsfw_fighters";
 }
 
 export module Constants{
@@ -47,9 +51,9 @@ export module Constants{
     }
 
     export enum TokensWorth {
-        BronzeToken = 100,
-        SilverToken = 200,
-        GoldToken = 600
+        Bronze = 100,
+        Silver = 200,
+        Gold = 600
     }
 
     export enum FightType {

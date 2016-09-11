@@ -62,6 +62,7 @@ describe("Fighter testing", () => {
         var x = new CommandHandler(fChatLibInstance, "here");
         //let y = x.fight.getTeamsList();
         //let z = x.fight.getTeamsIdList();
+        x.fight.setFightType("tagteam");
         x.join("Red", {character: "Aelith Blanchette", channel: "here"});
         x.join("Purple", {character: "Purple1", channel: "here"});
         x.join("Purple", {character: "Purple2", channel: "here"});

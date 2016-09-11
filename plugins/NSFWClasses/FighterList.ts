@@ -192,6 +192,7 @@ export class FighterList extends Array<Fighter>{
         let fighter:Fighter;
         while(tries < 99 && (fighter == undefined || fighter.assignedTeam == undefined || fighter.assignedTeam == team)){
             fighter = this.getRandomFighter();
+            tries++;
         }
         return fighter;
     }
