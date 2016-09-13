@@ -14,6 +14,7 @@ import FightType = Constants.FightType;
 import {Data} from "./Model";
 import FightTier = Constants.FightTier;
 import TokensPerWin = Constants.TokensPerWin;
+import {Trigger} from "./Modifier";
 var CircularJSON = require('circular-json');
 
 export class Fight{
@@ -248,6 +249,9 @@ export class Fight{
 
     nextTurn(){
         this.currentTurn++;
+        for(let fighter of this.fighterList){
+            fighter.triggerMods(Trigger.OnTurnTick);
+        }
         this.outputStatus();
         this.saveState();
         this.waitingForAction = true;

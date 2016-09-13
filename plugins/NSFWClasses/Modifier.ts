@@ -17,7 +17,7 @@ export interface IModifier{
 }
 
 export enum Trigger{
-    OnTick = 0,
+    OnTurnTick = 0,
     OnHPDamage = 1,
     OnLustDamage = 2,
     OnFocusDamage = 3,
