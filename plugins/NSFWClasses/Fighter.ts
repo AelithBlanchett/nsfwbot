@@ -12,6 +12,8 @@ import TokensWorth = Constants.TokensWorth;
 import Affinity = Constants.Affinity;
 import Stats = Constants.Stats;
 import StatTier = Constants.StatTier;
+import {IModifier} from "./Modifier";
+import {Trigger} from "./Modifier";
 
 export class Fighter implements IFighter{
     id:number = -1;
@@ -32,7 +34,7 @@ export class Fighter implements IFighter{
     endurance:number = 0;
     willpower:number = 0;
 
-    modifiers:Array<any>;
+    modifiers:Array<IModifier>;
 
 
 
@@ -110,6 +112,12 @@ export class Fighter implements IFighter{
         });
     }
 
+    triggerMods(event:Trigger){
+        for(let mod of this.modifiers){
+            mod.trigger(event);
+        }
+    }
+
     get hpPerHeart():number {
         return (10 + this.power + this.dexterity + (this.toughness * 2) + this.endurance);
     }
@@ -141,10 +149,12 @@ export class Fighter implements IFighter{
         }
         this.hp -= hp;
         this.fight.addMessage(`${this.name} [color=red]lost ${hp} HP![/color]`);
+        this.triggerMods(Trigger.OnHPDamage);
         if(this.hp <= 0){
             this.hp = 0;
             this.heartsRemaining--;
             this.fight.addMessage(`[b][color=red]Heart broken![/color][/b] ${this.name} has ${this.heartsRemaining} hearts left.`);
+            this.triggerMods(Trigger.OnHeartBroken);
             if(this.heartsRemaining > 0){
                 this.hp = this.hpPerHeart;
             }
@@ -160,11 +170,14 @@ export class Fighter implements IFighter{
             lust = 1;
         }
         this.lust += lust;
+        this.fight.addMessage(`${this.name} [color=red]gained ${lust} Lust![/color]`);
+        this.triggerMods(Trigger.OnLustDamage);
         if(this.lust >= this.lustPerOrgasm){
             this.lust = 0;
             this.orgasmsRemaining--;
             this.fight.addMessage(`[b][color=blue]Orgasm on the mat![/color][/b] ${this.name} has ${this.orgasmsRemaining} orgasms left.`);
             this.lust = 0;
+            this.triggerMods(Trigger.OnOrgasm);
             if(this.orgasmsRemaining == 1){
                 this.fight.addMessage(`[b][color=blue]Last orgasm[/color][/b] for ${this.name}!`);
             }
