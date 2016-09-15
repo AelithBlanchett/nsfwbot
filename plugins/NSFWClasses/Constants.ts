@@ -7,6 +7,7 @@ export class Constants{
     static tokensPerLossMultiplier:number = 0.5; //needs to be < 1 of course
     static turnsToWaitBetweenTwoTags:number = 4;
 
+    public static get currencyName(): string    { return "tokens"; }
     public static get pluginName(): string    { return "nsfw"; }
     public static get fightTableName(): string    { return "nsfw_fights"; }
     public static get fightFightersTableName(): string    { return "nsfw_fightfighters"; }

@@ -29,9 +29,10 @@ export class Fighter implements IFighter{
     affinity:Affinity = Affinity.Power;
 
     power:number = 0;
-    dexterity:number = 0;
+    sensuality:number = 0;
     toughness:number = 0;
     endurance:number = 0;
+    dexterity:number = 0;
     willpower:number = 0;
 
     modifiers:Array<IModifier>;
@@ -74,6 +75,7 @@ export class Fighter implements IFighter{
                     `totalFights`, \
                     `winRate`, \
                     `power`, \
+                    `sensuality`, \
                     `dexterity`, \
                     `toughness`, \
                     `endurance`, \
@@ -97,9 +99,9 @@ export class Fighter implements IFighter{
 
     updateInDb(){
         return new Promise(function(resolve, reject) {
-            var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`dexterity` = ?,\
+            var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`sensuality` = ?,`dexterity` = ?,\
                 `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ?,`affinity` = ? WHERE `id` = ?;";
-            sql = Data.db.format(sql, [Constants.fightersTableName, this.tokens, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate, this.power, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, this.affinity, this.id]);
+            sql = Data.db.format(sql, [Constants.fightersTableName, this.tokens, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate, this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, this.affinity, this.id]);
             Data.db.query(sql, function (err, result) {
                 if (result) {
                     console.log("Updated "+this.name+"'s entry in the db.");
@@ -119,7 +121,7 @@ export class Fighter implements IFighter{
     }
 
     get hpPerHeart():number {
-        return (10 + this.power + this.dexterity + (this.toughness * 2) + this.endurance);
+        return (10 + this.power + this.sensuality + this.dexterity + (this.toughness * 2) + this.endurance);
     }
 
     get maxHearts():number {
@@ -127,7 +129,7 @@ export class Fighter implements IFighter{
     }
 
     get lustPerOrgasm():number{
-        return (10 + this.power + this.dexterity + this.toughness * +(this.endurance * 2));
+        return (10 + this.power + this.sensuality + this.dexterity + this.toughness * +(this.endurance * 2));
     }
 
     get maxOrgasms():number {
@@ -236,14 +238,14 @@ export class Fighter implements IFighter{
         });
     }
 
-    static createRaw(name:string, power:number, dexterity:number, toughness:number, endurance:number, willpower:number){
+    static createRaw(name:string, power:number, sensuality: number, dexterity:number, toughness:number, endurance:number, willpower:number){
         return new Promise(function(resolve, reject) {
             let self = this;
-            if (!(power != undefined && dexterity != undefined && toughness != undefined && endurance != undefined && willpower != undefined)) {
+            if (!(power != undefined && sensuality != undefined && dexterity != undefined && toughness != undefined && endurance != undefined && willpower != undefined)) {
                 reject("Wrong stats passed.");
             }
             else {
-                Data.db.query("INSERT INTO `flistplugins`.??(`name`, `power`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [Constants.fightersTableName, name, power, dexterity, toughness, endurance, willpower], function (err, result) {
+                Data.db.query("INSERT INTO `flistplugins`.??(`name`, `power`, `sensuality`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [Constants.fightersTableName, name, power, sensuality, dexterity, toughness, endurance, willpower], function (err, result) {
                     if (result) {
                         console.log(JSON.stringify(result));
                         resolve();
@@ -259,11 +261,11 @@ export class Fighter implements IFighter{
     outputStats():string{
         return "[b]" + this.name + "[/b]'s stats" + "              [i]Affinity:[/i] [b]" + Affinity[this.affinity] + "[/b]" + "\n" +
             "[b][color=red]Power[/color][/b]:  " + this.power + "      " + "[b][color=red]Hearts[/color][/b]: " + this.maxHearts + " * " + this.hpPerHeart +" [b][color=red]HP[/color] per heart[/b]"+"\n" +
-            "[b][color=orange]Dexterity[/color][/b]:  " + this.dexterity + "      " + "[b][color=pink]Orgasms[/color][/b]: " + this.maxOrgasms + " * " + this.lustPerOrgasm +" [b][color=pink]Lust[/color] per Orgasm[/b]"+"\n" +
+            "[b][color=orange]Sensuality[/color][/b]:  " + this.sensuality + "      " + "[b][color=pink]Orgasms[/color][/b]: " + this.maxOrgasms + " * " + this.lustPerOrgasm +" [b][color=pink]Lust[/color] per Orgasm[/b]"+"\n" +
             "[b][color=green]Toughness[/color][/b]:  " + this.toughness + "\n" +
             "[b][color=cyan]Endurance[/color][/b]:    " + this.endurance + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + this.wins + " - " + this.losses + "\n" +
-            "[b][color=purple]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Bronze tokens available[/color][/b]: " + this.bronzeTokens + "\n" +
-            "[b][color=blue]Endurance[/color][/b]: " + this.endurance +  "      " + "[b][color=orange]Total tokens:[/color][/b]: " + this.tokens + "\n";/*+ "\n\n"  +
+            "[b][color=purple]Dexterity[/color][/b]: " + this.dexterity +  "      " + "[b][color=orange]Bronze tokens available[/color][/b]: " + this.bronzeTokens + "\n" +
+            "[b][color=blue]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Total tokens:[/color][/b]: " + this.tokens + "\n";/*+ "\n\n"  +
             "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]"*/
     }
 
@@ -382,13 +384,13 @@ export class Fighter implements IFighter{
     }
 
     get tier():FightTier{
-        if(this.power <= 2 && this.dexterity <= 2 && this.toughness <= 2 && this.endurance <= 2 && this.willpower <= 2){
+        if(this.power <= 2 && this.sensuality <= 2 && this.dexterity <= 2 && this.toughness <= 2 && this.endurance <= 2 && this.willpower <= 2){
             return FightTier.Bronze;
         }
-        else if(this.power <= 4 && this.dexterity <= 4 && this.toughness <= 4 && this.endurance <= 4 && this.willpower <= 4){
+        else if(this.power <= 4 && this.sensuality <= 4 && this.dexterity <= 4 && this.toughness <= 4 && this.endurance <= 4 && this.willpower <= 4){
             return FightTier.Silver;
         }
-        else if(this.power <= 6 && this.dexterity <= 6 && this.toughness <= 6 && this.endurance <= 6 && this.willpower <= 6){
+        else if(this.power <= 6 && this.sensuality <= 6 && this.dexterity <= 6 && this.toughness <= 6 && this.endurance <= 6 && this.willpower <= 6){
             return FightTier.Gold;
         }
         return;
@@ -407,6 +409,7 @@ export class Fighter implements IFighter{
                     `totalFights`, \
                     `winRate`, \
                     `power`, \
+                    `sensuality`, \
                     `dexterity`, \
                     `toughness`, \
                     `endurance`, \

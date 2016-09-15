@@ -491,11 +491,11 @@ export class Fight{
                     var callsToMake = [];
                     for(let fighter of this.fighterList){
                         if(fighter.assignedTeam == this.winnerTeam){
-                            this.addMessage(`Awarded ${tokensToGiveToWinners} tokens to ${fighter.getStylizedName()}`);
+                            this.addMessage(`Awarded ${tokensToGiveToWinners} ${Constants.currencyName} to ${fighter.getStylizedName()}`);
                             callsToMake.push(fighter.giveTokens(tokensToGiveToWinners));
                         }
                         else{
-                            this.addMessage(`Awarded ${tokensToGiveToLosers} tokens to ${fighter.getStylizedName()}`);
+                            this.addMessage(`Awarded ${tokensToGiveToLosers} ${Constants.currencyName} to ${fighter.getStylizedName()}`);
                             callsToMake.push(fighter.giveTokens(tokensToGiveToLosers));
                         }
                     }

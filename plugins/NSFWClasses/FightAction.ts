@@ -36,7 +36,7 @@ export class FightAction{
         this.defender = defender;
     }
 
-    attackFormula(tier:Tier, actorAtk:number, targetDef:number, roll:number):number{
+    strikeFormula(tier:Tier, actorAtk:number, targetDef:number, roll:number):number{
         return BaseDamage[Tier[tier]]-(actorAtk-targetDef)+roll;
     }
 
@@ -45,7 +45,17 @@ export class FightAction{
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.power;
         if(this.diceScore >= RequiredRoll[Tier[this.tier]]){
             this.missed = false;
-            this.hpDamage = this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
+            this.hpDamage = this.strikeFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
+        }
+        return this;
+    }
+
+    actionSex():FightAction{
+        this.type = "sexstrike";
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.power;
+        if(this.diceScore >= RequiredRoll[Tier[this.tier]]){
+            this.missed = false;
+            this.lustDamage = this.strikeFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
         }
         return this;
     }

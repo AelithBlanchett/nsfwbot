@@ -37,9 +37,16 @@ export class BaseModifier implements IModifier{
     uses: number;
     eventTrigger:Trigger = 0;
 
-    constructor(applier:Fighter, receiver: Fighter){
+    constructor(applier:Fighter, receiver: Fighter, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number, eventTrigger:Trigger){
         this.applier = applier;
         this.receiver = receiver;
+        this.hpDamage = hpDamage;
+        this.lustDamage = lustDamage;
+        this.focusDamage = focusDamage;
+        this.diceRoll = diceRoll;
+        this.escapeRoll = escapeRoll;
+        this.uses = uses;
+        this.eventTrigger = eventTrigger;
     }
 
     isOver():boolean{
