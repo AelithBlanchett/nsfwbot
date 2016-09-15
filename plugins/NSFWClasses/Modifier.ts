@@ -17,13 +17,19 @@ export interface IModifier{
 }
 
 export enum Trigger{
-    OnTurnTick = 0,
-    OnHPDamage = 1,
-    OnLustDamage = 2,
-    OnFocusDamage = 3,
-    OnOrgasm = 4,
-    OnHeartBroken = 5,
-    Permanent = 6
+    Permanent = 0,
+    OnTurnTick = 1,
+    OnHPDamage = 2,
+    OnLustDamage = 3,
+    OnFocusDamage = 4,
+    OnOrgasm = 5,
+    OnHeartBroken = 6,
+    OnRoll = 7,
+    OnTag = 8,
+    OnEscape = 9,
+    OnAttackRoll = 10 | OnRoll,
+    OnEscapeRoll = 11 | OnRoll,
+    OnDamage = 12 | OnHPDamage | OnLustDamage
 }
 
 export class BaseModifier implements IModifier{

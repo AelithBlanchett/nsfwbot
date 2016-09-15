@@ -21,6 +21,7 @@ export class FightAction{
     focusDamage: number;
     diceScore: number;
     missed: boolean;
+    requiresRoll: boolean;
 
     constructor(fightId:number, currentTurn:number, tier:Tier, attacker:Fighter, defender?:Fighter) {
         this.fightId = fightId;
@@ -34,10 +35,16 @@ export class FightAction{
         this.atTurn = currentTurn;
         this.attacker = attacker;
         this.defender = defender;
+        this.requiresRoll = true;
     }
 
     strikeFormula(tier:Tier, actorAtk:number, targetDef:number, roll:number):number{
         return BaseDamage[Tier[tier]]-(actorAtk-targetDef)+roll;
+    }
+
+    requiredDiceScore(){
+        let scoreRequired = 0;
+
     }
 
     actionBrawl():FightAction{
@@ -52,7 +59,7 @@ export class FightAction{
 
     actionSex():FightAction{
         this.type = "sexstrike";
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.power;
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= RequiredRoll[Tier[this.tier]]){
             this.missed = false;
             this.lustDamage = this.strikeFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
@@ -63,6 +70,7 @@ export class FightAction{
     actionTag():FightAction{ //"skips" a turn
         this.type = "tag";
         this.diceScore = 0;
+        this.requiresRoll = false;
         this.attacker.lastTagTurn = this.atTurn;
         this.defender.lastTagTurn = this.atTurn;
         this.attacker.isInTheRing = false;

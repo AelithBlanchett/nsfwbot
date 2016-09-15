@@ -35,7 +35,7 @@ export class Fighter implements IFighter{
     dexterity:number = 0;
     willpower:number = 0;
 
-    modifiers:Array<IModifier>;
+    modifiers:Array<IModifier> = [];
 
 
 
