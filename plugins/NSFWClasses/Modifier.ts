@@ -1,5 +1,8 @@
 import {Fighter} from "./Fighter";
 import {FighterList} from "./FighterList";
+import {Constants} from "./Constants";
+import Trigger = Constants.Trigger;
+
 export interface IModifier{
     applier: Fighter;
     receiver: Fighter;
@@ -14,22 +17,6 @@ export interface IModifier{
     isOver():boolean;
     trigger(event:Trigger):void;
     willTriggerForEvent(event:Trigger):void;
-}
-
-export enum Trigger{
-    Permanent = 0,
-    OnTurnTick = 1,
-    OnHPDamage = 2,
-    OnLustDamage = 3,
-    OnFocusDamage = 4,
-    OnOrgasm = 5,
-    OnHeartBroken = 6,
-    OnRoll = 7,
-    OnTag = 8,
-    OnEscape = 9,
-    OnAttackRoll = 10 | OnRoll,
-    OnEscapeRoll = 11 | OnRoll,
-    OnDamage = 12 | OnHPDamage | OnLustDamage
 }
 
 export class BaseModifier implements IModifier{

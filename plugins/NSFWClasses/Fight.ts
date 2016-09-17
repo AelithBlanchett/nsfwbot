@@ -9,12 +9,12 @@ import Team = Constants.Team;
 import {FighterList} from "./FighterList";
 import BaseDamage = Constants.BaseDamage;
 import Tier = Constants.Tier;
-import RequiredRoll = Constants.RequiredRoll;
 import FightType = Constants.FightType;
 import {Data} from "./Model";
 import FightTier = Constants.FightTier;
 import TokensPerWin = Constants.TokensPerWin;
-import {Trigger} from "./Modifier";
+import Trigger = Constants.Trigger;
+import Action = Constants.Action;
 var CircularJSON = require('circular-json');
 
 export class Fight{
@@ -226,7 +226,7 @@ export class Fight{
 
 
         this.sendMessage();
-        this.fighterList.reorderFightersByInitiative(this.rollAllDice());
+        this.fighterList.reorderFightersByInitiative(this.rollAllDice(Trigger.BeforeInitiationRoll, Trigger.AfterInitiationRoll));
         this.currentTurn = 1;
         this.addMessage(`${this.currentPlayer.getStylizedName()} starts first for the ${this.currentTeamName} team!`);
         for(let i = 1; i < this.fighterList.length; i++){
@@ -248,9 +248,12 @@ export class Fight{
     }
 
     nextTurn(){
+        for(let fighter of this.fighterList){
+            fighter.triggerMods(Trigger.BeforeTurnTick);
+        }
         this.currentTurn++;
         for(let fighter of this.fighterList){
-            fighter.triggerMods(Trigger.OnTurnTick);
+            fighter.triggerMods(Trigger.AfterTurnTick);
         }
         this.outputStatus();
         this.saveState();
@@ -309,10 +312,10 @@ export class Fight{
 
     //Dice rolling
 
-    rollAllDice():Array<Fighter>{
+    rollAllDice(eventBefore:Trigger = Trigger.BeforeRoll, eventAfter:Trigger = Trigger.AfterRoll):Array<Fighter>{
         let arrSortedFightersByInitiative = new Array<Fighter>();
         for(let player of this.fighterList.getAlivePlayers()){
-            player.lastDiceRoll = player.dice.roll(10).reduce(function(a, b){return a+b;});
+            player.lastDiceRoll = player.roll(10, eventBefore, eventAfter);
             arrSortedFightersByInitiative.push(player);
             this.addMessage(`[color=${Team[player.assignedTeam]}]${player.name}[/color] rolled a ${player.lastDiceRoll}`);
         }
@@ -396,7 +399,7 @@ export class Fight{
         }
     }
 
-    doAction(idFighter:number, action:string, tier:Tier, customTarget?:Fighter){
+    doAction(idFighter:number, action:Action, tier:Tier, customTarget?:Fighter){
         if(this.hasStarted && !this.hasEnded){
             if(this.currentPlayer == undefined || idFighter != this.currentPlayer.id){
                 this.addMessage(`[b][color=red]This isn't your turn.[/color][/b]`);
@@ -407,7 +410,7 @@ export class Fight{
                 if(!this.canAttack()){
                     return;
                 }
-                if(action == "tag"){
+                if(action == Action.Tag){
                     if(!this.canTag())
                         return;
                     if(customTarget != undefined && customTarget.assignedTeam == this.currentPlayer.assignedTeam){
@@ -427,9 +430,9 @@ export class Fight{
                     }
                 }
                 this.waitingForAction = false;
-                let theAction = new FightAction(this.id, this.currentTurn, tier, this.currentPlayer, this.currentTarget);
-                theAction["action"+Utils.toTitleCase(action)]();
-                theAction.commit(this);
+                this.currentPlayer.pendingAction = new FightAction(this.id, this.currentTurn, tier, this.currentPlayer, this.currentTarget);
+                this.currentPlayer.pendingAction.actionGateway(action);
+                this.currentPlayer.pendingAction.commit(this);
             }
         }
     }

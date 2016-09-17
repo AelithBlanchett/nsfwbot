@@ -13,7 +13,7 @@ import Affinity = Constants.Affinity;
 import Stats = Constants.Stats;
 import StatTier = Constants.StatTier;
 import {IModifier} from "./Modifier";
-import {Trigger} from "./Modifier";
+import Trigger = Constants.Trigger;
 
 export class Fighter implements IFighter{
     id:number = -1;
@@ -55,6 +55,7 @@ export class Fighter implements IFighter{
     lastDiceRoll:number;
     isInTheRing:boolean = true;
     lastTagTurn:number = 9999999;
+    pendingAction:FightAction;
 
     constructor() {
     }
@@ -114,6 +115,20 @@ export class Fighter implements IFighter{
         });
     }
 
+    //returns dice score
+    roll(times:number = 1, eventBefore:Trigger = Trigger.BeforeRoll, eventAfter:Trigger = Trigger.AfterRoll):number{
+        this.triggerMods(eventBefore);
+        let result = 0;
+        if(times == 1){
+            result = this.dice.roll(1);
+        }
+        else{
+            result = this.dice.roll(times).reduce(function(a, b){return a+b;});
+        }
+        this.triggerMods(eventAfter);
+        return result;
+    }
+
     triggerMods(event:Trigger){
         for(let mod of this.modifiers){
             mod.trigger(event);
@@ -149,21 +164,23 @@ export class Fighter implements IFighter{
         if (hp < 1) {
             hp = 1;
         }
+        this.triggerMods(Trigger.BeforeHPDamage);
         this.hp -= hp;
         this.fight.addMessage(`${this.name} [color=red]lost ${hp} HP![/color]`);
-        this.triggerMods(Trigger.OnHPDamage);
         if(this.hp <= 0){
+            this.triggerMods(Trigger.BeforeHeartLoss);
             this.hp = 0;
             this.heartsRemaining--;
             this.fight.addMessage(`[b][color=red]Heart broken![/color][/b] ${this.name} has ${this.heartsRemaining} hearts left.`);
-            this.triggerMods(Trigger.OnHeartBroken);
             if(this.heartsRemaining > 0){
                 this.hp = this.hpPerHeart;
             }
             else if(this.heartsRemaining == 1){
                 this.fight.addMessage(`[b][color=red]Last heart[/color][/b] for ${this.name}!`);
             }
+            this.triggerMods(Trigger.AfterHeartLoss);
         }
+        this.triggerMods(Trigger.AfterHPDamage);
     }
 
     hitLust(lust:number) {
@@ -171,19 +188,21 @@ export class Fighter implements IFighter{
         if (lust < 1) {
             lust = 1;
         }
+        this.triggerMods(Trigger.BeforeLustDamage);
         this.lust += lust;
         this.fight.addMessage(`${this.name} [color=red]gained ${lust} Lust![/color]`);
-        this.triggerMods(Trigger.OnLustDamage);
         if(this.lust >= this.lustPerOrgasm){
+            this.triggerMods(Trigger.BeforeOrgasm);
             this.lust = 0;
             this.orgasmsRemaining--;
-            this.fight.addMessage(`[b][color=blue]Orgasm on the mat![/color][/b] ${this.name} has ${this.orgasmsRemaining} orgasms left.`);
+            this.fight.addMessage(`[b][color=pink]Orgasm on the mat![/color][/b] ${this.name} has ${this.orgasmsRemaining} orgasms left.`);
             this.lust = 0;
-            this.triggerMods(Trigger.OnOrgasm);
+            this.triggerMods(Trigger.AfterOrgasm);
             if(this.orgasmsRemaining == 1){
-                this.fight.addMessage(`[b][color=blue]Last orgasm[/color][/b] for ${this.name}!`);
+                this.fight.addMessage(`[b][color=red]Last orgasm[/color][/b] for ${this.name}!`);
             }
         }
+        this.triggerMods(Trigger.AfterLustDamage);
     }
 
     hitFocus(amount:number) {
@@ -191,10 +210,12 @@ export class Fighter implements IFighter{
         if(amount == 0){
             return;
         }
+        this.triggerMods(Trigger.BeforeFocusDamage);
         this.focus -= amount;
         if(this.focus >= this.maxFocus) {
             this.focus = this.maxFocus;
         }
+        this.triggerMods(Trigger.AfterFocusDamage);
         if(this.focus == this.minFocus) {
             this.fight.addMessage(`${this.getStylizedName()} seems way too distracted to possibly continue the fight! Is it their submissiveness? Their morale? One thing's sure, they'll be soon too broken to continue fighting!`);
         }

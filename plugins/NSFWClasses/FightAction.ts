@@ -2,10 +2,12 @@ import {Fighter} from "./Fighter";
 import {Constants} from "./Constants";
 import Tier = Constants.Tier;
 import {Data} from "./Model";
-import RequiredRoll = Constants.RequiredRoll;
 import BaseDamage = Constants.BaseDamage;
 import {Fight} from "./Fight";
 import {Dice} from "./Dice";
+import TierDifficulty = Constants.TierDifficulty;
+import Trigger = Constants.Trigger;
+import Action = Constants.Action;
 
 export class FightAction{
     id: number;
@@ -42,32 +44,70 @@ export class FightAction{
         return BaseDamage[Tier[tier]]-(actorAtk-targetDef)+roll;
     }
 
-    requiredDiceScore(){
+    requiredDiceScore(attack:Action, tier:Tier):number{
         let scoreRequired = 0;
-
+        //difficulties here
+        //if fighter.indexOf(mod) != -1 then add some difficulty
+        scoreRequired += TierDifficulty[Tier[this.tier]];
+        return scoreRequired;
     }
 
-    actionBrawl():FightAction{
+    actionGateway(actionType:Action){
+        let result;
+        switch (actionType) {
+            case Action.Brawl:
+                result = this.actionBrawl();
+                break;
+            case Action.SexStrike:
+                result = this.actionSexStrike();
+                break;
+            case Action.Tag:
+                result = this.actionTag();
+                break;
+            case Action.Pass:
+                result = this.actionPass();
+                break;
+            default:
+                result = Trigger.None;
+                break;
+        }
+        return result;
+    }
+
+    actionBrawl():Trigger{
         this.type = "brawl";
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.power;
-        if(this.diceScore >= RequiredRoll[Tier[this.tier]]){
+        this.attacker.triggerMods(Trigger.BeforeBrawlAttack);
+        this.diceScore = this.attacker.roll(1) + this.attacker.power;
+        if(this.diceScore >= this.requiredDiceScore(Action.Brawl, this.tier)){
             this.missed = false;
             this.hpDamage = this.strikeFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
         }
-        return this;
+        return Trigger.AfterBrawlAttack;
     }
 
-    actionSex():FightAction{
+    actionSexStrike():Trigger{
+        this.attacker.triggerMods(Trigger.BeforeSexStrikeAttack);
         this.type = "sexstrike";
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
-        if(this.diceScore >= RequiredRoll[Tier[this.tier]]){
+        this.diceScore = this.attacker.roll(1) + this.attacker.sensuality;
+        if(this.diceScore >= this.requiredDiceScore(Action.SexStrike, this.tier)){
             this.missed = false;
-            this.lustDamage = this.strikeFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
+            this.lustDamage = this.strikeFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
         }
-        return this;
+        return Trigger.AfterSexStrikeAttack;
     }
 
-    actionTag():FightAction{ //"skips" a turn
+    actionSubHold():Trigger{
+        this.attacker.triggerMods(Trigger.BeforeSubmissionHold);
+        this.type = "subhold";
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
+        if(this.diceScore >= this.requiredDiceScore(Action.SexStrike, this.tier)){
+            this.missed = false;
+            this.lustDamage = this.strikeFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
+        }
+        return Trigger.AfterSubmissionHold;
+    }
+
+    actionTag():Trigger{ //"skips" a turn
         this.type = "tag";
         this.diceScore = 0;
         this.requiresRoll = false;
@@ -76,14 +116,14 @@ export class FightAction{
         this.attacker.isInTheRing = false;
         this.defender.isInTheRing = true;
         this.missed = false;
-        return this;
+        return Trigger.AfterTag;
     }
 
-    actionPass():FightAction{ //"skips" a turn
+    actionPass():Trigger{ //"skips" a turn
         this.type = "pass";
         this.diceScore = 0;
         this.missed = false;
-        return this;
+        return Trigger.AfterPass;
     }
 
     commitDb(){

@@ -10,6 +10,7 @@ import Team = Constants.Team;
 import {Utils} from "./Utils";
 import Tier = Constants.Tier;
 import Affinity = Constants.Affinity;
+import Action = Constants.Action;
 
 export class CommandHandler implements ICommandHandler{
     fChatLibInstance:IFChatLib;
@@ -137,7 +138,7 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(data.character).then(data =>{
             if(data){
                 let fighter:Fighter = data as Fighter;
-                this.fight.doAction(fighter.id, "brawl", tier as Tier);
+                this.fight.doAction(fighter.id, Action.Brawl, tier as Tier);
             }
             else{
                 this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
@@ -160,7 +161,7 @@ export class CommandHandler implements ICommandHandler{
                     this.fChatLibInstance.sendMessage("[color=red]The character to tag with is required.[/color]", this.channel);
                     return false;
                 }
-                this.fight.doAction(fighter.id, "tag", Tier.None, fighterToTagWith);
+                this.fight.doAction(fighter.id, Action.Tag, Tier.None, fighterToTagWith);
             }
             else{
                 this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);

@@ -70,7 +70,14 @@ export module Constants{
         Heavy = 18
     }
 
-    export enum RequiredRoll {
+    export enum Action {
+        Brawl,
+        SexStrike,
+        Tag,
+        Pass
+    }
+
+    export enum TierDifficulty {
         Light = 4,
         Medium = 8,
         Heavy = 12
@@ -125,5 +132,100 @@ export module Constants{
         "Slaughterhouse",
         "Junkyard"
     ];
+
+    export enum Trigger{
+        None = 0,
+
+        //Befores
+        BeforeTurnTick,
+
+        BeforeHPDamage,
+        BeforeLustDamage,
+        BeforeFocusDamage,
+        BeforeDamage = BeforeHPDamage | BeforeLustDamage,
+        BeforeBarDamage = BeforeHPDamage | BeforeLustDamage | BeforeFocusDamage,
+
+        BeforeOrgasm,
+        BeforeHeartLoss,
+        BeforeOrgasmOrHeartLoss = BeforeOrgasm | BeforeHeartLoss,
+
+        BeforeInitiationRoll,
+        BeforeRoll = 1 | BeforeInitiationRoll,
+
+        BeforeBrawlAttack,
+        BeforeSexStrikeAttack,
+        BeforeSexHoldAttack,
+        BeforeAttack = BeforeBrawlAttack | BeforeSexStrikeAttack | BeforeSexHoldAttack,
+        BeforeSubmissionHold,
+        BeforeBondageHold,
+        BeforeHumiliationHold,
+        BeforeHold = BeforeSubmissionHold | BeforeBondageHold | BeforeHumiliationHold,
+
+        BeforeItemPickup,
+        BeforeSextoyPickup,
+        BeforePickup = BeforeItemPickup | BeforeSextoyPickup,
+
+        BeforeTag,
+        BeforeEscape,
+        BeforePass,
+        BeforePassiveAction = BeforeTag | BeforeEscape | BeforePass,
+
+        BeforePowerdrive,
+        BeforePowerFantasy,
+        BeforeSnapshot,
+        BeforeKarmasutra,
+        BeforeFinisher = BeforePowerdrive | BeforePowerFantasy | BeforeSnapshot | BeforeKarmasutra,
+
+        BeforeUltimateHumiliation,
+        BeforeAnyOffensiveAction = BeforeAttack | BeforeHold | BeforeFinisher,
+        BeforeAnyAction = BeforePassiveAction | BeforeAnyOffensiveAction,
+
+
+
+
+        //Afters
+        AfterTurnTick,
+
+        AfterHPDamage,
+        AfterLustDamage,
+        AfterFocusDamage,
+        AfterDamage = AfterHPDamage | AfterLustDamage,
+        AfterBarDamage = AfterHPDamage | AfterLustDamage | AfterFocusDamage,
+
+        AfterOrgasm,
+        AfterHeartLoss,
+        AfterOrgasmOrHeartLoss = AfterOrgasm | AfterHeartLoss,
+
+        AfterInitiationRoll,
+        AfterRoll = 2 | AfterInitiationRoll,
+
+        AfterBrawlAttack,
+        AfterSexStrikeAttack,
+        AfterSexHoldAttack,
+        AfterAttack = AfterBrawlAttack | AfterSexStrikeAttack | AfterSexHoldAttack,
+        AfterSubmissionHold,
+        AfterBondageHold,
+        AfterHumiliationHold,
+        AfterHold = AfterSubmissionHold | AfterBondageHold | AfterHumiliationHold,
+
+        AfterItemPickup,
+        AfterSextoyPickup,
+        AfterPickup = AfterItemPickup | AfterSextoyPickup,
+
+        AfterTag,
+        AfterEscape,
+        AfterPass,
+        AfterPassiveAction = AfterTag | AfterEscape | AfterPass,
+
+        AfterPowerdrive,
+        AfterPowerFantasy,
+        AfterSnapshot,
+        AfterKarmasutra,
+        AfterFinisher = AfterPowerdrive | AfterPowerFantasy | AfterSnapshot | AfterKarmasutra,
+
+        AfterUltimateHumiliation,
+        AfterAnyOffensiveAction = AfterAttack | AfterHold | AfterFinisher,
+        AfterAnyAction = AfterPassiveAction | AfterAnyOffensiveAction,
+    }
 }
 
