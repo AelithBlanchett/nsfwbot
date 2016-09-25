@@ -27,37 +27,70 @@ describe("Fighter testing", () => {
                 console.log("Sent PRIVMESSAGE "+message + " to "+character);
             }
         };
+
+        spyOn(fChatLibInstance, 'sendMessage').and.callThrough();;
+        spyOn(fChatLibInstance, 'throwError').and.callThrough();;
+        spyOn(fChatLibInstance, 'sendPrivMessage').and.callThrough();;
     });
 
-    //it("should join ring", function(done){
-    //    var x = new CommandHandler(fChatLibInstance, "here");
-    //    var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
-    //    x.join("", data);
-    //    setTimeout(done, 1000);
-    //});
-    //
-    //it("should not join ring", function(done){
-    //    var x = new CommandHandler(fChatLibInstance, "here");
-    //    var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
-    //    x.join("", data);
-    //    x.join("", data);
-    //    setTimeout(done, 1000);
-    //});
-    //
-    //it("should join ring and set ready", function(done){
-    //    var x = new CommandHandler(fChatLibInstance, "here");
-    //    var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
-    //    x.ready("", data);
-    //    setTimeout(done, 1000);
-    //});
-    //
-    //it("should say already joined ring and set ready", function(done){
-    //    var x = new CommandHandler(fChatLibInstance, "here");
-    //    var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
-    //    x.ready("", data);
-    //    x.ready("", data);
-    //    setTimeout(done, 1000);
-    //});
+    it("should join ring", function(done){
+        var x = new CommandHandler(fChatLibInstance, "here");
+        var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
+        x.join("", data);
+        setTimeout(() => {
+            if(expect(fChatLibInstance.sendMessage).toHaveBeenCalledWith('[color=red]Aelith Blanchette stepped into the ring for the [color=Blue]Blue[/color] team! Waiting for everyone to be !ready.[/color]', 'here')){
+                done();
+            }
+            else{
+                done(new Error("The player couldn't join the match"));
+            }
+        }, 300);
+    });
+
+    it("should not join ring", function(done){
+        var x = new CommandHandler(fChatLibInstance, "here");
+        var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
+        x.join("", data);
+        x.join("", data);
+        setTimeout(() => {
+            if(expect(fChatLibInstance.sendMessage).toHaveBeenCalledWith('[color=red]You have already joined the fight.[/color]', 'here')){
+                done();
+            }
+            else{
+                done(new Error("The player couldn't join the match"));
+            }
+        }, 300);
+    });
+
+
+    it("should join ring and set ready", function(done){
+        var x = new CommandHandler(fChatLibInstance, "here");
+        var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
+        x.ready("", data);
+        setTimeout(() => {
+            if(expect(fChatLibInstance.sendMessage).toHaveBeenCalledWith('[color=red]Aelith Blanchette is now ready to get it on![/color]\n', 'here')){
+                done();
+            }
+            else{
+                done(new Error("Did not put the player as ready"));
+            }
+        }, 300);
+    });
+
+    it("should say already joined ring and set ready", function(done){
+        var x = new CommandHandler(fChatLibInstance, "here");
+        var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
+        x.ready("", data);
+        x.ready("", data);
+        setTimeout(() => {
+            if(expect(fChatLibInstance.sendMessage).toHaveBeenCalledWith('[color=red]You are already ready.[/color]', 'here')){
+                done();
+            }
+            else{
+                done(new Error("Did not successfully check if the fighter was already ready"));
+            }
+        }, 300);
+    });
 
     function initiateMatchSettings(cmdHandler){
         let pro = new Promise((resolve, reject) => {
@@ -82,7 +115,7 @@ describe("Fighter testing", () => {
         });
     }
 
-    it("should start the match", function(done){
+    it("should tag successfully", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -94,7 +127,7 @@ describe("Fighter testing", () => {
         });
         });
         });
-    },10000);
+    });
 
 
 

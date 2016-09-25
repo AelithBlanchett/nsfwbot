@@ -173,7 +173,7 @@ export class FighterList extends Array<Fighter>{
         let leastPlayersInTeam = Math.min(...arrPlayersCount.values());
         let indexOfFirstEmptiestTeam = arrPlayersCount.values().indexOf(leastPlayersInTeam);
 
-        if(mostPlayersInTeam == leastPlayersInTeam){
+        if(mostPlayersInTeam == leastPlayersInTeam || mostPlayersInTeam == -Infinity || leastPlayersInTeam == Infinity){
             teamToUse = Team.Blue;
         }
         else{
