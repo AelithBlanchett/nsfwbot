@@ -431,8 +431,9 @@ export class Fight{
                 }
                 this.waitingForAction = false;
                 this.currentPlayer.pendingAction = new FightAction(this.id, this.currentTurn, tier, this.currentPlayer, this.currentTarget);
-                this.currentPlayer.pendingAction.actionGateway(action);
+                let eventToTriggerAfter = this.currentPlayer.pendingAction.actionGateway(action); //The specific trigger BEFORE is executed inside the attacks, see FightAction.ts
                 this.currentPlayer.pendingAction.commit(this);
+                this.currentPlayer.triggerMods(eventToTriggerAfter);
             }
         }
     }

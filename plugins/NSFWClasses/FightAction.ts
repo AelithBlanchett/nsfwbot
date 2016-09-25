@@ -52,7 +52,7 @@ export class FightAction{
         return scoreRequired;
     }
 
-    actionGateway(actionType:Action){
+    actionGateway(actionType:Action):Trigger{
         let result;
         switch (actionType) {
             case Action.Brawl:
@@ -75,8 +75,8 @@ export class FightAction{
     }
 
     actionBrawl():Trigger{
-        this.type = "brawl";
         this.attacker.triggerMods(Trigger.BeforeBrawlAttack);
+        this.type = "brawl";
         this.diceScore = this.attacker.roll(1) + this.attacker.power;
         if(this.diceScore >= this.requiredDiceScore(Action.Brawl, this.tier)){
             this.missed = false;
@@ -108,6 +108,7 @@ export class FightAction{
     }
 
     actionTag():Trigger{ //"skips" a turn
+        this.attacker.triggerMods(Trigger.BeforeTag);
         this.type = "tag";
         this.diceScore = 0;
         this.requiresRoll = false;
@@ -120,6 +121,7 @@ export class FightAction{
     }
 
     actionPass():Trigger{ //"skips" a turn
+        this.attacker.triggerMods(Trigger.BeforePass);
         this.type = "pass";
         this.diceScore = 0;
         this.missed = false;
