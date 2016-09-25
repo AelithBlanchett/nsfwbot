@@ -11,7 +11,8 @@
     "jasmine": "2.2",
     "lodash": "*",
     "mysql": "*",
-    "promise": "^7.1.1"
+    "promise": "^7.1.1",
+    "wait-until": "*"
   },
   "devDependencies": {},
   "scripts": {

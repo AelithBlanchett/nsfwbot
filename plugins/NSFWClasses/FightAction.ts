@@ -32,6 +32,7 @@ export class FightAction{
         this.missed = true;
         this.hpDamage = 0;
         this.lustDamage = 0;
+        this.focusDamage = 0;
         this.diceScore = 0;
         this.tier = tier;
         this.atTurn = currentTurn;
@@ -110,7 +111,7 @@ export class FightAction{
     actionTag():Trigger{ //"skips" a turn
         this.attacker.triggerMods(Trigger.BeforeTag);
         this.type = "tag";
-        this.diceScore = 0;
+        this.diceScore = -1;
         this.requiresRoll = false;
         this.attacker.lastTagTurn = this.atTurn;
         this.defender.lastTagTurn = this.atTurn;
@@ -123,7 +124,7 @@ export class FightAction{
     actionPass():Trigger{ //"skips" a turn
         this.attacker.triggerMods(Trigger.BeforePass);
         this.type = "pass";
-        this.diceScore = 0;
+        this.diceScore = -1;
         this.missed = false;
         return Trigger.AfterPass;
     }
@@ -145,7 +146,12 @@ export class FightAction{
 
     commit(fight:Fight){
         if(this.missed == false){
-            fight.addMessage(`${this.attacker.name} rolled ${this.diceScore}, the ${this.type} attack [b][color=green]HITS![/color][/b]`);
+            if(this.diceScore == -1){ //-1 == no roll
+                //fight.addMessage(`The ${this.type} is [b][color=green]SUCCESSFUL![/color][/b]`);
+            }
+            else{
+                fight.addMessage(`${this.attacker.name} rolled ${this.diceScore}, the ${this.type} attack [b][color=green]HITS![/color][/b]`);
+            }
         }
         else{
             fight.addMessage(`${this.attacker.name} rolled ${this.diceScore}, the ${this.type} attack [b][color=red]MISSED![/color][/b]`);

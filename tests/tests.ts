@@ -4,6 +4,7 @@ import {IFChatLib} from "../plugins/NSFWClasses/interfaces/IFChatLib";
 import {CommandHandler} from "../plugins/NSFWClasses/CommandHandler";
 import {Constants} from "../plugins/NSFWClasses/Constants";
 import Tier = Constants.Tier;
+var waitUntil = require('wait-until');
 //let myFighter = new Fighter("test", 0, 0 ,0 ,0 ,0);
 
 var Jasmine = require('jasmine');
@@ -58,53 +59,42 @@ describe("Fighter testing", () => {
     //    setTimeout(done, 1000);
     //});
 
+    function initiateMatchSettings(cmdHandler){
+        let pro = new Promise((resolve, reject) => {
+            cmdHandler.fight.setFightType("tagteam");
+            resolve();
+        }).then(() => {
+            cmdHandler.join("Red", {character: "Aelith Blanchette", channel: "here"});
+        }).then(() => {
+            cmdHandler.join("Purple", {character: "Purple1", channel: "here"});
+        }).then(() => {
+            cmdHandler.join("Purple", {character: "Purple2", channel: "here"});
+        }).then(() => {
+            cmdHandler.join("Red", {character: "TheTinaArmstrong", channel: "here"});
+        }).then(() => {
+            cmdHandler.ready("Red", {character: "TheTinaArmstrong", channel: "here"});
+        }).then(() => {
+            cmdHandler.ready("Red", {character: "Aelith Blanchette", channel: "here"});
+        }).then(() => {
+            cmdHandler.ready("Red", {character: "Purple1", channel: "here"});
+        }).then(() => {
+            cmdHandler.ready("Red", {character: "Purple2", channel: "here"});
+        });
+    }
+
     it("should start the match", function(done){
-        var x = new CommandHandler(fChatLibInstance, "here");
-        //let y = x.fight.getTeamsList();
-        //let z = x.fight.getTeamsIdList();
-        x.fight.setFightType("tagteam");
-        x.join("Red", {character: "Aelith Blanchette", channel: "here"});
-        x.join("Purple", {character: "Purple1", channel: "here"});
-        x.join("Purple", {character: "Purple2", channel: "here"});
-        x.join("Red", {character: "TheTinaArmstrong", channel: "here"});
-        setTimeout(function(){x.ready("", {character: "Aelith Blanchette", channel: "here"})}, 1000);
-        setTimeout(function(){x.ready("", {character: "Purple1", channel: "here"})}, 1500);
-        setTimeout(function(){x.ready("", {character: "Purple2", channel: "here"})}, 2000);
-        setTimeout(function(){x.ready("", {character: "TheTinaArmstrong", channel: "here"})}, 2500);
-        setTimeout(function(){x.fight.fighterList.getFighterByName("TheTinaArmstrong").dice.addMod(50);}, 2500);
-
-        //x.join("Purple", {character: "Purple1", channel: "here"});
-        //setTimeout(function(){x.ready("", {character: "Purple1", channel: "here"})}, 2000);
-        //x.join("Purple", {character: "Purple2", channel: "here"});
-        //setTimeout(function(){x.ready("", {character: "Purple2", channel: "here"})}, 2000);
-        //x.join("Purple", {character: "Purple3", channel: "here"});
-        //setTimeout(function(){x.ready("", {character: "Purple3", channel: "here"})}, 2000);
-        //x.join("Yellow", {character: "Yellow1", channel: "here"});
-        //setTimeout(function(){x.ready("", {character: "Yellow1", channel: "here"})}, 2000);
-        //x.join("Yellow", {character: "Yellow2", channel: "here"});
-        //setTimeout(function(){x.ready("", {character: "Yellow2", channel: "here"})}, 2000);
-        //x.join("Yellow", {character: "Yellow3", channel: "here"});
-        //setTimeout(function(){x.ready("", {character: "Yellow3", channel: "here"})}, 2000);
-
-
-        //setTimeout(_ =>{
-        //    for(let i = 1; i <= 100; i++){
-        //        setTimeout(_ =>{
-        //            x.brawl("light", {character: x.fight.currentPlayer.name, channel: "here"});
-        //            //x.fight.doAction(x.fight.currentPlayer.id, "brawl", Tier.Light);
-        //        }, i*50);
-        //    }
-        //}, 6000);
-
-        setTimeout(_ =>{
-                    x.tag("Aelith Blanchette", {character: "TheTinaArmstrong", channel: "here"});
-        }, 4000);
-
-        setTimeout(_ =>{
-            x.fight.saveState();
-        }, 8000);
-        setTimeout(done, 10000000);
-    },100000000);
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.fighterList.getFighterByName("TheTinaArmstrong").dice.addMod(50);
+            waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
+                cmd.tag("Aelith Blanchette", {character: "TheTinaArmstrong", channel: "here"});
+                waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.currentPlayer.name != "Aelith Blanchette");}).done(() =>{
+                    done();
+        });
+        });
+        });
+    },10000);
 
 
 

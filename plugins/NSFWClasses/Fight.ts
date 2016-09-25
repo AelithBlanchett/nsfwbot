@@ -410,7 +410,7 @@ export class Fight{
                 if(!this.canAttack()){
                     return;
                 }
-                if(action == Action.Tag){
+                if(action == Action.Tag){ //put in the condition any attacks that could focus allies
                     if(!this.canTag())
                         return;
                     if(customTarget != undefined && customTarget.assignedTeam == this.currentPlayer.assignedTeam){
@@ -430,10 +430,12 @@ export class Fight{
                     }
                 }
                 this.waitingForAction = false;
-                this.currentPlayer.pendingAction = new FightAction(this.id, this.currentTurn, tier, this.currentPlayer, this.currentTarget);
-                let eventToTriggerAfter = this.currentPlayer.pendingAction.actionGateway(action); //The specific trigger BEFORE is executed inside the attacks, see FightAction.ts
-                this.currentPlayer.pendingAction.commit(this);
-                this.currentPlayer.triggerMods(eventToTriggerAfter);
+                let attacker = this.currentPlayer; // need to store them in case of turn-changing logic
+                let defender = this.currentTarget;
+                attacker.pendingAction = new FightAction(this.id, this.currentTurn, tier, attacker, defender);
+                let eventToTriggerAfter = attacker.pendingAction.actionGateway(action); //The specific trigger BEFORE is executed inside the attacks, see FightAction.ts
+                attacker.pendingAction.commit(this);
+                attacker.triggerMods(eventToTriggerAfter);
             }
         }
     }
