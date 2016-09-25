@@ -7,8 +7,11 @@ import {Fight} from "./Fight";
 
 export class FighterList extends Array<Fighter>{
 
-    public constructor() {
+    minNumberOfTeamsThatPlay:number = 0;
+
+    public constructor(minNumberOfTeamsThatPlay) {
         super();
+        this.minNumberOfTeamsThatPlay = minNumberOfTeamsThatPlay;
     }
 
     reorderFightersByInitiative(arrFightersSortedByInitiative:Array<Fighter>){
@@ -99,6 +102,24 @@ export class FighterList extends Array<Fighter>{
         return fullTeamCount.length;
     }
 
+    getAllUsedTeams():Array<Team>{
+        let usedTeams:Array<Team> = [];
+        for(let player of this){
+            if(usedTeams.indexOf(player.assignedTeam) == -1){
+                usedTeams.push(player.assignedTeam);
+            }
+        }
+        var teamIndex = 0;
+        while(usedTeams.length < this.minNumberOfTeamsThatPlay){
+            let teamToAdd = Team[Team[teamIndex]];
+            if(usedTeams.indexOf(teamToAdd)){
+                usedTeams.push(teamToAdd);
+            }
+            teamIndex++;
+        }
+        return usedTeams;
+    }
+
     getUsedTeams():Array<Team>{
         let usedTeams:Array<Team> = [];
         for(let player of this.getAlivePlayers()){
@@ -164,7 +185,7 @@ export class FighterList extends Array<Fighter>{
     getAvailableTeam():Team{
         let teamToUse:Team = Team.Blue;
         let arrPlayersCount = new Dictionary<Team, number>();
-        let usedTeams= this.getUsedTeams();
+        let usedTeams= this.getAllUsedTeams();
         for(var teamId of usedTeams){
             arrPlayersCount.add(teamId as Team, this.getNumberOfPlayersInTeam(Team[Team[teamId]]));
         }

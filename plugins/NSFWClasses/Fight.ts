@@ -39,7 +39,18 @@ export class Fight{
         this.stage = stage || this.pickStage();
         this.fChatLibInstance = fChatLibInstance;
         this.channel = channel;
-        this.fighterList = new FighterList();
+        this.fighterList = new FighterList(this.usedTeams);
+    }
+
+    changeMinTeamsInvolvedInFight(intNewNumberOfTeams:number){
+        if(intNewNumberOfTeams >= 2 ){
+            this.fighterList.minNumberOfTeamsThatPlay = intNewNumberOfTeams;
+            this.addMessage("Number of teams involved in the fight updated!.");
+        }
+        else{
+            this.addMessage("The number of teams should be superior or equal than 2.");
+        }
+        this.sendMessage();
     }
 
     setFightType(type:string){
@@ -136,7 +147,7 @@ export class Fight{
                 this.stage = "Virtual Arena";
                 this.usedTeams = results[0].usedTeams;
                 this.currentTurn = results[0].currentTurn;
-                this.fighterList = new FighterList();
+                this.fighterList = new FighterList(this.usedTeams);
                 //TODO: LOAD FORMER ACTIONS
 
                 var oldParsedList = CircularJSON.parse(results[0].fighterList);
@@ -209,7 +220,7 @@ export class Fight{
         this.hasStarted = true;
         this.fighterList.shufflePlayers(); //random order for teams
 
-        this.addMessage(`The fighters will meet in the... [color=red][b]${this.stage}![/b][/color`);
+        this.addMessage(`The fighters will meet in the... [color=red][b]${this.stage}![/b][/color]`);
 
         for(let i = 0; i < this.fighterList.maxPlayersPerTeam; i++){ //Prints as much names as there are team
             let fullStringVS = "[b]";

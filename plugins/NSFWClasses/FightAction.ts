@@ -125,6 +125,7 @@ export class FightAction{
         this.attacker.triggerMods(Trigger.BeforePass);
         this.type = "pass";
         this.diceScore = -1;
+        this.requiresRoll = false;
         this.missed = false;
         return Trigger.AfterPass;
     }
@@ -145,8 +146,9 @@ export class FightAction{
     }
 
     commit(fight:Fight){
+        fight.addMessage("\n");
         if(this.missed == false){
-            if(this.diceScore == -1){ //-1 == no roll
+            if(this.requiresRoll == false){ //-1 == no roll
                 //fight.addMessage(`The ${this.type} is [b][color=green]SUCCESSFUL![/color][/b]`);
             }
             else{
@@ -155,6 +157,10 @@ export class FightAction{
         }
         else{
             fight.addMessage(`${this.attacker.name} rolled ${this.diceScore}, the ${this.type} attack [b][color=red]MISSED![/color][/b]`);
+        }
+
+        if(this.requiresRoll){
+            fight.addMessage(`${this.attacker.name} needed to roll ${this.diceScore} for the ${Tier[this.tier]} ${this.type} attack to hit.`);
         }
 
         fight.pastActions.push(this);

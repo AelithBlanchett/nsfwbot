@@ -33,7 +33,7 @@ describe("Fighter testing", () => {
         spyOn(fChatLibInstance, 'sendPrivMessage').and.callThrough();;
     });
 
-    it("should join ring", function(done){
+    xit("should join ring", function(done){
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
@@ -47,7 +47,7 @@ describe("Fighter testing", () => {
         }, 300);
     });
 
-    it("should not join ring", function(done){
+    xit("should not join ring", function(done){
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
@@ -63,7 +63,7 @@ describe("Fighter testing", () => {
     });
 
 
-    it("should join ring and set ready", function(done){
+    xit("should join ring and set ready", function(done){
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.ready("", data);
@@ -77,7 +77,7 @@ describe("Fighter testing", () => {
         }, 300);
     });
 
-    it("should say already joined ring and set ready", function(done){
+    xit("should say already joined ring and set ready", function(done){
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.ready("", data);
@@ -88,6 +88,24 @@ describe("Fighter testing", () => {
             }
             else{
                 done(new Error("Did not successfully check if the fighter was already ready"));
+            }
+        }, 300);
+    });
+
+    xit("should NOT start the match with the blue and red team", function(done){
+        var x = new CommandHandler(fChatLibInstance, "here");
+        var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
+        x.join("", data);
+        var data:FChatResponse = {character: "TheTinaArmstrong", channel: "here"};
+        x.join("", data);
+        setTimeout(() => {
+            if(expect(fChatLibInstance.sendMessage).toHaveBeenCalledWith('[color=red]Aelith Blanchette stepped into the ring for the [color=Blue]Blue[/color] team! Waiting for everyone to be !ready.[/color]', 'here')
+            && expect(fChatLibInstance.sendMessage).toHaveBeenCalledWith('[color=red]TheTinaArmstrong stepped into the ring for the [color=Red]Red[/color] team! Waiting for everyone to be !ready.[/color]', 'here')
+            && x.fight.hasStarted == false){
+                done();
+            }
+            else{
+                done(new Error("Did not put the player as ready"));
             }
         }, 300);
     });
@@ -115,7 +133,7 @@ describe("Fighter testing", () => {
         });
     }
 
-    it("should tag successfully", function(done){
+    xit("should tag successfully", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{

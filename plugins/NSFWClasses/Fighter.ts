@@ -307,7 +307,7 @@ export class Fighter implements IFighter{
                 `  ${this.heartsRemaining}/${this.maxHearts} [color=red]Hearts[/color]  |`+
                 `  ${this.lust}/${this.lustPerOrgasm} [color=pink]Lust[/color]  |`+
                 `  ${this.orgasmsRemaining}/${this.maxOrgasms} [color=pink]Orgasms[/color]  |`+
-                `  [sub]${this.minFocus}[/sub]|[b]${this.focus}[/b]|[sub]${this.maxFocus}[/sub] Focus[/color]`+
+                `  [color=red][sub]${this.minFocus}[/sub][/color]|[b]${this.focus}[/b]|[color=red][sub]${this.maxFocus}[/sub][/color] Focus`+
                 (this.target != undefined ? `  [color=red]Target:[/color] ${this.target.getStylizedName()}` : "")+
                 "\n";
     }

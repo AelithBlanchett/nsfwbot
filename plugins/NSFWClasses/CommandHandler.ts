@@ -26,7 +26,7 @@ export class CommandHandler implements ICommandHandler{
     register(args:string, data:FChatResponse){
         let parsedAffinity:Affinity = Parser.Commands.register(args);
         if(parsedAffinity == -1){
-            this.fChatLibInstance.sendMessage("This type of affinity hasn't been found. Please try again with either Power or Finesse.", this.channel);
+            this.fChatLibInstance.sendMessage("[color=red]This type of affinity hasn't been found. Please try again with either Power or Finesse. Example: !register Power[/color]", this.channel);
             return;
         }
         Fighter.exists(data.character).then(doesExist =>{
@@ -132,13 +132,36 @@ export class CommandHandler implements ICommandHandler{
         }
         let tier = Utils.stringToEnum(Tier, args);
         if(tier == -1){
-            this.fChatLibInstance.sendMessage("[color=red]The tier is required, and neither Light, Medium or Heavy was specified.[/color]", this.channel);
+            this.fChatLibInstance.sendMessage("[color=red]The tier is required, and neither Light, Medium or Heavy was specified. Example: !brawl Medium[/color]", this.channel);
             return false;
         }
         Fighter.exists(data.character).then(data =>{
             if(data){
                 let fighter:Fighter = data as Fighter;
                 this.fight.doAction(fighter.id, Action.Brawl, tier as Tier);
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
+    sexy(args:string, data:FChatResponse){
+        if(this.fight == undefined || !this.fight.hasStarted){
+            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
+            return false;
+        }
+        let tier = Utils.stringToEnum(Tier, args);
+        if(tier == -1){
+            this.fChatLibInstance.sendMessage("[color=red]The tier is required, and neither Light, Medium or Heavy was specified. Example: !sexy Heavy[/color]", this.channel);
+            return false;
+        }
+        Fighter.exists(data.character).then(data =>{
+            if(data){
+                let fighter:Fighter = data as Fighter;
+                this.fight.doAction(fighter.id, Action.SexStrike, tier as Tier);
             }
             else{
                 this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
@@ -162,6 +185,24 @@ export class CommandHandler implements ICommandHandler{
                     return false;
                 }
                 this.fight.doAction(fighter.id, Action.Tag, Tier.None, fighterToTagWith);
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
+    pass(args:string, data:FChatResponse){
+        if(this.fight == undefined || !this.fight.hasStarted){
+            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
+            return false;
+        }
+        Fighter.exists(data.character).then(data =>{
+            if(data){
+                let fighter:Fighter = data as Fighter;
+                this.fight.doAction(fighter.id, Action.Pass, Tier.None);
             }
             else{
                 this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
