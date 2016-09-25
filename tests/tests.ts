@@ -87,10 +87,10 @@ describe("Fighter testing", () => {
         initiateMatchSettings(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.fighterList.getFighterByName("TheTinaArmstrong").dice.addMod(50);
-            waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                cmd.tag("Aelith Blanchette", {character: "TheTinaArmstrong", channel: "here"});
-                waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.currentPlayer.name != "Aelith Blanchette");}).done(() =>{
-                    done();
+        waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
+            cmd.tag("Aelith Blanchette", {character: "TheTinaArmstrong", channel: "here"});
+        waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.currentPlayer.name != "Aelith Blanchette");}).done(() =>{
+            done();
         });
         });
         });
