@@ -13,7 +13,7 @@ export class FightAction{
     id: number;
     fightId: number;
     atTurn: number;
-    type: string;
+    type: Action;
     tier: Tier;
     isHold: boolean;
     attacker: Fighter;
@@ -27,7 +27,6 @@ export class FightAction{
 
     constructor(fightId:number, currentTurn:number, tier:Tier, attacker:Fighter, defender?:Fighter) {
         this.fightId = fightId;
-        this.type = "";
         this.isHold = false;
         this.missed = true;
         this.hpDamage = 0;
@@ -77,9 +76,9 @@ export class FightAction{
 
     actionBrawl():Trigger{
         this.attacker.triggerMods(Trigger.BeforeBrawlAttack);
-        this.type = "brawl";
+        this.type = Action.Brawl;
         this.diceScore = this.attacker.roll(1) + this.attacker.power;
-        if(this.diceScore >= this.requiredDiceScore(Action.Brawl, this.tier)){
+        if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
             this.hpDamage = this.strikeFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
         }
@@ -88,9 +87,9 @@ export class FightAction{
 
     actionSexStrike():Trigger{
         this.attacker.triggerMods(Trigger.BeforeSexStrikeAttack);
-        this.type = "sexstrike";
+        this.type = Action.SexStrike;
         this.diceScore = this.attacker.roll(1) + this.attacker.sensuality;
-        if(this.diceScore >= this.requiredDiceScore(Action.SexStrike, this.tier)){
+        if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
             this.lustDamage = this.strikeFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
         }
@@ -99,9 +98,9 @@ export class FightAction{
 
     actionSubHold():Trigger{
         this.attacker.triggerMods(Trigger.BeforeSubmissionHold);
-        this.type = "subhold";
+        this.type = Action.SexStrike;
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
-        if(this.diceScore >= this.requiredDiceScore(Action.SexStrike, this.tier)){
+        if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
             this.lustDamage = this.strikeFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
         }
@@ -110,7 +109,7 @@ export class FightAction{
 
     actionTag():Trigger{ //"skips" a turn
         this.attacker.triggerMods(Trigger.BeforeTag);
-        this.type = "tag";
+        this.type = Action.Tag;
         this.diceScore = -1;
         this.requiresRoll = false;
         this.attacker.lastTagTurn = this.atTurn;
@@ -123,24 +122,24 @@ export class FightAction{
 
     actionPass():Trigger{ //"skips" a turn
         this.attacker.triggerMods(Trigger.BeforePass);
-        this.type = "pass";
+        this.type = Action.Pass;
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
         return Trigger.AfterPass;
     }
 
-    commitDb(){
-        let attackerId = this.attacker.id || null;
-        let defenderId = this.defender.id || null;
+    static commitDb(action:FightAction){
+        let attackerId = action.attacker.id || null;
+        let defenderId = action.defender.id || null;
         var sql = "INSERT INTO `flistplugins`.?? (`idFight`,`atTurn`,`type`,`tier`,`isHold`,`idAttacker`,`idDefender`,`hpDamage`,`lustDamage`,`focusDamage`,`diceScore`,`missed`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
-        sql = Data.db.format(sql, [Constants.actionTableName, this.fightId, this.atTurn, this.type, this.tier, this.isHold, attackerId, defenderId, this.hpDamage, this.lustDamage, this.focusDamage, this.diceScore, this.missed]);
+        sql = Data.db.format(sql, [Constants.actionTableName, action.fightId, action.atTurn, action.type, action.tier, action.isHold, attackerId, defenderId, action.hpDamage, action.lustDamage, action.focusDamage, action.diceScore, action.missed]);
         Data.db.query(sql, (err, results) => {
             if (err) {
                 throw err;
             }
             else {
-                this.id = results.insertId;
+                action.id = results.insertId;
             }
         });
     }
@@ -152,15 +151,15 @@ export class FightAction{
                 //fight.addMessage(`The ${this.type} is [b][color=green]SUCCESSFUL![/color][/b]`);
             }
             else{
-                fight.addMessage(`${this.attacker.name} rolled ${this.diceScore}, the ${this.type} attack [b][color=green]HITS![/color][/b]`);
+                fight.addMessage(`${this.attacker.name} rolled ${this.diceScore}, the ${Action[this.type]} attack [b][color=green]HITS![/color][/b]`);
             }
         }
         else{
-            fight.addMessage(`${this.attacker.name} rolled ${this.diceScore}, the ${this.type} attack [b][color=red]MISSED![/color][/b]`);
+            fight.addMessage(`${this.attacker.name} rolled ${this.diceScore}, the ${Action[this.type]} attack [b][color=red]MISSED![/color][/b]`);
         }
 
         if(this.requiresRoll){
-            fight.addMessage(`${this.attacker.name} needed to roll ${this.diceScore} for the ${Tier[this.tier]} ${this.type} attack to hit.`);
+            fight.addMessage(`${this.attacker.name} needed to roll ${this.requiredDiceScore(this.type, this.tier)} for the ${Tier[this.tier]} ${Action[this.type]} attack to hit.`);
         }
 
         fight.pastActions.push(this);
@@ -177,7 +176,7 @@ export class FightAction{
             }
         }
 
-        if(this.type == "tag"){
+        if(this.type == Action.Tag){
             fight.addMessage(`[b][color=red]TAG![/color][/b] ${this.defender.name} enters inside the ring!`);
         }
 
@@ -190,12 +189,15 @@ export class FightAction{
             this.defender.triggerOutsideRing();
         }
         else if(this.defender.isBroken()){
-            fight.addMessage(`${this.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
+            fight.addMessage(`${this.defender.name} is too mentally exhausted to continue! [b][color=red]They're out![/color][/b]`);
             this.defender.triggerOutsideRing();
+        }
+        else if(!this.defender.isInTheRing || !this.attacker.isInTheRing){
+            fight.addMessage(`${this.defender.name} can't stay inside the ring anymore! [b][color=red]They're out![/color][/b]`);
         }
 
         //Save it to the DB
-        this.commitDb();
+        FightAction.commitDb(this);
 
         //check for fight ending status
         if (fight.fighterList.getUsedTeams().length != 1) {

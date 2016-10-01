@@ -304,7 +304,7 @@ export class Fight{
 
     setCurrentPlayer(fighterName:string){
         let index = this.fighterList.findIndex((x) => x.name == fighterName && !x.isTechnicallyOut());
-        if(index != -1){ //switch positions
+        if(index != -1 && this.fighterList[0].name != fighterName){ //switch positions
             var temp = this.fighterList[0];
             this.fighterList[0] = this.fighterList[index];
             this.fighterList[index] = temp;
@@ -315,7 +315,7 @@ export class Fight{
             this.addMessage(`Successfully changed ${temp.name}'s place with ${this.fighterList[0].name}'s!`)
         }
         else{
-            this.addMessage("Couldn't switch the two wrestlers. The name is either wrong, or this fighter isn't able to fight right now.")
+            this.addMessage("Couldn't switch the two wrestlers. The name is either wrong, this fighter is already in the ring or this fighter isn't able to fight right now.")
         }
     }
 
@@ -509,12 +509,15 @@ export class Fight{
         this.winnerTeam = this.fighterList.getUsedTeams()[0];
         this.addMessage(`${Team[this.winnerTeam]} team wins the fight!`);
         this.sendMessage();
-        var tokensToGiveToWinners:number = TokensPerWin[FightTier[this.getFightTier(this.winnerTeam)]];
-        var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.tokensPerLossMultiplier;
+        Fight.commitEndFightDb(this);
+    }
 
+    static commitEndFightDb(fight){
+        var tokensToGiveToWinners:number = TokensPerWin[FightTier[fight.getFightTier(fight.winnerTeam)]];
+        var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.tokensPerLossMultiplier;
         Data.db.beginTransaction(err =>{
             var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
-            sql = Data.db.format(sql, [Constants.fightTableName, this.currentTurn, "", true, this.winnerTeam, this.id]);
+            sql = Data.db.format(sql, [Constants.fightTableName, fight.currentTurn, "", true, fight.winnerTeam, fight.id]);
             Data.db.query(sql, (err, results) => {
                 if(err){
                     Data.db.rollback(function(){
@@ -523,21 +526,21 @@ export class Fight{
                 }
                 else{
                     var callsToMake = [];
-                    for(let fighter of this.fighterList){
-                        if(fighter.assignedTeam == this.winnerTeam){
-                            this.addMessage(`Awarded ${tokensToGiveToWinners} ${Constants.currencyName} to ${fighter.getStylizedName()}`);
+                    for(let fighter of fight.fighterList){
+                        if(fighter.assignedTeam == fight.winnerTeam){
+                            fight.addMessage(`Awarded ${tokensToGiveToWinners} ${Constants.currencyName} to ${fighter.getStylizedName()}`);
                             callsToMake.push(fighter.giveTokens(tokensToGiveToWinners));
                         }
                         else{
-                            this.addMessage(`Awarded ${tokensToGiveToLosers} ${Constants.currencyName} to ${fighter.getStylizedName()}`);
+                            fight.addMessage(`Awarded ${tokensToGiveToLosers} ${Constants.currencyName} to ${fighter.getStylizedName()}`);
                             callsToMake.push(fighter.giveTokens(tokensToGiveToLosers));
                         }
                     }
                     Promise.all(callsToMake)
                         .then(_ => {
                             Data.db.commit(_ => {
-                                console.log(`Finished fight ${this.id} and given all the according tokens successfully`);
-                                this.sendMessage(); //send tokens message and everything
+                                console.log(`Finished fight ${fight.id} and given all the according tokens successfully`);
+                                fight.sendMessage(); //send tokens message and everything
                             });
                         })
                         .catch((err) => {
