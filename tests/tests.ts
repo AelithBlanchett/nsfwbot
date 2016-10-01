@@ -13,6 +13,7 @@ var jasmine = new Jasmine();
 
 var mockedClasses = [];
 var usedIndexes = [];
+var usedFighters = [];
 
 function getMock(mockedClass) {
     if(mockedClasses.indexOf(mockedClass) != -1){
@@ -31,19 +32,27 @@ Fighter.exists = function(name){
 };
 
 function createFighter(name, intStatsToAssign:number = 3):Fighter{
-    let myFighter = getMock(Fighter);
-    let randomId = -1;
-    do{
-        randomId = Utils.getRandomInt(0,1000000);
-    }while(usedIndexes.indexOf(randomId) != -1);
-    myFighter.id = randomId;
-    myFighter.name = name;
-    myFighter.strength = myFighter.dexterity = myFighter.endurance = myFighter.toughness = myFighter.willpower = intStatsToAssign;
-    myFighter.hp = myFighter.hpPerHeart();
-    myFighter.heartsRemaining = myFighter.maxHearts();
-    myFighter.lust = 0;
-    myFighter.orgasmsRemaining = myFighter.maxOrgasms();
-    myFighter.focus = myFighter.willpower;
+    let myFighter;
+    if(usedFighters.findIndex(x => x.name == name) == -1){
+        myFighter = getMock(Fighter);
+        let randomId = -1;
+        do{
+            randomId = Utils.getRandomInt(0,1000000);
+        }while(usedIndexes.indexOf(randomId) != -1);
+        myFighter.id = randomId;
+        myFighter.name = name;
+        myFighter.strength = myFighter.dexterity = myFighter.endurance = myFighter.toughness = myFighter.willpower = intStatsToAssign;
+        myFighter.hp = myFighter.hpPerHeart();
+        myFighter.heartsRemaining = myFighter.maxHearts();
+        myFighter.lust = 0;
+        myFighter.orgasmsRemaining = myFighter.maxOrgasms();
+        myFighter.focus = myFighter.willpower;
+        usedFighters.push(myFighter);
+    }
+    else{
+        myFighter = usedFighters.find(x => x.name == name);
+    }
+
     return myFighter;
 }
 
@@ -234,23 +243,56 @@ describe("The match", () => {
     }
 
     function wasHealthHit(cmd:CommandHandler, name:string){
-        return ((cmd.fight.fighterList.getFighterByName(name).hp == cmd.fight.fighterList.getFighterByName(name).hpPerHeart && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").heartsRemaining <= cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxHearts) || cmd.fight.fighterList.getFighterByName("Aelith Blanchette").hpPerHeart < 25);
+        return (
+                    (
+                        cmd.fight.fighterList.getFighterByName(name).hp == cmd.fight.fighterList.getFighterByName(name).hpPerHeart() &&
+                        cmd.fight.fighterList.getFighterByName(name).heartsRemaining < cmd.fight.fighterList.getFighterByName(name).maxHearts()
+                    )
+                    ||
+                    cmd.fight.fighterList.getFighterByName(name).hp < cmd.fight.fighterList.getFighterByName(name).hpPerHeart()
+                );
     }
 
     function wasLustHit(cmd:CommandHandler, name:string){ //TODO change values
-        return ((cmd.fight.fighterList.getFighterByName(name).lust == 25 && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").orgasmsRemaining <= 2) || cmd.fight.fighterList.getFighterByName("Aelith Blanchette").lust < 25);
+        return (
+            (
+                cmd.fight.fighterList.getFighterByName(name).lust == cmd.fight.fighterList.getFighterByName(name).lustPerOrgasm() &&
+                cmd.fight.fighterList.getFighterByName(name).orgasmsRemaining < cmd.fight.fighterList.getFighterByName(name).maxOrgasms()
+            )
+            ||
+            cmd.fight.fighterList.getFighterByName(name).lust < cmd.fight.fighterList.getFighterByName(name).lustPerOrgasm()
+        );
     }
 
-    xit("should do a brawl move", function(done){
+    xit("should swap to TheTinaArmstrong", function(done) {
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction)}).done(() =>{
+            let fighterNameBefore = cmd.fight.currentPlayer.name;
+            console.log("Fighter before: "+fighterNameBefore);
+            cmd.fight.assignRandomTarget(cmd.fight.currentPlayer)
+            cmd.fight.setCurrentPlayer(cmd.fight.currentTarget.name);
+            if(cmd.fight.currentPlayer.name != fighterNameBefore){
+                console.log("Fighter after: "+cmd.fight.currentPlayer.name);
+                done();
+            }
+            else{
+                done(new Error("Fighters didn't swap places."));
+            }
+        });
+    });
+
+    it("should do a brawl move", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "brawl", "Light").then(() => {
                 if(wasHealthHit(cmd, "Aelith Blanchette")) {
                     done();
                 }
                 else{
-                    done(new Error("HPs were not drained despite the fact that the attack had hit."));
+                    done(new Error("HPs were not drained despite the fact that the attack should have hit."));
                 }
             });
         });
@@ -271,25 +313,6 @@ describe("The match", () => {
         });
     });
 
-
-
-    //it("should load the first fight and do a move", function(done){
-    //    var x = new CommandHandler(fChatLibInstance, "here");
-    //    x.fight.loadState(1);
-    //
-    //    setTimeout(_ =>{
-    //        for(let i = 1; i <= 1; i++){
-    //            setTimeout(_ =>{
-    //                x.fight.doAction(x.fight.currentPlayer.id, "brawl", Tier.Light);
-    //            }, i*1000);
-    //        }
-    //    }, 6000);
-    //
-    //    //setTimeout(_ =>{
-    //    //    x.fight.saveState();
-    //    //}, 8000);
-    //    setTimeout(done, 10000000);
-    //},100000000);
 
 });
 

@@ -306,13 +306,13 @@ export class Fight{
         let index = this.fighterList.findIndex((x) => x.name == fighterName && !x.isTechnicallyOut());
         if(index != -1){ //switch positions
             var temp = this.fighterList[0];
-            this[0] = this[index];
-            this[index] = temp;
-            this[0].isInTheRing = true;
-            if(this[index].assignedTeam == this[0].assignedTeam && this[index].isInTheRing == true && this.fightType == FightType.Tag){
-                this[index].isInTheRing = false;
+            this.fighterList[0] = this.fighterList[index];
+            this.fighterList[index] = temp;
+            this.fighterList[0].isInTheRing = true;
+            if(this.fighterList[index].assignedTeam == this.fighterList[0].assignedTeam && this.fighterList[index].isInTheRing == true && this.fightType == FightType.Tag){
+                this.fighterList[index].isInTheRing = false;
             }
-            this.addMessage(`Successfully changed ${temp.name}'s place with ${this[0].name}'s!`)
+            this.addMessage(`Successfully changed ${temp.name}'s place with ${this.fighterList[0].name}'s!`)
         }
         else{
             this.addMessage("Couldn't switch the two wrestlers. The name is either wrong, or this fighter isn't able to fight right now.")
