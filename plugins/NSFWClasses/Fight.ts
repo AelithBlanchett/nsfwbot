@@ -208,7 +208,7 @@ export class Fight{
     }
 
     canStartMatch(){
-        let canGo = (this.fighterList.isEveryoneReady() && !this.hasStarted && this.fighterList.getUsedTeams().length >= this.usedTeams);
+        let canGo = (this.fighterList.isEveryoneReady() && !this.hasStarted && this.fighterList.getAllUsedTeams().length >= this.usedTeams);
         return canGo; //only start if everyone's ready and if the teams are balanced
     }
 
@@ -300,6 +300,23 @@ export class Fight{
 
     get nextPlayer():Fighter{
         return this.fighterList.getAlivePlayers()[this.currentTurn % this.fighterList.aliveFighterCount];
+    }
+
+    setCurrentPlayer(fighterName:string){
+        let index = this.fighterList.findIndex((x) => x.name == fighterName && !x.isTechnicallyOut());
+        if(index != -1){ //switch positions
+            var temp = this.fighterList[0];
+            this[0] = this[index];
+            this[index] = temp;
+            this[0].isInTheRing = true;
+            if(this[index].assignedTeam == this[0].assignedTeam && this[index].isInTheRing == true && this.fightType == FightType.Tag){
+                this[index].isInTheRing = false;
+            }
+            this.addMessage(`Successfully changed ${temp.name}'s place with ${this[0].name}'s!`)
+        }
+        else{
+            this.addMessage("Couldn't switch the two wrestlers. The name is either wrong, or this fighter isn't able to fight right now.")
+        }
     }
 
     //Fight helpers
@@ -454,8 +471,8 @@ export class Fight{
     getFightTier(winnerTeam){
         var highestWinnerTier = FightTier.Bronze;
         for(let fighter of this.fighterList.getTeam(winnerTeam)){
-            if(fighter.tier > highestWinnerTier){
-                highestWinnerTier = fighter.tier;
+            if(fighter.tier() > highestWinnerTier){
+                highestWinnerTier = fighter.tier();
             }
         }
 
@@ -463,10 +480,10 @@ export class Fight{
         for(let fighter of this.fighterList){
             if(fighter.assignedTeam != winnerTeam){
                 if(lowestLoserTier == undefined){
-                    lowestLoserTier = fighter.tier;
+                    lowestLoserTier = fighter.tier();
                 }
-                else if(lowestLoserTier > fighter.tier){
-                    lowestLoserTier = fighter.tier;
+                else if(lowestLoserTier > fighter.tier()){
+                    lowestLoserTier = fighter.tier();
                 }
             }
         }

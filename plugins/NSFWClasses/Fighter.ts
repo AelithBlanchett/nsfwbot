@@ -58,6 +58,7 @@ export class Fighter implements IFighter{
     pendingAction:FightAction;
 
     constructor() {
+        this.dice = new Dice(10);
     }
 
     load(name){
@@ -103,7 +104,7 @@ export class Fighter implements IFighter{
             var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`sensuality` = ?,`dexterity` = ?,\
                 `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ?,`affinity` = ? WHERE `id` = ?;";
             sql = Data.db.format(sql, [Constants.fightersTableName, this.tokens, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate, this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, this.affinity, this.id]);
-            Data.db.query(sql, function (err, result) {
+            Data.db.query(sql, (err, result) => {
                 if (result) {
                     console.log("Updated "+this.name+"'s entry in the db.");
                     resolve();
@@ -135,27 +136,27 @@ export class Fighter implements IFighter{
         }
     }
 
-    get hpPerHeart():number {
+    hpPerHeart():number {
         return (10 + this.power + this.sensuality + this.dexterity + (this.toughness * 2) + this.endurance);
     }
 
-    get maxHearts():number {
+    maxHearts():number {
         return this.toughness;
     }
 
-    get lustPerOrgasm():number{
+    lustPerOrgasm():number{
         return (10 + this.power + this.sensuality + this.dexterity + this.toughness * +(this.endurance * 2));
     }
 
-    get maxOrgasms():number {
+    maxOrgasms():number {
         return this.endurance;
     }
 
-    get minFocus():number {
+    minFocus():number {
         return -1-this.willpower;
     }
 
-    get maxFocus():number {
+    maxFocus():number {
         return 1+this.willpower;
     }
 
@@ -173,7 +174,7 @@ export class Fighter implements IFighter{
             this.heartsRemaining--;
             this.fight.addMessage(`[b][color=red]Heart broken![/color][/b] ${this.name} has ${this.heartsRemaining} hearts left.`);
             if(this.heartsRemaining > 0){
-                this.hp = this.hpPerHeart;
+                this.hp = this.hpPerHeart();
             }
             else if(this.heartsRemaining == 1){
                 this.fight.addMessage(`[b][color=red]Last heart[/color][/b] for ${this.name}!`);
@@ -191,7 +192,7 @@ export class Fighter implements IFighter{
         this.triggerMods(Trigger.BeforeLustDamage);
         this.lust += lust;
         this.fight.addMessage(`${this.name} [color=red]gained ${lust} Lust![/color]`);
-        if(this.lust >= this.lustPerOrgasm){
+        if(this.lust >= this.lustPerOrgasm()){
             this.triggerMods(Trigger.BeforeOrgasm);
             this.lust = 0;
             this.orgasmsRemaining--;
@@ -212,11 +213,11 @@ export class Fighter implements IFighter{
         }
         this.triggerMods(Trigger.BeforeFocusDamage);
         this.focus -= amount;
-        if(this.focus >= this.maxFocus) {
-            this.focus = this.maxFocus;
+        if(this.focus >= this.maxFocus()) {
+            this.focus = this.maxFocus();
         }
         this.triggerMods(Trigger.AfterFocusDamage);
-        if(this.focus == this.minFocus) {
+        if(this.focus == this.minFocus()) {
             this.fight.addMessage(`${this.getStylizedName()} seems way too distracted to possibly continue the fight! Is it their submissiveness? Their morale? One thing's sure, they'll be soon too broken to continue fighting!`);
         }
     }
@@ -238,7 +239,7 @@ export class Fighter implements IFighter{
     }
 
     isBroken():boolean{
-        return this.focus < this.minFocus;
+        return this.focus < this.minFocus();
     }
 
     isTechnicallyOut():boolean{
@@ -261,7 +262,6 @@ export class Fighter implements IFighter{
 
     static createRaw(name:string, power:number, sensuality: number, dexterity:number, toughness:number, endurance:number, willpower:number){
         return new Promise(function(resolve, reject) {
-            let self = this;
             if (!(power != undefined && sensuality != undefined && dexterity != undefined && toughness != undefined && endurance != undefined && willpower != undefined)) {
                 reject("Wrong stats passed.");
             }
@@ -281,33 +281,33 @@ export class Fighter implements IFighter{
 
     outputStats():string{
         return "[b]" + this.name + "[/b]'s stats" + "              [i]Affinity:[/i] [b]" + Affinity[this.affinity] + "[/b]" + "\n" +
-            "[b][color=red]Power[/color][/b]:  " + this.power + "      " + "[b][color=red]Hearts[/color][/b]: " + this.maxHearts + " * " + this.hpPerHeart +" [b][color=red]HP[/color] per heart[/b]"+"\n" +
-            "[b][color=orange]Sensuality[/color][/b]:  " + this.sensuality + "      " + "[b][color=pink]Orgasms[/color][/b]: " + this.maxOrgasms + " * " + this.lustPerOrgasm +" [b][color=pink]Lust[/color] per Orgasm[/b]"+"\n" +
+            "[b][color=red]Power[/color][/b]:  " + this.power + "      " + "[b][color=red]Hearts[/color][/b]: " + this.maxHearts() + " * " + this.hpPerHeart() +" [b][color=red]HP[/color] per heart[/b]"+"\n" +
+            "[b][color=orange]Sensuality[/color][/b]:  " + this.sensuality + "      " + "[b][color=pink]Orgasms[/color][/b]: " + this.maxOrgasms() + " * " + this.lustPerOrgasm() +" [b][color=pink]Lust[/color] per Orgasm[/b]"+"\n" +
             "[b][color=green]Toughness[/color][/b]:  " + this.toughness + "\n" +
             "[b][color=cyan]Endurance[/color][/b]:    " + this.endurance + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + this.wins + " - " + this.losses + "\n" +
-            "[b][color=purple]Dexterity[/color][/b]: " + this.dexterity +  "      " + "[b][color=orange]Bronze tokens available[/color][/b]: " + this.bronzeTokens + "\n" +
+            "[b][color=purple]Dexterity[/color][/b]: " + this.dexterity +  "      " + "[b][color=orange]Bronze tokens available[/color][/b]: " + this.bronzeTokens() + "\n" +
             "[b][color=blue]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Total tokens:[/color][/b]: " + this.tokens + "\n";/*+ "\n\n"  +
             "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]"*/
     }
 
-    get bronzeTokens():number{
+    bronzeTokens():number{
         return Math.floor(this.tokens/TokensWorth.Bronze);
     }
 
-    get silverTokens():number{
+    silverTokens():number{
         return Math.floor(this.tokens/TokensWorth.Silver);
     }
 
-    get goldTokens():number{
+    goldTokens():number{
         return Math.floor(this.tokens/TokensWorth.Gold);
     }
 
     outputStatus(){
-        return `${this.getStylizedName()} ${this.hp}/${this.hpPerHeart} [color=red]HP[/color]  |`+
-                `  ${this.heartsRemaining}/${this.maxHearts} [color=red]Hearts[/color]  |`+
-                `  ${this.lust}/${this.lustPerOrgasm} [color=pink]Lust[/color]  |`+
-                `  ${this.orgasmsRemaining}/${this.maxOrgasms} [color=pink]Orgasms[/color]  |`+
-                `  [color=red][sub]${this.minFocus}[/sub][/color]|[b]${this.focus}[/b]|[color=red][sub]${this.maxFocus}[/sub][/color] Focus`+
+        return `${this.getStylizedName()} ${this.hp}/${this.hpPerHeart()} [color=red]HP[/color]  |`+
+                `  ${this.heartsRemaining}/${this.maxHearts()} [color=red]Hearts[/color]  |`+
+                `  ${this.lust}/${this.lustPerOrgasm()} [color=pink]Lust[/color]  |`+
+                `  ${this.orgasmsRemaining}/${this.maxOrgasms()} [color=pink]Orgasms[/color]  |`+
+                `  [color=red][sub]${this.minFocus()}[/sub][/color]|[b]${this.focus}[/b]|[color=red][sub]${this.maxFocus()}[/sub][/color] Focus`+
                 (this.target != undefined ? `  [color=red]Target:[/color] ${this.target.getStylizedName()}` : "")+
                 "\n";
     }
@@ -335,12 +335,11 @@ export class Fighter implements IFighter{
             }
         }
 
-        this.hp = this.hpPerHeart;
-        this.heartsRemaining = this.maxHearts;
+        this.hp = this.hpPerHeart();
+        this.heartsRemaining = this.maxHearts();
         this.lust = 0;
-        this.orgasmsRemaining = this.maxOrgasms;
+        this.orgasmsRemaining = this.maxOrgasms();
         this.focus = this.willpower;
-        this.dice = new Dice(10);
     }
 
     addStat(stat:Stats):any{
@@ -404,7 +403,7 @@ export class Fighter implements IFighter{
         return this.updateInDb();
     }
 
-    get tier():FightTier{
+    tier():FightTier{
         if(this.power <= 2 && this.sensuality <= 2 && this.dexterity <= 2 && this.toughness <= 2 && this.endurance <= 2 && this.willpower <= 2){
             return FightTier.Bronze;
         }

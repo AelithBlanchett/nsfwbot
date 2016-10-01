@@ -148,7 +148,7 @@ export class CommandHandler implements ICommandHandler{
         });
     };
 
-    sexy(args:string, data:FChatResponse){
+    sex(args:string, data:FChatResponse){
         if(this.fight == undefined || !this.fight.hasStarted){
             this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
             return false;
