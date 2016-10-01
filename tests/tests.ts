@@ -26,6 +26,10 @@ function getMock(mockedClass) {
     return new mockedClass();
 }
 
+//
+//Abstraction of database layer
+//
+
 Fighter.exists = function(name){
     return new Promise(function(resolve, reject) {
         resolve(createFighter(name));
@@ -39,6 +43,17 @@ FightAction.commitDb = function(action){
 Fight.commitEndFightDb = function(fight){
     return true;
 };
+
+Fight.saveState = function(fight){
+    return true;
+};
+
+Fight.loadState = function(id, fight){
+    fight.id = id;
+    return true;
+};
+
+//Utilities
 
 function createFighter(name, intStatsToAssign:number = 3):Fighter{
     let myFighter;
@@ -65,11 +80,92 @@ function createFighter(name, intStatsToAssign:number = 3):Fighter{
     return myFighter;
 }
 
-/// <reference path="../typings/jasmine/jasmine.d.ts">
+function doAction(cmd:CommandHandler, action:string, target:string = "", condition?:any){
+    return new Promise((resolve, reject) => {
+        if(!condition){
+            condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+        }
+        waitUntil().interval(100).times(50).condition(condition).done(() => {
+            cmd.fight.currentPlayer.dice.addMod(50);
+            cmd[action](target, {character: cmd.fight.currentPlayer.name, channel: "here"});
+            waitUntil().interval(100).times(50).condition(condition).done(() => {
+                resolve();
+            });
+        });
+    });
+}
 
-describe("The match", () => {
+function wasHealthHit(cmd:CommandHandler, name:string){
+    return (
+        (
+            cmd.fight.fighterList.getFighterByName(name).hp == cmd.fight.fighterList.getFighterByName(name).hpPerHeart() &&
+            cmd.fight.fighterList.getFighterByName(name).heartsRemaining < cmd.fight.fighterList.getFighterByName(name).maxHearts()
+        )
+        ||
+        cmd.fight.fighterList.getFighterByName(name).hp < cmd.fight.fighterList.getFighterByName(name).hpPerHeart()
+    );
+}
+
+function wasLustHit(cmd:CommandHandler, name:string){
+    return (
+        (
+            cmd.fight.fighterList.getFighterByName(name).lust == cmd.fight.fighterList.getFighterByName(name).lustPerOrgasm() &&
+            cmd.fight.fighterList.getFighterByName(name).orgasmsRemaining < cmd.fight.fighterList.getFighterByName(name).maxOrgasms()
+        )
+        ||
+        cmd.fight.fighterList.getFighterByName(name).lust < cmd.fight.fighterList.getFighterByName(name).lustPerOrgasm()
+    );
+}
+
+function initiateMatchSettings2vs2Tag(cmdHandler){
+    return new Promise((resolve, reject) => {
+        cmdHandler.fight.setFightType("tagteam");
+        cmdHandler.join("Red", {character: "Aelith Blanchette", channel: "here"});
+        cmdHandler.join("Purple", {character: "Purple1", channel: "here"});
+        cmdHandler.join("Purple", {character: "Purple2", channel: "here"});
+        cmdHandler.join("Red", {character: "TheTinaArmstrong", channel: "here"});
+        cmdHandler.ready("Red", {character: "TheTinaArmstrong", channel: "here"});
+        cmdHandler.ready("Red", {character: "Aelith Blanchette", channel: "here"});
+        cmdHandler.ready("Red", {character: "Purple1", channel: "here"});
+        cmdHandler.ready("Red", {character: "Purple2", channel: "here"});
+        resolve();
+    });
+}
+
+function initiateMatchSettings1vs1(cmdHandler){
+    let pro = new Promise((resolve, reject) => {
+        cmdHandler.fight.setFightType("tagteam");
+        resolve();
+    }).then(() => {
+        cmdHandler.join("Red", {character: "Aelith Blanchette", channel: "here"});
+    }).then(() => {
+        cmdHandler.join("Blue", {character: "TheTinaArmstrong", channel: "here"});
+    }).then(() => {
+        cmdHandler.ready("Blue", {character: "TheTinaArmstrong", channel: "here"});
+    }).then(() => {
+        cmdHandler.ready("Red", {character: "Aelith Blanchette", channel: "here"});
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/// <reference path="../typings/jasmine/jasmine.d.ts">
+describe("The player(s)", () => {
     var fChatLibInstance: IFChatLib;
-    var debug = true;
+    var debug = false;
 
     beforeEach(function() {
         fChatLibInstance = {
@@ -99,19 +195,19 @@ describe("The match", () => {
         spyOn(Fighter, 'exists').and.callThrough();
     });
 
-    xit("should initialize 3-3-3-3-3-3 fighter with name = Yolo", function(){
+    it("should be initialized to 3-3-3-3-3-3 name = Yolo", function(){
         let fighterYolo = createFighter("Yolo");
         expect(fighterYolo.name).toBe("Yolo");
     });
 
-    xit("should initialize two 3-3-3-3-3-3 fighters with concat names = YoloLoyo", function(){
+    it("should be initialized 3-3-3-3-3-3 stats with two different names", function(){
         let fighterYolo = createFighter("Yolo");
         let fighterLoyo = createFighter("Loyo");
         expect(fighterYolo.name+fighterLoyo.name).toBe("YoloLoyo");
     });
 
 
-    xit("should be joined", function(done){
+    it("should join the match", function(done){
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
@@ -125,14 +221,14 @@ describe("The match", () => {
         }, 300);
     });
 
-    xit("should check if fighter exists", function(){
+    it("should have been checking if fighter exists", function(){
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
         expect(Fighter.exists).toHaveBeenCalled();
     });
 
-    xit("should not be joined twice", function(done){
+    it("should not be joining a match twice", function(done){
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
@@ -148,7 +244,7 @@ describe("The match", () => {
     });
 
 
-    xit("should be joined and set as ready", function(done){
+    it("should join the match and set as ready", function(done){
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.ready("", data);
@@ -162,7 +258,7 @@ describe("The match", () => {
         }, 300);
     });
 
-    xit("should be already joined ring and set ready", function(done){
+    it("should have already joined the ring and already set ready", function(done){
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.ready("", data);
@@ -177,7 +273,7 @@ describe("The match", () => {
         }, 300);
     });
 
-    xit("should be ready to start with the default blue and red team", function(done){
+    it("should be ready to start with the default blue and red team", function(done){
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
@@ -195,41 +291,11 @@ describe("The match", () => {
         }, 300);
     });
 
-    function initiateMatchSettings2vs2Tag(cmdHandler){
-        return new Promise((resolve, reject) => {
-            cmdHandler.fight.setFightType("tagteam");
-            cmdHandler.join("Red", {character: "Aelith Blanchette", channel: "here"});
-            cmdHandler.join("Purple", {character: "Purple1", channel: "here"});
-            cmdHandler.join("Purple", {character: "Purple2", channel: "here"});
-            cmdHandler.join("Red", {character: "TheTinaArmstrong", channel: "here"});
-            cmdHandler.ready("Red", {character: "TheTinaArmstrong", channel: "here"});
-            cmdHandler.ready("Red", {character: "Aelith Blanchette", channel: "here"});
-            cmdHandler.ready("Red", {character: "Purple1", channel: "here"});
-            cmdHandler.ready("Red", {character: "Purple2", channel: "here"});
-            resolve();
-        });
-    }
-
-    function initiateMatchSettings1vs1(cmdHandler){
-        let pro = new Promise((resolve, reject) => {
-            cmdHandler.fight.setFightType("tagteam");
-            resolve();
-        }).then(() => {
-            cmdHandler.join("Red", {character: "Aelith Blanchette", channel: "here"});
-        }).then(() => {
-            cmdHandler.join("Blue", {character: "TheTinaArmstrong", channel: "here"});
-        }).then(() => {
-            cmdHandler.ready("Blue", {character: "TheTinaArmstrong", channel: "here"});
-        }).then(() => {
-            cmdHandler.ready("Red", {character: "Aelith Blanchette", channel: "here"});
-        });
-    }
-
-    xit("should tag successfully with Aelith", function(done){
+    it("should tag successfully with Aelith", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings2vs2Tag(cmd);
         waitUntil().interval(2).times(5000).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
-            cmd.fight.fighterList.getFighterByName("TheTinaArmstrong").dice.addMod(50);
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
                 cmd.tag("Aelith Blanchette", {character: "TheTinaArmstrong", channel: "here"});
                 waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.currentPlayer != undefined && cmd.fight.currentPlayer.name != "Aelith Blanchette");}).done(() =>{
@@ -237,44 +303,8 @@ describe("The match", () => {
                 });
             });
         });
-    },100000000);
+    },5000);
 
-    function doAction(cmd:CommandHandler, action:string, target:string = "", condition?:any){
-        return new Promise((resolve, reject) => {
-            if(!condition){
-                condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
-            }
-            waitUntil().interval(100).times(50).condition(condition).done(() => {
-                cmd.fight.currentPlayer.dice.addMod(50);
-                cmd[action](target, {character: cmd.fight.currentPlayer.name, channel: "here"});
-                waitUntil().interval(100).times(50).condition(condition).done(() => {
-                    resolve();
-                });
-            });
-        });
-    }
-
-    function wasHealthHit(cmd:CommandHandler, name:string){
-        return (
-                    (
-                        cmd.fight.fighterList.getFighterByName(name).hp == cmd.fight.fighterList.getFighterByName(name).hpPerHeart() &&
-                        cmd.fight.fighterList.getFighterByName(name).heartsRemaining < cmd.fight.fighterList.getFighterByName(name).maxHearts()
-                    )
-                    ||
-                    cmd.fight.fighterList.getFighterByName(name).hp < cmd.fight.fighterList.getFighterByName(name).hpPerHeart()
-                );
-    }
-
-    function wasLustHit(cmd:CommandHandler, name:string){ //TODO change values
-        return (
-            (
-                cmd.fight.fighterList.getFighterByName(name).lust == cmd.fight.fighterList.getFighterByName(name).lustPerOrgasm() &&
-                cmd.fight.fighterList.getFighterByName(name).orgasmsRemaining < cmd.fight.fighterList.getFighterByName(name).maxOrgasms()
-            )
-            ||
-            cmd.fight.fighterList.getFighterByName(name).lust < cmd.fight.fighterList.getFighterByName(name).lustPerOrgasm()
-        );
-    }
 
     it("should swap to TheTinaArmstrong", function(done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
@@ -294,7 +324,7 @@ describe("The match", () => {
         });
     });
 
-    xit("should do a brawl move", function(done){
+    it("should do a brawl move", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -318,6 +348,42 @@ describe("The match", () => {
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             doAction(cmd, "sex", "Light").then(() => {
                 if(wasLustHit(cmd, "Aelith Blanchette")) {
+                    done();
+                }
+                else{
+                    done(new Error("HPs were not drained despite the fact that the attack had hit."));
+                }
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    });
+
+    it("should pass", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            let fighterNameBefore = cmd.fight.currentPlayer.name;
+            doAction(cmd, "pass", "Light").then(() => {
+                if(cmd.fight.currentPlayer.name != fighterNameBefore) {
+                    done();
+                }
+                else{
+                    done(new Error("HPs were not drained despite the fact that the attack had hit."));
+                }
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    });
+
+    it("should do a subhold", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            let fighterNameBefore = cmd.fight.currentPlayer.name;
+            doAction(cmd, "subhold", "Light").then(() => {
+                if(cmd.fight.currentPlayer.name != fighterNameBefore) {
                     done();
                 }
                 else{

@@ -98,7 +98,7 @@ export class FightAction{
 
     actionSubHold():Trigger{
         this.attacker.triggerMods(Trigger.BeforeSubmissionHold);
-        this.type = Action.SexStrike;
+        this.type = Action.SubHold;
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;

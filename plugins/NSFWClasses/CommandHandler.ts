@@ -125,20 +125,31 @@ export class CommandHandler implements ICommandHandler{
         });
     };
 
-    brawl(args:string, data:FChatResponse){
+    private actionHandler(actionType:Action, tierRequired:boolean, isCustomTargetInsteadOfTier:boolean, args:string, data:FChatResponse){
+        let tier = Tier.None;
+        let customTarget:Fighter = null;
         if(this.fight == undefined || !this.fight.hasStarted){
             this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
             return false;
         }
-        let tier = Utils.stringToEnum(Tier, args);
-        if(tier == -1){
-            this.fChatLibInstance.sendMessage("[color=red]The tier is required, and neither Light, Medium or Heavy was specified. Example: !brawl Medium[/color]", this.channel);
-            return false;
+        if(tierRequired){
+            let tier = Utils.stringToEnum(Tier, args);
+            if(tier == -1){
+                this.fChatLibInstance.sendMessage(`[color=red]The tier is required, and neither Light, Medium or Heavy was specified. Example: !${Action[actionType]} Medium[/color]`, this.channel);
+                return false;
+            }
+        }
+        if(isCustomTargetInsteadOfTier){
+            customTarget = this.fight.fighterList.getFighterByName(args);
+            if(customTarget == null){
+                this.fChatLibInstance.sendMessage("[color=red]The character to tag with is required.[/color]", this.channel);
+                return false;
+            }
         }
         Fighter.exists(data.character).then(data =>{
             if(data){
                 let fighter:Fighter = data as Fighter;
-                this.fight.doAction(fighter.id, Action.Brawl, tier as Tier);
+                this.fight.doAction(fighter.id, actionType, tier as Tier, customTarget);
             }
             else{
                 this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
@@ -146,70 +157,26 @@ export class CommandHandler implements ICommandHandler{
         }).catch(err =>{
             this.fChatLibInstance.throwError(err);
         });
+    }
+
+    brawl(args:string, data:FChatResponse){
+        this.actionHandler(Action.Brawl, true, false, args, data);
     };
 
     sex(args:string, data:FChatResponse){
-        if(this.fight == undefined || !this.fight.hasStarted){
-            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
-            return false;
-        }
-        let tier = Utils.stringToEnum(Tier, args);
-        if(tier == -1){
-            this.fChatLibInstance.sendMessage("[color=red]The tier is required, and neither Light, Medium or Heavy was specified. Example: !sexy Heavy[/color]", this.channel);
-            return false;
-        }
-        Fighter.exists(data.character).then(data =>{
-            if(data){
-                let fighter:Fighter = data as Fighter;
-                this.fight.doAction(fighter.id, Action.SexStrike, tier as Tier);
-            }
-            else{
-                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
-            }
-        }).catch(err =>{
-            this.fChatLibInstance.throwError(err);
-        });
+        this.actionHandler(Action.SexStrike, true, false, args, data);
+    };
+
+    subhold(args:string, data:FChatResponse){
+        this.actionHandler(Action.SubHold, true, false, args, data);
     };
 
     tag(args:string, data:FChatResponse){
-        if(this.fight == undefined || !this.fight.hasStarted){
-            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
-            return false;
-        }
-        Fighter.exists(data.character).then(data =>{
-            if(data){
-                let fighter:Fighter = data as Fighter;
-                let fighterToTagWith = this.fight.fighterList.getFighterByName(args);
-                if(fighterToTagWith == null){
-                    this.fChatLibInstance.sendMessage("[color=red]The character to tag with is required.[/color]", this.channel);
-                    return false;
-                }
-                this.fight.doAction(fighter.id, Action.Tag, Tier.None, fighterToTagWith);
-            }
-            else{
-                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
-            }
-        }).catch(err =>{
-            this.fChatLibInstance.throwError(err);
-        });
+        this.actionHandler(Action.Tag, false, true, args, data);
     };
 
     pass(args:string, data:FChatResponse){
-        if(this.fight == undefined || !this.fight.hasStarted){
-            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
-            return false;
-        }
-        Fighter.exists(data.character).then(data =>{
-            if(data){
-                let fighter:Fighter = data as Fighter;
-                this.fight.doAction(fighter.id, Action.Pass, Tier.None);
-            }
-            else{
-                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
-            }
-        }).catch(err =>{
-            this.fChatLibInstance.throwError(err);
-        });
+        this.actionHandler(Action.Pass, false, false, args, data);
     };
 
 

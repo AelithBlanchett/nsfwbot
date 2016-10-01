@@ -74,7 +74,8 @@ export module Constants{
         Brawl,
         SexStrike,
         Tag,
-        Pass
+        Pass,
+        SubHold
     }
 
     export enum TierDifficulty {

@@ -78,8 +78,8 @@ export class Fight{
         this.sendMessage();
     }
 
-    saveState(){
-        if(this.id == -1){
+    static saveState(fight){
+        if(fight.id == -1){
             var mysqlDataUpdate = function(idFight, idFighter){
                 new Promise((resolve, reject) => {
                     //Do the db
@@ -98,7 +98,7 @@ export class Fight{
 
             Data.db.beginTransaction(err =>{
                 var sql = "INSERT INTO `flistplugins`.?? (`idFightType`, `idStage`, `usedTeams`, `currentTurn`, `fighterList`) VALUES (?,?,?,?,?)";
-                sql = Data.db.format(sql, [Constants.fightTableName, this.fightType, 1, this.usedTeams, this.currentTurn, CircularJSON.stringify(this.fighterList)]);
+                sql = Data.db.format(sql, [Constants.fightTableName, fight.fightType, 1, fight.usedTeams, fight.currentTurn, CircularJSON.stringify(fight.fighterList)]);
                 Data.db.query(sql, (err, results) => {
                     if(err){
                         Data.db.rollback(function(){
@@ -106,9 +106,9 @@ export class Fight{
                         });
                     }
                     else{
-                        this.id = results.insertId;
+                        fight.id = results.insertId;
                         var callsToMake = [];
-                        for(let fighter of this.fighterList){
+                        for(let fighter of fight.fighterList){
                             callsToMake.push(mysqlDataUpdate(results.insertId, fighter.id));
                         }
                         Promise.all(callsToMake)
@@ -124,30 +124,30 @@ export class Fight{
         }
         else{
             var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ? WHERE `idFight` = ?;";
-            sql = Data.db.format(sql, [Constants.fightTableName, this.currentTurn, CircularJSON.stringify(this.fighterList), this.id]);
+            sql = Data.db.format(sql, [Constants.fightTableName, fight.currentTurn, CircularJSON.stringify(fight.fighterList), fight.id]);
             Data.db.query(sql, (err, results) => {
                 if (err) {
                 }
                 else {
-                    console.log("Successfully updated fight " + this.id + " to database.");
+                    console.log("Successfully updated fight " + fight.id + " to database.");
                 }
             });
         }
     }
 
-    loadState(fightId:number){
+    static loadState(fightId:number, fight:Fight){
         var sql = "SELECT `idFight`,`idFightType`,`idStage`,`usedTeams`,`currentTurn`,`fighterList` FROM `flistplugins`.?? WHERE idFight = ?;";
         sql = Data.db.format(sql, [Constants.fightTableName, fightId]);
         Data.db.query(sql, (err, results) => {
             if (err) {
             }
             else {
-                this.id = fightId;
-                this.fightType = results[0].idFightType;
-                this.stage = "Virtual Arena";
-                this.usedTeams = results[0].usedTeams;
-                this.currentTurn = results[0].currentTurn;
-                this.fighterList = new FighterList(this.usedTeams);
+                fight.id = fightId;
+                fight.fightType = results[0].idFightType;
+                fight.stage = "Virtual Arena";
+                fight.usedTeams = results[0].usedTeams;
+                fight.currentTurn = results[0].currentTurn;
+                fight.fighterList = new FighterList(fight.usedTeams);
                 //TODO: LOAD FORMER ACTIONS
 
                 var oldParsedList = CircularJSON.parse(results[0].fighterList);
@@ -157,13 +157,13 @@ export class Fight{
                         player[attrname] = nonParsedPlayer[attrname];
                     }
                     player.dice = new Dice(10);
-                    player.fight = this;
+                    player.fight = fight;
                     player.target = null;
-                    this.fighterList.push(player);
+                    fight.fighterList.push(player);
                 }
 
-                console.log("Successfully loaded  fight " + this.id + " from database.");
-                this.outputStatus();
+                console.log("Successfully loaded  fight " + fight.id + " from database.");
+                fight.outputStatus();
             }
         });
     }
@@ -267,7 +267,7 @@ export class Fight{
             fighter.triggerMods(Trigger.AfterTurnTick);
         }
         this.outputStatus();
-        this.saveState();
+        Fight.saveState(this);
         this.waitingForAction = true;
     }
 
