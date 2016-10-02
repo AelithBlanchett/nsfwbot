@@ -133,7 +133,7 @@ export class CommandHandler implements ICommandHandler{
             return false;
         }
         if(tierRequired){
-            let tier = Utils.stringToEnum(Tier, args);
+            tier = Utils.stringToEnum(Tier, args);
             if(tier == -1){
                 this.fChatLibInstance.sendMessage(`[color=red]The tier is required, and neither Light, Medium or Heavy was specified. Example: !${Action[actionType]} Medium[/color]`, this.channel);
                 return false;

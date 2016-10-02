@@ -136,6 +136,25 @@ export class Fighter implements IFighter{
         }
     }
 
+    removeMod(idMod:string){ //removes a mod, and also its children. If a children has two parent Ids, then it doesn't remove the mod.
+        let index = this.modifiers.findIndex(x => x.id == idMod);
+        let listOfModsToRemove = [];
+        if(index != -1){
+            listOfModsToRemove.push(index);
+            for(let mod of this.modifiers){
+                if(mod.parentIds.length == 1 && mod.parentIds[0] == idMod){
+                    listOfModsToRemove.push(mod);
+                }
+                else if(mod.parentIds.indexOf(idMod) != -1){
+                    mod.parentIds.splice(mod.parentIds.indexOf(idMod));
+                }
+            }
+        }
+        for(let modIndex of listOfModsToRemove){
+            this.modifiers.splice(modIndex);
+        }
+    }
+
     hpPerHeart():number {
         return (10 + this.power + this.sensuality + this.dexterity + (this.toughness * 2) + this.endurance);
     }

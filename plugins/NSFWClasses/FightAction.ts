@@ -8,6 +8,7 @@ import {Dice} from "./Dice";
 import TierDifficulty = Constants.TierDifficulty;
 import Trigger = Constants.Trigger;
 import Action = Constants.Action;
+import {Modifier} from "./Modifier";
 
 export class FightAction{
     id: number;
@@ -16,6 +17,7 @@ export class FightAction{
     type: Action;
     tier: Tier;
     isHold: boolean;
+    modifiers: Array<Modifier>;
     attacker: Fighter;
     defender: Fighter;
     hpDamage: number;
@@ -28,6 +30,7 @@ export class FightAction{
     constructor(fightId:number, currentTurn:number, tier:Tier, attacker:Fighter, defender?:Fighter) {
         this.fightId = fightId;
         this.isHold = false;
+        this.modifiers = [];
         this.missed = true;
         this.hpDamage = 0;
         this.lustDamage = 0;
@@ -60,6 +63,9 @@ export class FightAction{
                 break;
             case Action.SexStrike:
                 result = this.actionSexStrike();
+                break;
+            case Action.SubHold:
+                result = this.actionSubHold();
                 break;
             case Action.Tag:
                 result = this.actionTag();
@@ -99,10 +105,20 @@ export class FightAction{
     actionSubHold():Trigger{
         this.attacker.triggerMods(Trigger.BeforeSubmissionHold);
         this.type = Action.SubHold;
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.power;
         if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
-            this.lustDamage = this.strikeFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
+            let hpDamage = 1;
+            let lustDamage = 0;
+            let focusDamage = 0;
+            let turns = 3;
+            let parentModifier = new Modifier(this.defender, this.attacker, hpDamage, lustDamage, focusDamage, 0, 0, turns, Constants.Trigger.BeforeTurnTick, [], Constants.Modifier.SubHold);
+            let accuracyBonus = 3;
+            let brawlBonusAttacker = new Modifier(this.attacker, this.defender, 0, 0, 0, accuracyBonus, 0, turns, Constants.Trigger.BeforeBrawlAttack, [parentModifier.id], Constants.Modifier.SubHoldBrawlBonus);
+            let brawlBonusDefender = new Modifier(this.defender, this.attacker, 0, 0, 0, accuracyBonus, 0, turns, Constants.Trigger.BeforeBrawlAttack, [parentModifier.id], Constants.Modifier.SubHoldBrawlBonus);
+            this.modifiers.push(parentModifier);
+            this.modifiers.push(brawlBonusAttacker);
+            this.modifiers.push(brawlBonusDefender);
         }
         return Trigger.AfterSubmissionHold;
     }
@@ -159,7 +175,7 @@ export class FightAction{
         }
 
         if(this.requiresRoll){
-            fight.addMessage(`${this.attacker.name} needed to roll ${this.requiredDiceScore(this.type, this.tier)} for the ${Tier[this.tier]} ${Action[this.type]} attack to hit.`);
+            fight.addMessage(`${this.attacker.name} needed to roll ${this.requiredDiceScore(this.type, this.tier)} for the${(this.tier != -1 ?" "+Tier[this.tier]:"")} ${Action[this.type]} attack to hit.`);
         }
 
         fight.pastActions.push(this);
@@ -173,6 +189,16 @@ export class FightAction{
             }
             if(this.focusDamage != 0){
                 this.defender.hitFocus(this.focusDamage);
+            }
+            if(this.modifiers.length > 0){
+                for(let mod of this.modifiers){
+                    if(mod.receiver == this.attacker){
+                        this.attacker.modifiers.push(mod);
+                    }
+                    else if(mod.receiver == this.defender){
+                        this.defender.modifiers.push(mod);
+                    }
+                }
             }
         }
 

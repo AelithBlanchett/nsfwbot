@@ -21,6 +21,10 @@ export class Constants{
 
 export module Constants{
 
+    export class Modifier {
+        static SubHoldBrawlBonus = "bonus on accuracy during a submission hold";
+        static SubHold = "submission hold";
+    }
 
     export enum Team {
         Unknown = -1,
