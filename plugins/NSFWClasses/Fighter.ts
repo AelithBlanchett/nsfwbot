@@ -266,14 +266,18 @@ export class Fighter implements IFighter{
         return (this.isSexuallyExhausted() || this.isDead() || this.isBroken() || this.isCompletelyBound());
     }
 
-    isCompletelyBound():boolean{
+    bondageItemsOnSelf():number{
         let bondageModCount = 0;
         for(let mod of this.modifiers){
             if(mod.name == Constants.Modifier.Bondage){
                 bondageModCount++;
             }
         }
-        return bondageModCount >= Constants.maxBondageItemsOnSelf;
+        return bondageModCount;
+    }
+
+    isCompletelyBound():boolean{
+        return this.bondageItemsOnSelf() >= Constants.maxBondageItemsOnSelf;
     }
 
     isInHold():boolean{
@@ -357,7 +361,8 @@ export class Fighter implements IFighter{
                 `  ${this.heartsRemaining}/${this.maxHearts()} [color=red]Hearts[/color]  |`+
                 `  ${this.lust}/${this.lustPerOrgasm()} [color=pink]Lust[/color]  |`+
                 `  ${this.orgasmsRemaining}/${this.maxOrgasms()} [color=pink]Orgasms[/color]  |`+
-                `  [color=red][sub]${this.minFocus()}[/sub][/color]|[b]${this.focus}[/b]|[color=red][sub]${this.maxFocus()}[/sub][/color] Focus`+
+                `  [color=red][sub]${this.minFocus()}[/sub][/color]|[b]${this.focus}[/b]|[color=orange][sub]${this.maxFocus()}[/sub][/color] Focus  |`+
+                `  ${this.bondageItemsOnSelf()}/${Constants.maxBondageItemsOnSelf} [color=black]Bondage Items[/color]  |`+
                 (this.target != undefined ? `  [color=red]Target:[/color] ${this.target.getStylizedName()}` : "")+
                 "\n";
     }
