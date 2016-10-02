@@ -297,10 +297,8 @@ describe("The player(s)", () => {
         waitUntil().interval(2).times(5000).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                debug = true;
                 cmd.tag("Aelith Blanchette", {character: "TheTinaArmstrong", channel: "here"});
                 waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.currentPlayer != undefined && cmd.fight.currentPlayer.name != "Aelith Blanchette");}).done(() =>{
-                    debug = false;
                     done();
                 });
             });
@@ -571,7 +569,6 @@ describe("The player(s)", () => {
     });
 
     it("should be dealing more focus damage with humiliation ", function(done){
-        debug = true;
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -594,7 +591,6 @@ describe("The player(s)", () => {
 
 
     it("should pickup an item and trigger bonus brawl modifier", function(done){
-        debug = true;
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -618,7 +614,6 @@ describe("The player(s)", () => {
     });
 
     it("should pickup a sextoy and trigger bonus sexstrike modifier", function(done){
-        debug = true;
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
