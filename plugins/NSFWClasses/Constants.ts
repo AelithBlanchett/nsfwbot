@@ -7,6 +7,17 @@ export class Constants{
     static tokensPerLossMultiplier:number = 0.5; //needs to be < 1 of course
     static turnsToWaitBetweenTwoTags:number = 4;
     static maxBondageItemsOnSelf:number = 3;
+    static itemPickupMultiplier:number = 1.5;
+    static sextoyPickupMultiplier:number = 1.5;
+    static degradationFocusBonusDamage:number = 3;
+    static difficultyIncreasePerBondageItem:number = 2;
+    static itemPickupBonusUses:number = 1;
+    static sextoyPickupBonusUses:number = 1;
+    static degradationBonusUses:number = 1;
+    static holdDamageMultiplier:number = 0.5;
+    static accuracyBonusBrawlInsideSubHold:number = 3;
+    static accuracyBonusSexStrikeInsideSexHold:number = 3;
+    static initialNumberOfTurnsForHold:number = 5;
 
     public static get currencyName(): string    { return "tokens"; }
     public static get pluginName(): string    { return "nsfw"; }

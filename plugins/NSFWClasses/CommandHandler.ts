@@ -175,12 +175,12 @@ export class CommandHandler implements ICommandHandler{
         this.actionHandler(Action.SexHold, true, false, args, data);
     };
 
-    bondage(args:string, data:FChatResponse){
-        this.actionHandler(Action.Bondage, true, false, args, data);
-    };
-
     humhold(args:string, data:FChatResponse){
         this.actionHandler(Action.HumHold, true, false, args, data);
+    };
+
+    bondage(args:string, data:FChatResponse){
+        this.actionHandler(Action.Bondage, false, false, args, data);
     };
 
     itempickup(args:string, data:FChatResponse){
