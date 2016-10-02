@@ -617,7 +617,7 @@ describe("The player(s)", () => {
         });
     });
 
-    it("should pickup a sextoy and trigger bonus sexstrike modifier", function(done){
+    xit("should pickup a sextoy and trigger bonus sexstrike modifier", function(done){
         debug = true;
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
@@ -640,6 +640,45 @@ describe("The player(s)", () => {
             });
         });
     });
+
+    it("should win the match with 3 bondage attacks", function(done){
+        debug = true;
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "sexhold", "Light").then(() => {
+                cmd.fight.nextTurn();
+                doAction(cmd, "bondage", "Light").then(() => {
+                    cmd.fight.nextTurn();
+                    doAction(cmd, "sexhold", "Light").then(() => {
+                        cmd.fight.nextTurn();
+                        doAction(cmd, "bondage", "Light").then(() => {
+                            cmd.fight.nextTurn();
+                            doAction(cmd, "bondage", "Light").then(() => {
+                                if (wasMessageSent(`Aelith Blanchette has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`)) {
+                                    done();
+                                }
+                                else{
+                                    done(new Error("Did not say that the attacker has an item pickup bonus."));
+                                }
+                            }).catch(err => {
+                                fChatLibInstance.throwError(err);
+                            });
+                        }).catch(err => {
+                            fChatLibInstance.throwError(err);
+                        });
+                    }).catch(err => {
+                        fChatLibInstance.throwError(err);
+                    });
+                }).catch(err => {
+                    fChatLibInstance.throwError(err);
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    },150000);
 
 
 });
