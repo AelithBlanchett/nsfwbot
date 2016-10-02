@@ -261,6 +261,7 @@ export class Fight{
             }
         }
         this.sendMessage();
+        Fight.saveState(this);
         this.outputStatus();
     }
 
