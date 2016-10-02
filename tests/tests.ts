@@ -570,6 +570,77 @@ describe("The player(s)", () => {
         });
     });
 
+    xit("should be dealing more focus damage with humiliation ", function(done){
+        debug = true;
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "degradation", "Light").then(() => {
+                cmd.fight.nextTurn();
+                doAction(cmd, "sexhold", "Light").then(() => {
+                    cmd.fight.nextTurn();
+                    doAction(cmd, "humhold", "Light").then(() => {
+                        if (wasMessageSent("[b][color=Red]Aelith Blanchette[/color][/b] is still affected by the degradation malus!")) {
+                            done();
+                        }
+                    });
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    });
+
+
+    xit("should pickup an item and trigger bonus brawl modifier", function(done){
+        debug = true;
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "itempickup", "Light").then(() => {
+                cmd.fight.nextTurn();
+                doAction(cmd, "brawl", "Light").then(() => {
+                    if (wasMessageSent(`[b][color=Blue]TheTinaArmstrong[/color][/b] is still affected by the ${Constants.Modifier.ItemPickupBonus}!\n`)) {
+                        done();
+                    }
+                    else{
+                        done(new Error("Did not say that the attacker has an item pickup bonus."));
+                    }
+                }).catch(err => {
+                    fChatLibInstance.throwError(err);
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    });
+
+    it("should pickup a sextoy and trigger bonus sexstrike modifier", function(done){
+        debug = true;
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "sextoypickup", "Light").then(() => {
+                cmd.fight.nextTurn();
+                doAction(cmd, "sex", "Light").then(() => {
+                    if (wasMessageSent(`[b][color=Blue]TheTinaArmstrong[/color][/b] is still affected by the ${Constants.Modifier.SextoyPickupBonus}!\n`)) {
+                        done();
+                    }
+                    else{
+                        done(new Error("Did not say that the attacker has an item pickup bonus."));
+                    }
+                }).catch(err => {
+                    fChatLibInstance.throwError(err);
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    });
+
 
 });
 

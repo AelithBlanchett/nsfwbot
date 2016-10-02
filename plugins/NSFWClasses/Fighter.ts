@@ -130,9 +130,9 @@ export class Fighter implements IFighter{
         return result;
     }
 
-    triggerMods(event:Trigger){
+    triggerMods(event:Trigger, objFightAction?:any){
         for(let mod of this.modifiers){
-            mod.trigger(event);
+            mod.trigger(event, objFightAction);
         }
     }
 
@@ -179,12 +179,12 @@ export class Fighter implements IFighter{
         return 1+this.willpower;
     }
 
-    hitHp(hp:number) {
+    hitHp(hp:number, triggerMods:boolean = true) {
         hp = Math.floor(hp);
         if (hp < 1) {
             hp = 1;
         }
-        this.triggerMods(Trigger.BeforeHPDamage);
+        if(triggerMods){this.triggerMods(Trigger.BeforeHPDamage);}
         this.hp -= hp;
         this.fight.addMessage(`${this.name} [color=red]lost ${hp} HP![/color]`);
         if(this.hp <= 0){
@@ -200,15 +200,15 @@ export class Fighter implements IFighter{
             }
             this.triggerMods(Trigger.AfterHeartLoss);
         }
-        this.triggerMods(Trigger.AfterHPDamage);
+        if(triggerMods){this.triggerMods(Trigger.AfterHPDamage);}
     }
 
-    hitLust(lust:number) {
+    hitLust(lust:number, triggerMods:boolean = true) {
         lust = Math.floor(lust);
         if (lust < 1) {
             lust = 1;
         }
-        this.triggerMods(Trigger.BeforeLustDamage);
+        if(triggerMods){this.triggerMods(Trigger.BeforeLustDamage);}
         this.lust += lust;
         this.fight.addMessage(`${this.name} [color=red]gained ${lust} Lust![/color]`);
         if(this.lust >= this.lustPerOrgasm()){
@@ -217,7 +217,7 @@ export class Fighter implements IFighter{
             this.orgasmsRemaining--;
             this.fight.addMessage(`[b][color=pink]Orgasm on the mat![/color][/b] ${this.name} has ${this.orgasmsRemaining} orgasms left.`);
             this.lust = 0;
-            this.triggerMods(Trigger.AfterOrgasm);
+            if(triggerMods){this.triggerMods(Trigger.AfterOrgasm);}
             if(this.orgasmsRemaining == 1){
                 this.fight.addMessage(`[b][color=red]Last orgasm[/color][/b] for ${this.name}!`);
             }
@@ -225,18 +225,18 @@ export class Fighter implements IFighter{
         this.triggerMods(Trigger.AfterLustDamage);
     }
 
-    hitFocus(focusDamage:number) { //focusDamage CAN BE NEGATIVE to gain it
+    hitFocus(focusDamage:number, triggerMods:boolean = true) { //focusDamage CAN BE NEGATIVE to gain it
         focusDamage = Math.floor(focusDamage);
         if(focusDamage == 0){
             return;
         }
-        this.triggerMods(Trigger.BeforeFocusDamage);
+        if(triggerMods){this.triggerMods(Trigger.BeforeFocusDamage);}
         this.focus -= focusDamage;
-        this.fight.addMessage(`${this.name} [color=red]${(focusDamage > 0 ? "lost": "gained")} ${this.focus} Focus![/color]`);
+        this.fight.addMessage(`${this.name} [color=red]${(focusDamage > 0 ? "lost": "gained")} ${focusDamage} Focus![/color]`);
         if(this.focus >= this.maxFocus()) {
             this.focus = this.maxFocus();
         }
-        this.triggerMods(Trigger.AfterFocusDamage);
+        if(triggerMods){this.triggerMods(Trigger.AfterFocusDamage);}
         if(this.focus == this.minFocus()) {
             this.fight.addMessage(`${this.getStylizedName()} seems way too distracted to possibly continue the fight! Is it their submissiveness? Their morale? One thing's sure, they'll be soon too broken to continue fighting!`);
         }

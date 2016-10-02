@@ -489,8 +489,8 @@ export class Fight{
                 let defender = this.currentTarget;
                 attacker.pendingAction = new FightAction(this.id, this.currentTurn, tier, attacker, defender);
                 let eventToTriggerAfter = attacker.pendingAction.actionGateway(action); //The specific trigger BEFORE is executed inside the attacks, see FightAction.ts
+                attacker.triggerMods(eventToTriggerAfter, attacker.pendingAction);
                 attacker.pendingAction.commit(this);
-                attacker.triggerMods(eventToTriggerAfter);
             }
         }
     }

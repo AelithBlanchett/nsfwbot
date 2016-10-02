@@ -19,7 +19,7 @@ export interface IModifier{
     parentIds: Array<string>;
 
     isOver():boolean;
-    trigger(event:Trigger):void;
+    trigger(event:Trigger, objFightAction?:any):void;
     willTriggerForEvent(event:Trigger):void;
 }
 
@@ -31,13 +31,14 @@ export class Modifier implements IModifier{
     hpDamage: number;
     lustDamage: number;
     focusDamage: number;
+    areDamageMultipliers: boolean = false;
     diceRoll: number;
     escapeRoll: number;
     uses: number;
     eventTrigger:Trigger = 0;
     parentIds: Array<string>;
 
-    constructor(receiver:Fighter, applier:Fighter, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number, eventTrigger:Trigger, parentIds:Array<string>, name?:string){
+    constructor(receiver:Fighter, applier:Fighter, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number, eventTrigger:Trigger, parentIds:Array<string>, areMultipliers:boolean, name?:string){
         this.id = Utils.generateUUID();
         this.receiver = receiver; //ALWAYS filled!
         this.applier = applier; //can be null
@@ -49,6 +50,7 @@ export class Modifier implements IModifier{
         this.uses = uses;
         this.eventTrigger = eventTrigger;
         this.parentIds = parentIds;
+        this.areDamageMultipliers = areMultipliers;
         if(name) {
             this.name = name;
         }
@@ -62,22 +64,64 @@ export class Modifier implements IModifier{
         return event == this.eventTrigger;
     }
 
-    trigger(event:Trigger):void{
+    trigger(event:Trigger, objFightAction?:any):void{
         if(this.willTriggerForEvent(event)){
             this.receiver.fight.addMessage(`${this.receiver.getStylizedName()} is still affected by the ${this.name}!`);
             this.uses--;
-            if(this.hpDamage > 0){
-                this.receiver.hitHp(this.hpDamage);
+            if(!objFightAction){
+                if(this.hpDamage > 0){
+                    let flagTriggerMods = !(event == Constants.Trigger.BeforeHPDamage || event == Constants.Trigger.AfterHPDamage);
+                    this.receiver.hitHp(this.hpDamage, flagTriggerMods);
+                }
+                if(this.lustDamage > 0){
+                    let flagTriggerMods = !(event == Constants.Trigger.BeforeLustDamage || event == Constants.Trigger.AfterLustDamage);
+                    this.receiver.hitLust(this.lustDamage, flagTriggerMods);
+                }
+                if(this.diceRoll != 0){
+                    this.receiver.dice.addTmpMod(this.diceRoll,1);
+                }
+                if(this.focusDamage > 0){
+                    let flagTriggerMods = true;
+                    if(event == Constants.Trigger.BeforeFocusDamage || event == Constants.Trigger.AfterFocusDamage){
+                        flagTriggerMods = false;
+                    }
+                    this.receiver.hitFocus(this.focusDamage, flagTriggerMods);
+                }
             }
-            if(this.lustDamage > 0){
-                this.receiver.hitLust(this.lustDamage);
+            else{
+                if(this.hpDamage > 0){
+                    if(this.areDamageMultipliers){
+                        objFightAction.hpDamage *= this.hpDamage;
+                    }
+                    else{
+                        let flagTriggerMods = !(event == Constants.Trigger.BeforeHPDamage || event == Constants.Trigger.AfterHPDamage);
+                        this.receiver.hitHp(this.hpDamage, flagTriggerMods);
+                    }
+
+                }
+                if(this.lustDamage > 0){
+                    if(this.areDamageMultipliers){
+                        objFightAction.lustDamage *= this.lustDamage;
+                    }
+                    else {
+                        let flagTriggerMods = !(event == Constants.Trigger.BeforeLustDamage || event == Constants.Trigger.AfterLustDamage);
+                        this.receiver.hitLust(this.lustDamage, flagTriggerMods);
+                    }
+                }
+                if(this.diceRoll != 0){
+                    objFightAction.diceScore += this.diceRoll;
+                }
+                if(this.focusDamage > 0){
+                    if(this.areDamageMultipliers){
+                        objFightAction.focusDamage *= this.focusDamage;
+                    }
+                    else {
+                        let flagTriggerMods = !(event == Constants.Trigger.BeforeLustDamage || event == Constants.Trigger.AfterLustDamage);
+                        this.receiver.hitFocus(this.focusDamage, flagTriggerMods);
+                    }
+                }
             }
-            if(this.diceRoll != 0){
-                this.receiver.dice.addTmpMod(this.diceRoll,1);
-            }
-            if(this.focusDamage > 0){
-                this.receiver.hitFocus(this.focusDamage);
-            }
+
             this.receiver.fight.sendMessage();
             if(this.isOver()){
                 this.receiver.removeMod(this.id);

@@ -6,7 +6,7 @@ import {Fighter} from "./Fighter";
 export class DummyModifier extends Modifier {
 
     constructor(receiver: Fighter, applier:Fighter, hpDamage:number, lustDamage:number, focusDamage: number, uses:number, parentId:Array<string>, holdName:string){
-        super(receiver, applier, hpDamage, lustDamage, focusDamage, 0, 0, uses, Constants.Trigger.BeforeTurnTick, parentId, holdName);
+        super(receiver, applier, hpDamage, lustDamage, focusDamage, 0, 0, uses, Constants.Trigger.BeforeTurnTick, parentId, false, holdName);
     }
 
     trigger(event:Trigger):void{

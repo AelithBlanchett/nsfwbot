@@ -29,6 +29,7 @@ export module Constants{
         static SexHold = "sexual hold";
         static Bondage = "bondage items";
         static HumHold = "humiliation hold";
+        static DegradationMalus = "degradation malus";
         static ItemPickupBonus = "bonus damage on item pickup";
         static SextoyPickupBonus = "bonus lust damage on sextoy pickup";
     }
@@ -91,7 +92,8 @@ export module Constants{
         Bondage,
         HumHold,
         ItemPickup,
-        SextoyPickup
+        SextoyPickup,
+        Degradation
     }
 
     export enum TierDifficulty {
@@ -175,6 +177,7 @@ export module Constants{
         BeforeAttack = BeforeBrawlAttack | BeforeSexStrikeAttack | BeforeSexHoldAttack,
         BeforeSubmissionHold,
         BeforeBondage,
+        BeforeDegradation,
         BeforeHumiliationHold,
         BeforeHold = BeforeSubmissionHold | BeforeHumiliationHold,
         BeforePowerBasedAttack = BeforeBrawlAttack | BeforeSubmissionHold,
@@ -223,6 +226,7 @@ export module Constants{
         AfterAttack = AfterBrawlAttack | AfterSexStrikeAttack | AfterSexHoldAttack,
         AfterSubmissionHold,
         AfterBondage,
+        AfterDegradation,
         AfterHumiliationHold,
         AfterHold = AfterSubmissionHold | AfterHumiliationHold,
         AfterPowerBasedAttack = AfterBrawlAttack | AfterSubmissionHold,
