@@ -506,7 +506,7 @@ describe("The player(s)", () => {
                 let usesLeftBefore = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
                 cmd.fight.nextTurn();
                 doAction(cmd, "subhold", "Light").then(() => {
-                    let usesLeftAfter = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
+                    let usesLeftAfter = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses; //TODO check bug for modifiers being abnormally empty
                     if (usesLeftAfter > usesLeftBefore) {
                         done();
                     }
