@@ -543,12 +543,12 @@ export class Fight{
         this.winnerTeam = this.fighterList.getUsedTeams()[0];
         this.addMessage(`${Team[this.winnerTeam]} team wins the fight!`);
         this.sendMessage();
-        Fight.commitEndFightDb(this);
+        var tokensToGiveToWinners:number = TokensPerWin[FightTier[this.getFightTier(this.winnerTeam)]];
+        var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.tokensPerLossMultiplier;
+        Fight.commitEndFightDb(this, tokensToGiveToWinners, tokensToGiveToLosers);
     }
 
-    static commitEndFightDb(fight){
-        var tokensToGiveToWinners:number = TokensPerWin[FightTier[fight.getFightTier(fight.winnerTeam)]];
-        var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.tokensPerLossMultiplier;
+    static commitEndFightDb(fight, tokensToGiveToWinners, tokensToGiveToLosers){
         Data.db.beginTransaction(err =>{
             var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
             sql = Data.db.format(sql, [Constants.fightTableName, fight.currentTurn, "", true, fight.winnerTeam, fight.id]);

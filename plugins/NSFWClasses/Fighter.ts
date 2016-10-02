@@ -99,6 +99,20 @@ export class Fighter implements IFighter{
         });
     }
 
+    update(){
+        return new Promise<boolean>((res, rej) =>{
+            this.updateInDb().then(() => {
+                this.load(this.name).then( () =>{
+                    res(true);
+                }).catch(err => {
+                    rej(err);
+                });
+            }).catch(err => {
+                rej(err);
+            });
+        });
+    }
+
     updateInDb(){
         return new Promise<number>((resolve, reject) => {
             var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`sensuality` = ?,`dexterity` = ?,\
@@ -414,7 +428,9 @@ export class Fighter implements IFighter{
         if(amountToRemove != 0 && (this.tokens - amountToRemove >= 0)){
             this.tokens -= amountToRemove;
             this[stat]++;
-            return this.updateInDb();
+            this.update().then(() => {
+               return true;
+            });
         }
         else{
             return false;
