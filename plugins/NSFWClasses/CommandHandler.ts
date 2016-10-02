@@ -171,6 +171,26 @@ export class CommandHandler implements ICommandHandler{
         this.actionHandler(Action.SubHold, true, false, args, data);
     };
 
+    sexhold(args:string, data:FChatResponse){
+        this.actionHandler(Action.SexHold, true, false, args, data);
+    };
+
+    bondage(args:string, data:FChatResponse){
+        this.actionHandler(Action.Bondage, true, false, args, data);
+    };
+
+    humhold(args:string, data:FChatResponse){
+        this.actionHandler(Action.HumHold, true, false, args, data);
+    };
+
+    itempickup(args:string, data:FChatResponse){
+        this.actionHandler(Action.ItemPickup, true, false, args, data);
+    };
+
+    sextoypickup(args:string, data:FChatResponse){
+        this.actionHandler(Action.SextoyPickup, true, false, args, data);
+    };
+
     tag(args:string, data:FChatResponse){
         this.actionHandler(Action.Tag, false, true, args, data);
     };

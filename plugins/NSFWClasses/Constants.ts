@@ -6,6 +6,7 @@ export class Constants{
     static maxTagBonus:number = 3;
     static tokensPerLossMultiplier:number = 0.5; //needs to be < 1 of course
     static turnsToWaitBetweenTwoTags:number = 4;
+    static maxBondageItemsOnSelf:number = 3;
 
     public static get currencyName(): string    { return "tokens"; }
     public static get pluginName(): string    { return "nsfw"; }
@@ -22,8 +23,14 @@ export class Constants{
 export module Constants{
 
     export class Modifier {
-        static SubHoldBrawlBonus = "bonus on accuracy during a submission hold";
+        static SubHoldBrawlBonus = "bonus on brawl attacks accuracy during a submission hold";
         static SubHold = "submission hold";
+        static SexHoldLustBonus = "bonus on lust attacks accuracy during a sexual hold";
+        static SexHold = "sexual hold";
+        static Bondage = "bondage items";
+        static HumHold = "humiliation hold";
+        static ItemPickupBonus = "bonus damage on item pickup";
+        static SextoyPickupBonus = "bonus lust damage on sextoy pickup";
     }
 
     export enum Team {
@@ -79,7 +86,12 @@ export module Constants{
         SexStrike,
         Tag,
         Pass,
-        SubHold
+        SubHold,
+        SexHold,
+        Bondage,
+        HumHold,
+        ItemPickup,
+        SextoyPickup
     }
 
     export enum TierDifficulty {
@@ -162,9 +174,10 @@ export module Constants{
         BeforeSexHoldAttack,
         BeforeAttack = BeforeBrawlAttack | BeforeSexStrikeAttack | BeforeSexHoldAttack,
         BeforeSubmissionHold,
-        BeforeBondageHold,
+        BeforeBondage,
         BeforeHumiliationHold,
-        BeforeHold = BeforeSubmissionHold | BeforeBondageHold | BeforeHumiliationHold,
+        BeforeHold = BeforeSubmissionHold | BeforeHumiliationHold,
+        BeforePowerBasedAttack = BeforeBrawlAttack | BeforeSubmissionHold,
 
         BeforeItemPickup,
         BeforeSextoyPickup,
@@ -209,9 +222,10 @@ export module Constants{
         AfterSexHoldAttack,
         AfterAttack = AfterBrawlAttack | AfterSexStrikeAttack | AfterSexHoldAttack,
         AfterSubmissionHold,
-        AfterBondageHold,
+        AfterBondage,
         AfterHumiliationHold,
-        AfterHold = AfterSubmissionHold | AfterBondageHold | AfterHumiliationHold,
+        AfterHold = AfterSubmissionHold | AfterHumiliationHold,
+        AfterPowerBasedAttack = AfterBrawlAttack | AfterSubmissionHold,
 
         AfterItemPickup,
         AfterSextoyPickup,

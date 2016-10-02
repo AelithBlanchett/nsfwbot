@@ -15,7 +15,6 @@ import FightTier = Constants.FightTier;
 import TokensPerWin = Constants.TokensPerWin;
 import Trigger = Constants.Trigger;
 import Action = Constants.Action;
-import Action = Constants.Action;
 var CircularJSON = require('circular-json');
 
 export class Fight{
@@ -391,6 +390,10 @@ export class Fight{
 
     canAttack(action:Action){
         let flag = true;
+        if(action == undefined){
+            flag = false;
+            this.addMessage(`[b][color=red]The last action hasn't been processed yet.[/color][/b]`);
+        }
         if(!this.waitingForAction){
             flag = false;
             this.addMessage(`[b][color=red]The last action hasn't been processed yet.[/color][/b]`);
@@ -411,10 +414,24 @@ export class Fight{
             flag = false;
             this.addMessage(`[b][color=red]Your target is out of this fight.[/color][/b]`);
         }
-        if(action == Action.SubHold){
+        if(action == Action.SubHold || action == Action.SexHold || action == Action.HumHold || action == Action.Bondage){
             if(this.currentPlayer.isInHold()){
                 flag = false;
                 this.addMessage(`[b][color=red]You cannot do that since you're in a hold.[/color][/b]`);
+            }
+        }
+        if(flag == false){
+            this.sendMessage();
+        }
+        return flag;
+    }
+
+    checkAttackRequirements(action:Action) {
+        let flag = true;
+        if(action == Action.HumHold || action == Action.Bondage){
+            if(!this.currentTarget.isInSpecificHold(Constants.Modifier.SexHold)){
+                flag = false;
+                this.addMessage(`[b][color=red]You cannot do that since your target is not in a sexual hold.[/color][/b]`);
             }
         }
         if(flag == false){
@@ -463,6 +480,9 @@ export class Fight{
                             return;
                         }
                     }
+                }
+                if(!this.checkAttackRequirements(action)){
+                    return;
                 }
                 this.waitingForAction = false;
                 let attacker = this.currentPlayer; // need to store them in case of turn-changing logic

@@ -67,6 +67,21 @@ export class FightAction{
             case Action.SubHold:
                 result = this.actionSubHold();
                 break;
+            case Action.SexHold:
+                result = this.actionSexHold();
+                break;
+            case Action.HumHold:
+                result = this.actionHumHold();
+                break;
+            case Action.Bondage:
+                result = this.actionBondage();
+                break;
+            case Action.ItemPickup:
+                result = this.actionItemPickup();
+                break;
+            case Action.SextoyPickup:
+                result = this.actionSextoyPickup();
+                break;
             case Action.Tag:
                 result = this.actionTag();
                 break;
@@ -112,15 +127,86 @@ export class FightAction{
             let lustDamage = 0;
             let focusDamage = 0;
             let turns = 5;
-            let parentModifier = new Modifier(this.defender, this.attacker, hpDamage, lustDamage, focusDamage, 0, 0, turns, Constants.Trigger.BeforeTurnTick, [], Constants.Modifier.SubHold);
             let accuracyBonus = 3;
-            let brawlBonusAttacker = new Modifier(this.attacker, this.defender, 0, 0, 0, accuracyBonus, 0, turns, Constants.Trigger.BeforeBrawlAttack, [parentModifier.id], Constants.Modifier.SubHoldBrawlBonus);
-            let brawlBonusDefender = new Modifier(this.defender, this.attacker, 0, 0, 0, accuracyBonus, 0, turns, Constants.Trigger.BeforeBrawlAttack, [parentModifier.id], Constants.Modifier.SubHoldBrawlBonus);
-            this.modifiers.push(parentModifier);
+            let holdModifier = new Modifier(this.defender, this.attacker, hpDamage, lustDamage, focusDamage, 0, 0, turns, Constants.Trigger.BeforeTurnTick, [], Constants.Modifier.SubHold);
+            let brawlBonusAttacker = new Modifier(this.attacker, this.defender, 0, 0, 0, accuracyBonus, 0, turns, Constants.Trigger.BeforeBrawlAttack, [holdModifier.id], Constants.Modifier.SubHoldBrawlBonus);
+            let brawlBonusDefender = new Modifier(this.defender, this.attacker, 0, 0, 0, accuracyBonus, 0, turns, Constants.Trigger.BeforeBrawlAttack, [holdModifier.id], Constants.Modifier.SubHoldBrawlBonus);
+            this.modifiers.push(holdModifier);
             this.modifiers.push(brawlBonusAttacker);
             this.modifiers.push(brawlBonusDefender);
         }
         return Trigger.AfterSubmissionHold;
+    }
+
+    actionSexHold():Trigger{
+        this.attacker.triggerMods(Trigger.BeforeSexHoldAttack);
+        this.type = Action.SexHold;
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
+        if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
+            this.missed = false;
+            let hpDamage = 0;
+            let lustDamage = 1;
+            let focusDamage = 0;
+            let turns = 5;
+            let accuracyBonus = 3;
+            let holdModifier = new Modifier(this.defender, this.attacker, hpDamage, lustDamage, focusDamage, 0, 0, turns, Constants.Trigger.BeforeTurnTick, [], Constants.Modifier.SexHold);
+            let lustBonusAttacker = new Modifier(this.attacker, this.defender, 0, 0, 0, accuracyBonus, 0, turns, Constants.Trigger.BeforeSexStrikeAttack, [holdModifier.id], Constants.Modifier.SexHoldLustBonus);
+            let lustBonusDefender = new Modifier(this.defender, this.attacker, 0, 0, 0, accuracyBonus, 0, turns, Constants.Trigger.BeforeSexStrikeAttack, [holdModifier.id], Constants.Modifier.SexHoldLustBonus);
+            this.modifiers.push(holdModifier);
+            this.modifiers.push(lustBonusAttacker);
+            this.modifiers.push(lustBonusDefender);
+        }
+        return Trigger.AfterSexHoldAttack;
+    }
+
+    actionHumHold():Trigger{
+        this.attacker.triggerMods(Trigger.BeforeHumiliationHold);
+        this.type = Action.HumHold;
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
+        if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
+            this.missed = false;
+            let hpDamage = 0;
+            let lustDamage = 0;
+            let focusDamage = 1;
+            let turns = 5;
+            let accuracyBonus = 3;
+            let holdModifier = new Modifier(this.defender, this.attacker, hpDamage, lustDamage, focusDamage, 0, 0, turns, Constants.Trigger.BeforeTurnTick, [], Constants.Modifier.HumHold);
+            this.modifiers.push(holdModifier);
+        }
+        return Trigger.AfterHumiliationHold;
+    }
+
+    actionBondage():Trigger{ //"skips" a turn
+        this.attacker.triggerMods(Trigger.BeforeBondage);
+        this.type = Action.Bondage;
+        this.diceScore = -1;
+        this.requiresRoll = false;
+        this.missed = false;
+        let holdModifier = new Modifier(this.defender, this.attacker, 0, 0, 0, 0, 0, 1, Constants.Trigger.None, [], Constants.Modifier.Bondage);
+        this.modifiers.push(holdModifier);
+        return Trigger.AfterBondage;
+    }
+
+    actionItemPickup():Trigger{ //"skips" a turn
+        this.attacker.triggerMods(Trigger.BeforeItemPickup);
+        this.type = Action.ItemPickup;
+        this.diceScore = -1;
+        this.requiresRoll = false;
+        this.missed = false;
+        let itemPickupModifier = new Modifier(this.defender, this.attacker, 0, 0, 0, 0, 0, 1, Constants.Trigger.BeforeBrawlAttack, [], Constants.Modifier.ItemPickupBonus);
+        this.modifiers.push(itemPickupModifier);
+        return Trigger.AfterItemPickup;
+    }
+
+    actionSextoyPickup():Trigger{ //"skips" a turn
+        this.attacker.triggerMods(Trigger.BeforeSextoyPickup);
+        this.type = Action.SextoyPickup;
+        this.diceScore = -1;
+        this.requiresRoll = false;
+        this.missed = false;
+        let itemPickupModifier = new Modifier(this.defender, this.attacker, 0, 0, 0, 0, 0, 1, Constants.Trigger.BeforeSexStrikeAttack, [], Constants.Modifier.ItemPickupBonus);
+        this.modifiers.push(itemPickupModifier);
+        return Trigger.AfterSextoyPickup;
     }
 
     actionTag():Trigger{ //"skips" a turn
@@ -191,36 +277,36 @@ export class FightAction{
                 this.defender.hitFocus(this.focusDamage);
             }
             if(this.modifiers.length > 0){
-                if(this.type == Action.SubHold){ //for any holds, do the stacking here
-                    let indexOfNewHold = this.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold);
-                    let indexOfAlreadyExistantHoldForDefender = this.defender.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold);
+                if(this.type == Action.SubHold || this.type == Action.SexHold || this.type == Action.HumHold){ //for any holds, do the stacking here
+                    let indexOfNewHold = this.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold || x.name == Constants.Modifier.SexHold || x.name == Constants.Modifier.HumHold);
+                    let indexOfAlreadyExistantHoldForDefender = this.defender.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold || x.name == Constants.Modifier.SexHold || x.name == Constants.Modifier.HumHold);
                     if(indexOfAlreadyExistantHoldForDefender != -1){
                         let idOfFormerHold = this.defender.modifiers[indexOfAlreadyExistantHoldForDefender].id;
                         for(let mod of this.defender.modifiers){
                             //we updated the children and parent's damage and turns
-                            if(mod.id == idOfFormerHold || mod.parentIds.indexOf(idOfFormerHold) != -1){
+                            if(mod.id == idOfFormerHold){
+                                mod.name = this.modifiers[indexOfNewHold].name;
+                                mod.eventTrigger = this.modifiers[indexOfNewHold].eventTrigger;
                                 mod.uses += this.modifiers[indexOfNewHold].uses;
                                 mod.hpDamage += this.modifiers[indexOfNewHold].hpDamage;
                                 mod.lustDamage += this.modifiers[indexOfNewHold].lustDamage;
                                 mod.focusDamage += this.modifiers[indexOfNewHold].focusDamage;
                                 //Did not add the dice/escape score modifications, if needed, implement here
+                            }
+                            else if(mod.parentIds.indexOf(idOfFormerHold) != -1){
+                                mod.uses += this.modifiers[indexOfNewHold].uses;
                             }
                         }
                         for(let mod of this.attacker.modifiers){
-                            //we updated the children and parent's damage and turns
-                            if(mod.id == idOfFormerHold || mod.parentIds.indexOf(idOfFormerHold) != -1){
+                            //update the bonus modifiers length
+                            if(mod.parentIds.indexOf(idOfFormerHold) != -1){
                                 mod.uses += this.modifiers[indexOfNewHold].uses;
-                                mod.hpDamage += this.modifiers[indexOfNewHold].hpDamage;
-                                mod.lustDamage += this.modifiers[indexOfNewHold].lustDamage;
-                                mod.focusDamage += this.modifiers[indexOfNewHold].focusDamage;
-                                //Did not add the dice/escape score modifications, if needed, implement here
                             }
                         }
-                        fight.addMessage(`[b][color=red]Hold Stacking![/color][/b] ${this.defender.name} will have to suffer this hold for ${this.modifiers[indexOfNewHold].uses} more turns,\
-                         and will also suffer a bit more!\n\
-                         ${(this.modifiers[indexOfNewHold].hpDamage > 0 ? "Added -"+this.modifiers[indexOfNewHold].hpDamage+" HP per turn\n":"")}
-                         ${(this.modifiers[indexOfNewHold].lustDamage > 0 ? "Added +"+this.modifiers[indexOfNewHold].lustDamage+" Lust per turn\n":"")}
-                         ${(this.modifiers[indexOfNewHold].focusDamage > 0 ? "Added "+this.modifiers[indexOfNewHold].focusDamage+" Focus per turn\n":"")}
+                        fight.addMessage(`[b][color=red]Hold Stacking![/color][/b] ${this.defender.name} will have to suffer this hold for ${this.modifiers[indexOfNewHold].uses} more turns, and will also suffer a bit more!\n
+                                         ${(this.modifiers[indexOfNewHold].hpDamage > 0 ? "Added -"+this.modifiers[indexOfNewHold].hpDamage+" HP per turn\n":"")}
+                                         ${(this.modifiers[indexOfNewHold].lustDamage > 0 ? "Added +"+this.modifiers[indexOfNewHold].lustDamage+" Lust per turn\n":"")}
+                                         ${(this.modifiers[indexOfNewHold].focusDamage > 0 ? "Added "+this.modifiers[indexOfNewHold].focusDamage+" Focus per turn\n":"")}
                          `);
                     }
                     else{
@@ -261,6 +347,10 @@ export class FightAction{
         }
         else if(this.defender.isBroken()){
             fight.addMessage(`${this.defender.name} is too mentally exhausted to continue! [b][color=red]They're out![/color][/b]`);
+            this.defender.triggerOutsideRing();
+        }
+        else if(this.defender.isCompletelyBound()){
+            fight.addMessage(`${this.defender.name} has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`);
             this.defender.triggerOutsideRing();
         }
         else if(!this.defender.isInTheRing || !this.attacker.isInTheRing){

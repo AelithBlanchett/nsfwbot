@@ -457,7 +457,6 @@ describe("The player(s)", () => {
     });
 
     xit("should be allowed to do a second subhold while already APPLYING one", function(done){
-        debug = true;
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -475,7 +474,7 @@ describe("The player(s)", () => {
         });
     });
 
-    it("should stack the current subhold with another subhold, verify stacking", function(done){
+    xit("should stack the current subhold with another subhold, verify stacking", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -496,7 +495,7 @@ describe("The player(s)", () => {
         });
     });
 
-    it("should stack the current subhold with another subhold, verify uses", function(done){
+    xit("should stack the current subhold with another subhold, verify uses", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -515,6 +514,54 @@ describe("The player(s)", () => {
                     }
                     else{
                         done(new Error("The number of uses after a hold stacking hasn't been increased correctly."))
+                    }
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    });
+
+    xit("should do a sexhold and tick", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "sexhold", "Light").then(() => {
+                if(wasLustHit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.SexHold) != -1){
+                    done();
+                }
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    });
+
+    xit("should not be able to do a humhold without a sexhold", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "humhold", "Light").then(() => {
+                if(wasMessageSent("[b][color=red]You cannot do that since your target is not in a sexual hold.[/color][/b]")){
+                    done();
+                }
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    });
+
+    xit("should be able to do a humhold with sexhold", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "sexhold", "Light").then(() => {
+                cmd.fight.nextTurn();
+                doAction(cmd, "humhold", "Light").then(() => {
+                    if(wasMessageSent("the HumHold attack [b][color=green]HITS![/color][/b]")){
+                        done();
                     }
                 });
             }).catch(err => {

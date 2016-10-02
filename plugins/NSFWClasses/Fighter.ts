@@ -225,13 +225,14 @@ export class Fighter implements IFighter{
         this.triggerMods(Trigger.AfterLustDamage);
     }
 
-    hitFocus(amount:number) {
-        amount = Math.floor(amount);
-        if(amount == 0){
+    hitFocus(focusDamage:number) { //focusDamage CAN BE NEGATIVE to gain it
+        focusDamage = Math.floor(focusDamage);
+        if(focusDamage == 0){
             return;
         }
         this.triggerMods(Trigger.BeforeFocusDamage);
-        this.focus -= amount;
+        this.focus -= focusDamage;
+        this.fight.addMessage(`${this.name} [color=red]${(focusDamage > 0 ? "lost": "gained")} ${this.focus} Focus![/color]`);
         if(this.focus >= this.maxFocus()) {
             this.focus = this.maxFocus();
         }
@@ -262,13 +263,33 @@ export class Fighter implements IFighter{
     }
 
     isTechnicallyOut():boolean{
-        return (this.isSexuallyExhausted() || this.isDead() || this.isBroken());
+        return (this.isSexuallyExhausted() || this.isDead() || this.isBroken() || this.isCompletelyBound());
+    }
+
+    isCompletelyBound():boolean{
+        let bondageModCount = 0;
+        for(let mod of this.modifiers){
+            if(mod.name == Constants.Modifier.Bondage){
+                bondageModCount++;
+            }
+        }
+        return bondageModCount >= Constants.maxBondageItemsOnSelf;
     }
 
     isInHold():boolean{
         let isInHold = false;
         for(let mod of this.modifiers){
-            if(mod.receiver == this && mod.name == Constants.Modifier.SubHold){
+            if(mod.receiver == this && (mod.name == Constants.Modifier.SubHold || mod.name == Constants.Modifier.SexHold || mod.name == Constants.Modifier.HumHold )){
+                isInHold = true;
+            }
+        }
+        return isInHold;
+    }
+
+    isInSpecificHold(holdName:string):boolean{
+        let isInHold = false;
+        for(let mod of this.modifiers){
+            if(mod.receiver == this && mod.name == holdName){
                 isInHold = true;
             }
         }
