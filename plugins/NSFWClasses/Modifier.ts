@@ -80,7 +80,7 @@ export class Modifier implements IModifier{
             }
             this.receiver.fight.sendMessage();
             if(this.isOver()){
-                this.receiver.modifiers.splice(this.receiver.modifiers.indexOf(this));
+                this.receiver.removeMod(this.id);
             }
         }
     }

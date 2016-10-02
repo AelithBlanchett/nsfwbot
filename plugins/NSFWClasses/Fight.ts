@@ -15,6 +15,7 @@ import FightTier = Constants.FightTier;
 import TokensPerWin = Constants.TokensPerWin;
 import Trigger = Constants.Trigger;
 import Action = Constants.Action;
+import Action = Constants.Action;
 var CircularJSON = require('circular-json');
 
 export class Fight{
@@ -388,7 +389,7 @@ export class Fight{
         return flag;
     }
 
-    canAttack(){
+    canAttack(action:Action){
         let flag = true;
         if(!this.waitingForAction){
             flag = false;
@@ -409,6 +410,12 @@ export class Fight{
         if(this.currentTarget.isTechnicallyOut()){
             flag = false;
             this.addMessage(`[b][color=red]Your target is out of this fight.[/color][/b]`);
+        }
+        if(action == Action.SubHold){
+            if(this.currentPlayer.isInHold()){
+                flag = false;
+                this.addMessage(`[b][color=red]You cannot do that since you're in a hold.[/color][/b]`);
+            }
         }
         if(flag == false){
             this.sendMessage();
@@ -435,7 +442,7 @@ export class Fight{
             }
             else{
                 this.validateTarget();
-                if(!this.canAttack()){
+                if(!this.canAttack(action)){
                     return;
                 }
                 if(action == Action.Tag){ //put in the condition any attacks that could focus allies

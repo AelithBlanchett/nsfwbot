@@ -265,6 +265,16 @@ export class Fighter implements IFighter{
         return (this.isSexuallyExhausted() || this.isDead() || this.isBroken());
     }
 
+    isInHold():boolean{
+        let isInHold = false;
+        for(let mod of this.modifiers){
+            if(mod.receiver == this && mod.name == Constants.Modifier.SubHold){
+                isInHold = true;
+            }
+        }
+        return isInHold;
+    }
+
     static create(name:string, affinity:Affinity){
         return new Promise(function(resolve, reject) {
             Data.db.query("INSERT INTO `flistplugins`.??(`name`, `affinity`) VALUES (?,?)", [Constants.fightersTableName, name, affinity], function (err, result) {

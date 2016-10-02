@@ -111,7 +111,7 @@ export class FightAction{
             let hpDamage = 1;
             let lustDamage = 0;
             let focusDamage = 0;
-            let turns = 3;
+            let turns = 5;
             let parentModifier = new Modifier(this.defender, this.attacker, hpDamage, lustDamage, focusDamage, 0, 0, turns, Constants.Trigger.BeforeTurnTick, [], Constants.Modifier.SubHold);
             let accuracyBonus = 3;
             let brawlBonusAttacker = new Modifier(this.attacker, this.defender, 0, 0, 0, accuracyBonus, 0, turns, Constants.Trigger.BeforeBrawlAttack, [parentModifier.id], Constants.Modifier.SubHoldBrawlBonus);
@@ -191,12 +191,57 @@ export class FightAction{
                 this.defender.hitFocus(this.focusDamage);
             }
             if(this.modifiers.length > 0){
-                for(let mod of this.modifiers){
-                    if(mod.receiver == this.attacker){
-                        this.attacker.modifiers.push(mod);
+                if(this.type == Action.SubHold){ //for any holds, do the stacking here
+                    let indexOfNewHold = this.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold);
+                    let indexOfAlreadyExistantHoldForDefender = this.defender.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold);
+                    if(indexOfAlreadyExistantHoldForDefender != -1){
+                        let idOfFormerHold = this.defender.modifiers[indexOfAlreadyExistantHoldForDefender].id;
+                        for(let mod of this.defender.modifiers){
+                            //we updated the children and parent's damage and turns
+                            if(mod.id == idOfFormerHold || mod.parentIds.indexOf(idOfFormerHold) != -1){
+                                mod.uses += this.modifiers[indexOfNewHold].uses;
+                                mod.hpDamage += this.modifiers[indexOfNewHold].hpDamage;
+                                mod.lustDamage += this.modifiers[indexOfNewHold].lustDamage;
+                                mod.focusDamage += this.modifiers[indexOfNewHold].focusDamage;
+                                //Did not add the dice/escape score modifications, if needed, implement here
+                            }
+                        }
+                        for(let mod of this.attacker.modifiers){
+                            //we updated the children and parent's damage and turns
+                            if(mod.id == idOfFormerHold || mod.parentIds.indexOf(idOfFormerHold) != -1){
+                                mod.uses += this.modifiers[indexOfNewHold].uses;
+                                mod.hpDamage += this.modifiers[indexOfNewHold].hpDamage;
+                                mod.lustDamage += this.modifiers[indexOfNewHold].lustDamage;
+                                mod.focusDamage += this.modifiers[indexOfNewHold].focusDamage;
+                                //Did not add the dice/escape score modifications, if needed, implement here
+                            }
+                        }
+                        fight.addMessage(`[b][color=red]Hold Stacking![/color][/b] ${this.defender.name} will have to suffer this hold for ${this.modifiers[indexOfNewHold].uses} more turns,\
+                         and will also suffer a bit more!\n\
+                         ${(this.modifiers[indexOfNewHold].hpDamage > 0 ? "Added -"+this.modifiers[indexOfNewHold].hpDamage+" HP per turn\n":"")}
+                         ${(this.modifiers[indexOfNewHold].lustDamage > 0 ? "Added +"+this.modifiers[indexOfNewHold].lustDamage+" Lust per turn\n":"")}
+                         ${(this.modifiers[indexOfNewHold].focusDamage > 0 ? "Added "+this.modifiers[indexOfNewHold].focusDamage+" Focus per turn\n":"")}
+                         `);
                     }
-                    else if(mod.receiver == this.defender){
-                        this.defender.modifiers.push(mod);
+                    else{
+                        for(let mod of this.modifiers){
+                            if(mod.receiver == this.defender){
+                                this.defender.modifiers.push(mod);
+                            }
+                            else if(mod.receiver == this.attacker){
+                                this.attacker.modifiers.push(mod);
+                            }
+                        }
+                    }
+                }
+                else{
+                    for(let mod of this.modifiers){
+                        if(mod.receiver == this.attacker){
+                            this.attacker.modifiers.push(mod);
+                        }
+                        else if(mod.receiver == this.defender){
+                            this.defender.modifiers.push(mod);
+                        }
                     }
                 }
             }

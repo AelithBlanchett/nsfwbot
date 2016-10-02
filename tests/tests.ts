@@ -148,7 +148,7 @@ function initiateMatchSettings1vs1(cmdHandler){
 }
 
 function wasMessageSent(msg){
-    return fChatLibInstance.sendMessage.calls.all().find(x => x.args[0] == msg) != undefined;
+    return fChatLibInstance.sendMessage.calls.all().find(x => x.args[0].indexOf(msg) != -1) != undefined;
 }
 
 
@@ -405,13 +405,16 @@ describe("The player(s)", () => {
                 if(wasHealthHit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.length == 0){
                     done();
                 }
+                else{
+                    done(new Error("Did not correctly expire the modifiers, or the health wasn't hit."));
+                }
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
     });
 
-    it("should do a subhold and trigger bonus brawl modifier", function(done){
+    xit("should do a subhold and trigger bonus brawl modifier", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -421,8 +424,98 @@ describe("The player(s)", () => {
                     if (wasMessageSent("[b][color=Red]Aelith Blanchette[/color][/b] is still affected by the bonus on accuracy during a submission hold!\n")) {
                         done();
                     }
+                    else{
+                        done(new Error("Did not say that the attacker has an accuracy bonus."));
+                    }
                 }).catch(err => {
                     fChatLibInstance.throwError(err);
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    });
+
+    xit("should not be allowed to do a subhold while already in one", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "subhold", "Light").then(() => {
+                doAction(cmd, "subhold", "Light").then(() => {
+                    if (wasMessageSent("[b][color=red]You cannot do that since you're in a hold.[/color][/b]\n")) {
+                        done();
+                    }
+                    else{
+                        done(new Error("Did not say that the attacker is locked in a hold."));
+                    }
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    });
+
+    xit("should be allowed to do a second subhold while already APPLYING one", function(done){
+        debug = true;
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "subhold", "Light").then(() => {
+                cmd.fight.nextTurn();
+                doAction(cmd, "subhold", "Light").then(() => {
+                    if (!wasMessageSent("[b][color=red]You cannot do that since you're in a hold.[/color][/b]\n")) {
+                        done();
+                    }
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    });
+
+    it("should stack the current subhold with another subhold, verify stacking", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "subhold", "Light").then(() => {
+                cmd.fight.nextTurn();
+                doAction(cmd, "subhold", "Light").then(() => {
+                    if (wasMessageSent("[b][color=red]Hold Stacking![/color][/b]")) {
+                        done();
+                    }
+                    else{
+                        done(new Error("The number of uses after a hold stacking hasn't been increased correctly."))
+                    }
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    });
+
+    it("should stack the current subhold with another subhold, verify uses", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "subhold", "Light").then(() => {
+                let indexOfSubHoldModifier = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.SubHold);
+                if(indexOfSubHoldModifier == -1){
+                    done(new Error("Did not find the correct subhold modifier in the defender's list."));
+                }
+                let usesLeftBefore = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
+                cmd.fight.nextTurn();
+                doAction(cmd, "subhold", "Light").then(() => {
+                    let usesLeftAfter = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
+                    if (usesLeftAfter > usesLeftBefore) {
+                        done();
+                    }
+                    else{
+                        done(new Error("The number of uses after a hold stacking hasn't been increased correctly."))
+                    }
                 });
             }).catch(err => {
                 fChatLibInstance.throwError(err);
