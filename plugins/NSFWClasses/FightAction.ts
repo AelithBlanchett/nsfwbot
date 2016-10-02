@@ -9,6 +9,7 @@ import TierDifficulty = Constants.TierDifficulty;
 import Trigger = Constants.Trigger;
 import Action = Constants.Action;
 import {Modifier} from "./Modifier";
+import FocusDamageHumHold = Constants.FocusDamageHumHold;
 
 export class FightAction{
     id: number;
@@ -27,7 +28,7 @@ export class FightAction{
     missed: boolean;
     requiresRoll: boolean;
 
-    constructor(fightId:number, currentTurn:number, tier:Tier, attacker:Fighter, defender?:Fighter) {
+    constructor(fightId:number, currentTurn:number, tier:Tier, actionType:Action, attacker:Fighter, defender?:Fighter) {
         this.fightId = fightId;
         this.isHold = false;
         this.modifiers = [];
@@ -41,6 +42,7 @@ export class FightAction{
         this.attacker = attacker;
         this.defender = defender;
         this.requiresRoll = true;
+        this.type = actionType;
     }
 
     attackFormula(tier:Tier, actorAtk:number, targetDef:number, roll:number):number{
@@ -56,9 +58,9 @@ export class FightAction{
         return scoreRequired;
     }
 
-    actionGateway(actionType:Action):Trigger{
+    triggerAction():Trigger{
         let result;
-        switch (actionType) {
+        switch (this.type) {
             case Action.Brawl:
                 result = this.actionBrawl();
                 break;
@@ -101,7 +103,6 @@ export class FightAction{
 
     actionBrawl():Trigger{
         this.attacker.triggerMods(Trigger.BeforeBrawlAttack);
-        this.type = Action.Brawl;
         this.diceScore = this.attacker.roll(1) + this.attacker.power;
         if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
@@ -161,7 +162,7 @@ export class FightAction{
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
-            let focusDamage = 1; //TODO adapter ça en fonction du tier
+            let focusDamage = FocusDamageHumHold[Tier[this.tier]];
             let holdModifier = new Modifier(this.defender, this.attacker, 0, 0, focusDamage, 0, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeTurnTick, [], false, Constants.Modifier.HumHold);
             this.modifiers.push(holdModifier);
         }
@@ -235,17 +236,23 @@ export class FightAction{
     }
 
     static commitDb(action:FightAction){
-        let attackerId = action.attacker.id || null;
-        let defenderId = action.defender.id || null;
-        var sql = "INSERT INTO `flistplugins`.?? (`idFight`,`atTurn`,`type`,`tier`,`isHold`,`idAttacker`,`idDefender`,`hpDamage`,`lustDamage`,`focusDamage`,`diceScore`,`missed`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
-        sql = Data.db.format(sql, [Constants.actionTableName, action.fightId, action.atTurn, action.type, action.tier, action.isHold, attackerId, defenderId, action.hpDamage, action.lustDamage, action.focusDamage, action.diceScore, action.missed]);
-        Data.db.query(sql, (err, results) => {
-            if (err) {
-                throw err;
+        return new Promise<number>(function(resolve, reject) {
+            let attackerId = action.attacker.id || null;
+            let defenderId = null;
+            if(action.defender){
+                defenderId = action.defender.id;
             }
-            else {
-                action.id = results.insertId;
-            }
+            var sql = "INSERT INTO `flistplugins`.?? (`idFight`,`atTurn`,`type`,`tier`,`isHold`,`idAttacker`,`idDefender`,`hpDamage`,`lustDamage`,`focusDamage`,`diceScore`,`missed`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
+            sql = Data.db.format(sql, [Constants.actionTableName, action.fightId, action.atTurn, action.type, action.tier, action.isHold, attackerId, defenderId, action.hpDamage, action.lustDamage, action.focusDamage, action.diceScore, action.missed]);
+            Data.db.query(sql, (err, results) => {
+                if (err) {
+                    throw err;
+                }
+                else {
+                    action.id = results.insertId;
+                    resolve(results.insertId);
+                }
+            });
         });
     }
 

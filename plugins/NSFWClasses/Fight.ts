@@ -79,60 +79,66 @@ export class Fight{
     }
 
     static saveState(fight){
-        if(fight.id == -1){
-            var mysqlDataUpdate = function(idFight, idFighter){
-                new Promise((resolve, reject) => {
-                    //Do the db
-                    var sql = "INSERT INTO `flistplugins`.?? (`idFight`, `idFighter`) VALUES (?,?);";
-                    sql = Data.db.format(sql, [Constants.fightFightersTableName,idFight, idFighter]);
-                    Data.db.query(sql, function(err, results) {
-                        if(err){
-                            reject(err);
+        return new Promise<number>((resolve, reject) => {
+            if (fight.id == -1) {
+                var mysqlDataUpdate = function (idFight, idFighter) {
+                    new Promise((resolve, reject) => {
+                        //Do the db
+                        var sql = "INSERT INTO `flistplugins`.?? (`idFight`, `idFighter`) VALUES (?,?);";
+                        sql = Data.db.format(sql, [Constants.fightFightersTableName, idFight, idFighter]);
+                        Data.db.query(sql, function (err, results) {
+                            if (err) {
+                                reject(err);
+                            }
+                            else {
+                                resolve();
+                            }
+                        });
+                    });
+                };
+
+                Data.db.beginTransaction(err => {
+                    var sql = "INSERT INTO `flistplugins`.?? (`idFightType`, `idStage`, `usedTeams`, `currentTurn`, `fighterList`) VALUES (?,?,?,?,?)";
+                    sql = Data.db.format(sql, [Constants.fightTableName, fight.fightType, 1, fight.usedTeams, fight.currentTurn, CircularJSON.stringify(fight.fighterList)]);
+                    Data.db.query(sql, (err, results) => {
+                        if (err) {
+                            Data.db.rollback(() => {
+                                reject(err);
+                            });
                         }
-                        else{
-                            resolve();
+                        else {
+                            fight.id = results.insertId;
+                            var callsToMake = [];
+                            for (let fighter of fight.fighterList) {
+                                callsToMake.push(mysqlDataUpdate(results.insertId, fighter.id));
+                            }
+                            Promise.all(callsToMake)
+                                .then(_ => Data.db.commit(() => {
+                                    resolve(fight.id);
+                                }))
+                                .catch((err) => {
+                                    Data.db.rollback(() => {
+                                        reject(err);
+                                    });
+                                });
                         }
                     });
                 });
-            };
-
-            Data.db.beginTransaction(err =>{
-                var sql = "INSERT INTO `flistplugins`.?? (`idFightType`, `idStage`, `usedTeams`, `currentTurn`, `fighterList`) VALUES (?,?,?,?,?)";
-                sql = Data.db.format(sql, [Constants.fightTableName, fight.fightType, 1, fight.usedTeams, fight.currentTurn, CircularJSON.stringify(fight.fighterList)]);
+            }
+            else {
+                var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ? WHERE `idFight` = ?;";
+                sql = Data.db.format(sql, [Constants.fightTableName, fight.currentTurn, CircularJSON.stringify(fight.fighterList), fight.id]);
                 Data.db.query(sql, (err, results) => {
-                    if(err){
-                        Data.db.rollback(function(){
-
-                        });
+                    if (err) {
+                        reject(err);
                     }
-                    else{
-                        fight.id = results.insertId;
-                        var callsToMake = [];
-                        for(let fighter of fight.fighterList){
-                            callsToMake.push(mysqlDataUpdate(results.insertId, fighter.id));
-                        }
-                        Promise.all(callsToMake)
-                            .then(_ => Data.db.commit(_ => {}))
-                            .catch((err) => {
-                                Data.db.rollback(function(){
-
-                                });
-                            });
+                    else {
+                        console.log("Successfully updated fight " + fight.id + " to database.");
+                        resolve(fight.id);
                     }
                 });
-            });
-        }
-        else{
-            var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ? WHERE `idFight` = ?;";
-            sql = Data.db.format(sql, [Constants.fightTableName, fight.currentTurn, CircularJSON.stringify(fight.fighterList), fight.id]);
-            Data.db.query(sql, (err, results) => {
-                if (err) {
-                }
-                else {
-                    console.log("Successfully updated fight " + fight.id + " to database.");
-                }
-            });
-        }
+            }
+        });
     }
 
     static loadState(fightId:number, fight:Fight){
@@ -487,8 +493,8 @@ export class Fight{
                 this.waitingForAction = false;
                 let attacker = this.currentPlayer; // need to store them in case of turn-changing logic
                 let defender = this.currentTarget;
-                attacker.pendingAction = new FightAction(this.id, this.currentTurn, tier, attacker, defender);
-                let eventToTriggerAfter = attacker.pendingAction.actionGateway(action); //The specific trigger BEFORE is executed inside the attacks, see FightAction.ts
+                attacker.pendingAction = new FightAction(this.id, this.currentTurn, tier, action, attacker, defender);
+                let eventToTriggerAfter = attacker.pendingAction.triggerAction(); //The specific trigger BEFORE is executed inside the attacks, see FightAction.ts
                 attacker.triggerMods(eventToTriggerAfter, attacker.pendingAction);
                 attacker.pendingAction.commit(this);
             }

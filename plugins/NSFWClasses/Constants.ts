@@ -93,6 +93,12 @@ export module Constants{
         Heavy = 18
     }
 
+    export enum FocusDamageHumHold {
+        Light = 2,
+        Medium = 3,
+        Heavy = 4
+    }
+
     export enum Action {
         Brawl,
         SexStrike,

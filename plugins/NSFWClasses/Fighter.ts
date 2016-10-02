@@ -100,14 +100,14 @@ export class Fighter implements IFighter{
     }
 
     updateInDb(){
-        return new Promise(function(resolve, reject) {
+        return new Promise<number>((resolve, reject) => {
             var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`sensuality` = ?,`dexterity` = ?,\
                 `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ?,`affinity` = ? WHERE `id` = ?;";
             sql = Data.db.format(sql, [Constants.fightersTableName, this.tokens, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate, this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, this.affinity, this.id]);
             Data.db.query(sql, (err, result) => {
                 if (result) {
                     console.log("Updated "+this.name+"'s entry in the db.");
-                    resolve();
+                    resolve(result.affectedRows);
                 }
                 else {
                     reject("Unable to update fighter "+this.name+ " " + err);
@@ -472,7 +472,7 @@ export class Fighter implements IFighter{
     }
 
     static exists(name:string){
-        return new Promise(function(resolve, reject) {
+        return new Promise<Fighter>(function(resolve, reject) {
             Data.db.query("SELECT `id`, \
                     `name`, \
                     `tokens`, \
@@ -500,7 +500,7 @@ export class Fighter implements IFighter{
                         reject(err);
                     }
                     else{
-                        resolve(false);
+                        resolve(null);
                     }
                 }
             });
