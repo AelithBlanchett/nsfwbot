@@ -6,6 +6,6 @@ install:
   - npm install
 script:
   - typings install
-  - tsc -p .
+  - tsc
   - cd tests
   - node tests.js

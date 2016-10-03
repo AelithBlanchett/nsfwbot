@@ -14,11 +14,11 @@
     "promise": "^7.1.1",
     "wait-until": "*",
     "typings": "*",
-    "typescript": "^1.8.10"
+    "typescript": "^2.0.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "node tests/tests.js"
+    "test": "cd tests && node tests.js"
   },
   "repository": {
     "type": "git",
