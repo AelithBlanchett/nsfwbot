@@ -95,8 +95,8 @@ export class FightAction{
             case Action.Tag:
                 result = this.actionTag();
                 break;
-            case Action.Pass:
-                result = this.actionPass();
+            case Action.Rest:
+                result = this.actionRest();
                 break;
             default:
                 result = Trigger.None;
@@ -230,16 +230,16 @@ export class FightAction{
         return Trigger.AfterTag;
     }
 
-    actionPass():Trigger{ //"skips" a turn
-        this.attacker.triggerMods(Trigger.BeforePass);
-        this.type = Action.Pass;
+    actionRest():Trigger{ //"skips" a turn
+        this.attacker.triggerMods(Trigger.BeforeRest);
+        this.type = Action.Rest;
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
         this.attacker.healHP(this.attacker.hp*Constants.hpPercantageToHealOnRest);
         this.attacker.healLP(this.attacker.hp*Constants.lpPercantageToHealOnRest);
         this.attacker.healFP(this.attacker.hp*Constants.fpPointsToHealOnRest);
-        return Trigger.AfterPass;
+        return Trigger.AfterRest;
     }
 
     static commitDb(action:FightAction){

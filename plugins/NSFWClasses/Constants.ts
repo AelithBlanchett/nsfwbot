@@ -131,7 +131,7 @@ export module Constants{
         Brawl,
         SexStrike,
         Tag,
-        Pass,
+        Rest,
         SubHold,
         SexHold,
         Bondage,
@@ -240,8 +240,8 @@ export module Constants{
 
         BeforeTag,
         BeforeEscape,
-        BeforePass,
-        BeforePassiveAction = BeforeTag | BeforeEscape | BeforePass,
+        BeforeRest,
+        BeforePassiveAction = BeforeTag | BeforeEscape | BeforeRest,
 
         BeforePowerdrive,
         BeforePowerFantasy,
@@ -293,8 +293,8 @@ export module Constants{
 
         AfterTag,
         AfterEscape,
-        AfterPass,
-        AfterPassiveAction = AfterTag | AfterEscape | AfterPass,
+        AfterRest,
+        AfterPassiveAction = AfterTag | AfterEscape | AfterRest,
 
         AfterPowerdrive,
         AfterPowerFantasy,

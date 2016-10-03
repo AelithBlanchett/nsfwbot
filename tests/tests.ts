@@ -548,7 +548,7 @@ describe("The player(s)", () => {
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             let fighterNameBefore = cmd.fight.currentPlayer.name;
-            doAction(cmd, "pass", "Light").then(() => {
+            doAction(cmd, "rest", "Light").then(() => {
                 if(cmd.fight.currentPlayer.name != fighterNameBefore) {
                     done();
                 }

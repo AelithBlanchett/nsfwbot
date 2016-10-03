@@ -198,8 +198,8 @@ export class CommandHandler implements ICommandHandler{
         this.actionHandler(Action.Tag, false, true, args, data);
     };
 
-    pass(args:string, data:FChatResponse){
-        this.actionHandler(Action.Pass, false, false, args, data);
+    rest(args:string, data:FChatResponse){
+        this.actionHandler(Action.Rest, false, false, args, data);
     };
 
     forfeit(args:string, data:FChatResponse){
