@@ -207,6 +207,12 @@ export module Constants{
         BeforeDamage = BeforeHPDamage | BeforeLustDamage,
         BeforeBarDamage = BeforeHPDamage | BeforeLustDamage | BeforeFocusDamage,
 
+        BeforeHPHealing,
+        BeforeLustHealing,
+        BeforeFocusHealing,
+        BeforeHeal = BeforeHPHealing | BeforeLustHealing,
+        BeforeBarHealing = BeforeHeal | BeforeFocusDamage,
+
         BeforeOrgasm,
         BeforeHeartLoss,
         BeforeOrgasmOrHeartLoss = BeforeOrgasm | BeforeHeartLoss,
@@ -253,6 +259,12 @@ export module Constants{
         AfterFocusDamage,
         AfterDamage = AfterHPDamage | AfterLustDamage,
         AfterBarDamage = AfterHPDamage | AfterLustDamage | AfterFocusDamage,
+
+        AfterHPHealing,
+        AfterLustHealing,
+        AfterFocusHealing,
+        AfterHeal = AfterHPHealing | AfterLustHealing,
+        AfterBarHealing = AfterHeal | AfterFocusDamage,
 
         AfterOrgasm,
         AfterHeartLoss,

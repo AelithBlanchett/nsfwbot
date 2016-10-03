@@ -270,7 +270,9 @@ export class Fight{
     nextTurn(){
         for(let fighter of this.fighterList){
             fighter.triggerMods(Trigger.OnTurnTick);
-            //if(fighter.modifiers.indexOf())
+            if(!fighter.isInHold()){
+                fighter.healFP(-1);
+            }
         }
         this.currentTurn++;
         this.outputStatus();

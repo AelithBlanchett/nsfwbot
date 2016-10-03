@@ -203,7 +203,49 @@ export class Fighter implements IFighter{
         return 1+this.willpower;
     }
 
-    hitHp(hp:number, triggerMods:boolean = true) {
+    healHP(hp:number, triggerMods:boolean = true){
+        hp = Math.floor(hp);
+        if (hp < 1) {
+            hp = 1;
+        }
+        if(triggerMods){this.triggerMods(Trigger.BeforeHPHealing);}
+        if(this.hp + hp > this.hpPerHeart()){
+            hp = this.hpPerHeart() - this.hp; //reduce the number if it overflows the bar
+        }
+        this.hp += hp;
+        this.fight.addMessage(`${this.name} [color=green]gained ${hp} HP![/color]`);
+        if(triggerMods){this.triggerMods(Trigger.AfterHPHealing);}
+    }
+
+    healLP(lust:number, triggerMods:boolean = true){
+        lust = Math.floor(lust);
+        if (lust < 1) {
+            lust = 1;
+        }
+        if(triggerMods){this.triggerMods(Trigger.BeforeLustHealing);}
+        if(this.lust - lust < 0){
+            lust = this.lust; //reduce the number if it overflows the bar
+        }
+        this.lust += lust;
+        this.fight.addMessage(`${this.name} [color=green]was removed ${lust} LP![/color]`);
+        if(triggerMods){this.triggerMods(Trigger.AfterLustHealing);}
+    }
+
+    healFP(focus:number, triggerMods:boolean = true){
+        focus = Math.floor(focus);
+        if (focus < 1) {
+            focus = 1;
+        }
+        if(triggerMods){this.triggerMods(Trigger.BeforeFocusHealing);}
+        if(this.focus + focus < this.maxFocus()){
+            focus = this.maxFocus() - this.focus; //reduce the number if it overflows the bar
+        }
+        this.focus += focus;
+        this.fight.addMessage(`${this.name} [color=green]gained ${focus} FP![/color]`);
+        if(triggerMods){this.triggerMods(Trigger.AfterFocusHealing);}
+    }
+
+    hitHP(hp:number, triggerMods:boolean = true) {
         hp = Math.floor(hp);
         if (hp < 1) {
             hp = 1;
@@ -227,7 +269,7 @@ export class Fighter implements IFighter{
         if(triggerMods){this.triggerMods(Trigger.AfterHPDamage);}
     }
 
-    hitLust(lust:number, triggerMods:boolean = true) {
+    hitLP(lust:number, triggerMods:boolean = true) {
         lust = Math.floor(lust);
         if (lust < 1) {
             lust = 1;
@@ -249,19 +291,16 @@ export class Fighter implements IFighter{
         this.triggerMods(Trigger.AfterLustDamage);
     }
 
-    hitFocus(focusDamage:number, triggerMods:boolean = true) { //focusDamage CAN BE NEGATIVE to gain it
+    hitFP(focusDamage:number, triggerMods:boolean = true) { //focusDamage CAN BE NEGATIVE to gain it
         focusDamage = Math.floor(focusDamage);
-        if(focusDamage == 0){
+        if(focusDamage <= 0){
             return;
         }
         if(triggerMods){this.triggerMods(Trigger.BeforeFocusDamage);}
         this.focus -= focusDamage;
-        this.fight.addMessage(`${this.name} [color=red]${(focusDamage > 0 ? "lost": "gained")} ${focusDamage} Focus![/color]`);
-        if(this.focus >= this.maxFocus()) {
-            this.focus = this.maxFocus();
-        }
+        this.fight.addMessage(`${this.name} [color=red]lost ${focusDamage} Focus![/color]`);
         if(triggerMods){this.triggerMods(Trigger.AfterFocusDamage);}
-        if(this.focus == this.minFocus()) {
+        if(this.focus <= this.minFocus()) {
             this.fight.addMessage(`${this.getStylizedName()} seems way too distracted to possibly continue the fight! Is it their submissiveness? Their morale? One thing's sure, they'll be soon too broken to continue fighting!`);
         }
     }

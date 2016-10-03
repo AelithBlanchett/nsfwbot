@@ -282,13 +282,13 @@ export class FightAction{
 
         if(this.missed == false) {
             if (this.hpDamage > 0) {
-                this.defender.hitHp(this.hpDamage);
+                this.defender.hitHP(this.hpDamage);
             }
             if (this.lustDamage > 0) {
-                this.defender.hitLust(this.lustDamage);
+                this.defender.hitLP(this.lustDamage);
             }
             if(this.focusDamage != 0){
-                this.defender.hitFocus(this.focusDamage);
+                this.defender.hitFP(this.focusDamage);
             }
             if(this.modifiers.length > 0){
                 if(this.type == Action.SubHold || this.type == Action.SexHold || this.type == Action.HumHold){ //for any holds, do the stacking here

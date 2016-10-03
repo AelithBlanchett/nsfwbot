@@ -92,11 +92,11 @@ export class Modifier implements IModifier{
             if(!objFightAction){
                 if(this.hpDamage > 0){
                     let flagTriggerMods = !(event == Constants.Trigger.BeforeHPDamage || event == Constants.Trigger.AfterHPDamage);
-                    this.receiver.hitHp(this.hpDamage, flagTriggerMods);
+                    this.receiver.hitHP(this.hpDamage, flagTriggerMods);
                 }
                 if(this.lustDamage > 0){
                     let flagTriggerMods = !(event == Constants.Trigger.BeforeLustDamage || event == Constants.Trigger.AfterLustDamage);
-                    this.receiver.hitLust(this.lustDamage, flagTriggerMods);
+                    this.receiver.hitLP(this.lustDamage, flagTriggerMods);
                 }
                 if(this.diceRoll != 0){
                     this.receiver.dice.addTmpMod(this.diceRoll,1);
@@ -106,7 +106,7 @@ export class Modifier implements IModifier{
                     if(event == Constants.Trigger.BeforeFocusDamage || event == Constants.Trigger.AfterFocusDamage){
                         flagTriggerMods = false;
                     }
-                    this.receiver.hitFocus(this.focusDamage, flagTriggerMods);
+                    this.receiver.hitFP(this.focusDamage, flagTriggerMods);
                 }
             }
             else{
@@ -116,7 +116,7 @@ export class Modifier implements IModifier{
                     }
                     else{
                         let flagTriggerMods = !(event == Constants.Trigger.BeforeHPDamage || event == Constants.Trigger.AfterHPDamage);
-                        this.receiver.hitHp(this.hpDamage, flagTriggerMods);
+                        this.receiver.hitHP(this.hpDamage, flagTriggerMods);
                     }
 
                 }
@@ -126,7 +126,7 @@ export class Modifier implements IModifier{
                     }
                     else {
                         let flagTriggerMods = !(event == Constants.Trigger.BeforeLustDamage || event == Constants.Trigger.AfterLustDamage);
-                        this.receiver.hitLust(this.lustDamage, flagTriggerMods);
+                        this.receiver.hitLP(this.lustDamage, flagTriggerMods);
                     }
                 }
                 if(this.diceRoll != 0){
@@ -138,7 +138,7 @@ export class Modifier implements IModifier{
                     }
                     else {
                         let flagTriggerMods = !(event == Constants.Trigger.BeforeLustDamage || event == Constants.Trigger.AfterLustDamage);
-                        this.receiver.hitFocus(this.focusDamage, flagTriggerMods);
+                        this.receiver.hitFP(this.focusDamage, flagTriggerMods);
                     }
                 }
             }
