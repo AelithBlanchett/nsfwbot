@@ -199,7 +199,7 @@ export class FightAction{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
-        let itemPickupModifier = new Modifier(this.defender, this.attacker, 0, Constants.sextoyPickupMultiplier, 0, 0, 0, Constants.sextoyPickupBonusUses, Constants.Trigger.AfterSexStrikeAttack, [], true, Constants.Modifier.ItemPickupBonus);
+        let itemPickupModifier = new Modifier(this.attacker, null, 0, Constants.sextoyPickupMultiplier, 0, 0, 0, Constants.sextoyPickupBonusUses, Constants.Trigger.AfterSexStrikeAttack, [], true, Constants.Modifier.SextoyPickupBonus);
         this.modifiers.push(itemPickupModifier);
         return Trigger.AfterSextoyPickup;
     }

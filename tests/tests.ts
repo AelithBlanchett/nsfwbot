@@ -18,6 +18,8 @@ var mockedClasses = [];
 var usedIndexes = [];
 var usedFighters = [];
 
+const DEFAULT_TIMEOUT = 15000;
+
 function getMock(mockedClass) {
     if(mockedClasses.indexOf(mockedClass) != -1){
         return new mockedClasses[mockedClasses.indexOf(mockedClass)]();
@@ -105,7 +107,8 @@ function doAction(cmd:CommandHandler, action:string, target:string = "", conditi
     });
 }
 
-function wasHealthHxit(cmd:CommandHandler, name:string){
+
+function wasHealthHit(cmd:CommandHandler, name:string){
     return (
         (
             cmd.fight.fighterList.getFighterByName(name).hp == cmd.fight.fighterList.getFighterByName(name).hpPerHeart() &&
@@ -116,7 +119,7 @@ function wasHealthHxit(cmd:CommandHandler, name:string){
     );
 }
 
-function wasLustHxit(cmd:CommandHandler, name:string){
+function wasLustHit(cmd:CommandHandler, name:string){
     return (
         (
             cmd.fight.fighterList.getFighterByName(name).lust == cmd.fight.fighterList.getFighterByName(name).lustPerOrgasm() &&
@@ -138,21 +141,6 @@ function initiateMatchSettings2vs2Tag(cmdHandler){
         cmdHandler.ready("Red", {character: "Aelith Blanchette", channel: "here"});
         cmdHandler.ready("Red", {character: "Purple1", channel: "here"});
         cmdHandler.ready("Red", {character: "Purple2", channel: "here"});
-        resolve();
-    });
-}
-
-function initiateMatchSettings2vs2TagForDb(cmdHandler){
-    return new Promise((resolve, reject) => {
-        cmdHandler.fight.setFightType("tagteam");
-        cmdHandler.join("Red", {character: "test2", channel: "here"});
-        cmdHandler.join("Purple", {character: "test3", channel: "here"});
-        cmdHandler.join("Purple", {character: "test4", channel: "here"});
-        cmdHandler.join("Red", {character: "test", channel: "here"});
-        cmdHandler.ready("Red", {character: "test3", channel: "here"});
-        cmdHandler.ready("Red", {character: "test4", channel: "here"});
-        cmdHandler.ready("Red", {character: "test", channel: "here"});
-        cmdHandler.ready("Red", {character: "test2", channel: "here"});
         resolve();
     });
 }
@@ -186,170 +174,6 @@ function wasMessageSent(msg){
 
 
 
-xdescribe("The database(s)", () => {
-
-    function resetData(){
-        return new Promise((resolve, reject) => {
-            var subRequestFights = "SELECT flistplugins.nsfw_fights.idFight FROM flistplugins.nsfw_fights LEFT JOIN flistplugins.nsfw_fightfighters ON flistplugins.nsfw_fights.idFight = flistplugins.nsfw_fightfighters.idFight\
-            WHERE idFighter IS NULL OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4";
-            var sqlResetFightsActions = "DELETE FROM flistplugins.nsfw_actions where idFight IN ("+subRequestFights+") OR idAttacker = 1 OR idAttacker = 2 OR idAttacker = 3 OR idAttacker = 4 OR idDefender = 1 OR idDefender = 2 OR idDefender = 3 OR idDefender = 4";
-            var sqlResetFightFighters = "DELETE FROM flistplugins.nsfw_fightfighters where idFight IN ("+subRequestFights+") OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4;";
-            var sqlResetFights = "DELETE flistplugins.nsfw_fights.* FROM flistplugins.nsfw_fights \
-            WHERE idFight IN ("+subRequestFights+") idFighter IS NULL OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4;"; //clear all fights linked to the 4 fighters
-            var sqlResetTestFighters = "DELETE FROM flistplugins.nsfw_fighters where name = 'test' OR name = 'test2' OR name = 'test3' OR name = 'test4';";
-            var sqlAddTestFighter1 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('1', 'test', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
-            var sqlAddTestFighter2 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('2', 'test2', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
-            var sqlAddTestFighter3 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('3', 'test3', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
-            var sqlAddTestFighter4 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('4', 'test4', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
-            var addFight = "INSERT INTO `flistplugins`.`nsfw_fights` (`idFight`, `idFightType`,  `idStage`, `usedTeams`, `currentTurn`, `fighterList`, `hasEnded`) VALUES (1,1, 1,2, 2, '', 0);";
-            Data.db.query(sqlResetFightsActions, (err, result) => {
-                Data.db.query(sqlResetFightFighters, (err, result) => {
-                    Data.db.query(sqlResetFights, (err, result) => {
-                        Data.db.query(sqlResetTestFighters, (err, result) => {
-                            Data.db.query(sqlAddTestFighter1, (err, result) => {
-                                Data.db.query(sqlAddTestFighter2, (err, result) => {
-                                    Data.db.query(sqlAddTestFighter3, (err, result) => {
-                                        Data.db.query(sqlAddTestFighter4, (err, result) => {
-                                            Data.db.query(addFight, (err, result) => {
-                                                resolve();
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    }
-
-    beforeAll(function(done) {
-        resetData().then(() => {
-            done();
-        });
-    },5000);
-
-    beforeEach(function () {
-        fChatLibInstance = {
-            sendMessage: function (message:string, channel:string) {
-                if (debug) {
-                    console.log("Sent MESSAGE " + message + " on channel " + channel);
-                }
-            },
-            throwError: function (s:string) {
-                if (debug) {
-                    console.log("Sent ERROR " + s);
-                }
-            },
-            sendPrivMessage: function (character:string, message:string) {
-                if (debug) {
-                    console.log("Sent PRIVMESSAGE " + message + " to " + character);
-                }
-            }
-        };
-
-        spyOn(fChatLibInstance, 'sendMessage').and.callThrough();
-        spyOn(fChatLibInstance, 'throwError').and.callThrough();
-        spyOn(fChatLibInstance, 'sendPrivMessage').and.callThrough();
-    });
-
-    xit("should say Test is already there", function (done) {
-        Fighter.exists("Test").then(x => {
-            if(x.name == "Test"){
-                done();
-            }
-            else{
-                done(new Error("Test wasn't found in the database."));
-            }
-        }).catch(err => {
-            done.fail(err);
-        });
-    },5000);
-
-    xit("should say Test2 is already there", function (done) {
-        Fighter.exists("Test2").then(x => {
-            if(x.name == "Test2"){
-                done();
-            }
-            else{
-                done(new Error("Test2 wasn't found in the database."));
-            }
-        }).catch(err => {
-            done.fail(err);
-        });
-    },5000);
-
-    xit("should say Test2 is already there", function (done) {
-        Fighter.exists("Tewefwefwfwst2").then(x => {
-            if(x == undefined){
-                done();
-            }
-            else{
-                done.fail(new Error("Fighter shouldn't have been found in the database."));
-            }
-        }).catch(err => {
-            done.fail(err);
-        });
-    },5000);
-
-    xit("should update Test2's power to something else", function (done) {
-        Fighter.exists("Test2").then(x => {
-            let randomId = -1;
-            do{
-                randomId = Utils.getRandomInt(1,6);
-            }while(x.power == randomId);
-            x.power = randomId;
-            x.update().then(updWorked => {
-                expect(updWorked).toBe(true);
-                done();
-            }).catch(err => {
-                done.fail(err);
-            });
-        }).catch(err => {
-            done.fail(err);
-        });
-    },500000);
-
-    xit("should write a new action in the database", function (done) {
-        Fighter.exists("Test2").then(x => {
-            let myAction = new FightAction(1, 1, 1, Action.Brawl, x);
-            FightAction.commitDb(myAction).then(id => {
-                expect(id).toBeGreaterThan(0);
-                done();
-            }).catch(err => {
-                done.fail(err);
-            });
-        });
-    },5000);
-
-    xit("should write a new fight in the database", function (done) {
-        Fighter.exists("Test2").then(x => {
-            let myFight = new Fight(fChatLibInstance, "here", "hello");
-            Fight.saveState(myFight).then(id => {
-                expect(id).toBeGreaterThan(0);
-                done();
-            }).catch(err => {
-                done.fail(err);
-            });
-        });
-    },50000);
-
-    xit("should tag successfully with Aelith", function(done){
-        var cmd = new CommandHandler(fChatLibInstance, "here");
-        initiateMatchSettings2vs2TagForDb(cmd);
-        waitUntil().interval(2).times(5000).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "test") != -1; }).done(() =>{
-            waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                cmd.fight.setCurrentPlayer("test");
-                cmd.tag("test2", {character: "test", channel: "here"});
-                waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.currentPlayer != undefined && cmd.fight.currentPlayer.name != "test2");}).done(() =>{
-                    done();
-                });
-            });
-        });
-    },8000);
-});
-
 
 /// <reference path="../typings/jasmine/jasmine.d.ts">
 describe("The player(s)", () => {
@@ -382,120 +206,127 @@ describe("The player(s)", () => {
         spyOn(fChatLibInstance, 'throwError').and.callThrough();
         spyOn(fChatLibInstance, 'sendPrivMessage').and.callThrough();
         spyOn(Fighter, 'exists').and.callThrough();
-    });
 
-    xit("should be initialized to 3-3-3-3-3-3 name = Yolo", function(){
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+    },DEFAULT_TIMEOUT);
+
+    it("should be initialized to 3-3-3-3-3-3 name = Yolo", function(){ //1
         let fighterYolo = createFighter("Yolo");
         expect(fighterYolo.name).toBe("Yolo");
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should be initialized 3-3-3-3-3-3 stats with two different names", function(){
+    it("should be initialized 3-3-3-3-3-3 stats with two different names", function(){ //2
         let fighterYolo = createFighter("Yolo");
         let fighterLoyo = createFighter("Loyo");
         expect(fighterYolo.name+fighterLoyo.name).toBe("YoloLoyo");
-    });
+    },DEFAULT_TIMEOUT);
 
 
-    xit("should join the match", function(done){
+    it("should join the match", function(done){ //3
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
         setTimeout(() => {
-            if(expect(fChatLibInstance.sendMessage).toHaveBeenCalledWith('[color=red]Aelith Blanchette stepped into the ring for the [color=Blue]Blue[/color] team! Waiting for everyone to be !ready.[/color]', 'here')){
+            if(wasMessageSent("stepped into the ring for the")){
                 done();
             }
             else{
-                done(new Error("The player couldn't join the match"));
+                done.fail(new Error("The player couldn't join the match"));
             }
         }, 300);
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should have been checking if fighter exists", function(){
+    it("should have been checking if fighter exists", function(){ //4
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
         expect(Fighter.exists).toHaveBeenCalled();
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should not be joining a match twice", function(done){
+    it("should not be joining a match twice", function(done){ //5
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
         x.join("", data);
         setTimeout(() => {
-            if(expect(fChatLibInstance.sendMessage).toHaveBeenCalledWith('[color=red]You have already joined the fight.[/color]', 'here')){
+            if(wasMessageSent('You have already joined the fight')){
                 done();
             }
             else{
-                done(new Error("The player couldn't join the match"));
+                done.fail(new Error("The player couldn't join the match"));
             }
         }, 300);
-    });
+    },DEFAULT_TIMEOUT);
 
 
-    xit("should join the match and set as ready", function(done){
+    it("should join the match and set as ready", function(done){ //6
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.ready("", data);
         setTimeout(() => {
-            if(expect(fChatLibInstance.sendMessage).toHaveBeenCalledWith('[color=red]Aelith Blanchette is now ready to get it on![/color]\n', 'here')){
+            if(wasMessageSent("is now ready to get it on!")){
                 done();
             }
             else{
-                done(new Error("Did not put the player as ready"));
+                done.fail(new Error("Did not put the player as ready"));
             }
         }, 300);
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should have already joined the ring and already set ready", function(done){
+    it("should have already joined the ring and already set ready", function(done){ //7
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.ready("", data);
         x.ready("", data);
         setTimeout(() => {
-            if(expect(fChatLibInstance.sendMessage).toHaveBeenCalledWith('[color=red]You are already ready.[/color]', 'here')){
+            if(wasMessageSent("You are already ready.[/color]")){
                 done();
             }
             else{
-                done(new Error("Did not successfully check if the fighter was already ready"));
+                done.fail(new Error("Did not successfully check if the fighter was already ready"));
             }
         }, 300);
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should be ready to start with the default blue and red team", function(done){
+    it("should be ready to start with the default blue and red team", function(done){ //8
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
         var data:FChatResponse = {character: "TheTinaArmstrong", channel: "here"};
         x.join("", data);
         setTimeout(() => {
-            if(expect(fChatLibInstance.sendMessage).toHaveBeenCalledWith('[color=red]Aelith Blanchette stepped into the ring for the [color=Blue]Blue[/color] team! Waiting for everyone to be !ready.[/color]', 'here')
-            && expect(fChatLibInstance.sendMessage).toHaveBeenCalledWith('[color=red]TheTinaArmstrong stepped into the ring for the [color=Red]Red[/color] team! Waiting for everyone to be !ready.[/color]', 'here')
+            if(wasMessageSent("stepped into the ring for the [color=Blue]Blue[/color] team! Waiting for everyone to be !ready.")
+            && wasMessageSent("stepped into the ring for the [color=Red]Red[/color] team! Waiting for everyone to be !ready.")
             && x.fight.hasStarted == false){
                 done();
             }
             else{
-                done(new Error("Did not put the player as ready"));
+                done.fail(new Error("Did not put the player as ready"));
             }
         }, 300);
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should tag successfully with Aelith", function(done){
+    it("should tag successfully with Aelith", function(done){ // 9
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings2vs2Tag(cmd);
-        waitUntil().interval(2).times(5000).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+        waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
                 cmd.tag("Aelith Blanchette", {character: "TheTinaArmstrong", channel: "here"});
-                waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.currentPlayer != undefined && cmd.fight.currentPlayer.name != "Aelith Blanchette");}).done(() =>{
-                    done();
+                waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").isInTheRing);}).done((res) =>{
+                    if(res){
+                        done();
+                    }
+                    else{
+                        done.fail(new Error("Did not tag with Aelith"));
+                    }
                 });
             });
         });
-    },8000);
+    },DEFAULT_TIMEOUT);
 
 
-    xit("should swap to TheTinaArmstrong", function(done) {
+    it("should swap to TheTinaArmstrong", function(done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction)}).done(() =>{
@@ -506,47 +337,47 @@ describe("The player(s)", () => {
                 done();
             }
             else{
-                done(new Error("Fighters didn't swap places."));
+                done.fail(new Error("Fighters didn't swap places."));
             }
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should do a brawl move", function(done){
+    it("should do a brawl move", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "brawl", "Light").then(() => {
-                if(wasHealthHxit(cmd, "Aelith Blanchette")) {
+                if(wasHealthHit(cmd, "Aelith Blanchette")) {
                     done();
                 }
                 else{
-                    done(new Error("HPs were not drained despite the fact that the attack should have hit."));
+                    done.fail(new Error("HPs were not drained despite the fact that the attack should have hit."));
                 }
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should do a sexstrike move", function(done){
+    it("should do a sexstrike move", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             doAction(cmd, "sex", "Light").then(() => {
-                if(wasLustHxit(cmd, "Aelith Blanchette")) {
+                if(wasLustHit(cmd, "Aelith Blanchette")) {
                     done();
                 }
                 else{
-                    done(new Error("HPs were not drained despite the fact that the attack had hit."));
+                    done.fail(new Error("Did not do a sextrike move, or the damage wasn't done"));
                 }
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should pass", function(done){
+    it("should pass", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -556,61 +387,64 @@ describe("The player(s)", () => {
                     done();
                 }
                 else{
-                    done(new Error("HPs were not drained despite the fact that the attack had hit."));
+                    done.fail(new Error("Did not pass turn correctly"));
                 }
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should do a subhold and tick", function(done){
+    it("should do a subhold and tick", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "subhold", "Light").then(() => {
-                if(wasHealthHxit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.SubHold) != -1){
-                    done();
-                }
-            }).catch(err => {
-                fChatLibInstance.throwError(err);
-            });
-        });
-    });
-
-    xit("should do a subhold and expire after two turns", function(done){
-        var cmd = new CommandHandler(fChatLibInstance, "here");
-        initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
-            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
-            doAction(cmd, "subhold", "Light").then(() => {
-                cmd.fight.nextTurn();
-                cmd.fight.nextTurn();
-                if(wasHealthHxit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.length == 0){
+                if(wasHealthHit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.SubHold) != -1){
                     done();
                 }
                 else{
-                    done(new Error("Did not correctly expire the modifiers, or the health wasn't hit."));
+                    done.fail(new Error("Didn't tick subhold"));
                 }
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should do a subhold and trigger bonus brawl modifier", function(done){
+    it("should do a subhold and expire after two turns", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "subhold", "Light").then(() => {
+                cmd.fight.nextTurn();
+                cmd.fight.nextTurn();
+                if(wasHealthHit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.length == 0){
+                    done();
+                }
+                else{
+                    done.fail(new Error("Did not correctly expire the modifiers, or the health wasn't hit."));
+                }
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    },DEFAULT_TIMEOUT);
+
+    it("should do a subhold and trigger bonus brawl modifier", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "subhold", "Light").then(() => {
                 doAction(cmd, "brawl", "Light").then(() => {
-                    if (wasMessageSent("[b][color=Red]Aelith Blanchette[/color][/b] is still affected by the bonus on accuracy during a submission hold!\n")) {
+                    if (wasMessageSent(Constants.Modifier.SubHoldBrawlBonus)) {
                         done();
                     }
                     else{
-                        done(new Error("Did not say that the attacker has an accuracy bonus."));
+                        done.fail(new Error("Did not say that the attacker has an accuracy bonus."));
                     }
                 }).catch(err => {
                     fChatLibInstance.throwError(err);
@@ -619,9 +453,9 @@ describe("The player(s)", () => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should not be allowed to do a subhold while already in one", function(done){
+    it("should not be allowed to do a subhold while already in one", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -632,16 +466,16 @@ describe("The player(s)", () => {
                         done();
                     }
                     else{
-                        done(new Error("Did not say that the attacker is locked in a hold."));
+                        done.fail(new Error("Did not say that the attacker is locked in a hold."));
                     }
                 });
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should be allowed to do a second subhold while already APPLYING one", function(done){
+    it("should be allowed to do a second subhold while already APPLYING one", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -649,17 +483,23 @@ describe("The player(s)", () => {
             doAction(cmd, "subhold", "Light").then(() => {
                 cmd.fight.nextTurn();
                 doAction(cmd, "subhold", "Light").then(() => {
-                    if (!wasMessageSent("[b][color=red]You cannot do that since you're in a hold.[/color][/b]\n")) {
-                        done();
-                    }
+                    let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                        if (!wasMessageSent("[b][color=red]You cannot do that since you're in a hold.[/color][/b]\n")) {
+                            done();
+                        }
+                        else {
+                            done.fail(new Error("Didn't stack the two subholds correctly"));
+                        }
+                    });
                 });
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should stack the current subhold with another subhold, verify stacking", function(done){
+    it("should stack the current subhold with another subhold, verify stacking", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -667,20 +507,23 @@ describe("The player(s)", () => {
             doAction(cmd, "subhold", "Light").then(() => {
                 cmd.fight.nextTurn();
                 doAction(cmd, "subhold", "Light").then(() => {
-                    if (wasMessageSent("[b][color=red]Hold Stacking![/color][/b]")) {
-                        done();
-                    }
-                    else{
-                        done(new Error("The number of uses after a hold stacking hasn't been increased correctly."))
-                    }
+                    let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                        if (wasMessageSent("[b][color=red]Hold Stacking![/color][/b]")) {
+                            done();
+                        }
+                        else {
+                            done.fail(new Error("The number of uses after a hold stacking hasn't been increased correctly."))
+                        }
+                    });
                 });
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should stack the current subhold with another subhold, verify uses", function(done){
+    it("should stack the current subhold with another subhold, verify uses", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -694,52 +537,66 @@ describe("The player(s)", () => {
                 cmd.fight.nextTurn();
                 //CAREFUL! Sometimes the damage is way too high, so it breaks one heart per tick. So we reset the hearts.
                 cmd.fight.fighterList.getFighterByName("Aelith Blanchette").heartsRemaining = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxHearts();
-                doAction(cmd, "subhold", "Light").then(() => {
-                    let usesLeftAfter = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
-                    if (usesLeftAfter > usesLeftBefore) {
+                doAction(cmd, "subhold", "Light").then(() => { let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                        let usesLeftAfter = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
+                        if (usesLeftAfter > usesLeftBefore) {
+                            done();
+                        }
+                        else {
+                            done.fail(new Error("The number of uses after a hold stacking hasn't been increased correctly."))
+                        }
+                    });
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    },DEFAULT_TIMEOUT);
+
+    it("should do a sexhold and tick", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "sexhold", "Light").then(() => {
+                let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    if (wasLustHit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.SexHold) != -1) {
                         done();
                     }
-                    else{
-                        done(new Error("The number of uses after a hold stacking hasn't been increased correctly."))
+                    else {
+                        done.fail(new Error("Didn't tick sexhold"));
                     }
                 });
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    },100000000);
+    },DEFAULT_TIMEOUT);
 
-    xit("should do a sexhold and tick", function(done){
-        var cmd = new CommandHandler(fChatLibInstance, "here");
-        initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
-            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
-            doAction(cmd, "sexhold", "Light").then(() => {
-                if(wasLustHxit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.SexHold) != -1){
-                    done();
-                }
-            }).catch(err => {
-                fChatLibInstance.throwError(err);
-            });
-        });
-    });
-
-    xit("should not be able to do a humhold without a sexhold", function(done){
+    it("should not be able to do a humhold without a sexhold", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "humhold", "Light").then(() => {
-                if(wasMessageSent("[b][color=red]You cannot do that since your target is not in a sexual hold.[/color][/b]")){
-                    done();
-                }
+                let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    if (wasMessageSent("[b][color=red]You cannot do that since your target is not in a sexual hold.[/color][/b]")) {
+                        done();
+                    }
+                    else {
+                        done.fail(new Error("Still did a humiliation hold without a sexhold"));
+                    }
+                });
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should be able to do a humhold with sexhold", function(done){
+    it("should be able to do a humhold with sexhold", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -747,36 +604,49 @@ describe("The player(s)", () => {
             doAction(cmd, "sexhold", "Light").then(() => {
                 cmd.fight.nextTurn();
                 doAction(cmd, "humhold", "Light").then(() => {
-                    if(wasMessageSent("the HumHold attack [b][color=green]HITS![/color][/b]")){
-                        done();
-                    }
+                    let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                        if (wasMessageSent("the HumHold attack [b][color=green]HITS![/color][/b]")) {
+                            done();
+                        }
+                        else {
+                            done.fail(new Error("Didn't get to do a humiliation hold after a sexhold"));
+                        }
+                    });
                 });
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    }, DEFAULT_TIMEOUT);
 
-    xit("should be making the humhold tick", function(done){
+    it("should be making the humhold tick", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "sexhold", "Light").then(() => {
                 cmd.fight.nextTurn();
+                cmd.fight.fighterList.getFighterByName("Aelith Blanchette").orgasmsRemaining = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxOrgasms(); //to prevent ending the fight this way
                 doAction(cmd, "humhold", "Light").then(() => {
-                    if(wasMessageSent("Aelith Blanchette [color=red]lost 2 Focus![/color]")){
-                        done();
-                    }
+                    let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                        if(cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.HumHold) != -1){
+                            done();
+                        }
+                        else{
+                            done.fail(new Error("Didn't give humiliation hold modifier"));
+                        }
+                    });
                 });
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
     it("should be dealing more focus damage with humiliation ", function(done){
-        debug = true;
+        //debug = true;
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -786,19 +656,25 @@ describe("The player(s)", () => {
                 doAction(cmd, "sexhold", "Light").then(() => {
                     cmd.fight.nextTurn();
                     doAction(cmd, "humhold", "Light").then(() => {
-                        if (wasMessageSent("is still affected by the degradation malus!")) {
-                            done();
-                        }
+                        let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                        waitUntil().interval(100).times(50).condition(condition).done(() => {
+                            if (wasMessageSent("is still affected by the degradation malus!")) {
+                                done();
+                            }
+                            else {
+                                done.fail(new Error("Didn't deal more damage with degradation malus"));
+                            }
+                        });
                     });
                 });
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    },10000);
+    },DEFAULT_TIMEOUT);
 
 
-    xit("should pickup an item and trigger bonus brawl modifier", function(done){
+    it("should pickup an item and trigger bonus brawl modifier", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -806,12 +682,15 @@ describe("The player(s)", () => {
             doAction(cmd, "itempickup", "Light").then(() => {
                 cmd.fight.nextTurn();
                 doAction(cmd, "brawl", "Light").then(() => {
-                    if (wasMessageSent(`[b][color=Blue]TheTinaArmstrong[/color][/b] is still affected by the ${Constants.Modifier.ItemPickupBonus}!\n`)) {
-                        done();
-                    }
-                    else{
-                        done(new Error("Did not say that the attacker has an item pickup bonus."));
-                    }
+                    let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                        if (wasMessageSent(Constants.Modifier.ItemPickupBonus)) {
+                            done();
+                        }
+                        else {
+                            done.fail(new Error("Did not say that the attacker has an item pickup bonus."));
+                        }
+                    });
                 }).catch(err => {
                     fChatLibInstance.throwError(err);
                 });
@@ -819,22 +698,25 @@ describe("The player(s)", () => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should pickup a sextoy and trigger bonus sexstrike modifier", function(done){
+    it("should pickup a sextoy and trigger bonus sexstrike modifier", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+        waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "sextoypickup", "Light").then(() => {
                 cmd.fight.nextTurn();
                 doAction(cmd, "sex", "Light").then(() => {
-                    if (wasMessageSent(`[b][color=Blue]TheTinaArmstrong[/color][/b] is still affected by the ${Constants.Modifier.SextoyPickupBonus}!\n`)) {
-                        done();
-                    }
-                    else{
-                        done(new Error("Did not say that the attacker has an item pickup bonus."));
-                    }
+                    let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                        if (wasMessageSent(Constants.Modifier.SextoyPickupBonus)) {
+                            done();
+                        }
+                        else {
+                            done.fail(new Error("Did not say that the attacker has a sextoy item pickup bonus."));
+                        }
+                    });
                 }).catch(err => {
                     fChatLibInstance.throwError(err);
                 });
@@ -842,12 +724,12 @@ describe("The player(s)", () => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should win the match with 3 bondage attacks", function(done){
+    it("should win the match with 3 bondage attacks", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+        waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "sexhold", "Light").then(() => {
                 cmd.fight.nextTurn();
@@ -862,12 +744,15 @@ describe("The player(s)", () => {
                             cmd.fight.nextTurn();
                             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").orgasmsRemaining = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxOrgasms();
                             doAction(cmd, "bondage", "Light").then(() => {
-                                if (wasMessageSent(`Aelith Blanchette has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`)) {
-                                    done();
-                                }
-                                else{
-                                    done(new Error("Did not say that the attacker has an item pickup bonus."));
-                                }
+                                let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                                    if (wasMessageSent(`Aelith Blanchette has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`)) {
+                                        done();
+                                    }
+                                    else {
+                                        done.fail(new Error("Did not say that the attacker has an item pickup bonus."));
+                                    }
+                                });
                             }).catch(err => {
                                 fChatLibInstance.throwError(err);
                             });
@@ -884,62 +769,71 @@ describe("The player(s)", () => {
                 fChatLibInstance.throwError(err);
             });
         });
-    },150000);
+    },DEFAULT_TIMEOUT);
 
-    xit("should say you can't place a bondage attack without a sexhold", function(done){
+    it("should say you can't place a bondage attack without a sexhold", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
                 doAction(cmd, "bondage", "Light").then(() => {
-                    if (wasMessageSent(`[b][color=red]You cannot do that since your target is not in a sexual hold.[/color][/b]`)) {
-                        done();
-                    }
-                    else{
-                        done(new Error("Did not say that the attacker must apply a sexhold for a bondage attack."));
-                    }
+                    let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                        if (wasMessageSent(`[b][color=red]You cannot do that since your target is not in a sexual hold.[/color][/b]`)) {
+                            done();
+                        }
+                        else {
+                            done.fail(new Error("Did not say that the attacker must apply a sexhold for a bondage attack."));
+                        }
+                    });
                 }).catch(err => {
                     fChatLibInstance.throwError(err);
                 });
         });
-    });
+    },DEFAULT_TIMEOUT);
 
-    xit("should forfeit the match and give the win", function(done){
+    it("should forfeit the match and give the win", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             doAction(cmd, "forfeit", "").then(() => {
-                if (wasMessageSent("has too many items on them to possibly fight!")) {
-                    done();
-                }
-                else{
-                    done(new Error("Did not say that the attacker must apply a sexhold for a bondage attack."));
-                }
+                let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    if (wasMessageSent("has too many items on them to possibly fight!")) {
+                        done();
+                    }
+                    else {
+                        done.fail(new Error("Did not say that the attacker must apply a sexhold for a bondage attack."));
+                    }
+                });
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    },500000);
+    },DEFAULT_TIMEOUT);
 
-    xit("should call the match a draw", function(done){
+    it("should call the match a draw", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             doAction(cmd, "draw", "").then(() => {
                 cmd.fight.nextTurn();
                 doAction(cmd, "draw", "").then(() => {
-                    if (wasMessageSent("Everybody agrees, it's a draw!")) {
-                        done();
-                    }
-                    else{
-                        done(new Error("Did not say that the attacker must apply a sexhold for a bondage attack."));
-                    }
+                    let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                        if (wasMessageSent("Everybody agrees, it's a draw!")) {
+                            done();
+                        }
+                        else {
+                            done(new Error("Did not say that the attacker must apply a sexhold for a bondage attack."));
+                        }
+                    });
                 });
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    },500000);
+    },DEFAULT_TIMEOUT);
 
 });
 

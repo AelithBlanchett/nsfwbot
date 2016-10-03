@@ -28,14 +28,9 @@ export class CommandHandler implements ICommandHandler{
     }
 
     register(args:string, data:FChatResponse){
-        let parsedAffinity:Affinity = Parser.Commands.register(args);
-        if(parsedAffinity == -1){
-            this.fChatLibInstance.sendMessage("[color=red]This type of affinity hasn't been found. Please try again with either Power or Finesse. Example: !register Power[/color]", this.channel);
-            return;
-        }
         Fighter.exists(data.character).then(doesExist =>{
             if(!doesExist){
-                Fighter.create(data.character, parsedAffinity).then(()=>{
+                Fighter.create(data.character).then(()=>{
                     this.fChatLibInstance.sendMessage("You are now registered! Welcome!", this.channel);
                 }).catch(err => {
                     this.fChatLibInstance.throwError(err);
