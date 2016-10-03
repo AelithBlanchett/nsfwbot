@@ -4,6 +4,7 @@ import {Constants} from "./Constants";
 import Team = Constants.Team;
 import {Utils} from "./Utils";
 import {Fight} from "./Fight";
+var ES = require("es-abstract/es6.js");
 
 export class FighterList extends Array<Fighter>{
 
@@ -12,6 +13,22 @@ export class FighterList extends Array<Fighter>{
     public constructor(minNumberOfTeamsThatPlay) {
         super();
         this.minNumberOfTeamsThatPlay = minNumberOfTeamsThatPlay;
+    }
+
+
+    findIndex(predicate: (value: Fighter) => boolean, thisArg?: any): number{
+        var list = ES.ToObject(this);
+        var length = ES.ToLength(ES.ToLength(list.length));
+        if (!ES.IsCallable(predicate)) {
+            throw new TypeError('Array#findIndex: predicate must be a function');
+        }
+        if (length === 0) return -1;
+        var thisArg = arguments[1];
+        for (var i = 0, value; i < length; i++) {
+            value = list[i];
+            if (ES.Call(predicate, thisArg, [value, i, list])) return i;
+        }
+        return -1;
     }
 
     reorderFightersByInitiative(arrFightersSortedByInitiative:Array<Fighter>){

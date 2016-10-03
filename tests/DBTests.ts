@@ -8,7 +8,7 @@ import {Utils} from "../plugins/NSFWClasses/Utils";
 import {FightAction} from "../plugins/NSFWClasses/FightAction";
 import Action = Constants.Action;
 import {Data} from "../plugins/NSFWClasses/Model";
-
+import {Promise} from "es6-promise";
 var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
 var jasmine = new Jasmine();

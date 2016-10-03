@@ -5,7 +5,7 @@ import {FightAction} from "./FightAction";
 import {Constants} from "./Constants";
 import {Data} from "./Model";
 import {Utils} from "./Utils";
-
+import {Promise} from "es6-promise";
 import Team = Constants.Team;
 import FightTier = Constants.FightTier;
 import TokensWorth = Constants.TokensWorth;
@@ -13,6 +13,7 @@ import Stats = Constants.Stats;
 import StatTier = Constants.StatTier;
 import {IModifier} from "./Modifier";
 import Trigger = Constants.Trigger;
+import {Modifiers} from "./Modifier";
 
 export class Fighter implements IFighter{
     id:number = -1;
@@ -32,7 +33,7 @@ export class Fighter implements IFighter{
     dexterity:number = 0;
     willpower:number = 0;
 
-    modifiers:Array<IModifier> = [];
+    modifiers:Modifiers = new Modifiers();
 
 
 

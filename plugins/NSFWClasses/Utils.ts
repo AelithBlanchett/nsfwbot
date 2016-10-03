@@ -1,12 +1,22 @@
 import {Constants} from "./Constants";
 import Team = Constants.Team;
 import StatTier = Constants.StatTier;
+
 export class Utils {
     static minInArray(arr: Array<Number>) {
         return Math.min.apply(Math, arr);
     }
     static maxInArray(arr: Array<Number>) {
         return Math.max.apply(Math, arr);
+    }
+
+    static findIndex(array, attr, value) {
+        for(var i = 0; i < array.length; i += 1) {
+            if(array[i][attr] === value) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     static pad(width, string, padding) {

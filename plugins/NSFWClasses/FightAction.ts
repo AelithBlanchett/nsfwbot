@@ -9,9 +9,11 @@ import TierDifficulty = Constants.TierDifficulty;
 import Trigger = Constants.Trigger;
 import Action = Constants.Action;
 import {Modifier} from "./Modifier";
+import {Promise} from "es6-promise";
 import FocusDamageHumHold = Constants.FocusDamageHumHold;
 import TokensPerWin = Constants.TokensPerWin;
 import FightTier = Constants.FightTier;
+import {Modifiers} from "./Modifier";
 
 export class FightAction{
     id: number;
@@ -20,7 +22,7 @@ export class FightAction{
     type: Action;
     tier: Tier;
     isHold: boolean;
-    modifiers: Array<Modifier>;
+    modifiers: Modifiers;
     attacker: Fighter;
     defender: Fighter;
     hpDamage: number;
@@ -33,7 +35,7 @@ export class FightAction{
     constructor(fightId:number, currentTurn:number, tier:Tier, actionType:Action, attacker:Fighter, defender?:Fighter) {
         this.fightId = fightId;
         this.isHold = false;
-        this.modifiers = [];
+        this.modifiers = new Modifiers();
         this.missed = true;
         this.hpDamage = 0;
         this.lustDamage = 0;

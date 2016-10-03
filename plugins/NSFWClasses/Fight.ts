@@ -16,6 +16,7 @@ import TokensPerWin = Constants.TokensPerWin;
 import Trigger = Constants.Trigger;
 import Action = Constants.Action;
 import {Modifier} from "./Modifier";
+import {Promise} from "es6-promise";
 var CircularJSON = require('circular-json');
 
 export class Fight{

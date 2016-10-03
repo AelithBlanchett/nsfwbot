@@ -3,6 +3,7 @@ import {FighterList} from "./FighterList";
 import {Constants} from "./Constants";
 import Trigger = Constants.Trigger;
 import {Utils} from "./Utils";
+var ES = require("es-abstract/es6.js");
 
 export interface IModifier{
     id: string;
@@ -21,6 +22,7 @@ export interface IModifier{
     isOver():boolean;
     trigger(event:Trigger, objFightAction?:any):void;
     willTriggerForEvent(event:Trigger):void;
+    findIndex(predicate: (value: Modifier) => boolean, thisArg?: any): number;
 }
 
 export class Modifier implements IModifier{
@@ -54,6 +56,21 @@ export class Modifier implements IModifier{
         if(name) {
             this.name = name;
         }
+    }
+
+    findIndex(predicate: (value: Modifier) => boolean, thisArg?: any): number{
+        var list = ES.ToObject(this);
+        var length = ES.ToLength(ES.ToLength(list.length));
+        if (!ES.IsCallable(predicate)) {
+            throw new TypeError('Array#findIndex: predicate must be a function');
+        }
+        if (length === 0) return -1;
+        var thisArg = arguments[1];
+        for (var i = 0, value; i < length; i++) {
+            value = list[i];
+            if (ES.Call(predicate, thisArg, [value, i, list])) return i;
+        }
+        return -1;
     }
 
     isOver():boolean{
@@ -127,5 +144,22 @@ export class Modifier implements IModifier{
                 this.receiver.removeMod(this.id);
             }
         }
+    }
+}
+
+export class Modifiers extends Array<Modifier>{
+    findIndex(predicate: (value: Modifier) => boolean, thisArg?: any): number{
+        var list = ES.ToObject(this);
+        var length = ES.ToLength(ES.ToLength(list.length));
+        if (!ES.IsCallable(predicate)) {
+            throw new TypeError('Array#findIndex: predicate must be a function');
+        }
+        if (length === 0) return -1;
+        var thisArg = arguments[1];
+        for (var i = 0, value; i < length; i++) {
+            value = list[i];
+            if (ES.Call(predicate, thisArg, [value, i, list])) return i;
+        }
+        return -1;
     }
 }

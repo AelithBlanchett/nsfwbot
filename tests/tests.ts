@@ -8,7 +8,7 @@ import {Utils} from "../plugins/NSFWClasses/Utils";
 import {FightAction} from "../plugins/NSFWClasses/FightAction";
 import Action = Constants.Action;
 import {Data} from "../plugins/NSFWClasses/Model";
-
+import {Promise} from "es6-promise";
 var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
 var jasmine = new Jasmine();
@@ -69,7 +69,7 @@ function abstractDatabase(){
 
 function createFighter(name, intStatsToAssign:number = 3):Fighter{
     let myFighter;
-    if(usedFighters.findIndex(x => x.name == name) == -1){
+    if(Utils.findIndex(usedFighters,"name",name) == -1){
         myFighter = getMock(Fighter);
         let randomId = -1;
         do{
@@ -86,7 +86,7 @@ function createFighter(name, intStatsToAssign:number = 3):Fighter{
         usedFighters.push(myFighter);
     }
     else{
-        myFighter = usedFighters.find(x => x.name == name);
+        myFighter = usedFighters[Utils.findIndex(usedFighters,"name",name)];
     }
 
     return myFighter;
