@@ -23,6 +23,10 @@ export class CommandHandler implements ICommandHandler{
         this.fight = new Fight(this.fChatLibInstance, this.channel);
     }
 
+    howtostart(args:string, data:FChatResponse){
+
+    }
+
     register(args:string, data:FChatResponse){
         let parsedAffinity:Affinity = Parser.Commands.register(args);
         if(parsedAffinity == -1){
@@ -201,6 +205,58 @@ export class CommandHandler implements ICommandHandler{
 
     pass(args:string, data:FChatResponse){
         this.actionHandler(Action.Pass, false, false, args, data);
+    };
+
+    forfeit(args:string, data:FChatResponse){
+        if(this.fight == undefined || !this.fight.hasStarted){
+            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
+            return false;
+        }
+        Fighter.exists(data.character).then(data =>{
+            if(data){
+                let fighter:Fighter = data as Fighter;
+                if(this.fight.fighterList.getFighterByID(fighter.id)){
+                    this.fight.forfeit(fighter);
+                }
+                else{
+                    this.fChatLibInstance.sendMessage("[color=red]You are not participating in this fight.[/color]", this.channel);
+                }
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
+    draw(args:string, data:FChatResponse){
+        if(this.fight == undefined || !this.fight.hasStarted){
+            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
+            return false;
+        }
+        Fighter.exists(data.character).then(data =>{
+            if(data){
+                let fighter:Fighter = data as Fighter;
+                if(this.fight.fighterList.getFighterByID(fighter.id)){
+                    if(fighter.wantsDraw){
+                        this.fChatLibInstance.sendMessage("[color=red]You are already waiting for the draw.[/color]", this.channel);
+                    }
+                    else{
+                        fighter.wantsDraw = true;
+                        this.fight.checkForDraw();
+                    }
+                }
+                else{
+                    this.fChatLibInstance.sendMessage("[color=red]You are not participating in this fight.[/color]", this.channel);
+                }
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
     };
 
 

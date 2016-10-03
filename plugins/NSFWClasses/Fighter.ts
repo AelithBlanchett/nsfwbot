@@ -9,7 +9,6 @@ import {Utils} from "./Utils";
 import Team = Constants.Team;
 import FightTier = Constants.FightTier;
 import TokensWorth = Constants.TokensWorth;
-import Affinity = Constants.Affinity;
 import Stats = Constants.Stats;
 import StatTier = Constants.StatTier;
 import {IModifier} from "./Modifier";
@@ -24,9 +23,7 @@ export class Fighter implements IFighter{
     forfeits: number = 0;
     quits: number = 0;
     totalFights: number = 0;
-    winRate: number = 0;
     areStatsPrivate:boolean = true;
-    affinity:Affinity = Affinity.Power;
 
     power:number = 0;
     sensuality:number = 0;
@@ -54,15 +51,17 @@ export class Fighter implements IFighter{
     focus:number = 0;
     lastDiceRoll:number;
     isInTheRing:boolean = true;
+    canMoveFromOrOffRing = true;
     lastTagTurn:number = 9999999;
     pendingAction:FightAction;
+    wantsDraw:boolean = false;
 
     constructor() {
         this.dice = new Dice(10);
     }
 
     load(name){
-        return new Promise(function(fullfill, reject){
+        return new Promise((fullfill, reject) => {
             let self = this;
             if (name != undefined) {
                 //load mysql
@@ -75,7 +74,6 @@ export class Fighter implements IFighter{
                     `forfeits`, \
                     `quits`, \
                     `totalFights`, \
-                    `winRate`, \
                     `power`, \
                     `sensuality`, \
                     `dexterity`, \
@@ -99,16 +97,16 @@ export class Fighter implements IFighter{
         });
     }
 
-    update(){
+    update():Promise<boolean>{
         return new Promise<boolean>((res, rej) =>{
             this.updateInDb().then(() => {
                 this.load(this.name).then( () =>{
                     res(true);
                 }).catch(err => {
-                    rej(err);
+                    rej(false);
                 });
             }).catch(err => {
-                rej(err);
+                rej(false);
             });
         });
     }
@@ -116,8 +114,8 @@ export class Fighter implements IFighter{
     updateInDb(){
         return new Promise<number>((resolve, reject) => {
             var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`sensuality` = ?,`dexterity` = ?,\
-                `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ?,`affinity` = ? WHERE `id` = ?;";
-            sql = Data.db.format(sql, [Constants.fightersTableName, this.tokens, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate, this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, this.affinity, this.id]);
+                `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ? WHERE `id` = ?;";
+            sql = Data.db.format(sql, [Constants.fightersTableName, this.tokens, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate(), this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, this.id]);
             Data.db.query(sql, (err, result) => {
                 if (result) {
                     console.log("Updated "+this.name+"'s entry in the db.");
@@ -128,6 +126,17 @@ export class Fighter implements IFighter{
                 }
             });
         });
+    }
+
+    winRate():number{
+        let winRate = 0.00;
+        if(this.totalFights > 0 && this.wins > 0){
+            winRate = this.totalFights/this.wins;
+        }
+        else if(this.totalFights > 0 && this.losses > 0){
+            winRate = 1 - this.totalFights/this.losses;
+        }
+        return winRate;
     }
 
     //returns dice score
@@ -264,6 +273,16 @@ export class Fighter implements IFighter{
         this.isInTheRing = false;
     }
 
+    triggerPermanentInsideRing(){
+        this.isInTheRing = false;
+        this.canMoveFromOrOffRing = false;
+    }
+
+    triggerPermanentOutsideRing(){
+        this.triggerOutsideRing();
+        this.canMoveFromOrOffRing = false;
+    }
+
     isDead():boolean{
         return this.heartsRemaining == 0;
     }
@@ -314,9 +333,9 @@ export class Fighter implements IFighter{
         return isInHold;
     }
 
-    static create(name:string, affinity:Affinity){
+    static create(name:string){
         return new Promise(function(resolve, reject) {
-            Data.db.query("INSERT INTO `flistplugins`.??(`name`, `affinity`) VALUES (?,?)", [Constants.fightersTableName, name, affinity], function (err, result) {
+            Data.db.query("INSERT INTO `flistplugins`.??(`name`) VALUES (?,?)", [Constants.fightersTableName, name], function (err, result) {
                 if (result) {
                     console.log("Added "+name+" to the roster: "+JSON.stringify(result));
                     resolve();
@@ -348,7 +367,7 @@ export class Fighter implements IFighter{
     }
 
     outputStats():string{
-        return "[b]" + this.name + "[/b]'s stats" + "              [i]Affinity:[/i] [b]" + Affinity[this.affinity] + "[/b]" + "\n" +
+        return "[b]" + this.name + "[/b]'s stats" + "\n" +
             "[b][color=red]Power[/color][/b]:  " + this.power + "      " + "[b][color=red]Hearts[/color][/b]: " + this.maxHearts() + " * " + this.hpPerHeart() +" [b][color=red]HP[/color] per heart[/b]"+"\n" +
             "[b][color=orange]Sensuality[/color][/b]:  " + this.sensuality + "      " + "[b][color=pink]Orgasms[/color][/b]: " + this.maxOrgasms() + " * " + this.lustPerOrgasm() +" [b][color=pink]Lust[/color] per Orgasm[/b]"+"\n" +
             "[b][color=green]Toughness[/color][/b]:  " + this.toughness + "\n" +
@@ -428,9 +447,7 @@ export class Fighter implements IFighter{
         if(amountToRemove != 0 && (this.tokens - amountToRemove >= 0)){
             this.tokens -= amountToRemove;
             this[stat]++;
-            this.update().then(() => {
-               return true;
-            });
+            this.update();
         }
         else{
             return false;
@@ -452,9 +469,9 @@ export class Fighter implements IFighter{
         }
 
         if(amountToGive != 0){
-            this.tokens += amountToGive;
+            this.tokens += Math.floor(amountToGive/2);
             this[stat]--;
-            return this.updateInDb();
+            this.update();
         }
         else{
             return false;
@@ -463,7 +480,6 @@ export class Fighter implements IFighter{
 
     giveTokens(amount){
         this.tokens += amount;
-        return this.updateInDb();
     }
 
     removeTokens(amount){
@@ -471,7 +487,6 @@ export class Fighter implements IFighter{
         if(this.tokens < 0){
             this.tokens = 0;
         }
-        return this.updateInDb();
     }
 
     tier():FightTier{
@@ -498,7 +513,6 @@ export class Fighter implements IFighter{
                     `quits`, \
                     `areStatsPrivate`, \
                     `totalFights`, \
-                    `winRate`, \
                     `power`, \
                     `sensuality`, \
                     `dexterity`, \

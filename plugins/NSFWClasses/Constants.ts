@@ -5,6 +5,7 @@ export class Constants{
     static maxLevel:number = 6;
     static maxTagBonus:number = 3;
     static tokensPerLossMultiplier:number = 0.5; //needs to be < 1 of course
+    static tokensForWinnerByForfeitMultiplier:number = 0.5; //needs to be < 1 of course
     static turnsToWaitBetweenTwoTags:number = 4;
     static maxBondageItemsOnSelf:number = 3;
     static itemPickupMultiplier:number = 1.5;
@@ -29,6 +30,30 @@ export class Constants{
     public static get finesseBonusText(): string    { return "+1 accuracy to all your attacks"; }
     public static get brawlerBonusDamage(): number    { return 2; }
     public static get brawlerBonusText(): string    { return "+2 HP damage to all your attacks"; }
+
+
+    static startupGuide= `Note: Any commands written down there are starting with a ! and must be typed without the "".
+    It's easy! First, you need to register.
+    Just type "!register", and your profile will be created.
+    You will have 1 point in every stat: Power, Sensuality, Toughness, Endurance, Dexterity, Willpower.
+
+    Power will be used wear out the defender Physically with your strength, reducing their Health
+    Sensuality will wear out the defender Sexually
+    Toughness will help you resist Physical attacks by increasing your maximum Health
+    Endurance will help you resist Sexual attacks, and increasing your Lust and Orgasm Counter
+    Dexterity will help your moves to hit, help you to dodge attacks and influence your initiative
+    Willpower will help you to keep your focus, and increase your Focus bar’s bounds
+
+    Your overall Health is primarily determined by your Toughness plus a percentage of your overall stats.
+    Your Lust and Orgasm Counter scales with the Endurance and also a percentage of your overall stats.
+
+    Health works similarly to how Lust does.
+    For your health, you will have 5 hearts, each representing 25 HP.
+    For your lust, the hearts are replaced by the Orgasm Counter, and the HP by a Lust Counter.
+    The Orgasm Counter will go up to X, this X being your Endurance.
+    You will trigger an orgasm when you max your Lust Counter, which will reset back to 0, and removing one orgasm from your Orgasm Counter.
+    No Hearts = No More Orgasms = You're out!
+    `;
 }
 
 export module Constants{

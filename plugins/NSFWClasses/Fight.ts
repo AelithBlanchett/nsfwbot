@@ -15,6 +15,7 @@ import FightTier = Constants.FightTier;
 import TokensPerWin = Constants.TokensPerWin;
 import Trigger = Constants.Trigger;
 import Action = Constants.Action;
+import {Modifier} from "./Modifier";
 var CircularJSON = require('circular-json');
 
 export class Fight{
@@ -184,7 +185,7 @@ export class Fight{
                 }
                 else{
                     fighter.assignedTeam = this.fighterList.getAvailableTeam();
-                    console.log(`assigned team ${fighter.assignedTeam} to ${fighter.name}`);
+                    //console.log(`assigned team ${fighter.assignedTeam} to ${fighter.name}`);
                 }
                 fighter.fight = this;
                 this.fighterList.push(fighter);
@@ -274,8 +275,21 @@ export class Fight{
             fighter.triggerMods(Trigger.AfterTurnTick);
         }
         this.outputStatus();
-        Fight.saveState(this);
-        this.waitingForAction = true;
+
+        if (this.isFightOver()) { //Check for the ending
+            this.outputStatus();
+            var tokensToGiveToWinners:number = TokensPerWin[FightTier[this.getFightTier(this.winnerTeam)]];
+            var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.tokensPerLossMultiplier;
+            this.endFight(tokensToGiveToWinners, tokensToGiveToLosers);
+        }
+        else{
+            Fight.saveState(this);
+            this.waitingForAction = true;
+        }
+    }
+
+    isFightOver():boolean{
+        return this.fighterList.getUsedTeams().length <= 1;
     }
 
     //Fighting info displays
@@ -390,6 +404,11 @@ export class Fight{
         if(turnsToWait > 0){
             flag = false;
             this.addMessage(`[b][color=red]You can't tag yet. Turns left: ${turnsToWait}[/color][/b]`);
+            this.sendMessage();
+        }
+        if(!this.currentTarget.canMoveFromOrOffRing){
+            flag = false;
+            this.addMessage(`[b][color=red]You can't tag with this character. They're permanently out.[/color][/b]`);
             this.sendMessage();
         }
         return flag;
@@ -538,13 +557,70 @@ export class Fight{
         return Constants.Arenas[Math.floor(Math.random() * Constants.Arenas.length)];
     }
 
-    endFight(){
-        this.hasEnded = true;
-        this.winnerTeam = this.fighterList.getUsedTeams()[0];
-        this.addMessage(`${Team[this.winnerTeam]} team wins the fight!`);
+    forfeit(fighter:Fighter){
+        if(fighter != null){
+            if(!fighter.isTechnicallyOut()){
+                this.addMessage(`${fighter.getStylizedName()} forfeits! Which means... 3 bondage items landing on them to punish them!`);
+                for(var i = 0; i < 3; i++){
+                    fighter.modifiers.push(new Modifier(fighter, null, 0, 0, 0, 0, 0, 1, Constants.Trigger.None, [], false, Constants.Modifier.Bondage));
+                }
+                fighter.forfeits++;
+                this.addMessage(`${fighter.getStylizedName()} has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`);
+                fighter.triggerPermanentOutsideRing();
+            }
+            else{
+                this.addMessage(`You are already out of the match. No need to forfeit.`);
+                this.sendMessage();
+                return;
+            }
+        }
+        else{
+            this.addMessage(`You are not participating in the match. OH, and that message should NEVER happen.`);
+            this.sendMessage();
+            return;
+        }
         this.sendMessage();
-        var tokensToGiveToWinners:number = TokensPerWin[FightTier[this.getFightTier(this.winnerTeam)]];
-        var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.tokensPerLossMultiplier;
+        if (this.isFightOver()) {
+            var tokensToGiveToWinners:number = TokensPerWin[FightTier[this.getFightTier(this.winnerTeam)]]*Constants.tokensPerLossMultiplier;
+            this.endFight(tokensToGiveToWinners, 0);
+        }
+    }
+
+    checkForDraw(){
+        let neededDrawFlags = this.fighterList.getAlivePlayers().length;
+        let drawFlags = 0;
+        for(let fighter of this.fighterList.getAlivePlayers()){
+            if(fighter.wantsDraw){
+                drawFlags++;
+            }
+        }
+        if(neededDrawFlags == drawFlags){
+            this.addMessage(`Everybody agrees, it's a draw!`);
+            this.sendMessage();
+            let tokensToGive:number = this.currentTurn;
+            if(tokensToGive > parseInt(TokensPerWin[FightTier.Bronze])){
+                tokensToGive = parseInt(TokensPerWin[FightTier.Bronze]);
+            }
+            this.endFight(0,tokensToGive, Team.Unknown); //0 because there isn't a winning team
+        }
+        else{
+            this.addMessage(`Waiting for the other players still in the fight to call the draw.`);
+            this.sendMessage();
+        }
+    }
+
+    endFight(tokensToGiveToWinners, tokensToGiveToLosers, forceWinner?:Team){
+        this.hasEnded = true;
+        if(!forceWinner){
+            this.winnerTeam = this.fighterList.getUsedTeams()[0];
+        }
+        else{
+            this.winnerTeam = forceWinner;
+        }
+        if(this.winnerTeam != Team.Unknown){
+            this.addMessage(`${Team[this.winnerTeam]} team wins the fight!`);
+            this.sendMessage();
+        }
         Fight.commitEndFightDb(this, tokensToGiveToWinners, tokensToGiveToLosers);
     }
 
@@ -561,13 +637,20 @@ export class Fight{
                 else{
                     var callsToMake = [];
                     for(let fighter of fight.fighterList){
+                        fighter.totalFights++;
                         if(fighter.assignedTeam == fight.winnerTeam){
+                            fighter.wins++;
                             fight.addMessage(`Awarded ${tokensToGiveToWinners} ${Constants.currencyName} to ${fighter.getStylizedName()}`);
-                            callsToMake.push(fighter.giveTokens(tokensToGiveToWinners));
+                            fighter.giveTokens(tokensToGiveToWinners)
+                            callsToMake.push(fighter.update());
                         }
                         else{
+                            if(fight.winnerTeam != Team.Unknown){
+                                fighter.losses++;
+                            }
                             fight.addMessage(`Awarded ${tokensToGiveToLosers} ${Constants.currencyName} to ${fighter.getStylizedName()}`);
-                            callsToMake.push(fighter.giveTokens(tokensToGiveToLosers));
+                            fighter.giveTokens(tokensToGiveToLosers)
+                            callsToMake.push(fighter.update());
                         }
                     }
                     Promise.all(callsToMake)

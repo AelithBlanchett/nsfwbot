@@ -105,7 +105,7 @@ function doAction(cmd:CommandHandler, action:string, target:string = "", conditi
     });
 }
 
-function wasHealthHit(cmd:CommandHandler, name:string){
+function wasHealthHxit(cmd:CommandHandler, name:string){
     return (
         (
             cmd.fight.fighterList.getFighterByName(name).hp == cmd.fight.fighterList.getFighterByName(name).hpPerHeart() &&
@@ -116,7 +116,7 @@ function wasHealthHit(cmd:CommandHandler, name:string){
     );
 }
 
-function wasLustHit(cmd:CommandHandler, name:string){
+function wasLustHxit(cmd:CommandHandler, name:string){
     return (
         (
             cmd.fight.fighterList.getFighterByName(name).lust == cmd.fight.fighterList.getFighterByName(name).lustPerOrgasm() &&
@@ -186,34 +186,33 @@ function wasMessageSent(msg){
 
 
 
-describe("The database(s)", () => {
+xdescribe("The database(s)", () => {
 
     function resetData(){
         return new Promise((resolve, reject) => {
-            var sqlResetFightsActions = "DELETE FROM flistplugins.nsfw_actions where idFight = 1;";
-            var sqlResetFightFighters = "DELETE FROM flistplugins.nsfw_fightfighters where idFight = 1;";
-            var sqlResetFights = "DELETE FROM flistplugins.nsfw_fights where idFight = 1;";
+            var subRequestFights = "SELECT flistplugins.nsfw_fights.idFight FROM flistplugins.nsfw_fights LEFT JOIN flistplugins.nsfw_fightfighters ON flistplugins.nsfw_fights.idFight = flistplugins.nsfw_fightfighters.idFight\
+            WHERE idFighter IS NULL OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4";
+            var sqlResetFightsActions = "DELETE FROM flistplugins.nsfw_actions where idFight IN ("+subRequestFights+") OR idAttacker = 1 OR idAttacker = 2 OR idAttacker = 3 OR idAttacker = 4 OR idDefender = 1 OR idDefender = 2 OR idDefender = 3 OR idDefender = 4";
+            var sqlResetFightFighters = "DELETE FROM flistplugins.nsfw_fightfighters where idFight IN ("+subRequestFights+") OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4;";
+            var sqlResetFights = "DELETE flistplugins.nsfw_fights.* FROM flistplugins.nsfw_fights \
+            WHERE idFight IN ("+subRequestFights+") idFighter IS NULL OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4;"; //clear all fights linked to the 4 fighters
             var sqlResetTestFighters = "DELETE FROM flistplugins.nsfw_fighters where name = 'test' OR name = 'test2' OR name = 'test3' OR name = 'test4';";
             var sqlAddTestFighter1 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('1', 'test', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
             var sqlAddTestFighter2 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('2', 'test2', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
             var sqlAddTestFighter3 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('3', 'test3', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
             var sqlAddTestFighter4 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('4', 'test4', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
+            var addFight = "INSERT INTO `flistplugins`.`nsfw_fights` (`idFight`, `idFightType`,  `idStage`, `usedTeams`, `currentTurn`, `fighterList`, `hasEnded`) VALUES (1,1, 1,2, 2, '', 0);";
             Data.db.query(sqlResetFightsActions, (err, result) => {
                 Data.db.query(sqlResetFightFighters, (err, result) => {
-                    console.log(err + "     " + result.affectedRows);
-                    Data.db.query(sqlResetFights, (err2, result2) => {
-                        console.log(err2 + "     " + result2);
+                    Data.db.query(sqlResetFights, (err, result) => {
                         Data.db.query(sqlResetTestFighters, (err, result) => {
-                            console.log(err + "     " + result.affectedRows);
                             Data.db.query(sqlAddTestFighter1, (err, result) => {
-                                console.log(err + "     " + result.affectedRows);
                                 Data.db.query(sqlAddTestFighter2, (err, result) => {
-                                    console.log(err + "     " + result.affectedRows);
                                     Data.db.query(sqlAddTestFighter3, (err, result) => {
-                                        console.log(err + "     " + result.affectedRows);
                                         Data.db.query(sqlAddTestFighter4, (err, result) => {
-                                            console.log(err + "     " + result.affectedRows);
-                                            resolve();
+                                            Data.db.query(addFight, (err, result) => {
+                                                resolve();
+                                            });
                                         });
                                     });
                                 });
@@ -226,10 +225,10 @@ describe("The database(s)", () => {
     }
 
     beforeAll(function(done) {
-        resetData().then(()=> {
+        resetData().then(() => {
             done();
         });
-    });
+    },5000);
 
     beforeEach(function () {
         fChatLibInstance = {
@@ -301,8 +300,8 @@ describe("The database(s)", () => {
                 randomId = Utils.getRandomInt(1,6);
             }while(x.power == randomId);
             x.power = randomId;
-            x.updateInDb().then(intAffectedRows => {
-                expect(intAffectedRows).toBe(1);
+            x.update().then(updWorked => {
+                expect(updWorked).toBe(true);
                 done();
             }).catch(err => {
                 done.fail(err);
@@ -336,8 +335,7 @@ describe("The database(s)", () => {
         });
     },50000);
 
-    it("should tag successfully with Aelith", function(done){
-        debug = true;
+    xit("should tag successfully with Aelith", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings2vs2TagForDb(cmd);
         waitUntil().interval(2).times(5000).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "test") != -1; }).done(() =>{
@@ -354,7 +352,7 @@ describe("The database(s)", () => {
 
 
 /// <reference path="../typings/jasmine/jasmine.d.ts">
-xdescribe("The player(s)", () => {
+describe("The player(s)", () => {
 
 
     beforeEach(function() {
@@ -502,11 +500,9 @@ xdescribe("The player(s)", () => {
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction)}).done(() =>{
             let fighterNameBefore = cmd.fight.currentPlayer.name;
-            console.log("Fighter before: "+fighterNameBefore);
             cmd.fight.assignRandomTarget(cmd.fight.currentPlayer)
             cmd.fight.setCurrentPlayer(cmd.fight.currentTarget.name);
             if(cmd.fight.currentPlayer.name != fighterNameBefore){
-                console.log("Fighter after: "+cmd.fight.currentPlayer.name);
                 done();
             }
             else{
@@ -521,7 +517,7 @@ xdescribe("The player(s)", () => {
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "brawl", "Light").then(() => {
-                if(wasHealthHit(cmd, "Aelith Blanchette")) {
+                if(wasHealthHxit(cmd, "Aelith Blanchette")) {
                     done();
                 }
                 else{
@@ -538,7 +534,7 @@ xdescribe("The player(s)", () => {
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             doAction(cmd, "sex", "Light").then(() => {
-                if(wasLustHit(cmd, "Aelith Blanchette")) {
+                if(wasLustHxit(cmd, "Aelith Blanchette")) {
                     done();
                 }
                 else{
@@ -574,7 +570,7 @@ xdescribe("The player(s)", () => {
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "subhold", "Light").then(() => {
-                if(wasHealthHit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.SubHold) != -1){
+                if(wasHealthHxit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.SubHold) != -1){
                     done();
                 }
             }).catch(err => {
@@ -591,7 +587,7 @@ xdescribe("The player(s)", () => {
             doAction(cmd, "subhold", "Light").then(() => {
                 cmd.fight.nextTurn();
                 cmd.fight.nextTurn();
-                if(wasHealthHit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.length == 0){
+                if(wasHealthHxit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.length == 0){
                     done();
                 }
                 else{
@@ -719,7 +715,7 @@ xdescribe("The player(s)", () => {
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "sexhold", "Light").then(() => {
-                if(wasLustHit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.SexHold) != -1){
+                if(wasLustHxit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.SexHold) != -1){
                     done();
                 }
             }).catch(err => {
@@ -779,7 +775,8 @@ xdescribe("The player(s)", () => {
         });
     });
 
-    xit("should be dealing more focus damage with humiliation ", function(done){
+    it("should be dealing more focus damage with humiliation ", function(done){
+        debug = true;
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -789,7 +786,7 @@ xdescribe("The player(s)", () => {
                 doAction(cmd, "sexhold", "Light").then(() => {
                     cmd.fight.nextTurn();
                     doAction(cmd, "humhold", "Light").then(() => {
-                        if (wasMessageSent("[b][color=Red]Aelith Blanchette[/color][/b] is still affected by the degradation malus!")) {
+                        if (wasMessageSent("is still affected by the degradation malus!")) {
                             done();
                         }
                     });
@@ -798,7 +795,7 @@ xdescribe("The player(s)", () => {
                 fChatLibInstance.throwError(err);
             });
         });
-    });
+    },10000);
 
 
     xit("should pickup an item and trigger bonus brawl modifier", function(done){
@@ -907,9 +904,43 @@ xdescribe("The player(s)", () => {
         });
     });
 
+    xit("should forfeit the match and give the win", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            doAction(cmd, "forfeit", "").then(() => {
+                if (wasMessageSent("has too many items on them to possibly fight!")) {
+                    done();
+                }
+                else{
+                    done(new Error("Did not say that the attacker must apply a sexhold for a bondage attack."));
+                }
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    },500000);
+
+    xit("should call the match a draw", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            doAction(cmd, "draw", "").then(() => {
+                cmd.fight.nextTurn();
+                doAction(cmd, "draw", "").then(() => {
+                    if (wasMessageSent("Everybody agrees, it's a draw!")) {
+                        done();
+                    }
+                    else{
+                        done(new Error("Did not say that the attacker must apply a sexhold for a bondage attack."));
+                    }
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    },500000);
 
 });
 
 jasmine.execute();
-
-//console.log(myFighter.name);

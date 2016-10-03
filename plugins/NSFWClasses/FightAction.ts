@@ -10,6 +10,8 @@ import Trigger = Constants.Trigger;
 import Action = Constants.Action;
 import {Modifier} from "./Modifier";
 import FocusDamageHumHold = Constants.FocusDamageHumHold;
+import TokensPerWin = Constants.TokensPerWin;
+import FightTier = Constants.FightTier;
 
 export class FightAction{
     id: number;
@@ -346,22 +348,21 @@ export class FightAction{
         if(this.type == Action.Tag){
             fight.addMessage(`[b][color=red]TAG![/color][/b] ${this.defender.name} enters inside the ring!`);
         }
-
-        if(this.defender.isDead()){
+        else if(this.defender.isDead()){
             fight.addMessage(`${this.defender.name} couldn't take the hits anymore! [b][color=red]They're out![/color][/b]`);
-            this.defender.triggerOutsideRing();
+            this.defender.triggerPermanentOutsideRing();
         }
         else if(this.defender.isSexuallyExhausted()){
             fight.addMessage(`${this.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
-            this.defender.triggerOutsideRing();
+            this.defender.triggerPermanentOutsideRing();
         }
         else if(this.defender.isBroken()){
             fight.addMessage(`${this.defender.name} is too mentally exhausted to continue! [b][color=red]They're out![/color][/b]`);
-            this.defender.triggerOutsideRing();
+            this.defender.triggerPermanentOutsideRing();
         }
         else if(this.defender.isCompletelyBound()){
             fight.addMessage(`${this.defender.name} has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`);
-            this.defender.triggerOutsideRing();
+            this.defender.triggerPermanentOutsideRing();
         }
         else if(!this.defender.isInTheRing || !this.attacker.isInTheRing){
             fight.addMessage(`${this.defender.name} can't stay inside the ring anymore! [b][color=red]They're out![/color][/b]`);
@@ -371,11 +372,13 @@ export class FightAction{
         FightAction.commitDb(this);
 
         //check for fight ending status
-        if (fight.fighterList.getUsedTeams().length != 1) {
+        if (!fight.isFightOver()) {
             fight.nextTurn();
         } else { //if there's only one team left in the fight, then we're sure it's over
             fight.outputStatus();
-            fight.endFight();
+            var tokensToGiveToWinners:number = TokensPerWin[FightTier[fight.getFightTier(fight.winnerTeam)]];
+            var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.tokensPerLossMultiplier;
+            fight.endFight(tokensToGiveToWinners, tokensToGiveToLosers);
         }
     }
 }
