@@ -7,4 +7,5 @@ install:
 script:
   - typings install
   - tsc -p .
-  - npm test
+  - cd tests
+  - node tests.js
