@@ -14,9 +14,11 @@
     "promise": "^7.1.1",
     "wait-until": "*",
     "typings": "*",
-    "typescript": "*"
+    "typescript": "^2.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/node": "^6.0.41"
+  },
   "scripts": {
     "test": "cd tests && node tests.js"
   },
