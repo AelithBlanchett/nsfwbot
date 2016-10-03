@@ -1,3 +1,4 @@
+/// <reference path="./Dice.ts" />
 import {Fighter} from "./Fighter";
 import {Dice} from "./Dice";
 import {FightAction} from "./FightAction";

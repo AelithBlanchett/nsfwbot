@@ -1,4 +1,3 @@
-/// <reference path="./Fight.ts" />
 import * as mysql from "mysql";
 import {IConnection} from "mysql";
 var mySqlConfig = require('../../config/config.mysql.js');

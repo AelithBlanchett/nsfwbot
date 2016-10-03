@@ -3,10 +3,9 @@
     "module": "commonjs",
     "target": "es6",
     "sourceMap": true,
-    "types": ["node", "jasmine"]
+    "types": ["node", "jasmine", "mysql"]
   },
   "exclude": [
-    "node_modules",
-    "typings"
+    "node_modules"
   ]
 }
