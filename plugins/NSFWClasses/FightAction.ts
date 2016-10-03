@@ -110,6 +110,8 @@ export class FightAction{
         this.diceScore = this.attacker.roll(1) + this.attacker.power;
         if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
+            this.attacker.healFP(1);
+            this.defender.hitFP(1);
             this.hpDamage += this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
         }
         return Trigger.AfterBrawlAttack;
@@ -121,6 +123,8 @@ export class FightAction{
         this.diceScore = this.attacker.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
+            this.attacker.healFP(1);
+            this.defender.hitFP(1);
             this.lustDamage += this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
         }
         return Trigger.AfterSexStrikeAttack;
@@ -132,6 +136,8 @@ export class FightAction{
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.power;
         if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
+            this.attacker.healFP(1);
+            this.defender.hitFP(1);
             let hpDamage = this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
             let holdModifier = new Modifier(this.defender, this.attacker, hpDamage, 0, 0, 0, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.OnTurnTick, [], false, Constants.Modifier.SubHold, this.type);
             let brawlBonusAttacker = new Modifier(this.attacker, this.defender, 0, 0, 0, Constants.accuracyBonusBrawlInsideSubHold, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeBrawlAttack, [holdModifier.id], false, Constants.Modifier.SubHoldBrawlBonus, this.type);
@@ -149,6 +155,8 @@ export class FightAction{
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
+            this.attacker.healFP(1);
+            this.defender.hitFP(1);
             let lustDamage = this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
             let holdModifier = new Modifier(this.defender, this.attacker, 0, lustDamage, 0, 0, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.OnTurnTick, [], false, Constants.Modifier.SexHold, this.type);
             let lustBonusAttacker = new Modifier(this.attacker, this.defender, 0, 0, 0, Constants.accuracyBonusSexStrikeInsideSexHold, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeSexStrikeAttack, [holdModifier.id], false, Constants.Modifier.SexHoldLustBonus, this.type);
@@ -166,6 +174,7 @@ export class FightAction{
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
+            this.attacker.healFP(3);
             let focusDamage = FocusDamageHumHold[Tier[this.tier]];
             let holdModifier = new Modifier(this.defender, this.attacker, 0, 0, focusDamage, 0, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.OnTurnTick, [], false, Constants.Modifier.HumHold, this.type);
             this.modifiers.push(holdModifier);
@@ -179,6 +188,8 @@ export class FightAction{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
+        this.attacker.healFP(2);
+        this.defender.hitFP(3);
         let holdModifier = new Modifier(this.defender, this.attacker, 0, 0, 0, 0, 0, 1, Constants.Trigger.None, [], false, Constants.Modifier.Bondage, this.type);
         this.modifiers.push(holdModifier);
         return Trigger.AfterBondage;
@@ -190,6 +201,8 @@ export class FightAction{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
+        this.attacker.healFP(1);
+        this.defender.hitFP(1);
         let itemPickupModifier = new Modifier(this.attacker, null, Constants.itemPickupMultiplier, 0, 0, 0, 0, Constants.itemPickupBonusUses, Constants.Trigger.AfterBrawlAttack, [], true, Constants.Modifier.ItemPickupBonus);
         this.modifiers.push(itemPickupModifier);
         return Trigger.AfterItemPickup;
@@ -201,6 +214,8 @@ export class FightAction{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
+        this.attacker.healFP(1);
+        this.defender.hitFP(1);
         let itemPickupModifier = new Modifier(this.attacker, null, 0, Constants.sextoyPickupMultiplier, 0, 0, 0, Constants.sextoyPickupBonusUses, Constants.Trigger.AfterSexStrikeAttack, [], true, Constants.Modifier.SextoyPickupBonus);
         this.modifiers.push(itemPickupModifier);
         return Trigger.AfterSextoyPickup;
@@ -212,6 +227,8 @@ export class FightAction{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
+        this.defender.hitFP(2);
+        this.defender.hitFP(3);
         let humiliationModifier = new Modifier(this.defender, this.attacker, 0, 0, Constants.degradationFocusBonusDamage, 0, 0, Constants.degradationBonusUses, Constants.Trigger.BeforeFocusDamage, [], false, Constants.Modifier.DegradationMalus);
         this.modifiers.push(humiliationModifier);
         return Trigger.AfterDegradation;

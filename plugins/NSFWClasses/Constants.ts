@@ -10,7 +10,7 @@ export class Constants{
     static maxBondageItemsOnSelf:number = 3;
     static itemPickupMultiplier:number = 1.5;
     static sextoyPickupMultiplier:number = 1.5;
-    static degradationFocusBonusDamage:number = 3;
+    static degradationFocusBonusDamage:number = 2;
     static difficultyIncreasePerBondageItem:number = 2;
     static itemPickupBonusUses:number = 1;
     static sextoyPickupBonusUses:number = 1;
