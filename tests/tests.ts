@@ -217,7 +217,7 @@ describe("The player(s)", () => {
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healHP(10);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                if(wasMessageSent("gained 0 HP")){
+                if(!wasMessageSent("gained 0 HP")){
                     done();
                 }
                 else{
@@ -272,7 +272,7 @@ describe("The player(s)", () => {
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healLP(10);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                if(wasMessageSent("was removed 0 LP")){
+                if(!wasMessageSent("was removed 0 LP")){
                     done();
                 }
                 else{
@@ -328,7 +328,7 @@ describe("The player(s)", () => {
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healFP(10);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                if(wasMessageSent("gained 0 FP")){
+                if(!wasMessageSent("gained 0 FP")){
                     done();
                 }
                 else{

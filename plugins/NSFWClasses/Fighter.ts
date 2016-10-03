@@ -213,7 +213,9 @@ export class Fighter implements IFighter{
             hp = this.hpPerHeart() - this.hp; //reduce the number if it overflows the bar
         }
         this.hp += hp;
-        this.fight.addMessage(`${this.name} [color=green]gained ${hp} HP![/color]`);
+        if(hp != 0) {
+            this.fight.addMessage(`${this.name} [color=green]gained ${hp} HP![/color]`);
+        }
         if(triggerMods){this.triggerMods(Trigger.AfterHPHealing);}
     }
 
@@ -227,7 +229,9 @@ export class Fighter implements IFighter{
             lust = this.lust; //reduce the number if it overflows the bar
         }
         this.lust += lust;
-        this.fight.addMessage(`${this.name} [color=green]was removed ${lust} LP![/color]`);
+        if(lust != 0) {
+            this.fight.addMessage(`${this.name} [color=green]was removed ${lust} LP![/color]`);
+        }
         if(triggerMods){this.triggerMods(Trigger.AfterLustHealing);}
     }
 
@@ -241,7 +245,9 @@ export class Fighter implements IFighter{
             focus = this.maxFocus() - this.focus; //reduce the number if it overflows the bar
         }
         this.focus += focus;
-        this.fight.addMessage(`${this.name} [color=green]gained ${focus} FP![/color]`);
+        if(focus != 0){
+            this.fight.addMessage(`${this.name} [color=green]gained ${focus} FP![/color]`);
+        }
         if(triggerMods){this.triggerMods(Trigger.AfterFocusHealing);}
     }
 

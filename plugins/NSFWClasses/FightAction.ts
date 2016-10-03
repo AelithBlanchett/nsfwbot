@@ -236,7 +236,9 @@ export class FightAction{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
-        this.attacker.healHP(this.attacker.hp*Constants.hpPercantageToHealOnRest)
+        this.attacker.healHP(this.attacker.hp*Constants.hpPercantageToHealOnRest);
+        this.attacker.healLP(this.attacker.hp*Constants.lpPercantageToHealOnRest);
+        this.attacker.healFP(this.attacker.hp*Constants.fpPointsToHealOnRest);
         return Trigger.AfterPass;
     }
 

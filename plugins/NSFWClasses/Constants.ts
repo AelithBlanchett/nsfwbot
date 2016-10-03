@@ -20,6 +20,8 @@ export class Constants{
     static accuracyBonusSexStrikeInsideSexHold:number = 3;
     static initialNumberOfTurnsForHold:number = 5;
     static hpPercantageToHealOnRest:number = 0.25;
+    static lpPercantageToHealOnRest:number = 0.25;
+    static fpPointsToHealOnRest:number = 1;
 
     public static get currencyName(): string    { return "tokens"; }
     public static get pluginName(): string    { return "nsfw"; }
