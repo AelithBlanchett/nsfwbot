@@ -237,7 +237,7 @@ export class Fighter implements IFighter{
             focus = 1;
         }
         if(triggerMods){this.triggerMods(Trigger.BeforeFocusHealing);}
-        if(this.focus + focus < this.maxFocus()){
+        if(this.focus + focus > this.maxFocus()){
             focus = this.maxFocus() - this.focus; //reduce the number if it overflows the bar
         }
         this.focus += focus;

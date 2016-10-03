@@ -288,7 +288,7 @@ describe("The player(s)", () => {
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             var initialHp = 2;
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").lust = initialHp;
-            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healLust(50);
+            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healLP(50);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
                 if(wasMessageSent(`was removed ${initialHp} LP`)){
@@ -307,7 +307,7 @@ describe("The player(s)", () => {
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             var initialHp = 1;
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").lust = 1;
-            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healLust(1);
+            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healLP(1);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
                 if(wasMessageSent(`was removed 1 LP`)){
@@ -315,6 +315,62 @@ describe("The player(s)", () => {
                 }
                 else{
                     done.fail(new Error("Either lustheal was not triggered or was different than 1LP"));
+                }
+            });
+        });
+    },DEFAULT_TIMEOUT);
+
+    it("should heal 0 fp because it's already full", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").focus = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxFocus();
+            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healFP(10);
+            cmd.fight.sendMessage();
+            waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
+                if(wasMessageSent("gained 0 FP")){
+                    done();
+                }
+                else{
+                    done.fail(new Error("Either heal was not triggered or was different than 0FP"));
+                }
+            });
+        });
+    },DEFAULT_TIMEOUT);
+
+    it("should heal whatever fp amount is left", function(done){ // 0
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            var initialHp = 1;
+            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").focus = initialHp;
+            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healFP(50);
+            cmd.fight.sendMessage();
+            waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
+                if(wasMessageSent(`gained ${cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxFocus() - initialHp} FP`)){
+                    done();
+                }
+                else{
+                    done.fail(new Error("Either heal was not triggered or was different than the required FP"));
+                }
+            });
+        });
+    },DEFAULT_TIMEOUT);
+
+    it("should heal 1 FP", function(done){ // 0
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            var initialHp = 1;
+            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").focus = initialHp;
+            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healFP(1);
+            cmd.fight.sendMessage();
+            waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
+                if(wasMessageSent(`gained 1 FP`)){
+                    done();
+                }
+                else{
+                    done.fail(new Error("Either heal was not triggered or was different than 1FP"));
                 }
             });
         });
