@@ -197,9 +197,10 @@ export module Constants{
     export enum Trigger{
         None = 0,
 
-        //Befores
-        BeforeTurnTick,
 
+        OnTurnTick,
+
+        //Befores
         BeforeHPDamage,
         BeforeLustDamage,
         BeforeFocusDamage,
@@ -247,8 +248,6 @@ export module Constants{
 
 
         //Afters
-        AfterTurnTick,
-
         AfterHPDamage,
         AfterLustDamage,
         AfterFocusDamage,

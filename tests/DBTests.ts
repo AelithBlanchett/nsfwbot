@@ -102,8 +102,8 @@ describe("The database(s)", () => {
     });
 
     it("should say Test is already there", function (done) {
-        Fighter.exists("Test").then(x => {
-            if(x.name == "Test"){
+        Fighter.exists("test").then(x => {
+            if(x.name == "test"){
                 done();
             }
             else{
@@ -115,8 +115,8 @@ describe("The database(s)", () => {
     },5000);
 
     it("should say Test2 is already there", function (done) {
-        Fighter.exists("Test2").then(x => {
-            if(x.name == "Test2"){
+        Fighter.exists("test2").then(x => {
+            if(x.name == "test2"){
                 done();
             }
             else{
@@ -127,7 +127,7 @@ describe("The database(s)", () => {
         });
     },5000);
 
-    it("should say Test2 is already there", function (done) {
+    it("should say Tewefwefwfwst2 doesn't exist", function (done) {
         Fighter.exists("Tewefwefwfwst2").then(x => {
             if(x == undefined){
                 done();
@@ -141,7 +141,7 @@ describe("The database(s)", () => {
     },5000);
 
     it("should update Test2's power to something else", function (done) {
-        Fighter.exists("Test2").then(x => {
+        Fighter.exists("test2").then(x => {
             let randomId = -1;
             do{
                 randomId = Utils.getRandomInt(1,6);
@@ -159,7 +159,7 @@ describe("The database(s)", () => {
     },500000);
 
     it("should write a new action in the database", function (done) {
-        Fighter.exists("Test2").then(x => {
+        Fighter.exists("test2").then(x => {
             let myAction = new FightAction(1, 1, 1, Action.Brawl, x);
             FightAction.commitDb(myAction).then(id => {
                 expect(id).toBeGreaterThan(0);
@@ -171,7 +171,7 @@ describe("The database(s)", () => {
     },5000);
 
     it("should write a new fight in the database", function (done) {
-        Fighter.exists("Test2").then(x => {
+        Fighter.exists("test2").then(x => {
             let myFight = new Fight(fChatLibInstance, "here", "hello");
             Fight.saveState(myFight).then(id => {
                 expect(id).toBeGreaterThan(0);

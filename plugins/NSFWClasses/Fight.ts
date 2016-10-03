@@ -269,12 +269,10 @@ export class Fight{
 
     nextTurn(){
         for(let fighter of this.fighterList){
-            fighter.triggerMods(Trigger.BeforeTurnTick);
+            fighter.triggerMods(Trigger.OnTurnTick);
+            //if(fighter.modifiers.indexOf())
         }
         this.currentTurn++;
-        for(let fighter of this.fighterList){
-            fighter.triggerMods(Trigger.AfterTurnTick);
-        }
         this.outputStatus();
 
         if (this.isFightOver()) { //Check for the ending
@@ -563,7 +561,7 @@ export class Fight{
             if(!fighter.isTechnicallyOut()){
                 this.addMessage(`${fighter.getStylizedName()} forfeits! Which means... 3 bondage items landing on them to punish them!`);
                 for(var i = 0; i < 3; i++){
-                    fighter.modifiers.push(new Modifier(fighter, null, 0, 0, 0, 0, 0, 1, Constants.Trigger.None, [], false, Constants.Modifier.Bondage));
+                    fighter.modifiers.push(new Modifier(fighter, null, 0, 0, 0, 0, 0, 1, Constants.Trigger.None, [], false, Constants.Modifier.Bondage, Action.Bondage));
                 }
                 fighter.forfeits++;
                 this.addMessage(`${fighter.getStylizedName()} has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`);

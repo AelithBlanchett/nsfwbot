@@ -3,6 +3,7 @@ import {FighterList} from "./FighterList";
 import {Constants} from "./Constants";
 import Trigger = Constants.Trigger;
 import {Utils} from "./Utils";
+import Action = Constants.Action;
 var ES = require("es-abstract/es6.js");
 
 export interface IModifier{
@@ -16,6 +17,7 @@ export interface IModifier{
     diceRoll: number;
     escapeRoll: number;
     uses: number;
+    parentAction: Action;
     eventTrigger:Trigger;
     parentIds: Array<string>;
 
@@ -39,8 +41,9 @@ export class Modifier implements IModifier{
     uses: number;
     eventTrigger:Trigger = 0;
     parentIds: Array<string>;
+    parentAction: Action;
 
-    constructor(receiver:Fighter, applier:Fighter, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number, eventTrigger:Trigger, parentIds:Array<string>, areMultipliers:boolean, name?:string){
+    constructor(receiver:Fighter, applier:Fighter, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number, eventTrigger:Trigger, parentIds:Array<string>, areMultipliers:boolean, name:string, parentAction?:Action ){
         this.id = Utils.generateUUID();
         this.receiver = receiver; //ALWAYS filled!
         this.applier = applier; //can be null
@@ -53,8 +56,9 @@ export class Modifier implements IModifier{
         this.eventTrigger = eventTrigger;
         this.parentIds = parentIds;
         this.areDamageMultipliers = areMultipliers;
-        if(name) {
-            this.name = name;
+        this.name = name;
+        if(parentAction) {
+            this.parentAction = parentAction;
         }
     }
 

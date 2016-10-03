@@ -133,9 +133,9 @@ export class FightAction{
         if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
             let hpDamage = this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
-            let holdModifier = new Modifier(this.defender, this.attacker, hpDamage, 0, 0, 0, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeTurnTick, [], false, Constants.Modifier.SubHold);
-            let brawlBonusAttacker = new Modifier(this.attacker, this.defender, 0, 0, 0, Constants.accuracyBonusBrawlInsideSubHold, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeBrawlAttack, [holdModifier.id], false, Constants.Modifier.SubHoldBrawlBonus);
-            let brawlBonusDefender = new Modifier(this.defender, this.attacker, 0, 0, 0, Constants.accuracyBonusBrawlInsideSubHold, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeBrawlAttack, [holdModifier.id], false, Constants.Modifier.SubHoldBrawlBonus);
+            let holdModifier = new Modifier(this.defender, this.attacker, hpDamage, 0, 0, 0, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.OnTurnTick, [], false, Constants.Modifier.SubHold, this.type);
+            let brawlBonusAttacker = new Modifier(this.attacker, this.defender, 0, 0, 0, Constants.accuracyBonusBrawlInsideSubHold, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeBrawlAttack, [holdModifier.id], false, Constants.Modifier.SubHoldBrawlBonus, this.type);
+            let brawlBonusDefender = new Modifier(this.defender, this.attacker, 0, 0, 0, Constants.accuracyBonusBrawlInsideSubHold, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeBrawlAttack, [holdModifier.id], false, Constants.Modifier.SubHoldBrawlBonus, this.type);
             this.modifiers.push(holdModifier);
             this.modifiers.push(brawlBonusAttacker);
             this.modifiers.push(brawlBonusDefender);
@@ -150,9 +150,9 @@ export class FightAction{
         if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
             let lustDamage = this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
-            let holdModifier = new Modifier(this.defender, this.attacker, 0, lustDamage, 0, 0, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeTurnTick, [], false, Constants.Modifier.SexHold);
-            let lustBonusAttacker = new Modifier(this.attacker, this.defender, 0, 0, 0, Constants.accuracyBonusSexStrikeInsideSexHold, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeSexStrikeAttack, [holdModifier.id], false, Constants.Modifier.SexHoldLustBonus);
-            let lustBonusDefender = new Modifier(this.defender, this.attacker, 0, 0, 0, Constants.accuracyBonusSexStrikeInsideSexHold, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeSexStrikeAttack, [holdModifier.id], false, Constants.Modifier.SexHoldLustBonus);
+            let holdModifier = new Modifier(this.defender, this.attacker, 0, lustDamage, 0, 0, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.OnTurnTick, [], false, Constants.Modifier.SexHold, this.type);
+            let lustBonusAttacker = new Modifier(this.attacker, this.defender, 0, 0, 0, Constants.accuracyBonusSexStrikeInsideSexHold, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeSexStrikeAttack, [holdModifier.id], false, Constants.Modifier.SexHoldLustBonus, this.type);
+            let lustBonusDefender = new Modifier(this.defender, this.attacker, 0, 0, 0, Constants.accuracyBonusSexStrikeInsideSexHold, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeSexStrikeAttack, [holdModifier.id], false, Constants.Modifier.SexHoldLustBonus, this.type);
             this.modifiers.push(holdModifier);
             this.modifiers.push(lustBonusAttacker);
             this.modifiers.push(lustBonusDefender);
@@ -167,7 +167,7 @@ export class FightAction{
         if(this.diceScore >= this.requiredDiceScore(this.type, this.tier)){
             this.missed = false;
             let focusDamage = FocusDamageHumHold[Tier[this.tier]];
-            let holdModifier = new Modifier(this.defender, this.attacker, 0, 0, focusDamage, 0, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.BeforeTurnTick, [], false, Constants.Modifier.HumHold);
+            let holdModifier = new Modifier(this.defender, this.attacker, 0, 0, focusDamage, 0, 0, Constants.initialNumberOfTurnsForHold, Constants.Trigger.OnTurnTick, [], false, Constants.Modifier.HumHold, this.type);
             this.modifiers.push(holdModifier);
         }
         return Trigger.AfterHumiliationHold;
@@ -179,7 +179,7 @@ export class FightAction{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
-        let holdModifier = new Modifier(this.defender, this.attacker, 0, 0, 0, 0, 0, 1, Constants.Trigger.None, [], false, Constants.Modifier.Bondage);
+        let holdModifier = new Modifier(this.defender, this.attacker, 0, 0, 0, 0, 0, 1, Constants.Trigger.None, [], false, Constants.Modifier.Bondage, this.type);
         this.modifiers.push(holdModifier);
         return Trigger.AfterBondage;
     }
