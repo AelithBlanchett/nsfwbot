@@ -531,7 +531,7 @@ describe("The player(s)", () => {
             doAction(cmd, "subhold", "Light").then(() => {
                 let indexOfSubHoldModifier = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.SubHold);
                 if(indexOfSubHoldModifier == -1){
-                    done(new Error("Did not find the correct subhold modifier in the defender's list."));
+                    done.fail(new Error("Did not find the correct subhold modifier in the defender's list."));
                 }
                 let usesLeftBefore = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
                 cmd.fight.nextTurn();
@@ -825,7 +825,7 @@ describe("The player(s)", () => {
                             done();
                         }
                         else {
-                            done(new Error("Did not say that the attacker must apply a sexhold for a bondage attack."));
+                            done.fail(new Error("Did not say that the attacker must apply a sexhold for a bondage attack."));
                         }
                     });
                 });

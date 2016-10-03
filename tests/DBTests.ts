@@ -107,7 +107,7 @@ describe("The database(s)", () => {
                 done();
             }
             else{
-                done(new Error("Test wasn't found in the database."));
+                done.fail(new Error("Test wasn't found in the database."));
             }
         }).catch(err => {
             done.fail(err);
@@ -120,7 +120,7 @@ describe("The database(s)", () => {
                 done();
             }
             else{
-                done(new Error("Test2 wasn't found in the database."));
+                done.fail(new Error("Test2 wasn't found in the database."));
             }
         }).catch(err => {
             done.fail(err);
