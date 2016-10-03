@@ -1,6 +1,5 @@
 import * as mysql from "mysql";
 import {IConnection} from "mysql";
-var mySqlConfig = require('../../config/config.mysql.js');
 "use strict";
 
 export class Data {
@@ -12,7 +11,7 @@ export class Data {
 
     public static initializeDb(forceReset){
         if(Data.mydb == undefined || forceReset == true){
-            Data.mydb  = mysql.createConnection(mySqlConfig); // Recreate the connection, since
+            Data.mydb  = mysql.createConnection(require('../../config/config.mysql.js')); // Recreate the connection, since
             // the old one cannot be reused.
 
             Data.mydb .connect(function(err) {              // The server is either down
