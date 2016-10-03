@@ -1,11 +1,17 @@
-# NSFWBot
+# NSFWBot [![Build Status](https://travis-ci.org/AelithBlanchett/nsfwbot.svg?branch=master)](https://travis-ci.org/AelithBlanchett/nsfwbot)
 
 Not much here for the moment.
 
 ## Install
 1) Pull from master
 
-2) npm install
+2) Do that:
+  - npm install
+  - npm install typescript -g
+  - tsc
+  - cd tests
+  - node tests.js
+And check if the tests are working correctly.
 
 3) Edit config file with your info
 
