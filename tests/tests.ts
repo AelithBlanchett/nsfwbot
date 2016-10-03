@@ -164,6 +164,12 @@ function wasMessageSent(msg){
     return fChatLibInstance.sendMessage.calls.all().find(x => x.args[0].indexOf(msg) != -1) != undefined;
 }
 
+function refillHPLPFP(cmd, name){
+    cmd.fight.fighterList.getFighterByName(name).orgasmsRemaining = cmd.fight.fighterList.getFighterByName(name).maxOrgasms(); //to prevent ending the fight this way
+    cmd.fight.fighterList.getFighterByName(name).heartsRemaining = cmd.fight.fighterList.getFighterByName(name).maxHearts();
+    cmd.fight.fighterList.getFighterByName(name).consecutiveTurnsWithoutFocus = 0; //to prevent ending the fight this way
+    cmd.fight.fighterList.getFighterByName(name).focus = cmd.fight.fighterList.getFighterByName(name).maxFocus();
+}
 
 
 
@@ -324,7 +330,7 @@ describe("The player(s)", () => {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
-            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").focus = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxFocus();
+            refillHPLPFP(cmd, "Aelith Blanchette");
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healFP(10);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
@@ -561,6 +567,23 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
+    it(`should give a loss after ${Constants.maxTurnsWithoutFocus} turns without focus`, function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").focus = -100;
+            for(var i = 0; i < Constants.maxTurnsWithoutFocus; i++){
+                cmd.fight.nextTurn();
+            }
+            if(cmd.fight.fighterList.getFighterByName("Aelith Blanchette").isBroken()){
+                done();
+            }
+            else{
+                done.fail(new Error(`Player was still alive after ${Constants.maxTurnsWithoutFocus} turns without focus`));
+            }
+        });
+    },DEFAULT_TIMEOUT);
+
     it("should do a subhold and tick", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
@@ -701,8 +724,7 @@ describe("The player(s)", () => {
                 }
                 let usesLeftBefore = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
                 cmd.fight.nextTurn();
-                //CAREFUL! Sometimes the damage is way too high, so it breaks one heart per tick. So we reset the hearts.
-                cmd.fight.fighterList.getFighterByName("Aelith Blanchette").heartsRemaining = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxHearts();
+                refillHPLPFP(cmd, "Aelith Blanchette");
                 doAction(cmd, "subhold", "Light").then(() => { let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
                     waitUntil().interval(100).times(50).condition(condition).done(() => {
                         let usesLeftAfter = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
@@ -793,7 +815,7 @@ describe("The player(s)", () => {
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "sexhold", "Light").then(() => {
                 cmd.fight.nextTurn();
-                cmd.fight.fighterList.getFighterByName("Aelith Blanchette").orgasmsRemaining = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxOrgasms(); //to prevent ending the fight this way
+                refillHPLPFP(cmd, "Aelith Blanchette");
                 doAction(cmd, "humhold", "Light").then(() => {
                     let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
                     waitUntil().interval(100).times(50).condition(condition).done(() => {
@@ -812,7 +834,6 @@ describe("The player(s)", () => {
     },DEFAULT_TIMEOUT);
 
     it("should be dealing more focus damage with humiliation ", function(done){
-        //debug = true;
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -892,31 +913,33 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should win the match with 3 bondage attacks", function(done){
+   it("should win the match with 3 bondage attacks", function(done){
+        debug = true;
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "sexhold", "Light").then(() => {
                 cmd.fight.nextTurn();
-                cmd.fight.fighterList.getFighterByName("Aelith Blanchette").orgasmsRemaining = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxOrgasms(); //to prevent ending the fight this way
+                refillHPLPFP(cmd, "Aelith Blanchette");
                 doAction(cmd, "bondage", "Light").then(() => {
                     cmd.fight.nextTurn();
-                    cmd.fight.fighterList.getFighterByName("Aelith Blanchette").orgasmsRemaining = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxOrgasms();
+                    refillHPLPFP(cmd, "Aelith Blanchette");
                     doAction(cmd, "sexhold", "Light").then(() => {
                         cmd.fight.nextTurn();
-                        cmd.fight.fighterList.getFighterByName("Aelith Blanchette").orgasmsRemaining = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxOrgasms();
+                        refillHPLPFP(cmd, "Aelith Blanchette");
                         doAction(cmd, "bondage", "Light").then(() => {
                             cmd.fight.nextTurn();
-                            cmd.fight.fighterList.getFighterByName("Aelith Blanchette").orgasmsRemaining = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxOrgasms();
+                            refillHPLPFP(cmd, "Aelith Blanchette");
                             doAction(cmd, "bondage", "Light").then(() => {
+                                refillHPLPFP(cmd, "Aelith Blanchette");
                                 let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
                                 waitUntil().interval(100).times(50).condition(condition).done(() => {
-                                    if (wasMessageSent(`Aelith Blanchette has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`)) {
+                                    if (wasMessageSent(`has too many items on them to possibly fight`)) {
                                         done();
                                     }
                                     else {
-                                        done.fail(new Error("Did not say that the attacker has an item pickup bonus."));
+                                        done.fail(new Error("Did not say that the receiver must abandon because of bondage."));
                                     }
                                 });
                             }).catch(err => {
@@ -935,7 +958,7 @@ describe("The player(s)", () => {
                 fChatLibInstance.throwError(err);
             });
         });
-    },DEFAULT_TIMEOUT);
+    },DEFAULT_TIMEOUT+10000);
 
     it("should say you can't place a bondage attack without a sexhold", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");

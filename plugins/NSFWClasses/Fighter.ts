@@ -56,6 +56,7 @@ export class Fighter implements IFighter{
     lastTagTurn:number = 9999999;
     pendingAction:FightAction;
     wantsDraw:boolean = false;
+    consecutiveTurnsWithoutFocus:number = 0;
 
     constructor() {
         this.dice = new Dice(10);
@@ -338,7 +339,7 @@ export class Fighter implements IFighter{
     }
 
     isBroken():boolean{
-        return this.focus < this.minFocus();
+        return this.consecutiveTurnsWithoutFocus >= Constants.maxTurnsWithoutFocus;
     }
 
     isTechnicallyOut():boolean{

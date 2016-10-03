@@ -273,6 +273,12 @@ export class Fight{
             if(!fighter.isInHold()){
                 fighter.healFP(-1);
             }
+            if(fighter.focus < fighter.minFocus()){
+                fighter.consecutiveTurnsWithoutFocus++;
+            }
+            else{
+                fighter.consecutiveTurnsWithoutFocus = 0;
+            }
         }
         this.currentTurn++;
         this.outputStatus();

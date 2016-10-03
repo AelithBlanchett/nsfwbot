@@ -22,6 +22,7 @@ export class Constants{
     static hpPercantageToHealOnRest:number = 0.25;
     static lpPercantageToHealOnRest:number = 0.25;
     static fpPointsToHealOnRest:number = 1;
+    static maxTurnsWithoutFocus:number = 3;
 
     public static get currencyName(): string    { return "tokens"; }
     public static get pluginName(): string    { return "nsfw"; }
