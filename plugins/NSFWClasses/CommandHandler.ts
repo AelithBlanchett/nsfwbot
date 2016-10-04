@@ -177,6 +177,10 @@ export class CommandHandler implements ICommandHandler{
         this.actionHandler(Action.HumHold, true, false, args, data);
     };
 
+    forcedworship(args:string, data:FChatResponse){
+        this.actionHandler(Action.ForcedWorship, true, false, args, data);
+    };
+
     bondage(args:string, data:FChatResponse){
         this.actionHandler(Action.Bondage, false, false, args, data);
     };

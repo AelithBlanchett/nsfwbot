@@ -216,6 +216,27 @@ describe("The player(s)", () => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
     },DEFAULT_TIMEOUT);
 
+    it("should do a forcedworship attack", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "forcedworship", "Light").then(() => {
+                let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    if (wasMessageSent("the ForcedWorship attack [b][color=green]HITS![/color][/b]")) {
+                        done();
+                    }
+                    else {
+                        done.fail(new Error("Didn't tick sexhold"));
+                    }
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    },DEFAULT_TIMEOUT);
+
     it("should heal 0 hp because it's already full", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);

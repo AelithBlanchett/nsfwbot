@@ -23,6 +23,7 @@ export class Constants{
     static lpPercantageToHealOnRest:number = 0.25;
     static fpPointsToHealOnRest:number = 1;
     static maxTurnsWithoutFocus:number = 3;
+    static forcedLewdPercentageOfLPRemoved:number = 3;
 
     public static get currencyName(): string    { return "tokens"; }
     public static get pluginName(): string    { return "nsfw"; }
@@ -79,7 +80,8 @@ export module Constants{
     }
 
     export class SQL {
-        static commitFightAction = "INSERT INTO `flistplugins`.?? (`idFight`,`atTurn`,`type`,`tier`,`isHold`,`idAttacker`,`idDefender`,`hpDamage`,`lustDamage`,`focusDamage`,`diceScore`,`missed`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
+        static commitFightAction = "INSERT INTO `flistplugins`.`??` (`idFight`,`atTurn`,`type`,`tier`,`isHold`,`diceScore`,`missed`,`idAttacker`,`idDefender`,`hpDamageToDef`,`lpDamageToDef`,`fpDamageToDef`,`hpDamageToAtk`,`lpDamageToAtk`,`fpDamageToAtk`,`hpHealToDef`,`lpHealToDef`,`fpHealToDef`,`hpHealToAtk`,`lpHealToAtk`,`fpHealToAtk`)\
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     }
 
     export enum ModifierType {
@@ -156,7 +158,7 @@ export module Constants{
         ItemPickup,
         SextoyPickup,
         Degradation,
-        ForcedLewd
+        ForcedWorship
     }
 
     export enum TierDifficulty {
@@ -243,9 +245,9 @@ export module Constants{
 
         BeforeBrawlAttack,
         BeforeSexStrikeAttack,
-        BeforeForcedLewdAttack,
+        BeforeForcedWorshipAttack,
         BeforeSexHoldAttack,
-        BeforeAttack = BeforeBrawlAttack | BeforeSexStrikeAttack | BeforeSexHoldAttack | BeforeForcedLewdAttack,
+        BeforeAttack = BeforeBrawlAttack | BeforeSexStrikeAttack | BeforeSexHoldAttack | BeforeForcedWorshipAttack,
         BeforeSubmissionHold,
         BeforeBondage,
         BeforeDegradation,
@@ -297,9 +299,9 @@ export module Constants{
 
         AfterBrawlAttack,
         AfterSexStrikeAttack,
-        AfterForcedLewdAttack,
+        AfterForcedWorshipAttack,
         AfterSexHoldAttack,
-        AfterAttack = AfterBrawlAttack | AfterSexStrikeAttack | AfterSexHoldAttack | AfterForcedLewdAttack,
+        AfterAttack = AfterBrawlAttack | AfterSexStrikeAttack | AfterSexHoldAttack | AfterForcedWorshipAttack,
         AfterSubmissionHold,
         AfterBondage,
         AfterDegradation,

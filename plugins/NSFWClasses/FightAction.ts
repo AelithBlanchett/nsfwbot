@@ -10,7 +10,7 @@ import Trigger = Constants.Trigger;
 import Action = Constants.Action;
 import {Modifier} from "./Modifier";
 import {Promise} from "es6-promise";
-import FocusDamageHumHold = Constants.FocusDamageHumHold;
+import FocusDamageHum = Constants.FocusDamageHumHold;
 import TokensPerWin = Constants.TokensPerWin;
 import FightTier = Constants.FightTier;
 import {Modifiers} from "./Modifier";
@@ -33,9 +33,18 @@ export class FightAction{
     modifiers: Modifiers;
     attacker: Fighter;
     defender: Fighter;
-    hpDamage: number;
-    lustDamage: number;
-    focusDamage: number;
+    hpDamageToDef: number;
+    lpDamageToDef: number;
+    fpDamageToDef: number;
+    hpDamageToAtk: number;
+    lpDamageToAtk: number;
+    fpDamageToAtk: number;
+    hpHealToDef: number;
+    lpHealToDef: number;
+    fpHealToDef: number;
+    hpHealToAtk: number;
+    lpHealToAtk: number;
+    fpHealToAtk: number;
     diceScore: number;
     missed: boolean;
     requiresRoll: boolean;
@@ -45,9 +54,18 @@ export class FightAction{
         this.isHold = false;
         this.modifiers = new Modifiers();
         this.missed = true;
-        this.hpDamage = 0;
-        this.lustDamage = 0;
-        this.focusDamage = 0;
+        this.hpDamageToDef = 0;
+        this.lpDamageToDef = 0;
+        this.fpDamageToDef = 0;
+        this.hpDamageToAtk = 0;
+        this.lpDamageToAtk = 0;
+        this.fpDamageToAtk = 0;
+        this.hpHealToDef = 0;
+        this.lpHealToDef = 0;
+        this.fpHealToDef = 0;
+        this.hpHealToAtk = 0;
+        this.lpHealToAtk = 0;
+        this.fpHealToAtk = 0;
         this.diceScore = 0;
         this.tier = tier;
         this.atTurn = currentTurn;
@@ -103,8 +121,8 @@ export class FightAction{
             case Action.Degradation:
                 result = this.actionDegradation();
                 break;
-            case Action.ForcedLewd:
-                result = this.actionForcedLewd();
+            case Action.ForcedWorship:
+                result = this.actionForcedWorship();
                 break;
             case Action.Tag:
                 result = this.actionTag();
@@ -124,9 +142,9 @@ export class FightAction{
         this.diceScore = this.attacker.roll(1) + this.attacker.power;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.attacker.healFP(1);
-            this.defender.hitFP(1);
-            this.hpDamage += this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
+            this.fpHealToAtk += 1;
+            this.fpDamageToDef += 1;
+            this.hpDamageToDef += this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
         }
         return Trigger.AfterBrawlAttack;
     }
@@ -137,9 +155,9 @@ export class FightAction{
         this.diceScore = this.attacker.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.attacker.healFP(1);
-            this.defender.hitFP(1);
-            this.lustDamage += this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
+            this.fpHealToAtk += 1;
+            this.fpDamageToDef += 1;
+            this.lpDamageToDef += this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
         }
         return Trigger.AfterSexStrikeAttack;
     }
@@ -150,8 +168,8 @@ export class FightAction{
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.power;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.attacker.healFP(1);
-            this.defender.hitFP(1);
+            this.fpHealToAtk += 1;
+            this.fpDamageToDef += 1;
             let hpDamage = this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
             let holdModifier = new HoldModifier(this.defender, this.attacker, ModifierType.SubHold, hpDamage, 0, 0);
             let brawlBonusAttacker = new BrawlBonusSubHoldModifier(this.attacker, [holdModifier.id]);
@@ -169,8 +187,8 @@ export class FightAction{
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.attacker.healFP(1);
-            this.defender.hitFP(1);
+            this.fpHealToAtk += 1;
+            this.fpDamageToDef += 1;
             let lustDamage = this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
             let holdModifier = new HoldModifier(this.defender, this.attacker, ModifierType.SexHold, 0, lustDamage, 0);
             let lustBonusAttacker = new LustBonusSexHoldModifier(this.attacker, [holdModifier.id]);
@@ -188,8 +206,8 @@ export class FightAction{
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.attacker.healFP(3);
-            let focusDamage = FocusDamageHumHold[Tier[this.tier]];
+            this.fpHealToAtk += FocusDamageHum[Tier[this.tier]];
+            let focusDamage = FocusDamageHum[Tier[this.tier]];
             let holdModifier = new HoldModifier(this.defender, this.attacker, ModifierType.HumHold, 0, 0, focusDamage);
             this.modifiers.push(holdModifier);
         }
@@ -202,24 +220,24 @@ export class FightAction{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
-        this.attacker.healFP(2);
-        this.defender.hitFP(3);
+        this.fpHealToAtk += 3;
+        this.fpDamageToDef += 3;
         let bdModifier = new BondageModifier(this.defender, this.attacker);
         this.modifiers.push(bdModifier);
         return Trigger.AfterBondage;
     }
 
-    actionForcedLewd():Trigger{
-        this.attacker.triggerMods(Trigger.BeforeForcedLewdAttack);
-        this.type = Action.SexStrike;
+    actionForcedWorship():Trigger{
+        this.attacker.triggerMods(Trigger.BeforeForcedWorshipAttack);
+        this.type = Action.ForcedWorship;
         this.diceScore = this.attacker.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.attacker.hitLP(Math.floor(this.attacker.lustPerOrgasm()/3)); //TODO finish implementation, and also remove hitFP and put them in the commit section (or check if needed)
-            this.defender.hitFP(3);
-            this.lustDamage += this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
+            this.lpDamageToAtk += 5;
+            this.fpDamageToDef += FocusDamageHum[Tier[this.tier]];
+            this.lpDamageToDef += 1;
         }
-        return Trigger.AfterForcedLewdAttack;
+        return Trigger.AfterForcedWorshipAttack;
     }
 
     actionItemPickup():Trigger{
@@ -228,8 +246,8 @@ export class FightAction{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
-        this.attacker.healFP(1);
-        this.defender.hitFP(1);
+        this.fpHealToAtk += 1;
+        this.fpDamageToDef += 1;
         let itemPickupModifier = new ItemPickupModifier(this.attacker);
         this.modifiers.push(itemPickupModifier);
         return Trigger.AfterItemPickup;
@@ -241,8 +259,8 @@ export class FightAction{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
-        this.attacker.healFP(1);
-        this.defender.hitFP(1);
+        this.fpHealToAtk += 1;
+        this.fpDamageToDef += 1;
         let itemPickupModifier = new SextoyPickupModifier(this.attacker);
         this.modifiers.push(itemPickupModifier);
         return Trigger.AfterSextoyPickup;
@@ -254,8 +272,7 @@ export class FightAction{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
-        this.defender.hitFP(2);
-        this.defender.hitFP(3);
+        this.fpDamageToDef += 3;
         let humiliationModifier = new DegradationModifier(this.defender, this.attacker);
         this.modifiers.push(humiliationModifier);
         return Trigger.AfterDegradation;
@@ -280,9 +297,9 @@ export class FightAction{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
-        this.attacker.healHP(this.attacker.hp*Constants.hpPercantageToHealOnRest);
-        this.attacker.healLP(this.attacker.hp*Constants.lpPercantageToHealOnRest);
-        this.attacker.healFP(this.attacker.hp*Constants.fpPointsToHealOnRest);
+        this.hpHealToAtk += this.attacker.hp*Constants.hpPercantageToHealOnRest;
+        this.lpHealToAtk += this.attacker.hp*Constants.lpPercantageToHealOnRest;
+        this.fpHealToAtk += this.attacker.hp*Constants.fpPointsToHealOnRest;
         return Trigger.AfterRest;
     }
 
@@ -294,7 +311,7 @@ export class FightAction{
                 defenderId = action.defender.id;
             }
             var sql = Constants.SQL.commitFightAction;
-            sql = Data.db.format(sql, [Constants.actionTableName, action.fightId, action.atTurn, action.type, action.tier, action.isHold, attackerId, defenderId, action.hpDamage, action.lustDamage, action.focusDamage, action.diceScore, action.missed]);
+            sql = Data.db.format(sql, [Constants.actionTableName, action.fightId, action.atTurn, action.type, action.tier, action.isHold, action.diceScore, action.missed, attackerId, defenderId, action.hpDamageToDef, action.lpDamageToDef, action.fpDamageToDef, action.hpDamageToAtk, action.lpDamageToAtk, action.fpDamageToAtk, action.hpHealToDef, action.lpHealToDef, action.fpHealToDef, action.hpHealToAtk, action.lpHealToAtk, action.fpHealToAtk]);
             Data.db.query(sql, (err, results) => {
                 if (err) {
                     throw err;
@@ -328,15 +345,46 @@ export class FightAction{
         fight.pastActions.push(this);
 
         if(this.missed == false) {
-            if (this.hpDamage > 0) {
-                this.defender.hitHP(this.hpDamage);
+            if (this.hpDamageToDef > 0) {
+                this.defender.hitHP(this.hpDamageToDef);
             }
-            if (this.lustDamage > 0) {
-                this.defender.hitLP(this.lustDamage);
+            if (this.lpDamageToDef > 0) {
+                this.defender.hitLP(this.lpDamageToDef);
             }
-            if(this.focusDamage != 0){
-                this.defender.hitFP(this.focusDamage);
+            if(this.fpDamageToDef != 0){
+                this.defender.hitFP(this.fpDamageToDef);
             }
+            if (this.hpHealToDef > 0) {
+                this.defender.healHP(this.hpHealToDef);
+            }
+            if (this.lpHealToDef > 0) {
+                this.defender.healLP(this.lpHealToDef);
+            }
+            if(this.fpHealToDef != 0){
+                this.defender.healFP(this.fpHealToDef);
+            }
+
+
+            if (this.hpDamageToAtk > 0) {
+                this.attacker.hitHP(this.hpDamageToAtk);
+            }
+            if (this.lpDamageToAtk > 0) {
+                this.attacker.hitLP(this.lpDamageToAtk);
+            }
+            if(this.fpDamageToAtk != 0){
+                this.attacker.hitFP(this.fpDamageToAtk);
+            }
+            if (this.hpHealToAtk > 0) {
+                this.attacker.healHP(this.hpHealToAtk);
+            }
+            if (this.lpHealToAtk > 0) {
+                this.attacker.healLP(this.lpHealToAtk);
+            }
+            if(this.fpHealToAtk != 0){
+                this.attacker.healFP(this.fpHealToAtk);
+            }
+
+
             if(this.modifiers.length > 0){
                 if(this.type == Action.SubHold || this.type == Action.SexHold || this.type == Action.HumHold){ //for any holds, do the stacking here
                     let indexOfNewHold = this.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold || x.name == Constants.Modifier.SexHold || x.name == Constants.Modifier.HumHold);
