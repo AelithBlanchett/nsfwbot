@@ -24,7 +24,7 @@ export class Constants{
     static fpPointsToHealOnRest:number = 1;
     static maxTurnsWithoutFocus:number = 3;
     static forcedLewdPercentageOfLPRemoved:number = 3;
-    static powerMultiplierHighRiskAttack:number = 2;
+    static multiplierHighRiskAttack:number = 2;
 
     public static get currencyName(): string    { return "tokens"; }
     public static get pluginName(): string    { return "nsfw"; }

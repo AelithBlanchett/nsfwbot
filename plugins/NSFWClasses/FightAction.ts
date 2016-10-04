@@ -121,6 +121,12 @@ export class FightAction{
             case Action.Degradation:
                 result = this.actionDegradation();
                 break;
+            case Action.HighRisk:
+                result = this.actionHighRisk();
+                break;
+            case Action.HighRiskSex:
+                result = this.actionHighRiskSex();
+                break;
             case Action.ForcedWorship:
                 result = this.actionForcedWorship();
                 break;
@@ -142,8 +148,8 @@ export class FightAction{
         this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += 1;
-            this.fpDamageToDef += 1;
+            this.fpHealToAtk += this.tier + 1;
+            this.fpDamageToDef += this.tier + 1;
             this.hpDamageToDef += this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
         }
         return Trigger.AfterBrawlAttack;
@@ -155,8 +161,8 @@ export class FightAction{
         this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += 1;
-            this.fpDamageToDef += 1;
+            this.fpHealToAtk += this.tier + 1;
+            this.fpDamageToDef += this.tier + 1;
             this.lpDamageToDef += this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
         }
         return Trigger.AfterSexStrikeAttack;
@@ -168,8 +174,8 @@ export class FightAction{
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += 1;
-            this.fpDamageToDef += 1;
+            this.fpHealToAtk += this.tier + 1;
+            this.fpDamageToDef += this.tier + 1;
             let hpDamage = this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
             let holdModifier = new HoldModifier(this.defender, this.attacker, ModifierType.SubHold, hpDamage, 0, 0);
             let brawlBonusAttacker = new BrawlBonusSubHoldModifier(this.attacker, [holdModifier.id]);
@@ -187,8 +193,8 @@ export class FightAction{
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += 1;
-            this.fpDamageToDef += 1;
+            this.fpHealToAtk += this.tier + 1;
+            this.fpDamageToDef += this.tier + 1;
             let lustDamage = this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
             let holdModifier = new HoldModifier(this.defender, this.attacker, ModifierType.SexHold, 0, lustDamage, 0);
             let lustBonusAttacker = new LustBonusSexHoldModifier(this.attacker, [holdModifier.id]);
@@ -214,7 +220,7 @@ export class FightAction{
         return Trigger.AfterHumiliationHold;
     }
 
-    actionBondage():Trigger{
+    actionBondage():Trigger{ //No tier
         this.attacker.triggerMods(Trigger.BeforeBondage);
         this.type = Action.Bondage;
         this.diceScore = -1;
@@ -232,26 +238,44 @@ export class FightAction{
         this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += this.tier;
-            this.fpDamageToDef += this.tier;
-            this.hpDamageToDef += this.attackFormula(this.tier, this.attacker.power * Constants.powerMultiplierHighRiskAttack, this.defender.toughness, this.diceScore);
+            this.fpHealToAtk += this.tier + 1;
+            this.fpDamageToDef += this.tier + 1;
+            this.hpDamageToDef += this.attackFormula(this.tier, this.attacker.power * Constants.multiplierHighRiskAttack, this.defender.toughness, this.diceScore);
         }
         else{
             this.missed = true;
-            this.fpDamageToAtk += this.tier;
-            this.fpHealToDef += this.tier;
+            this.fpDamageToAtk += this.tier + 1;
+            this.fpHealToDef += this.tier + 1;
             this.hpDamageToAtk += this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, 0);
         }
         return Trigger.AfterHighRiskAttack;
+    }
+
+    actionHighRiskSex():Trigger{
+        this.attacker.triggerMods(Trigger.BeforeHighRiskSexAttack);
+        this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
+        if(this.diceScore >= this.requiredDiceScore()){
+            this.missed = false;
+            this.fpHealToAtk += this.tier + 1;
+            this.fpDamageToDef += this.tier + 1;
+            this.lpDamageToDef += this.attackFormula(this.tier, this.attacker.sensuality * Constants.multiplierHighRiskAttack, this.defender.endurance, this.diceScore);
+        }
+        else{
+            this.missed = true;
+            this.fpDamageToAtk += this.tier + 1;
+            this.fpHealToDef += this.tier + 1;
+            this.lpDamageToAtk += this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, 0);
+        }
+        return Trigger.AfterHighRiskSexAttack;
     }
 
     actionForcedWorship():Trigger{
         this.attacker.triggerMods(Trigger.BeforeForcedWorshipAttack);
         this.type = Action.ForcedWorship;
         this.diceScore = this.attacker.roll(1) + this.attacker.sensuality;
+        this.lpDamageToAtk += (this.tier+1) * 2; //deal damage anyway. They're gonna be exposed!
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.lpDamageToAtk += 5;
             this.fpDamageToDef += FocusDamageHum[Tier[this.tier]];
             this.lpDamageToDef += 1;
         }
@@ -287,12 +311,13 @@ export class FightAction{
     actionDegradation():Trigger{
         this.attacker.triggerMods(Trigger.BeforeDegradation);
         this.type = Action.Degradation;
-        this.diceScore = -1;
-        this.requiresRoll = false;
-        this.missed = false;
-        this.fpDamageToDef += 3;
-        let humiliationModifier = new DegradationModifier(this.defender, this.attacker);
-        this.modifiers.push(humiliationModifier);
+        this.diceScore = this.attacker.roll(1) + this.attacker.sensuality;
+        if(this.diceScore >= this.requiredDiceScore()) {
+            this.missed = false;
+            this.fpDamageToDef += FocusDamageHum[Tier[this.tier]] * 2;
+            let humiliationModifier = new DegradationModifier(this.defender, this.attacker);
+            this.modifiers.push(humiliationModifier);
+        }
         return Trigger.AfterDegradation;
     }
 

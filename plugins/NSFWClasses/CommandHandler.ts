@@ -202,7 +202,7 @@ export class CommandHandler implements ICommandHandler{
     };
 
     degradation(args:string, data:FChatResponse){
-        this.actionHandler(Action.Degradation, false, false, args, data);
+        this.actionHandler(Action.Degradation, true, false, args, data);
     };
 
     tag(args:string, data:FChatResponse){
