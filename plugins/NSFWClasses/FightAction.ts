@@ -103,6 +103,9 @@ export class FightAction{
             case Action.Degradation:
                 result = this.actionDegradation();
                 break;
+            case Action.ForcedLewd:
+                result = this.actionForcedLewd();
+                break;
             case Action.Tag:
                 result = this.actionTag();
                 break;
@@ -206,17 +209,17 @@ export class FightAction{
         return Trigger.AfterBondage;
     }
 
-    actionForceFuck():Trigger{
-        this.attacker.triggerMods(Trigger.BeforeSexStrikeAttack);
+    actionForcedLewd():Trigger{
+        this.attacker.triggerMods(Trigger.BeforeForcedLewdAttack);
         this.type = Action.SexStrike;
         this.diceScore = this.attacker.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.attacker.healFP(1);
-            this.defender.hitFP(1);
+            this.attacker.hitLP(Math.floor(this.attacker.lustPerOrgasm()/3)); //TODO finish implementation, and also remove hitFP and put them in the commit section (or check if needed)
+            this.defender.hitFP(3);
             this.lustDamage += this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
         }
-        return Trigger.AfterSexStrikeAttack;
+        return Trigger.AfterForcedLewdAttack;
     }
 
     actionItemPickup():Trigger{
