@@ -216,7 +216,29 @@ describe("The player(s)", () => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
     },DEFAULT_TIMEOUT);
 
-    it("should do a forcedworship attack", function(done){
+    it("should do a tackle and grant the stun modifier", function(done){
+        debug = true;
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "tackle", "Light").then(() => {
+                let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    if (wasMessageSent("the ForcedWorship attack [b][color=green]HITS![/color][/b]")) {
+                        done();
+                    }
+                    else {
+                        done.fail(new Error("Didn't do the tackle"));
+                    }
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    },DEFAULT_TIMEOUT);
+
+    xit("should do a forcedworship attack", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -237,7 +259,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should heal 0 hp because it's already full", function(done){
+    xit("should heal 0 hp because it's already full", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -254,7 +276,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should heal whatever hp amount is left", function(done){ // 0
+    xit("should heal whatever hp amount is left", function(done){ // 0
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -273,7 +295,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should heal 1 HP", function(done){ // 0
+    xit("should heal 1 HP", function(done){ // 0
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -292,7 +314,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should heal 0 lp because it's already full", function(done){
+    xit("should heal 0 lp because it's already full", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -309,7 +331,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should heal whatever lp amount is left", function(done){ // 0
+    xit("should heal whatever lp amount is left", function(done){ // 0
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -328,7 +350,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should heal 1 LP", function(done){ // 0
+    xit("should heal 1 LP", function(done){ // 0
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -347,7 +369,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should heal 0 fp because it's already full", function(done){
+    xit("should heal 0 fp because it's already full", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -365,7 +387,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should heal whatever fp amount is left", function(done){ // 0
+    xit("should heal whatever fp amount is left", function(done){ // 0
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -384,7 +406,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should heal 1 FP", function(done){ // 0
+    xit("should heal 1 FP", function(done){ // 0
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -403,19 +425,19 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should be initialized to 3-3-3-3-3-3 name = Yolo", function(){ //1
+    xit("should be initialized to 3-3-3-3-3-3 name = Yolo", function(){ //1
         let fighterYolo = createFighter("Yolo");
         expect(fighterYolo.name).toBe("Yolo");
     },DEFAULT_TIMEOUT);
 
-    it("should be initialized 3-3-3-3-3-3 stats with two different names", function(){ //2
+    xit("should be initialized 3-3-3-3-3-3 stats with two different names", function(){ //2
         let fighterYolo = createFighter("Yolo");
         let fighterLoyo = createFighter("Loyo");
         expect(fighterYolo.name+fighterLoyo.name).toBe("YoloLoyo");
     },DEFAULT_TIMEOUT);
 
 
-    it("should join the match", function(done){ //3
+    xit("should join the match", function(done){ //3
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
@@ -429,14 +451,14 @@ describe("The player(s)", () => {
         }, 300);
     },DEFAULT_TIMEOUT);
 
-    it("should have been checking if fighter exists", function(){ //4
+    xit("should have been checking if fighter exists", function(){ //4
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
         expect(Fighter.exists).toHaveBeenCalled();
     },DEFAULT_TIMEOUT);
 
-    it("should not be joining a match twice", function(done){ //5
+    xit("should not be joining a match twice", function(done){ //5
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
@@ -452,7 +474,7 @@ describe("The player(s)", () => {
     },DEFAULT_TIMEOUT);
 
 
-    it("should join the match and set as ready", function(done){ //6
+    xit("should join the match and set as ready", function(done){ //6
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.ready("", data);
@@ -466,7 +488,7 @@ describe("The player(s)", () => {
         }, 300);
     },DEFAULT_TIMEOUT);
 
-    it("should have already joined the ring and already set ready", function(done){ //7
+    xit("should have already joined the ring and already set ready", function(done){ //7
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.ready("", data);
@@ -481,7 +503,7 @@ describe("The player(s)", () => {
         }, 300);
     },DEFAULT_TIMEOUT);
 
-    it("should be ready to start with the default blue and red team", function(done){ //8
+    xit("should be ready to start with the default blue and red team", function(done){ //8
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
@@ -499,7 +521,7 @@ describe("The player(s)", () => {
         }, 300);
     },DEFAULT_TIMEOUT);
 
-    it("should tag successfully with Aelith", function(done){ // 9
+    xit("should tag successfully with Aelith", function(done){ // 9
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings2vs2Tag(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -519,7 +541,7 @@ describe("The player(s)", () => {
     },DEFAULT_TIMEOUT);
 
 
-    it("should swap to TheTinaArmstrong", function(done) {
+    xit("should swap to TheTinaArmstrong", function(done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction)}).done(() =>{
@@ -535,7 +557,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should do a brawl move", function(done){
+    xit("should do a brawl move", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -553,7 +575,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should do a sexstrike move", function(done){
+    xit("should do a sexstrike move", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -570,7 +592,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should pass", function(done){
+    xit("should pass", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -588,7 +610,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it(`should give a loss after ${Constants.maxTurnsWithoutFocus} turns without focus`, function(done){
+    xit(`should give a loss after ${Constants.maxTurnsWithoutFocus} turns without focus`, function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -605,7 +627,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should do a subhold and tick", function(done){
+    xit("should do a subhold and tick", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -623,7 +645,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should do a subhold and expire after the number of turns specified", function(done){
+    xit("should do a subhold and expire after the number of turns specified", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(10).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -645,7 +667,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT+5000);
 
-    it("should do a subhold and trigger bonus brawl modifier", function(done){
+    xit("should do a subhold and trigger bonus brawl modifier", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -667,7 +689,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should not be allowed to do a subhold while already in one", function(done){
+    xit("should not be allowed to do a subhold while already in one", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -687,7 +709,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should be allowed to do a second subhold while already APPLYING one", function(done){
+    xit("should be allowed to do a second subhold while already APPLYING one", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -711,7 +733,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should stack the current subhold with another subhold, verify stacking", function(done){
+    xit("should stack the current subhold with another subhold, verify stacking", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -735,7 +757,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should stack the current subhold with another subhold, verify uses", function(done){
+    xit("should stack the current subhold with another subhold, verify uses", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -765,7 +787,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should do a sexhold and tick", function(done){
+    xit("should do a sexhold and tick", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -786,7 +808,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should not be able to do a humhold without a sexhold", function(done){
+    xit("should not be able to do a humhold without a sexhold", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -807,7 +829,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should be able to do a humhold with sexhold", function(done){
+    xit("should be able to do a humhold with sexhold", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -831,7 +853,7 @@ describe("The player(s)", () => {
         });
     }, DEFAULT_TIMEOUT);
 
-    it("should be making the humhold tick", function(done){
+    xit("should be making the humhold tick", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -856,7 +878,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should be dealing more focus damage with humiliation ", function(done){
+    xit("should be dealing more focus damage with humiliation ", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -884,7 +906,7 @@ describe("The player(s)", () => {
     },DEFAULT_TIMEOUT);
 
 
-    it("should pickup an item and trigger bonus brawl modifier", function(done){
+    xit("should pickup an item and trigger bonus brawl modifier", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -910,7 +932,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should pickup a sextoy and trigger bonus sexstrike modifier", function(done){
+    xit("should pickup a sextoy and trigger bonus sexstrike modifier", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -936,7 +958,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-   it("should win the match with 3 bondage attacks", function(done){
+   xit("should win the match with 3 bondage attacks", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -982,7 +1004,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT+10000);
 
-    it("should say you can't place a bondage attack without a sexhold", function(done){
+    xit("should say you can't place a bondage attack without a sexhold", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -1003,7 +1025,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should forfeit the match and give the win", function(done){
+    xit("should forfeit the match and give the win", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -1023,7 +1045,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should call the match a draw", function(done){
+    xit("should call the match a draw", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{

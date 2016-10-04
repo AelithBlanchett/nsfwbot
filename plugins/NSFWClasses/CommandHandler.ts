@@ -205,6 +205,10 @@ export class CommandHandler implements ICommandHandler{
         this.actionHandler(Action.Degradation, true, false, args, data);
     };
 
+    tackle(args:string, data:FChatResponse){
+        this.actionHandler(Action.Tackle, true, false, args, data);
+    };
+
     tag(args:string, data:FChatResponse){
         this.actionHandler(Action.Tag, false, true, args, data);
     };

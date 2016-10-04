@@ -56,7 +56,7 @@ export class Modifier implements IModifier{
         this.lustDamage = lustDamage;
         this.focusDamage = focusDamage;
         this.diceRoll = diceRoll;
-        this.escapeRoll = escapeRoll;
+        this.escapeRoll = escapeRoll; //unused
         this.uses = uses;
         this.eventTrigger = eventTrigger;
         this.parentIds = parentIds;
@@ -102,6 +102,7 @@ export class Modifier implements IModifier{
                 }
                 if(this.diceRoll != 0){
                     this.receiver.dice.addTmpMod(this.diceRoll,1);
+                    this.receiver.fight.addMessage(`${this.receiver.getStylizedName()} got a ${this.diceRoll} penalty applied on their dice roll.`);
                 }
                 if(this.focusDamage > 0){
                     let flagTriggerMods = true;
@@ -133,6 +134,7 @@ export class Modifier implements IModifier{
                 }
                 if(this.diceRoll != 0){
                     objFightAction.diceScore += this.diceRoll;
+                    this.receiver.fight.addMessage(`${this.receiver.getStylizedName()} got a ${this.diceRoll} penalty applied on their dice roll.`);
                 }
                 if(this.focusDamage > 0){
                     if(this.areDamageMultipliers){

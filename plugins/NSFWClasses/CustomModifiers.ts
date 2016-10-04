@@ -47,6 +47,12 @@ export class DegradationModifier extends Modifier {
     }
 }
 
+export class StunModifier extends Modifier {
+    constructor(receiver: Fighter, applier:Fighter, dicePenalty:number, uses:number, parentIds?:Array<string>){
+        super(receiver, applier, ModifierType.Stun, 0, 0, 0, dicePenalty, dicePenalty, uses, Constants.Trigger.BeforeAnyOffensiveAction, parentIds, false);
+    }
+}
+
 
 export class DummyModifier extends Modifier {
 

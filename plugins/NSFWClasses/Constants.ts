@@ -25,6 +25,9 @@ export class Constants{
     static maxTurnsWithoutFocus:number = 3;
     static forcedLewdPercentageOfLPRemoved:number = 3;
     static multiplierHighRiskAttack:number = 2;
+    static tacklePowerDivider:number = 2;
+    static dicePenaltyMultiplierWhileStunned:number = 3;
+    static requiredScoreToTag:number = 8;
 
     public static get currencyName(): string    { return "tokens"; }
     public static get pluginName(): string    { return "nsfw"; }
@@ -94,7 +97,8 @@ export module Constants{
         HumHold = 5,
         DegradationMalus = 6,
         ItemPickupBonus = 7,
-        SextoyPickupBonus = 8
+        SextoyPickupBonus = 8,
+        Stun = 9
     }
 
     export enum Team {
@@ -161,7 +165,8 @@ export module Constants{
         Degradation,
         ForcedWorship,
         HighRisk,
-        HighRiskSex
+        HighRiskSex,
+        Tackle
     }
 
     export enum TierDifficulty {
@@ -249,16 +254,17 @@ export module Constants{
         BeforeBrawlAttack,
         BeforeSexStrikeAttack,
         BeforeForcedWorshipAttack,
-        BeforeSexHoldAttack,
         BeforeHighRiskAttack,
         BeforeHighRiskSexAttack,
-        BeforeAttack = BeforeBrawlAttack | BeforeSexStrikeAttack | BeforeSexHoldAttack | BeforeForcedWorshipAttack,
+        BeforeTackle,
+        BeforeAttack = BeforeBrawlAttack | BeforeSexStrikeAttack | BeforeForcedWorshipAttack | BeforeTackle,
         BeforeSubmissionHold,
         BeforeBondage,
         BeforeDegradation,
         BeforeHumiliationHold,
-        BeforeHold = BeforeSubmissionHold | BeforeHumiliationHold,
-        BeforePowerBasedAttack = BeforeBrawlAttack | BeforeSubmissionHold | BeforeHighRiskAttack,
+        BeforeSexHoldAttack,
+        BeforeHold = BeforeSubmissionHold | BeforeHumiliationHold | BeforeSexHoldAttack,
+        BeforePowerBasedAttack = BeforeBrawlAttack | BeforeSubmissionHold | BeforeHighRiskAttack | BeforeTackle,
 
         BeforeItemPickup,
         BeforeSextoyPickup,
@@ -305,15 +311,16 @@ export module Constants{
         AfterBrawlAttack,
         AfterSexStrikeAttack,
         AfterForcedWorshipAttack,
-        AfterSexHoldAttack,
         AfterHighRiskAttack,
         AfterHighRiskSexAttack,
-        AfterAttack = AfterBrawlAttack | AfterSexStrikeAttack | AfterSexHoldAttack | AfterForcedWorshipAttack,
+        AfterTackle,
+        AfterAttack = AfterBrawlAttack | AfterSexStrikeAttack | AfterForcedWorshipAttack | AfterTackle,
         AfterSubmissionHold,
+        AfterSexHoldAttack,
         AfterBondage,
         AfterDegradation,
         AfterHumiliationHold,
-        AfterHold = AfterSubmissionHold | AfterHumiliationHold,
+        AfterHold = AfterSubmissionHold | AfterHumiliationHold | AfterSexHoldAttack,
         AfterPowerBasedAttack = AfterBrawlAttack | AfterSubmissionHold,
 
         AfterItemPickup,
@@ -336,4 +343,3 @@ export module Constants{
         AfterAnyAction = AfterPassiveAction | AfterAnyOffensiveAction,
     }
 }
-

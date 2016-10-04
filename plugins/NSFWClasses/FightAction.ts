@@ -22,6 +22,7 @@ import {BrawlBonusSubHoldModifier} from "./CustomModifiers";
 import {ItemPickupModifier} from "./CustomModifiers";
 import {SextoyPickupModifier} from "./CustomModifiers";
 import {DegradationModifier} from "./CustomModifiers";
+import {StunModifier} from "./CustomModifiers";
 
 export class FightAction{
     id: number;
@@ -136,7 +137,11 @@ export class FightAction{
             case Action.Rest:
                 result = this.actionRest();
                 break;
+            case Action.Tackle:
+                result = this.actionTackle();
+                break;
             default:
+                this.attacker.fight.addMessage("WARNING! UNKNOWN ATTACK!");
                 result = Trigger.None;
                 break;
         }
@@ -157,7 +162,6 @@ export class FightAction{
 
     actionSexStrike():Trigger{
         this.attacker.triggerMods(Trigger.BeforeSexStrikeAttack);
-        this.type = Action.SexStrike;
         this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
@@ -170,7 +174,6 @@ export class FightAction{
 
     actionSubHold():Trigger{
         this.attacker.triggerMods(Trigger.BeforeSubmissionHold);
-        this.type = Action.SubHold;
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
@@ -189,7 +192,6 @@ export class FightAction{
 
     actionSexHold():Trigger{
         this.attacker.triggerMods(Trigger.BeforeSexHoldAttack);
-        this.type = Action.SexHold;
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
@@ -208,7 +210,6 @@ export class FightAction{
 
     actionHumHold():Trigger{
         this.attacker.triggerMods(Trigger.BeforeHumiliationHold);
-        this.type = Action.HumHold;
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
@@ -222,7 +223,6 @@ export class FightAction{
 
     actionBondage():Trigger{ //No tier
         this.attacker.triggerMods(Trigger.BeforeBondage);
-        this.type = Action.Bondage;
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
@@ -271,7 +271,6 @@ export class FightAction{
 
     actionForcedWorship():Trigger{
         this.attacker.triggerMods(Trigger.BeforeForcedWorshipAttack);
-        this.type = Action.ForcedWorship;
         this.diceScore = this.attacker.roll(1) + this.attacker.sensuality;
         this.lpDamageToAtk += (this.tier+1) * 2; //deal damage anyway. They're gonna be exposed!
         if(this.diceScore >= this.requiredDiceScore()){
@@ -284,7 +283,6 @@ export class FightAction{
 
     actionItemPickup():Trigger{
         this.attacker.triggerMods(Trigger.BeforeItemPickup);
-        this.type = Action.ItemPickup;
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
@@ -297,7 +295,6 @@ export class FightAction{
 
     actionSextoyPickup():Trigger{
         this.attacker.triggerMods(Trigger.BeforeSextoyPickup);
-        this.type = Action.SextoyPickup;
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
@@ -310,7 +307,6 @@ export class FightAction{
 
     actionDegradation():Trigger{
         this.attacker.triggerMods(Trigger.BeforeDegradation);
-        this.type = Action.Degradation;
         this.diceScore = this.attacker.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= this.requiredDiceScore()) {
             this.missed = false;
@@ -323,27 +319,42 @@ export class FightAction{
 
     actionTag():Trigger{ //"skips" a turn
         this.attacker.triggerMods(Trigger.BeforeTag);
-        this.type = Action.Tag;
-        this.diceScore = -1;
-        this.requiresRoll = false;
-        this.attacker.lastTagTurn = this.atTurn;
-        this.defender.lastTagTurn = this.atTurn;
-        this.attacker.isInTheRing = false;
-        this.defender.isInTheRing = true;
-        this.missed = false;
+        this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
+        if(this.diceScore >= Constants.requiredScoreToTag) {
+            this.attacker.lastTagTurn = this.atTurn;
+            this.defender.lastTagTurn = this.atTurn;
+            this.attacker.isInTheRing = false;
+            this.defender.isInTheRing = true;
+            this.missed = false;
+        }
         return Trigger.AfterTag;
     }
 
     actionRest():Trigger{ //"skips" a turn
         this.attacker.triggerMods(Trigger.BeforeRest);
-        this.type = Action.Rest;
-        this.diceScore = -1;
-        this.requiresRoll = false;
-        this.missed = false;
-        this.hpHealToAtk += this.attacker.hp*Constants.hpPercantageToHealOnRest;
-        this.lpHealToAtk += this.attacker.hp*Constants.lpPercantageToHealOnRest;
-        this.fpHealToAtk += this.attacker.hp*Constants.fpPointsToHealOnRest;
+        this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
+        if(this.diceScore >= Constants.requiredScoreToTag) {
+            this.missed = false;
+            this.hpHealToAtk += this.attacker.hp * Constants.hpPercantageToHealOnRest;
+            this.lpHealToAtk += this.attacker.hp * Constants.lpPercantageToHealOnRest;
+            this.fpHealToAtk += this.attacker.hp * Constants.fpPointsToHealOnRest;
+        }
         return Trigger.AfterRest;
+    }
+
+    actionTackle():Trigger{
+        this.attacker.triggerMods(Trigger.BeforeTackle);
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.dexterity;
+        if(this.diceScore >= this.requiredDiceScore()){
+            this.missed = false;
+            this.fpHealToAtk += this.tier + 1;
+            this.fpDamageToDef += this.tier + 1;
+            let nbOfAttacksStunned = this.tier + 1;
+            this.hpDamageToDef = this.attackFormula(this.tier, Math.floor(this.attacker.power / Constants.tacklePowerDivider), this.defender.toughness, this.diceScore);
+            let stunModifier = new StunModifier(this.defender, this.attacker, -((this.tier + 1) * Constants.dicePenaltyMultiplierWhileStunned), nbOfAttacksStunned);
+            this.modifiers.push(stunModifier);
+        }
+        return Trigger.AfterTackle;
     }
 
     static commitDb(action:FightAction){
