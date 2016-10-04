@@ -139,7 +139,7 @@ export class FightAction{
 
     actionBrawl():Trigger{
         this.attacker.triggerMods(Trigger.BeforeBrawlAttack);
-        this.diceScore = this.attacker.roll(1) + this.attacker.power;
+        this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += 1;
@@ -152,7 +152,7 @@ export class FightAction{
     actionSexStrike():Trigger{
         this.attacker.triggerMods(Trigger.BeforeSexStrikeAttack);
         this.type = Action.SexStrike;
-        this.diceScore = this.attacker.roll(1) + this.attacker.sensuality;
+        this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += 1;
@@ -165,7 +165,7 @@ export class FightAction{
     actionSubHold():Trigger{
         this.attacker.triggerMods(Trigger.BeforeSubmissionHold);
         this.type = Action.SubHold;
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.power;
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += 1;
@@ -184,7 +184,7 @@ export class FightAction{
     actionSexHold():Trigger{
         this.attacker.triggerMods(Trigger.BeforeSexHoldAttack);
         this.type = Action.SexHold;
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += 1;
@@ -203,7 +203,7 @@ export class FightAction{
     actionHumHold():Trigger{
         this.attacker.triggerMods(Trigger.BeforeHumiliationHold);
         this.type = Action.HumHold;
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += FocusDamageHum[Tier[this.tier]];
@@ -225,6 +225,24 @@ export class FightAction{
         let bdModifier = new BondageModifier(this.defender, this.attacker);
         this.modifiers.push(bdModifier);
         return Trigger.AfterBondage;
+    }
+
+    actionHighRisk():Trigger{
+        this.attacker.triggerMods(Trigger.BeforeHighRiskAttack);
+        this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
+        if(this.diceScore >= this.requiredDiceScore()){
+            this.missed = false;
+            this.fpHealToAtk += this.tier;
+            this.fpDamageToDef += this.tier;
+            this.hpDamageToDef += this.attackFormula(this.tier, this.attacker.power * Constants.powerMultiplierHighRiskAttack, this.defender.toughness, this.diceScore);
+        }
+        else{
+            this.missed = true;
+            this.fpDamageToAtk += this.tier;
+            this.fpHealToDef += this.tier;
+            this.hpDamageToAtk += this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, 0);
+        }
+        return Trigger.AfterHighRiskAttack;
     }
 
     actionForcedWorship():Trigger{
@@ -344,99 +362,97 @@ export class FightAction{
 
         fight.pastActions.push(this);
 
-        if(this.missed == false) {
-            if (this.hpDamageToDef > 0) {
-                this.defender.hitHP(this.hpDamageToDef);
-            }
-            if (this.lpDamageToDef > 0) {
-                this.defender.hitLP(this.lpDamageToDef);
-            }
-            if(this.fpDamageToDef != 0){
-                this.defender.hitFP(this.fpDamageToDef);
-            }
-            if (this.hpHealToDef > 0) {
-                this.defender.healHP(this.hpHealToDef);
-            }
-            if (this.lpHealToDef > 0) {
-                this.defender.healLP(this.lpHealToDef);
-            }
-            if(this.fpHealToDef != 0){
-                this.defender.healFP(this.fpHealToDef);
-            }
+        if (this.hpDamageToDef > 0) {
+            this.defender.hitHP(this.hpDamageToDef);
+        }
+        if (this.lpDamageToDef > 0) {
+            this.defender.hitLP(this.lpDamageToDef);
+        }
+        if(this.fpDamageToDef > 0){
+            this.defender.hitFP(this.fpDamageToDef);
+        }
+        if (this.hpHealToDef > 0) {
+            this.defender.healHP(this.hpHealToDef);
+        }
+        if (this.lpHealToDef > 0) {
+            this.defender.healLP(this.lpHealToDef);
+        }
+        if(this.fpHealToDef > 0){
+            this.defender.healFP(this.fpHealToDef);
+        }
 
 
-            if (this.hpDamageToAtk > 0) {
-                this.attacker.hitHP(this.hpDamageToAtk);
-            }
-            if (this.lpDamageToAtk > 0) {
-                this.attacker.hitLP(this.lpDamageToAtk);
-            }
-            if(this.fpDamageToAtk != 0){
-                this.attacker.hitFP(this.fpDamageToAtk);
-            }
-            if (this.hpHealToAtk > 0) {
-                this.attacker.healHP(this.hpHealToAtk);
-            }
-            if (this.lpHealToAtk > 0) {
-                this.attacker.healLP(this.lpHealToAtk);
-            }
-            if(this.fpHealToAtk != 0){
-                this.attacker.healFP(this.fpHealToAtk);
-            }
+        if (this.hpDamageToAtk > 0) {
+            this.attacker.hitHP(this.hpDamageToAtk);
+        }
+        if (this.lpDamageToAtk > 0) {
+            this.attacker.hitLP(this.lpDamageToAtk);
+        }
+        if(this.fpDamageToAtk > 0){
+            this.attacker.hitFP(this.fpDamageToAtk);
+        }
+        if (this.hpHealToAtk > 0) {
+            this.attacker.healHP(this.hpHealToAtk);
+        }
+        if (this.lpHealToAtk > 0) {
+            this.attacker.healLP(this.lpHealToAtk);
+        }
+        if(this.fpHealToAtk > 0){
+            this.attacker.healFP(this.fpHealToAtk);
+        }
 
 
-            if(this.modifiers.length > 0){
-                if(this.type == Action.SubHold || this.type == Action.SexHold || this.type == Action.HumHold){ //for any holds, do the stacking here
-                    let indexOfNewHold = this.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold || x.name == Constants.Modifier.SexHold || x.name == Constants.Modifier.HumHold);
-                    let indexOfAlreadyExistantHoldForDefender = this.defender.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold || x.name == Constants.Modifier.SexHold || x.name == Constants.Modifier.HumHold);
-                    if(indexOfAlreadyExistantHoldForDefender != -1){
-                        let idOfFormerHold = this.defender.modifiers[indexOfAlreadyExistantHoldForDefender].id;
-                        for(let mod of this.defender.modifiers){
-                            //we updated the children and parent's damage and turns
-                            if(mod.id == idOfFormerHold){
-                                mod.name = this.modifiers[indexOfNewHold].name;
-                                mod.eventTrigger = this.modifiers[indexOfNewHold].eventTrigger;
-                                mod.uses += this.modifiers[indexOfNewHold].uses;
-                                mod.hpDamage += this.modifiers[indexOfNewHold].hpDamage;
-                                mod.lustDamage += this.modifiers[indexOfNewHold].lustDamage;
-                                mod.focusDamage += this.modifiers[indexOfNewHold].focusDamage;
-                                //Did not add the dice/escape score modifications, if needed, implement here
-                            }
-                            else if(mod.parentIds && mod.parentIds.indexOf(idOfFormerHold) != -1){
-                                mod.uses += this.modifiers[indexOfNewHold].uses;
-                            }
+        if(this.modifiers.length > 0){
+            if(this.type == Action.SubHold || this.type == Action.SexHold || this.type == Action.HumHold){ //for any holds, do the stacking here
+                let indexOfNewHold = this.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold || x.name == Constants.Modifier.SexHold || x.name == Constants.Modifier.HumHold);
+                let indexOfAlreadyExistantHoldForDefender = this.defender.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold || x.name == Constants.Modifier.SexHold || x.name == Constants.Modifier.HumHold);
+                if(indexOfAlreadyExistantHoldForDefender != -1){
+                    let idOfFormerHold = this.defender.modifiers[indexOfAlreadyExistantHoldForDefender].id;
+                    for(let mod of this.defender.modifiers){
+                        //we updated the children and parent's damage and turns
+                        if(mod.id == idOfFormerHold){
+                            mod.name = this.modifiers[indexOfNewHold].name;
+                            mod.eventTrigger = this.modifiers[indexOfNewHold].eventTrigger;
+                            mod.uses += this.modifiers[indexOfNewHold].uses;
+                            mod.hpDamage += this.modifiers[indexOfNewHold].hpDamage;
+                            mod.lustDamage += this.modifiers[indexOfNewHold].lustDamage;
+                            mod.focusDamage += this.modifiers[indexOfNewHold].focusDamage;
+                            //Did not add the dice/escape score modifications, if needed, implement here
                         }
-                        for(let mod of this.attacker.modifiers){
-                            //update the bonus modifiers length
-                            if(mod.parentIds.indexOf(idOfFormerHold) != -1){
-                                mod.uses += this.modifiers[indexOfNewHold].uses;
-                            }
-                        }
-                        fight.addMessage(`[b][color=red]Hold Stacking![/color][/b] ${this.defender.name} will have to suffer this hold for ${this.modifiers[indexOfNewHold].uses} more turns, and will also suffer a bit more!\n
-                                         ${(this.modifiers[indexOfNewHold].hpDamage > 0 ? "Added -"+this.modifiers[indexOfNewHold].hpDamage+" HP per turn\n":"")}
-                                         ${(this.modifiers[indexOfNewHold].lustDamage > 0 ? "Added +"+this.modifiers[indexOfNewHold].lustDamage+" Lust per turn\n":"")}
-                                         ${(this.modifiers[indexOfNewHold].focusDamage > 0 ? "Added "+this.modifiers[indexOfNewHold].focusDamage+" Focus per turn\n":"")}
-                         `);
-                    }
-                    else{
-                        for(let mod of this.modifiers){
-                            if(mod.receiver == this.defender){
-                                this.defender.modifiers.push(mod);
-                            }
-                            else if(mod.receiver == this.attacker){
-                                this.attacker.modifiers.push(mod);
-                            }
+                        else if(mod.parentIds && mod.parentIds.indexOf(idOfFormerHold) != -1){
+                            mod.uses += this.modifiers[indexOfNewHold].uses;
                         }
                     }
+                    for(let mod of this.attacker.modifiers){
+                        //update the bonus modifiers length
+                        if(mod.parentIds.indexOf(idOfFormerHold) != -1){
+                            mod.uses += this.modifiers[indexOfNewHold].uses;
+                        }
+                    }
+                    fight.addMessage(`[b][color=red]Hold Stacking![/color][/b] ${this.defender.name} will have to suffer this hold for ${this.modifiers[indexOfNewHold].uses} more turns, and will also suffer a bit more!\n
+                                     ${(this.modifiers[indexOfNewHold].hpDamage > 0 ? "Added -"+this.modifiers[indexOfNewHold].hpDamage+" HP per turn\n":"")}
+                                     ${(this.modifiers[indexOfNewHold].lustDamage > 0 ? "Added +"+this.modifiers[indexOfNewHold].lustDamage+" Lust per turn\n":"")}
+                                     ${(this.modifiers[indexOfNewHold].focusDamage > 0 ? "Added "+this.modifiers[indexOfNewHold].focusDamage+" Focus per turn\n":"")}
+                     `);
                 }
                 else{
                     for(let mod of this.modifiers){
-                        if(mod.receiver == this.attacker){
-                            this.attacker.modifiers.push(mod);
-                        }
-                        else if(mod.receiver == this.defender){
+                        if(mod.receiver == this.defender){
                             this.defender.modifiers.push(mod);
                         }
+                        else if(mod.receiver == this.attacker){
+                            this.attacker.modifiers.push(mod);
+                        }
+                    }
+                }
+            }
+            else{
+                for(let mod of this.modifiers){
+                    if(mod.receiver == this.attacker){
+                        this.attacker.modifiers.push(mod);
+                    }
+                    else if(mod.receiver == this.defender){
+                        this.defender.modifiers.push(mod);
                     }
                 }
             }

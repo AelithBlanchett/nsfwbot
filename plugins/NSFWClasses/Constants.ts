@@ -24,6 +24,7 @@ export class Constants{
     static fpPointsToHealOnRest:number = 1;
     static maxTurnsWithoutFocus:number = 3;
     static forcedLewdPercentageOfLPRemoved:number = 3;
+    static powerMultiplierHighRiskAttack:number = 2;
 
     public static get currencyName(): string    { return "tokens"; }
     public static get pluginName(): string    { return "nsfw"; }
@@ -249,13 +250,15 @@ export module Constants{
         BeforeSexStrikeAttack,
         BeforeForcedWorshipAttack,
         BeforeSexHoldAttack,
+        BeforeHighRiskAttack,
+        BeforeHighRiskSexAttack,
         BeforeAttack = BeforeBrawlAttack | BeforeSexStrikeAttack | BeforeSexHoldAttack | BeforeForcedWorshipAttack,
         BeforeSubmissionHold,
         BeforeBondage,
         BeforeDegradation,
         BeforeHumiliationHold,
         BeforeHold = BeforeSubmissionHold | BeforeHumiliationHold,
-        BeforePowerBasedAttack = BeforeBrawlAttack | BeforeSubmissionHold,
+        BeforePowerBasedAttack = BeforeBrawlAttack | BeforeSubmissionHold | BeforeHighRiskAttack,
 
         BeforeItemPickup,
         BeforeSextoyPickup,
@@ -303,6 +306,8 @@ export module Constants{
         AfterSexStrikeAttack,
         AfterForcedWorshipAttack,
         AfterSexHoldAttack,
+        AfterHighRiskAttack,
+        AfterHighRiskSexAttack,
         AfterAttack = AfterBrawlAttack | AfterSexStrikeAttack | AfterSexHoldAttack | AfterForcedWorshipAttack,
         AfterSubmissionHold,
         AfterBondage,
