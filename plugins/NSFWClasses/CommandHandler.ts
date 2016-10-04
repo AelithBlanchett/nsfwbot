@@ -9,7 +9,6 @@ import {Constants} from "./Constants";
 import Team = Constants.Team;
 import {Utils} from "./Utils";
 import Tier = Constants.Tier;
-import Affinity = Constants.Affinity;
 import Action = Constants.Action;
 
 export class CommandHandler implements ICommandHandler{

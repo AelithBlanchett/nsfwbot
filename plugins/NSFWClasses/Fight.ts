@@ -17,6 +17,8 @@ import Trigger = Constants.Trigger;
 import Action = Constants.Action;
 import {Modifier} from "./Modifier";
 import {Promise} from "es6-promise";
+import ModifierType = Constants.ModifierType;
+import {BondageModifier} from "./CustomModifiers";
 var CircularJSON = require('circular-json');
 
 export class Fight{
@@ -569,7 +571,7 @@ export class Fight{
             if(!fighter.isTechnicallyOut()){
                 this.addMessage(`${fighter.getStylizedName()} forfeits! Which means... 3 bondage items landing on them to punish them!`);
                 for(var i = 0; i < 3; i++){
-                    fighter.modifiers.push(new Modifier(fighter, null, 0, 0, 0, 0, 0, 1, Constants.Trigger.None, [], false, Constants.Modifier.Bondage, Action.Bondage));
+                    fighter.modifiers.push(new BondageModifier(fighter));
                 }
                 fighter.forfeits++;
                 this.addMessage(`${fighter.getStylizedName()} has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`);

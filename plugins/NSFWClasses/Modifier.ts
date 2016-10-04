@@ -4,11 +4,13 @@ import {Constants} from "./Constants";
 import Trigger = Constants.Trigger;
 import {Utils} from "./Utils";
 import Action = Constants.Action;
+import ModifierType = Constants.ModifierType;
 var ES = require("es-abstract/es6.js");
 
 export interface IModifier{
     id: string;
     name:string;
+    type:ModifierType;
     applier: Fighter;
     receiver: Fighter;
     hpDamage: number;
@@ -30,6 +32,7 @@ export interface IModifier{
 export class Modifier implements IModifier{
     id: string;
     name:string = "modifier";
+    type:ModifierType;
     applier: Fighter;
     receiver: Fighter;
     hpDamage: number;
@@ -43,10 +46,12 @@ export class Modifier implements IModifier{
     parentIds: Array<string>;
     parentAction: Action;
 
-    constructor(receiver:Fighter, applier:Fighter, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number, eventTrigger:Trigger, parentIds:Array<string>, areMultipliers:boolean, name:string, parentAction?:Action ){
+    constructor(receiver:Fighter, applier:Fighter, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number,
+                eventTrigger:Trigger, parentIds:Array<string>, areMultipliers:boolean){
         this.id = Utils.generateUUID();
         this.receiver = receiver; //ALWAYS filled!
         this.applier = applier; //can be null
+        this.type = modType;
         this.hpDamage = hpDamage;
         this.lustDamage = lustDamage;
         this.focusDamage = focusDamage;
@@ -56,10 +61,7 @@ export class Modifier implements IModifier{
         this.eventTrigger = eventTrigger;
         this.parentIds = parentIds;
         this.areDamageMultipliers = areMultipliers;
-        this.name = name;
-        if(parentAction) {
-            this.parentAction = parentAction;
-        }
+        this.name = Constants.Modifier[ModifierType[modType]];
     }
 
     findIndex(predicate: (value: Modifier) => boolean, thisArg?: any): number{

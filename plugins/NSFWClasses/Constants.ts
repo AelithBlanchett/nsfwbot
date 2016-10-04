@@ -74,6 +74,18 @@ export module Constants{
         static SextoyPickupBonus = "bonus lust damage on sextoy pickup";
     }
 
+    export enum ModifierType {
+        SubHoldBrawlBonus = 0,
+        SubHold = 1,
+        SexHoldLustBonus = 2,
+        SexHold = 3,
+        Bondage = 4,
+        HumHold = 5,
+        DegradationMalus = 6,
+        ItemPickupBonus = 7,
+        SextoyPickupBonus = 8,
+    }
+
     export enum Team {
         Unknown = -1,
         Blue = 0,
@@ -89,12 +101,8 @@ export module Constants{
         Finesse = 1,
         Toughness = 2,
         Endurance = 3,
-        Willpower = 4
-    }
-
-    export enum Affinity {
-        Power = 0,
-        Finesse = 1
+        Willpower = 4,
+        Dexterity = 5
     }
 
     export enum Tier {
@@ -139,7 +147,8 @@ export module Constants{
         HumHold,
         ItemPickup,
         SextoyPickup,
-        Degradation
+        Degradation,
+        ForcedLewd
     }
 
     export enum TierDifficulty {
@@ -226,8 +235,9 @@ export module Constants{
 
         BeforeBrawlAttack,
         BeforeSexStrikeAttack,
+        BeforeForcedLewdAttack,
         BeforeSexHoldAttack,
-        BeforeAttack = BeforeBrawlAttack | BeforeSexStrikeAttack | BeforeSexHoldAttack,
+        BeforeAttack = BeforeBrawlAttack | BeforeSexStrikeAttack | BeforeSexHoldAttack | BeforeForcedLewdAttack,
         BeforeSubmissionHold,
         BeforeBondage,
         BeforeDegradation,
@@ -279,8 +289,9 @@ export module Constants{
 
         AfterBrawlAttack,
         AfterSexStrikeAttack,
+        AfterForcedLewdAttack,
         AfterSexHoldAttack,
-        AfterAttack = AfterBrawlAttack | AfterSexStrikeAttack | AfterSexHoldAttack,
+        AfterAttack = AfterBrawlAttack | AfterSexStrikeAttack | AfterSexHoldAttack | AfterForcedLewdAttack,
         AfterSubmissionHold,
         AfterBondage,
         AfterDegradation,

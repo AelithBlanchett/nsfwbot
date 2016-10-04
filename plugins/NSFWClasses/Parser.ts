@@ -3,16 +3,11 @@ import {Fight} from "./Fight";
 import {Constants} from "./Constants";
 import Team = Constants.Team;
 import Tier = Constants.Tier;
-import Affinity = Constants.Affinity;
 import Stats = Constants.Stats;
 import StatTier = Constants.StatTier;
 var _ = require('lodash');
 
 export class Commands{
-
-    public static register(args){
-        return Utils.stringToEnum(Affinity, args);
-    }
 
     public static join(args){
         let teams = Utils.getEnumList(Team);
