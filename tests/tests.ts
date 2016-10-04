@@ -602,25 +602,27 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-    it("should do a subhold and expire after two turns", function(done){
+    it("should do a subhold and expire after the number of turns specified", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+        waitUntil().interval(10).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "subhold", "Light").then(() => {
-                cmd.fight.nextTurn();
-                cmd.fight.nextTurn();
-                if(wasHealthHit(cmd, "Aelith Blanchette") && cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.length == 0){
+                for(var i = 0; i < Constants.initialNumberOfTurnsForHold; i++){
+                    cmd.fight.nextTurn();
+                    refillHPLPFP(cmd, "Aelith Blanchette");
+                }
+                if(cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.length == 0){
                     done();
                 }
                 else{
-                    done.fail(new Error("Did not correctly expire the modifiers, or the health wasn't hit."));
+                    done.fail(new Error("Did not correctly expire the sexhold modifiers."));
                 }
             }).catch(err => {
                 fChatLibInstance.throwError(err);
             });
         });
-    },DEFAULT_TIMEOUT);
+    },DEFAULT_TIMEOUT+5000);
 
     it("should do a subhold and trigger bonus brawl modifier", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");

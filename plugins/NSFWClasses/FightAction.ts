@@ -351,7 +351,7 @@ export class FightAction{
                                 mod.focusDamage += this.modifiers[indexOfNewHold].focusDamage;
                                 //Did not add the dice/escape score modifications, if needed, implement here
                             }
-                            else if(mod.parentIds.indexOf(idOfFormerHold) != -1){
+                            else if(mod.parentIds && mod.parentIds.indexOf(idOfFormerHold) != -1){
                                 mod.uses += this.modifiers[indexOfNewHold].uses;
                             }
                         }

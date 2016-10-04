@@ -167,12 +167,15 @@ export class Fighter implements IFighter{
         if(index != -1){
             listOfModsToRemove.push(index);
             for(let mod of this.modifiers){
-                if(mod.parentIds.length == 1 && mod.parentIds[0] == idMod){
-                    listOfModsToRemove.push(mod);
+                if(mod.parentIds){
+                    if(mod.parentIds.length == 1 && mod.parentIds[0] == idMod){
+                        listOfModsToRemove.push(mod);
+                    }
+                    else if(mod.parentIds.indexOf(idMod) != -1){
+                        mod.parentIds.splice(mod.parentIds.indexOf(idMod));
+                    }
                 }
-                else if(mod.parentIds.indexOf(idMod) != -1){
-                    mod.parentIds.splice(mod.parentIds.indexOf(idMod));
-                }
+
             }
         }
         for(let modIndex of listOfModsToRemove){

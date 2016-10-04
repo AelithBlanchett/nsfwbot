@@ -274,7 +274,7 @@ export class Fight{
         for(let fighter of this.fighterList){
             fighter.triggerMods(Trigger.OnTurnTick);
             if(!fighter.isInHold()){
-                fighter.healFP(-1);
+                fighter.healFP(1);
             }
             if(fighter.focus < fighter.minFocus()){
                 fighter.consecutiveTurnsWithoutFocus++;
