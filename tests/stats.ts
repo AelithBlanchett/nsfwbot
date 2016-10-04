@@ -241,9 +241,9 @@ describe("The player(s)", () => {
                     fight.fighterList[0].pendingAction.missed = false;
                     fight.fighterList[0].pendingAction.diceScore = 12;
                 }
-                HPdamagesDone.push(fight.fighterList[0].pendingAction.hpDamage);
-                LPdamagesDone.push(fight.fighterList[0].pendingAction.lustDamage);
-                FPdamagesDone.push(fight.fighterList[0].pendingAction.focusDamage);
+                HPdamagesDone.push(fight.fighterList[0].pendingAction.hpDamageToDef);
+                LPdamagesDone.push(fight.fighterList[0].pendingAction.lpDamageToDef);
+                FPdamagesDone.push(fight.fighterList[0].pendingAction.fpDamageToDef);
                 fight.fighterList[0].pendingAction.commit(fight);
 
                 turnsCount++;

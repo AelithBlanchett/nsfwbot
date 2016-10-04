@@ -23,7 +23,7 @@ export class CommandHandler implements ICommandHandler{
     }
 
     howtostart(args:string, data:FChatResponse){
-
+        this.fChatLibInstance.sendPrivMessage(data.character, Constants.startupGuide);
     }
 
     register(args:string, data:FChatResponse){
@@ -175,6 +175,14 @@ export class CommandHandler implements ICommandHandler{
 
     humhold(args:string, data:FChatResponse){
         this.actionHandler(Action.HumHold, true, false, args, data);
+    };
+
+    highrisk(args:string, data:FChatResponse){
+        this.actionHandler(Action.HighRisk, true, false, args, data);
+    };
+
+    highrisksex(args:string, data:FChatResponse){
+        this.actionHandler(Action.HighRiskSex, true, false, args, data);
     };
 
     forcedworship(args:string, data:FChatResponse){

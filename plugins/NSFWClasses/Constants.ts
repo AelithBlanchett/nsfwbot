@@ -93,7 +93,7 @@ export module Constants{
         HumHold = 5,
         DegradationMalus = 6,
         ItemPickupBonus = 7,
-        SextoyPickupBonus = 8,
+        SextoyPickupBonus = 8
     }
 
     export enum Team {
@@ -158,7 +158,9 @@ export module Constants{
         ItemPickup,
         SextoyPickup,
         Degradation,
-        ForcedWorship
+        ForcedWorship,
+        HighRisk,
+        HighRiskSex
     }
 
     export enum TierDifficulty {
