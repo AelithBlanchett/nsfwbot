@@ -50,14 +50,17 @@ export class FightAction{
     }
 
     attackFormula(tier:Tier, actorAtk:number, targetDef:number, roll:number):number{
-        return BaseDamage[Tier[tier]]-(actorAtk-targetDef)+roll;
+        return BaseDamage[Tier[tier]]-(actorAtk-targetDef)+(Math.floor(roll/2));
     }
 
     requiredDiceScore(attack:Action, tier:Tier):number{
         let scoreRequired = 0;
         //difficulties here
         //if fighter.indexOf(mod) != -1 then add some difficulty
-        scoreRequired += (Constants.difficultyIncreasePerBondageItem * this.defender.bondageItemsOnSelf()); //+2 difficulty per bondage item
+        scoreRequired += (Constants.difficultyIncreasePerBondageItem * this.attacker.bondageItemsOnSelf()); //+2 difficulty per bondage item
+        if(this.defender){
+            scoreRequired -= (Constants.difficultyIncreasePerBondageItem * this.defender.bondageItemsOnSelf()); //+2 difficulty per bondage item
+        }
         scoreRequired += TierDifficulty[Tier[this.tier]];
         return scoreRequired;
     }

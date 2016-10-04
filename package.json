@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "array.prototype.findindex": "^2.0.0",
+    "async": "^2.0.1",
     "cappu-dice": "*",
     "circular-json": "^0.3.1",
     "didyoumean": "*",
@@ -15,6 +16,7 @@
     "lodash": "*",
     "mysql": "*",
     "promise": "^7.1.1",
+    "stats-lite": "^2.0.3",
     "typescript": "^2.0",
     "typings": "*",
     "wait-until": "*"

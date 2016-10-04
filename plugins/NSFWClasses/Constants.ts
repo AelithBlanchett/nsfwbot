@@ -117,8 +117,8 @@ export module Constants{
     }
 
     export enum BaseDamage {
-        Light = 6,
-        Medium = 12,
+        Light = 4,
+        Medium = 10,
         Heavy = 18
     }
 
