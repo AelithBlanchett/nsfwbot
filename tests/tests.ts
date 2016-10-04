@@ -897,11 +897,11 @@ describe("The player(s)", () => {
                 doAction(cmd, "sex", "Light").then(() => {
                     let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
                     waitUntil().interval(100).times(50).condition(condition).done(() => {
-                        if (wasMessageSent(Constants.Modifier.SextoyPickupBonus)) {
+                        if (cmd.fight.fighterList.getFighterByName("TheTinaArmstrong").modifiers.findIndex((x) => x.type == Constants.ModifierType.SextoyPickupBonus) != -1) {
                             done();
                         }
                         else {
-                            done.fail(new Error("Did not say that the attacker has a sextoy item pickup bonus."));
+                            done.fail(new Error("Did not have the sextoy item pickup bonus modifier."));
                         }
                     });
                 }).catch(err => {
@@ -914,7 +914,6 @@ describe("The player(s)", () => {
     },DEFAULT_TIMEOUT);
 
    it("should win the match with 3 bondage attacks", function(done){
-        debug = true;
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(100).times(50).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{

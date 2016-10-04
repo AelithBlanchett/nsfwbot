@@ -1,6 +1,7 @@
 import {Constants} from "./Constants";
 import Team = Constants.Team;
 import StatTier = Constants.StatTier;
+var vsprintf = require('sprintf-js').vsprintf;
 
 export class Utils {
     static minInArray(arr: Array<Number>) {
@@ -8,6 +9,11 @@ export class Utils {
     }
     static maxInArray(arr: Array<Number>) {
         return Math.max.apply(Math, arr);
+    }
+
+
+    static format(str:string, params: Array<string> | string){
+        return vsprintf(str, [params]);
     }
 
     static findIndex(array, attr, value) {

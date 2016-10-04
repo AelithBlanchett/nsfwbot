@@ -74,6 +74,14 @@ export module Constants{
         static SextoyPickupBonus = "bonus lust damage on sextoy pickup";
     }
 
+    export class Messages {
+        static Ready = `[color=green]%s is now ready to get it on![/color]`;
+    }
+
+    export class SQL {
+        static commitFightAction = "INSERT INTO `flistplugins`.?? (`idFight`,`atTurn`,`type`,`tier`,`isHold`,`idAttacker`,`idDefender`,`hpDamage`,`lustDamage`,`focusDamage`,`diceScore`,`missed`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
+    }
+
     export enum ModifierType {
         SubHoldBrawlBonus = 0,
         SubHold = 1,

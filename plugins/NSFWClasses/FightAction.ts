@@ -290,7 +290,7 @@ export class FightAction{
             if(action.defender){
                 defenderId = action.defender.id;
             }
-            var sql = "INSERT INTO `flistplugins`.?? (`idFight`,`atTurn`,`type`,`tier`,`isHold`,`idAttacker`,`idDefender`,`hpDamage`,`lustDamage`,`focusDamage`,`diceScore`,`missed`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
+            var sql = Constants.SQL.commitFightAction;
             sql = Data.db.format(sql, [Constants.actionTableName, action.fightId, action.atTurn, action.type, action.tier, action.isHold, attackerId, defenderId, action.hpDamage, action.lustDamage, action.focusDamage, action.diceScore, action.missed]);
             Data.db.query(sql, (err, results) => {
                 if (err) {

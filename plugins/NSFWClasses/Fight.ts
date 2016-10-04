@@ -206,7 +206,8 @@ export class Fight{
             var fighterInFight = this.fighterList.getFighterByName(fighter.name);
             if(fighterInFight && !fighterInFight.isReady){ //find fighter by its name property instead of comparing objects, which doesn't work.
                 fighterInFight.isReady = true;
-                this.addMessage("[color=red]"+fighter.name+" is now ready to get it on![/color]");
+                var str = Utils.format(Constants.Messages.Ready, fighter.getStylizedName());
+                this.addMessage(str);
                 this.sendMessage();
                 if(this.canStartMatch()){
                     this.startMatch();

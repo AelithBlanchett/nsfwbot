@@ -16,6 +16,7 @@
     "lodash": "*",
     "mysql": "*",
     "promise": "^7.1.1",
+    "sprintf-js": "^1.0.3",
     "stats-lite": "^2.0.3",
     "typescript": "^2.0",
     "typings": "*",
