@@ -103,22 +103,19 @@ export class Modifier implements IModifier{
             this.uses--;
             if(!objFightAction){
                 if(this.hpDamage > 0){
-                    let flagTriggerMods = !(event == Constants.Trigger.HPDamage);
+                    let flagTriggerMods = !((event & Constants.Trigger.HPDamage) == 0);
                     this.receiver.hitHP(this.hpDamage, flagTriggerMods);
                 }
                 if(this.lustDamage > 0){
-                    let flagTriggerMods = !(event == Constants.Trigger.LustDamage);
-                    this.receiver.hitLP(this.lustDamage, flagTriggerMods);
+                    let flagTriggerMods = !((event & Constants.Trigger.LustDamage) == 0);
+                    this.receiver.hitLP(this.lustDamage, !flagTriggerMods);
                 }
                 if(this.diceRoll != 0){
                     this.receiver.dice.addTmpMod(this.diceRoll,1);
                     this.receiver.fight.addMessage(`${this.receiver.getStylizedName()} got a ${this.diceRoll} penalty applied on their dice roll.`);
                 }
                 if(this.focusDamage > 0){
-                    let flagTriggerMods = true;
-                    if(event == Constants.Trigger.FocusDamage){
-                        flagTriggerMods = false;
-                    }
+                    let flagTriggerMods = !((event & Constants.Trigger.FocusDamage) == 0);
                     this.receiver.hitFP(this.focusDamage, flagTriggerMods);
                 }
             }
@@ -128,7 +125,7 @@ export class Modifier implements IModifier{
                         objFightAction.hpDamage *= this.hpDamage;
                     }
                     else{
-                        let flagTriggerMods = !(event == Constants.Trigger.HPDamage);
+                        let flagTriggerMods = !(event & Constants.Trigger.HPDamage);
                         this.receiver.hitHP(this.hpDamage, flagTriggerMods);
                     }
 
@@ -138,7 +135,7 @@ export class Modifier implements IModifier{
                         objFightAction.lustDamage *= this.lustDamage;
                     }
                     else {
-                        let flagTriggerMods = !(event == Constants.Trigger.LustDamage);
+                        let flagTriggerMods = !(event & Constants.Trigger.LustDamage);
                         this.receiver.hitLP(this.lustDamage, flagTriggerMods);
                     }
                 }
@@ -151,7 +148,7 @@ export class Modifier implements IModifier{
                         objFightAction.focusDamage *= this.focusDamage;
                     }
                     else {
-                        let flagTriggerMods = !(event == Constants.Trigger.LustDamage);
+                        let flagTriggerMods = !(event & Constants.Trigger.LustDamage);
                         this.receiver.hitFP(this.focusDamage, flagTriggerMods);
                     }
                 }

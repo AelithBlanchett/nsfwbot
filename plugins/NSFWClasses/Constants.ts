@@ -228,15 +228,14 @@ export module Constants{
     export enum TriggerMoment{
         Never = -1,
         Before = 1 << 0,
-        After = 1 << 2,
+        After = 1 << 1,
         Any = Before | After
     }
 
     export enum Trigger{
         None = -1,
 
-
-        OnTurnTick = 0,
+        OnTurnTick = 5,
 
         HPDamage = 1 << 0,
         LustDamage = 1 << 1,
