@@ -5,6 +5,7 @@ import Trigger = Constants.Trigger;
 import {Utils} from "./Utils";
 import Action = Constants.Action;
 import ModifierType = Constants.ModifierType;
+import TriggerMoment = Constants.TriggerMoment;
 var ES = require("es-abstract/es6.js");
 
 export interface IModifier{
@@ -20,12 +21,13 @@ export interface IModifier{
     escapeRoll: number;
     uses: number;
     parentAction: Action;
-    eventTrigger:Trigger;
+    event:Trigger;
+    timeToTrigger:TriggerMoment;
     parentIds: Array<string>;
 
     isOver():boolean;
-    trigger(event:Trigger, objFightAction?:any):void;
-    willTriggerForEvent(event:Trigger):void;
+    trigger(moment: TriggerMoment, event:Trigger, objFightAction?:any):void;
+    willTriggerForEvent(moment: TriggerMoment, event:Trigger):void;
     findIndex(predicate: (value: Modifier) => boolean, thisArg?: any): number;
 }
 
@@ -42,12 +44,13 @@ export class Modifier implements IModifier{
     diceRoll: number;
     escapeRoll: number;
     uses: number;
-    eventTrigger:Trigger = 0;
+    event:Trigger;
+    timeToTrigger:TriggerMoment;
     parentIds: Array<string>;
     parentAction: Action;
 
     constructor(receiver:Fighter, applier:Fighter, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number,
-                eventTrigger:Trigger, parentIds:Array<string>, areMultipliers:boolean){
+                timeToTrigger:TriggerMoment, event:Trigger, parentIds:Array<string>, areMultipliers:boolean){
         this.id = Utils.generateUUID();
         this.receiver = receiver; //ALWAYS filled!
         this.applier = applier; //can be null
@@ -58,7 +61,8 @@ export class Modifier implements IModifier{
         this.diceRoll = diceRoll;
         this.escapeRoll = escapeRoll; //unused
         this.uses = uses;
-        this.eventTrigger = eventTrigger;
+        this.event = event;
+        this.timeToTrigger = timeToTrigger;
         this.parentIds = parentIds;
         this.areDamageMultipliers = areMultipliers;
         this.name = Constants.Modifier[ModifierType[modType]];
@@ -83,21 +87,27 @@ export class Modifier implements IModifier{
         return (this.uses <= 0 || this.receiver.isDead() || this.receiver.isSexuallyExhausted());
     }
 
-    willTriggerForEvent(event:Trigger){
-        return event == this.eventTrigger;
+    willTriggerForEvent(moment: TriggerMoment, event:Trigger):boolean{
+        let canPass = false;
+        if(event & this.event){
+            if(moment & this.timeToTrigger){
+                canPass = true;
+            }
+        }
+        return canPass;
     }
 
-    trigger(event:Trigger, objFightAction?:any):void{
-        if(this.willTriggerForEvent(event)){
+    trigger(moment: TriggerMoment, event:Trigger, objFightAction?:any):void{
+        if(this.willTriggerForEvent(moment, event)){
             this.receiver.fight.addMessage(`${this.receiver.getStylizedName()} is still affected by the ${this.name}!`);
             this.uses--;
             if(!objFightAction){
                 if(this.hpDamage > 0){
-                    let flagTriggerMods = !(event == Constants.Trigger.BeforeHPDamage || event == Constants.Trigger.AfterHPDamage);
+                    let flagTriggerMods = !(event == Constants.Trigger.HPDamage);
                     this.receiver.hitHP(this.hpDamage, flagTriggerMods);
                 }
                 if(this.lustDamage > 0){
-                    let flagTriggerMods = !(event == Constants.Trigger.BeforeLustDamage || event == Constants.Trigger.AfterLustDamage);
+                    let flagTriggerMods = !(event == Constants.Trigger.LustDamage);
                     this.receiver.hitLP(this.lustDamage, flagTriggerMods);
                 }
                 if(this.diceRoll != 0){
@@ -106,7 +116,7 @@ export class Modifier implements IModifier{
                 }
                 if(this.focusDamage > 0){
                     let flagTriggerMods = true;
-                    if(event == Constants.Trigger.BeforeFocusDamage || event == Constants.Trigger.AfterFocusDamage){
+                    if(event == Constants.Trigger.FocusDamage){
                         flagTriggerMods = false;
                     }
                     this.receiver.hitFP(this.focusDamage, flagTriggerMods);
@@ -118,7 +128,7 @@ export class Modifier implements IModifier{
                         objFightAction.hpDamage *= this.hpDamage;
                     }
                     else{
-                        let flagTriggerMods = !(event == Constants.Trigger.BeforeHPDamage || event == Constants.Trigger.AfterHPDamage);
+                        let flagTriggerMods = !(event == Constants.Trigger.HPDamage);
                         this.receiver.hitHP(this.hpDamage, flagTriggerMods);
                     }
 
@@ -128,7 +138,7 @@ export class Modifier implements IModifier{
                         objFightAction.lustDamage *= this.lustDamage;
                     }
                     else {
-                        let flagTriggerMods = !(event == Constants.Trigger.BeforeLustDamage || event == Constants.Trigger.AfterLustDamage);
+                        let flagTriggerMods = !(event == Constants.Trigger.LustDamage);
                         this.receiver.hitLP(this.lustDamage, flagTriggerMods);
                     }
                 }
@@ -141,7 +151,7 @@ export class Modifier implements IModifier{
                         objFightAction.focusDamage *= this.focusDamage;
                     }
                     else {
-                        let flagTriggerMods = !(event == Constants.Trigger.BeforeLustDamage || event == Constants.Trigger.AfterLustDamage);
+                        let flagTriggerMods = !(event == Constants.Trigger.LustDamage);
                         this.receiver.hitFP(this.focusDamage, flagTriggerMods);
                     }
                 }

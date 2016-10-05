@@ -19,6 +19,7 @@ import {Modifier} from "./Modifier";
 import {Promise} from "es6-promise";
 import ModifierType = Constants.ModifierType;
 import {BondageModifier} from "./CustomModifiers";
+import TriggerMoment = Constants.TriggerMoment;
 var CircularJSON = require('circular-json');
 
 export class Fight{
@@ -248,7 +249,7 @@ export class Fight{
 
 
         this.sendMessage();
-        this.fighterList.reorderFightersByInitiative(this.rollAllDice(Trigger.BeforeInitiationRoll, Trigger.AfterInitiationRoll));
+        this.fighterList.reorderFightersByInitiative(this.rollAllDice(Trigger.InitiationRoll));
         this.currentTurn = 1;
         this.addMessage(`${this.currentPlayer.getStylizedName()} starts first for the ${this.currentTeamName} team!`);
         for(let i = 1; i < this.fighterList.length; i++){
@@ -272,7 +273,7 @@ export class Fight{
 
     nextTurn(){
         for(let fighter of this.fighterList){
-            fighter.triggerMods(Trigger.OnTurnTick);
+            fighter.triggerMods(TriggerMoment.Any, Trigger.OnTurnTick);
             if(!fighter.isInHold()){
                 fighter.healFP(1);
             }
@@ -371,10 +372,10 @@ export class Fight{
 
     //Dice rolling
 
-    rollAllDice(eventBefore:Trigger = Trigger.BeforeRoll, eventAfter:Trigger = Trigger.AfterRoll):Array<Fighter>{
+    rollAllDice(event:Trigger):Array<Fighter>{
         let arrSortedFightersByInitiative = new Array<Fighter>();
         for(let player of this.fighterList.getAlivePlayers()){
-            player.lastDiceRoll = player.roll(10, eventBefore, eventAfter);
+            player.lastDiceRoll = player.roll(10, event);
             arrSortedFightersByInitiative.push(player);
             this.addMessage(`[color=${Team[player.assignedTeam]}]${player.name}[/color] rolled a ${player.lastDiceRoll}`);
         }
@@ -388,8 +389,8 @@ export class Fight{
         return arrSortedFightersByInitiative;
     }
 
-    rollAllGetWinner():Fighter{
-        return this.rollAllDice()[0];
+    rollAllGetWinner(event:Trigger):Fighter{
+        return this.rollAllDice(event)[0];
     }
 
 
@@ -525,7 +526,7 @@ export class Fight{
                 let defender = this.currentTarget;
                 attacker.pendingAction = new FightAction(this.id, this.currentTurn, tier, action, attacker, defender);
                 let eventToTriggerAfter = attacker.pendingAction.triggerAction(); //The specific trigger BEFORE is executed inside the attacks, see FightAction.ts
-                attacker.triggerMods(eventToTriggerAfter, attacker.pendingAction);
+                attacker.triggerMods(TriggerMoment.After, eventToTriggerAfter, attacker.pendingAction);
                 attacker.pendingAction.commit(this);
             }
         }

@@ -225,121 +225,70 @@ export module Constants{
         "Junkyard"
     ];
 
+    export enum TriggerMoment{
+        Never = -1,
+        Before = 1 << 0,
+        After = 1 << 2,
+        Any = Before | After
+    }
+
     export enum Trigger{
-        None = 0,
+        None = -1,
 
 
-        OnTurnTick,
+        OnTurnTick = 0,
 
-        //Befores
-        BeforeHPDamage,
-        BeforeLustDamage,
-        BeforeFocusDamage,
-        BeforeDamage = BeforeHPDamage | BeforeLustDamage,
-        BeforeBarDamage = BeforeHPDamage | BeforeLustDamage | BeforeFocusDamage,
+        HPDamage = 1 << 0,
+        LustDamage = 1 << 1,
+        FocusDamage = 1 << 2,
+        Damage = HPDamage | LustDamage,
+        BarDamage = HPDamage | LustDamage | FocusDamage,
 
-        BeforeHPHealing,
-        BeforeLustHealing,
-        BeforeFocusHealing,
-        BeforeHeal = BeforeHPHealing | BeforeLustHealing,
-        BeforeBarHealing = BeforeHeal | BeforeFocusDamage,
+        HPHealing = 1 << 3,
+        LustHealing = 1 << 4,
+        FocusHealing = 1 << 5,
+        Heal = HPHealing | LustHealing,
+        BarHealing = Heal | FocusDamage,
 
-        BeforeOrgasm,
-        BeforeHeartLoss,
-        BeforeOrgasmOrHeartLoss = BeforeOrgasm | BeforeHeartLoss,
+        Orgasm = 1 << 6,
+        HeartLoss = 1 << 7,
+        OrgasmOrHeartLoss = Orgasm | HeartLoss,
 
-        BeforeInitiationRoll,
-        BeforeRoll = 1 | BeforeInitiationRoll,
+        InitiationRoll = 1 << 8,
+        Roll = 1 | InitiationRoll,
 
-        BeforeBrawlAttack,
-        BeforeSexStrikeAttack,
-        BeforeForcedWorshipAttack,
-        BeforeHighRiskAttack,
-        BeforeHighRiskSexAttack,
-        BeforeTackle,
-        BeforeAttack = BeforeBrawlAttack | BeforeSexStrikeAttack | BeforeForcedWorshipAttack | BeforeTackle,
-        BeforeSubmissionHold,
-        BeforeBondage,
-        BeforeDegradation,
-        BeforeHumiliationHold,
-        BeforeSexHoldAttack,
-        BeforeHold = BeforeSubmissionHold | BeforeHumiliationHold | BeforeSexHoldAttack,
-        BeforePowerBasedAttack = BeforeBrawlAttack | BeforeSubmissionHold | BeforeHighRiskAttack | BeforeTackle,
+        BrawlAttack = 1 << 9,
+        SexStrikeAttack = 1 << 10,
+        ForcedWorshipAttack = 1 << 11,
+        HighRiskAttack = 1 << 12,
+        HighRiskSexAttack = 1 << 13,
+        Tackle = 1 << 14,
+        Attack = BrawlAttack | SexStrikeAttack | ForcedWorshipAttack | Tackle,
+        SubmissionHold = 1 << 15,
+        Bondage = 1 << 16,
+        Degradation = 1 << 17,
+        HumiliationHold = 1 << 18,
+        SexHoldAttack = 1 << 19,
+        Hold = SubmissionHold | HumiliationHold | SexHoldAttack,
+        PowerBasedAttack = BrawlAttack | SubmissionHold | HighRiskAttack | Tackle,
 
-        BeforeItemPickup,
-        BeforeSextoyPickup,
-        BeforePickup = BeforeItemPickup | BeforeSextoyPickup,
+        ItemPickup = 1 << 20,
+        SextoyPickup = 1 << 21,
+        Pickup = ItemPickup | SextoyPickup,
 
-        BeforeTag,
-        BeforeEscape,
-        BeforeRest,
-        BeforePassiveAction = BeforeTag | BeforeEscape | BeforeRest,
+        Tag = 1 << 22,
+        Escape = 1 << 23,
+        Rest = 1 << 24,
+        PassiveAction = Tag | Escape | Rest,
 
-        BeforePowerdrive,
-        BeforePowerFantasy,
-        BeforeSnapshot,
-        BeforeKarmasutra,
-        BeforeFinisher = BeforePowerdrive | BeforePowerFantasy | BeforeSnapshot | BeforeKarmasutra,
+        Powerdrive = 1 << 25,
+        PowerFantasy = 1 << 26,
+        Snapshot = 1 << 27,
+        Karmasutra = 1 << 28,
+        Finisher = Powerdrive | PowerFantasy | Snapshot | Karmasutra,
 
-        BeforeUltimateHumiliation,
-        BeforeAnyOffensiveAction = BeforeAttack | BeforeHold | BeforeFinisher,
-        BeforeAnyAction = BeforePassiveAction | BeforeAnyOffensiveAction,
-
-
-
-
-        //Afters
-        AfterHPDamage,
-        AfterLustDamage,
-        AfterFocusDamage,
-        AfterDamage = AfterHPDamage | AfterLustDamage,
-        AfterBarDamage = AfterHPDamage | AfterLustDamage | AfterFocusDamage,
-
-        AfterHPHealing,
-        AfterLustHealing,
-        AfterFocusHealing,
-        AfterHeal = AfterHPHealing | AfterLustHealing,
-        AfterBarHealing = AfterHeal | AfterFocusDamage,
-
-        AfterOrgasm,
-        AfterHeartLoss,
-        AfterOrgasmOrHeartLoss = AfterOrgasm | AfterHeartLoss,
-
-        AfterInitiationRoll,
-        AfterRoll = 2 | AfterInitiationRoll,
-
-        AfterBrawlAttack,
-        AfterSexStrikeAttack,
-        AfterForcedWorshipAttack,
-        AfterHighRiskAttack,
-        AfterHighRiskSexAttack,
-        AfterTackle,
-        AfterAttack = AfterBrawlAttack | AfterSexStrikeAttack | AfterForcedWorshipAttack | AfterTackle,
-        AfterSubmissionHold,
-        AfterSexHoldAttack,
-        AfterBondage,
-        AfterDegradation,
-        AfterHumiliationHold,
-        AfterHold = AfterSubmissionHold | AfterHumiliationHold | AfterSexHoldAttack,
-        AfterPowerBasedAttack = AfterBrawlAttack | AfterSubmissionHold,
-
-        AfterItemPickup,
-        AfterSextoyPickup,
-        AfterPickup = AfterItemPickup | AfterSextoyPickup,
-
-        AfterTag,
-        AfterEscape,
-        AfterRest,
-        AfterPassiveAction = AfterTag | AfterEscape | AfterRest,
-
-        AfterPowerdrive,
-        AfterPowerFantasy,
-        AfterSnapshot,
-        AfterKarmasutra,
-        AfterFinisher = AfterPowerdrive | AfterPowerFantasy | AfterSnapshot | AfterKarmasutra,
-
-        AfterUltimateHumiliation,
-        AfterAnyOffensiveAction = AfterAttack | AfterHold | AfterFinisher,
-        AfterAnyAction = AfterPassiveAction | AfterAnyOffensiveAction,
+        UltimateHumiliation = 1 << 29,
+        AnyOffensiveAction = Attack | Hold | Finisher,
+        AnyAction = PassiveAction | AnyOffensiveAction,
     }
 }

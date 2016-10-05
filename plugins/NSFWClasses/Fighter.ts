@@ -12,8 +12,9 @@ import TokensWorth = Constants.TokensWorth;
 import Stats = Constants.Stats;
 import StatTier = Constants.StatTier;
 import {IModifier} from "./Modifier";
-import Trigger = Constants.Trigger;
 import {Modifiers} from "./Modifier";
+import TriggerMoment = Constants.TriggerMoment;
+import Trigger = Constants.Trigger;
 
 export class Fighter implements IFighter{
     id:number = -1;
@@ -142,8 +143,8 @@ export class Fighter implements IFighter{
     }
 
     //returns dice score
-    roll(times:number = 1, eventBefore:Trigger = Trigger.BeforeRoll, eventAfter:Trigger = Trigger.AfterRoll):number{
-        this.triggerMods(eventBefore);
+    roll(times:number = 1, event:Trigger = Trigger.Roll):number{
+        this.triggerMods(TriggerMoment.Before, event);
         let result = 0;
         if(times == 1){
             result = this.dice.roll(1);
@@ -151,13 +152,13 @@ export class Fighter implements IFighter{
         else{
             result = this.dice.roll(times).reduce(function(a, b){return a+b;});
         }
-        this.triggerMods(eventAfter);
+        this.triggerMods(TriggerMoment.After, event);
         return result;
     }
 
-    triggerMods(event:Trigger, objFightAction?:any){
+    triggerMods(moment:TriggerMoment, event:Trigger, objFightAction?:any){
         for(let mod of this.modifiers){
-            mod.trigger(event, objFightAction);
+            mod.trigger(moment, event, objFightAction);
         }
     }
 
@@ -212,7 +213,7 @@ export class Fighter implements IFighter{
         if (hp < 1) {
             hp = 1;
         }
-        if(triggerMods){this.triggerMods(Trigger.BeforeHPHealing);}
+        if(triggerMods){this.triggerMods(TriggerMoment.Before, Trigger.HPHealing);}
         if(this.hp + hp > this.hpPerHeart()){
             hp = this.hpPerHeart() - this.hp; //reduce the number if it overflows the bar
         }
@@ -220,7 +221,7 @@ export class Fighter implements IFighter{
         if(hp != 0) {
             this.fight.addMessage(`${this.name} [color=green]gained ${hp} HP![/color]`);
         }
-        if(triggerMods){this.triggerMods(Trigger.AfterHPHealing);}
+        if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.HPHealing);}
     }
 
     healLP(lust:number, triggerMods:boolean = true){
@@ -228,7 +229,7 @@ export class Fighter implements IFighter{
         if (lust < 1) {
             lust = 1;
         }
-        if(triggerMods){this.triggerMods(Trigger.BeforeLustHealing);}
+        if(triggerMods){this.triggerMods(TriggerMoment.Before, Trigger.LustHealing);}
         if(this.lust - lust < 0){
             lust = this.lust; //reduce the number if it overflows the bar
         }
@@ -236,7 +237,7 @@ export class Fighter implements IFighter{
         if(lust != 0) {
             this.fight.addMessage(`${this.name} [color=green]was removed ${lust} LP![/color]`);
         }
-        if(triggerMods){this.triggerMods(Trigger.AfterLustHealing);}
+        if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.LustHealing);}
     }
 
     healFP(focus:number, triggerMods:boolean = true){
@@ -244,7 +245,7 @@ export class Fighter implements IFighter{
         if (focus < 1) {
             focus = 1;
         }
-        if(triggerMods){this.triggerMods(Trigger.BeforeFocusHealing);}
+        if(triggerMods){this.triggerMods(TriggerMoment.Before, Trigger.FocusHealing);}
         if(this.focus + focus > this.maxFocus()){
             focus = this.maxFocus() - this.focus; //reduce the number if it overflows the bar
         }
@@ -252,7 +253,7 @@ export class Fighter implements IFighter{
         if(focus != 0){
             this.fight.addMessage(`${this.name} [color=green]gained ${focus} FP![/color]`);
         }
-        if(triggerMods){this.triggerMods(Trigger.AfterFocusHealing);}
+        if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.FocusHealing);}
     }
 
     hitHP(hp:number, triggerMods:boolean = true) {
@@ -260,11 +261,11 @@ export class Fighter implements IFighter{
         if (hp < 1) {
             hp = 1;
         }
-        if(triggerMods){this.triggerMods(Trigger.BeforeHPDamage);}
+        if(triggerMods){this.triggerMods(TriggerMoment.Before, Trigger.HPDamage);}
         this.hp -= hp;
         this.fight.addMessage(`${this.name} [color=red]lost ${hp} HP![/color]`);
         if(this.hp <= 0){
-            this.triggerMods(Trigger.BeforeHeartLoss);
+            this.triggerMods(TriggerMoment.Before, Trigger.HeartLoss);
             this.hp = 0;
             this.heartsRemaining--;
             this.fight.addMessage(`[b][color=red]Heart broken![/color][/b] ${this.name} has ${this.heartsRemaining} hearts left.`);
@@ -274,9 +275,9 @@ export class Fighter implements IFighter{
             else if(this.heartsRemaining == 1){
                 this.fight.addMessage(`[b][color=red]Last heart[/color][/b] for ${this.name}!`);
             }
-            this.triggerMods(Trigger.AfterHeartLoss);
+            this.triggerMods(TriggerMoment.After, Trigger.HeartLoss);
         }
-        if(triggerMods){this.triggerMods(Trigger.AfterHPDamage);}
+        if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.HPDamage);}
     }
 
     hitLP(lust:number, triggerMods:boolean = true) {
@@ -284,21 +285,21 @@ export class Fighter implements IFighter{
         if (lust < 1) {
             lust = 1;
         }
-        if(triggerMods){this.triggerMods(Trigger.BeforeLustDamage);}
+        if(triggerMods){this.triggerMods(TriggerMoment.Before, Trigger.LustDamage);}
         this.lust += lust;
         this.fight.addMessage(`${this.name} [color=red]gained ${lust} Lust![/color]`);
         if(this.lust >= this.lustPerOrgasm()){
-            this.triggerMods(Trigger.BeforeOrgasm);
+            this.triggerMods(TriggerMoment.Before, Trigger.Orgasm);
             this.lust = 0;
             this.orgasmsRemaining--;
             this.fight.addMessage(`[b][color=pink]Orgasm on the mat![/color][/b] ${this.name} has ${this.orgasmsRemaining} orgasms left.`);
             this.lust = 0;
-            if(triggerMods){this.triggerMods(Trigger.AfterOrgasm);}
+            if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.Orgasm);}
             if(this.orgasmsRemaining == 1){
                 this.fight.addMessage(`[b][color=red]Last orgasm[/color][/b] for ${this.name}!`);
             }
         }
-        this.triggerMods(Trigger.AfterLustDamage);
+        this.triggerMods(TriggerMoment.After, Trigger.LustDamage);
     }
 
     hitFP(focusDamage:number, triggerMods:boolean = true) { //focusDamage CAN BE NEGATIVE to gain it
@@ -306,10 +307,10 @@ export class Fighter implements IFighter{
         if(focusDamage <= 0){
             return;
         }
-        if(triggerMods){this.triggerMods(Trigger.BeforeFocusDamage);}
+        if(triggerMods){this.triggerMods(TriggerMoment.Before, Trigger.FocusDamage);}
         this.focus -= focusDamage;
         this.fight.addMessage(`${this.name} [color=red]lost ${focusDamage} Focus![/color]`);
-        if(triggerMods){this.triggerMods(Trigger.AfterFocusDamage);}
+        if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.FocusDamage);}
         if(this.focus <= this.minFocus()) {
             this.fight.addMessage(`${this.getStylizedName()} seems way too distracted to possibly continue the fight! Is it their submissiveness? Their morale? One thing's sure, they'll be soon too broken to continue fighting!`);
         }
