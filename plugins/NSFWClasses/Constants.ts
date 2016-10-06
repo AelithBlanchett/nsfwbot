@@ -277,18 +277,10 @@ export module Constants{
         Escape = 1 << 24,
         Rest = 1 << 25,
         PassiveAction = Tag | Escape | Rest,
-
-        Powerdrive = 1 << 26,
-        PowerFantasy = 1 << 27,
-        Snapshot = 1 << 28,
-        Karmasutra = 1 << 29,
-        Finisher = Powerdrive | PowerFantasy | Snapshot | Karmasutra,
-
-        UltimateHumiliation = 1 << 30,
-        AnyOffensiveAction = Attack | Hold | Finisher,
+        AnyOffensiveAction = Attack | Hold,
         AnyAction = PassiveAction | AnyOffensiveAction,
 
-        None = 3 << 1,
-        OnTurnTick = 3 << 2
+        OnTurnTick = 1 << 26,
+        None = 1 << 27
     }
 }
