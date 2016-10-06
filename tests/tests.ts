@@ -646,7 +646,7 @@ describe("The player(s)", () => {
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "highrisksex", "Light").then(() => {
-                if(wasHealthHit(cmd, "Aelith Blanchette")) {
+                if(wasLustHit(cmd, "Aelith Blanchette")) {
                     done();
                 }
                 else{
