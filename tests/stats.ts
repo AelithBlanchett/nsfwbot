@@ -10,6 +10,8 @@ import Action = Constants.Action;
 import {Data} from "../plugins/NSFWClasses/Model";
 import {Promise} from "es6-promise";
 import Team = Constants.Team;
+import {EnumEx} from "../plugins/NSFWClasses/Utils";
+import Trigger = Constants.Trigger;
 var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
 var async = require('async');
