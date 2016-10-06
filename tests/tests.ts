@@ -779,7 +779,7 @@ describe("The player(s)", () => {
                 doAction(cmd, "subhold", "Light").then(() => {
                     let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
                     waitUntil().interval(100).times(50).condition(condition).done(() => {
-                        if (wasMessageSent("[b][color=red]Hold Stacking![/color][/b]")) {
+                        if (wasMessageSent("Hold Stacking!")) {
                             done();
                         }
                         else {
@@ -806,9 +806,13 @@ describe("The player(s)", () => {
                 let usesLeftBefore = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
                 cmd.fight.nextTurn();
                 refillHPLPFP(cmd, "Aelith Blanchette");
-                doAction(cmd, "subhold", "Light").then(() => { let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
+                doAction(cmd, "subhold", "Light").then(() => {
+                    let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
                     waitUntil().interval(100).times(50).condition(condition).done(() => {
-                        let usesLeftAfter = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
+                        let usesLeftAfter = 0;
+                        if(cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier]){
+                            usesLeftAfter = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
+                        }
                         if (usesLeftAfter > usesLeftBefore) {
                             done();
                         }
