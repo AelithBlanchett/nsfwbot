@@ -99,6 +99,27 @@ export class FightAction{
             case Action.Brawl:
                 result = this.actionBrawl();
                 break;
+            case Action.Bondage:
+                result = this.actionBondage();
+                break;
+            case Action.Degradation:
+                result = this.actionDegradation();
+                break;
+            case Action.ForcedWorship:
+                result = this.actionForcedWorship();
+                break;
+            case Action.HighRisk:
+                result = this.actionHighRisk();
+                break;
+            case Action.HighRiskSex:
+                result = this.actionHighRiskSex();
+                break;
+            case Action.HumHold:
+                result = this.actionHumHold();
+                break;
+            case Action.ItemPickup:
+                result = this.actionItemPickup();
+                break;
             case Action.SexStrike:
                 result = this.actionSexStrike();
                 break;
@@ -108,35 +129,14 @@ export class FightAction{
             case Action.SexHold:
                 result = this.actionSexHold();
                 break;
-            case Action.HumHold:
-                result = this.actionHumHold();
-                break;
-            case Action.Bondage:
-                result = this.actionBondage();
-                break;
-            case Action.ItemPickup:
-                result = this.actionItemPickup();
-                break;
             case Action.SextoyPickup:
                 result = this.actionSextoyPickup();
                 break;
-            case Action.Degradation:
-                result = this.actionDegradation();
-                break;
-            case Action.HighRisk:
-                result = this.actionHighRisk();
-                break;
-            case Action.HighRiskSex:
-                result = this.actionHighRiskSex();
-                break;
-            case Action.ForcedWorship:
-                result = this.actionForcedWorship();
+            case Action.Rest:
+                result = this.actionRest();
                 break;
             case Action.Tag:
                 result = this.actionTag();
-                break;
-            case Action.Rest:
-                result = this.actionRest();
                 break;
             case Action.Tackle:
                 result = this.actionTackle();

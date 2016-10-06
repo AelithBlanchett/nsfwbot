@@ -622,6 +622,42 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
+    it("should do a highrisk move", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "highrisk", "Light").then(() => {
+                if(wasHealthHit(cmd, "Aelith Blanchette")) {
+                    done();
+                }
+                else{
+                    done.fail(new Error("HPs were not drained despite the fact that the attack should have hit."));
+                }
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    },DEFAULT_TIMEOUT);
+
+    it("should do a highrisksex move", function(done){
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "highrisksex", "Light").then(() => {
+                if(wasHealthHit(cmd, "Aelith Blanchette")) {
+                    done();
+                }
+                else{
+                    done.fail(new Error("HPs were not drained despite the fact that the attack should have hit."));
+                }
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    },DEFAULT_TIMEOUT);
+
   it("should pass", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);

@@ -157,24 +157,20 @@ export class CommandHandler implements ICommandHandler{
         });
     }
 
+    bondage(args:string, data:FChatResponse){
+        this.actionHandler(Action.Bondage, false, false, args, data);
+    };
+
     brawl(args:string, data:FChatResponse){
         this.actionHandler(Action.Brawl, true, false, args, data);
     };
 
-    sex(args:string, data:FChatResponse){
-        this.actionHandler(Action.SexStrike, true, false, args, data);
+    degradation(args:string, data:FChatResponse){
+        this.actionHandler(Action.Degradation, true, false, args, data);
     };
 
-    subhold(args:string, data:FChatResponse){
-        this.actionHandler(Action.SubHold, true, false, args, data);
-    };
-
-    sexhold(args:string, data:FChatResponse){
-        this.actionHandler(Action.SexHold, true, false, args, data);
-    };
-
-    humhold(args:string, data:FChatResponse){
-        this.actionHandler(Action.HumHold, true, false, args, data);
+    forcedworship(args:string, data:FChatResponse){
+        this.actionHandler(Action.ForcedWorship, true, false, args, data);
     };
 
     highrisk(args:string, data:FChatResponse){
@@ -185,24 +181,32 @@ export class CommandHandler implements ICommandHandler{
         this.actionHandler(Action.HighRiskSex, true, false, args, data);
     };
 
-    forcedworship(args:string, data:FChatResponse){
-        this.actionHandler(Action.ForcedWorship, true, false, args, data);
-    };
-
-    bondage(args:string, data:FChatResponse){
-        this.actionHandler(Action.Bondage, false, false, args, data);
+    humhold(args:string, data:FChatResponse){
+        this.actionHandler(Action.HumHold, true, false, args, data);
     };
 
     itempickup(args:string, data:FChatResponse){
         this.actionHandler(Action.ItemPickup, false, false, args, data);
     };
 
-    sextoypickup(args:string, data:FChatResponse){
-        this.actionHandler(Action.SextoyPickup, false, false, args, data);
+    rest(args:string, data:FChatResponse){
+        this.actionHandler(Action.Rest, false, false, args, data);
     };
 
-    degradation(args:string, data:FChatResponse){
-        this.actionHandler(Action.Degradation, true, false, args, data);
+    sex(args:string, data:FChatResponse){
+        this.actionHandler(Action.SexStrike, true, false, args, data);
+    };
+
+    sexhold(args:string, data:FChatResponse){
+        this.actionHandler(Action.SexHold, true, false, args, data);
+    };
+
+    subhold(args:string, data:FChatResponse){
+        this.actionHandler(Action.SubHold, true, false, args, data);
+    };
+
+    sextoypickup(args:string, data:FChatResponse){
+        this.actionHandler(Action.SextoyPickup, false, false, args, data);
     };
 
     tackle(args:string, data:FChatResponse){
@@ -211,10 +215,6 @@ export class CommandHandler implements ICommandHandler{
 
     tag(args:string, data:FChatResponse){
         this.actionHandler(Action.Tag, false, true, args, data);
-    };
-
-    rest(args:string, data:FChatResponse){
-        this.actionHandler(Action.Rest, false, false, args, data);
     };
 
     forfeit(args:string, data:FChatResponse){
