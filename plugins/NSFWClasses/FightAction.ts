@@ -334,7 +334,7 @@ export class FightAction{
     actionRest():Trigger{ //"skips" a turn
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Rest);
         this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
-        if(this.diceScore >= Constants.requiredScoreToTag) {
+        if(this.diceScore >= Constants.requiredScoreToRest) {
             this.missed = false;
             this.hpHealToAtk += this.attacker.hp * Constants.hpPercantageToHealOnRest;
             this.lpHealToAtk += this.attacker.hp * Constants.lpPercantageToHealOnRest;

@@ -28,6 +28,7 @@ export class Constants{
     static tacklePowerDivider:number = 2;
     static dicePenaltyMultiplierWhileStunned:number = 3;
     static requiredScoreToTag:number = 8;
+    static requiredScoreToRest:number = 4;
 
     public static get currencyName(): string    { return "tokens"; }
     public static get pluginName(): string    { return "nsfw"; }
@@ -233,10 +234,6 @@ export module Constants{
     }
 
     export enum Trigger{
-        None = -1,
-
-        OnTurnTick = 5,
-
         HPDamage = 1 << 0,
         LustDamage = 1 << 1,
         FocusDamage = 1 << 2,
@@ -254,40 +251,44 @@ export module Constants{
         OrgasmOrHeartLoss = Orgasm | HeartLoss,
 
         InitiationRoll = 1 << 8,
-        Roll = 1 | InitiationRoll,
+        SingleRoll = 1 << 9,
+        Roll = SingleRoll | InitiationRoll,
 
-        BrawlAttack = 1 << 9,
-        SexStrikeAttack = 1 << 10,
-        ForcedWorshipAttack = 1 << 11,
-        HighRiskAttack = 1 << 12,
-        HighRiskSexAttack = 1 << 13,
-        Tackle = 1 << 14,
+        BrawlAttack = 1 << 10,
+        SexStrikeAttack = 1 << 11,
+        ForcedWorshipAttack = 1 << 12,
+        HighRiskAttack = 1 << 13,
+        HighRiskSexAttack = 1 << 14,
+        Tackle = 1 << 15,
         Attack = BrawlAttack | SexStrikeAttack | ForcedWorshipAttack | Tackle,
-        SubmissionHold = 1 << 15,
-        Bondage = 1 << 16,
-        Degradation = 1 << 17,
-        HumiliationHold = 1 << 18,
-        SexHoldAttack = 1 << 19,
+        SubmissionHold = 1 << 16,
+        Bondage = 1 << 17,
+        Degradation = 1 << 18,
+        HumiliationHold = 1 << 19,
+        SexHoldAttack = 1 << 20,
         Hold = SubmissionHold | HumiliationHold | SexHoldAttack,
         PowerBasedAttack = BrawlAttack | SubmissionHold | HighRiskAttack | Tackle,
 
-        ItemPickup = 1 << 20,
-        SextoyPickup = 1 << 21,
+        ItemPickup = 1 << 21,
+        SextoyPickup = 1 << 22,
         Pickup = ItemPickup | SextoyPickup,
 
-        Tag = 1 << 22,
-        Escape = 1 << 23,
-        Rest = 1 << 24,
+        Tag = 1 << 23,
+        Escape = 1 << 24,
+        Rest = 1 << 25,
         PassiveAction = Tag | Escape | Rest,
 
-        Powerdrive = 1 << 25,
-        PowerFantasy = 1 << 26,
-        Snapshot = 1 << 27,
-        Karmasutra = 1 << 28,
+        Powerdrive = 1 << 26,
+        PowerFantasy = 1 << 27,
+        Snapshot = 1 << 28,
+        Karmasutra = 1 << 29,
         Finisher = Powerdrive | PowerFantasy | Snapshot | Karmasutra,
 
-        UltimateHumiliation = 1 << 29,
+        UltimateHumiliation = 1 << 30,
         AnyOffensiveAction = Attack | Hold | Finisher,
         AnyAction = PassiveAction | AnyOffensiveAction,
+
+        None = 3 << 1,
+        OnTurnTick = 3 << 2
     }
 }

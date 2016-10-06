@@ -347,7 +347,10 @@ export class Fighter implements IFighter{
     }
 
     isTechnicallyOut():boolean{
-        return (this.isSexuallyExhausted() || this.isDead() || this.isBroken() || this.isCompletelyBound());
+        return (this.isSexuallyExhausted()
+        || this.isDead()
+        || this.isBroken()
+        || this.isCompletelyBound());
     }
 
     bondageItemsOnSelf():number{
