@@ -142,7 +142,7 @@ export class FightAction{
                 result = this.actionTackle();
                 break;
             default:
-                this.attacker.fight.addMessage("WARNING! UNKNOWN ATTACK!");
+                this.attacker.fight.message.addInfo("WARNING! UNKNOWN ATTACK!");
                 result = Trigger.None;
                 break;
         }
@@ -380,21 +380,21 @@ export class FightAction{
     }
 
     commit(fight:Fight){
-        fight.addMessage("\n");
+        fight.message.addInfo("\n");
         if(this.missed == false){
             if(this.requiresRoll == false){ //-1 == no roll
-                fight.addMessage(`The ${Action[this.type]} is [b][color=green]SUCCESSFUL![/color][/b]`);
+                fight.message.addInfo(`The ${Action[this.type]} is [b][color=green]SUCCESSFUL![/color][/b]`);
             }
             else{
-                fight.addMessage(`${this.attacker.name} rolled ${this.diceScore}, the ${Action[this.type]} attack [b][color=green]HITS![/color][/b]`);
+                fight.message.addInfo(`${this.attacker.name} rolled ${this.diceScore}, the ${Action[this.type]} attack [b][color=green]HITS![/color][/b]`);
             }
         }
         else{
-            fight.addMessage(`${this.attacker.name} rolled ${this.diceScore}, the ${Action[this.type]} attack [b][color=red]MISSED![/color][/b]`);
+            fight.message.addInfo(`${this.attacker.name} rolled ${this.diceScore}, the ${Action[this.type]} attack [b][color=red]MISSED![/color][/b]`);
         }
 
         if(this.requiresRoll){
-            fight.addMessage(`${this.attacker.name} needed to roll ${this.requiredDiceScore()} for the${(this.tier != -1 ?" "+Tier[this.tier]:"")} ${Action[this.type]} attack to hit.`);
+            fight.message.addInfo(`${this.attacker.name} needed to roll ${this.requiredDiceScore()} for the${(this.tier != -1 ?" "+Tier[this.tier]:"")} ${Action[this.type]} attack to hit.`);
         }
 
         fight.pastActions.push(this);
@@ -466,7 +466,7 @@ export class FightAction{
                             mod.uses += this.modifiers[indexOfNewHold].uses;
                         }
                     }
-                    fight.addMessage(`[b][color=red]Hold Stacking![/color][/b] ${this.defender.name} will have to suffer this hold for ${this.modifiers[indexOfNewHold].uses} more turns, and will also suffer a bit more!\n
+                    fight.message.addInfo(`[b][color=red]Hold Stacking![/color][/b] ${this.defender.name} will have to suffer this hold for ${this.modifiers[indexOfNewHold].uses} more turns, and will also suffer a bit more!\n
                                      ${(this.modifiers[indexOfNewHold].hpDamage > 0 ? "Added -"+this.modifiers[indexOfNewHold].hpDamage+" HP per turn\n":"")}
                                      ${(this.modifiers[indexOfNewHold].lustDamage > 0 ? "Added +"+this.modifiers[indexOfNewHold].lustDamage+" Lust per turn\n":"")}
                                      ${(this.modifiers[indexOfNewHold].focusDamage > 0 ? "Added "+this.modifiers[indexOfNewHold].focusDamage+" Focus per turn\n":"")}
@@ -496,26 +496,26 @@ export class FightAction{
         }
 
         if(this.type == Action.Tag){
-            fight.addMessage(`[b][color=red]TAG![/color][/b] ${this.defender.name} enters inside the ring!`);
+            fight.message.addInfo(`[b][color=red]TAG![/color][/b] ${this.defender.name} enters inside the ring!`);
         }
         else if(this.defender.isDead()){
-            fight.addMessage(`${this.defender.name} couldn't take the hits anymore! [b][color=red]They're out![/color][/b]`);
+            fight.message.addInfo(`${this.defender.name} couldn't take the hits anymore! [b][color=red]They're out![/color][/b]`);
             this.defender.triggerPermanentOutsideRing();
         }
         else if(this.defender.isSexuallyExhausted()){
-            fight.addMessage(`${this.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
+            fight.message.addInfo(`${this.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
             this.defender.triggerPermanentOutsideRing();
         }
         else if(this.defender.isBroken()){
-            fight.addMessage(`${this.defender.name} is too mentally exhausted to continue! [b][color=red]They're out![/color][/b]`);
+            fight.message.addInfo(`${this.defender.name} is too mentally exhausted to continue! [b][color=red]They're out![/color][/b]`);
             this.defender.triggerPermanentOutsideRing();
         }
         else if(this.defender.isCompletelyBound()){
-            fight.addMessage(`${this.defender.name} has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`);
+            fight.message.addInfo(`${this.defender.name} has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`);
             this.defender.triggerPermanentOutsideRing();
         }
         else if(!this.defender.isInTheRing || !this.attacker.isInTheRing){
-            fight.addMessage(`${this.defender.name} can't stay inside the ring anymore! [b][color=red]They're out![/color][/b]`);
+            fight.message.addInfo(`${this.defender.name} can't stay inside the ring anymore! [b][color=red]They're out![/color][/b]`);
         }
 
         //Save it to the DB

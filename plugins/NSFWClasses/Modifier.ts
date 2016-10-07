@@ -99,7 +99,7 @@ export class Modifier implements IModifier{
 
     trigger(moment: TriggerMoment, event:Trigger, objFightAction?:any):void{
         if(this.willTriggerForEvent(moment, event)){
-            this.receiver.fight.addMessage(`${this.receiver.getStylizedName()} is still affected by the ${this.name}!`);
+            this.receiver.fight.message.addInfo(`${this.receiver.getStylizedName()} is still affected by the ${this.name}!`);
             this.uses--;
             if(!objFightAction){
                 if(this.hpDamage > 0){
@@ -112,7 +112,7 @@ export class Modifier implements IModifier{
                 }
                 if(this.diceRoll != 0){
                     this.receiver.dice.addTmpMod(this.diceRoll,1);
-                    this.receiver.fight.addMessage(`${this.receiver.getStylizedName()} got a ${this.diceRoll} penalty applied on their dice roll.`);
+                    this.receiver.fight.message.addInfo(`${this.receiver.getStylizedName()} got a ${this.diceRoll} penalty applied on their dice roll.`);
                 }
                 if(this.focusDamage > 0){
                     let flagTriggerMods = !((event & Constants.Trigger.FocusDamage) == 0);
@@ -141,7 +141,7 @@ export class Modifier implements IModifier{
                 }
                 if(this.diceRoll != 0){
                     objFightAction.diceScore += this.diceRoll;
-                    this.receiver.fight.addMessage(`${this.receiver.getStylizedName()} got a ${this.diceRoll} penalty applied on their dice roll.`);
+                    this.receiver.fight.message.addInfo(`${this.receiver.getStylizedName()} got a ${this.diceRoll} penalty applied on their dice roll.`);
                 }
                 if(this.focusDamage > 0){
                     if(this.areDamageMultipliers){

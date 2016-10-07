@@ -9,7 +9,7 @@ interface IMessage {
     error: Array<string>;
 }
 
-class Message implements IMessage {
+export class Message implements IMessage {
     action:Array<string>;
     damage:number;
     heal:number;
@@ -19,6 +19,18 @@ class Message implements IMessage {
     special:Array<string>;
     info:Array<string>;
     error:Array<string>;
+
+    constructor(){
+        this.action = [];
+        this.damage = 0;
+        this.heal = 0;
+        this.hit = [];
+        this.status = [];
+        this.hint = [];
+        this.special = [];
+        this.info = [];
+        this.error = [];
+    }
 
     getAction() {
         return "Action: " + this.action.join(" ") + " ";
@@ -64,9 +76,14 @@ class Message implements IMessage {
         if (typeof line === "string") this.status.push(line);
     }
 
+    addInfo(line){
+        if (typeof line === "string") this.info.push(line);
+    }
 
-    getMessage(currentPlayerFormattedName:string) {
-        this.info.push(`This is ${currentPlayerFormattedName}'s turn`); //
+
+    getMessage() {
+        let message = "";
+
         var lines = [""];
 
         lines[0] += this.getAction();
@@ -80,6 +97,8 @@ class Message implements IMessage {
         if (this.special.length) lines.push(this.getSpecial());
         if (this.info.length) lines.push(this.getInfo());
 
-        return lines.join("\n");
+        message = lines.join("\n");
+
+        return message;
     }
 }
