@@ -27,7 +27,7 @@ export class Dice{
 
   // Public
   // ========================================================================
-  roll(times) {
+  roll(times) { //TODO Add some non-RNG in there for balancing
     var t = times || 1;
     var res = [];
     var i;
