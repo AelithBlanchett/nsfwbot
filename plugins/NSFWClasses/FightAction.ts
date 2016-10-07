@@ -402,41 +402,53 @@ export class FightAction{
 
         if (this.hpDamageToDef > 0) {
             this.defender.hitHP(this.hpDamageToDef);
+            this.defender.fight.message.HPDamage = this.hpDamageToDef;
         }
         if (this.lpDamageToDef > 0) {
             this.defender.hitLP(this.lpDamageToDef);
+            this.defender.fight.message.LPDamage = this.lpDamageToDef;
         }
         if(this.fpDamageToDef > 0){
             this.defender.hitFP(this.fpDamageToDef);
+            this.defender.fight.message.FPDamage = this.fpDamageToDef;
         }
         if (this.hpHealToDef > 0) {
             this.defender.healHP(this.hpHealToDef);
+            this.defender.fight.message.HPHeal = this.hpHealToDef;
         }
         if (this.lpHealToDef > 0) {
             this.defender.healLP(this.lpHealToDef);
+            this.defender.fight.message.LPHeal = this.lpHealToDef;
         }
         if(this.fpHealToDef > 0){
             this.defender.healFP(this.fpHealToDef);
+            this.defender.fight.message.FPHeal = this.fpHealToDef;
         }
 
 
         if (this.hpDamageToAtk > 0) {
             this.attacker.hitHP(this.hpDamageToAtk);
+            this.attacker.fight.message.HPDamage = this.hpDamageToAtk;
         }
         if (this.lpDamageToAtk > 0) {
             this.attacker.hitLP(this.lpDamageToAtk);
+            this.attacker.fight.message.FPHeal = this.lpDamageToAtk;
         }
         if(this.fpDamageToAtk > 0){
             this.attacker.hitFP(this.fpDamageToAtk);
+            this.attacker.fight.message.FPHeal = this.fpDamageToAtk;
         }
         if (this.hpHealToAtk > 0) {
             this.attacker.healHP(this.hpHealToAtk);
+            this.attacker.fight.message.FPHeal = this.hpHealToAtk;
         }
         if (this.lpHealToAtk > 0) {
             this.attacker.healLP(this.lpHealToAtk);
+            this.attacker.fight.message.FPHeal = this.lpHealToAtk;
         }
         if(this.fpHealToAtk > 0){
             this.attacker.healFP(this.fpHealToAtk);
+            this.attacker.fight.message.FPHeal = this.fpHealToAtk;
         }
 
 
