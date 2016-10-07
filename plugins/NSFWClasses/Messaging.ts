@@ -1,6 +1,11 @@
 interface IMessage {
     action: Array<string>;
-    damage: number;
+    HPDamage:number;
+    LPDamage:number;
+    FPDamage:number;
+    HPHeal:number;
+    LPHeal:number;
+    FPHeal:number;
     hit: Array<string>;
     status: Array<string>;
     hint: Array<string>;
@@ -11,8 +16,12 @@ interface IMessage {
 
 export class Message implements IMessage {
     action:Array<string>;
-    damage:number;
-    heal:number;
+    HPDamage:number;
+    LPDamage:number;
+    FPDamage:number;
+    HPHeal:number;
+    LPHeal:number;
+    FPHeal:number;
     hit:Array<string>;
     status:Array<string>;
     hint:Array<string>;
@@ -22,8 +31,11 @@ export class Message implements IMessage {
 
     constructor(){
         this.action = [];
-        this.damage = 0;
-        this.heal = 0;
+        this.LPDamage = 0;
+        this.FPDamage = 0;
+        this.HPHeal = 0;
+        this.LPHeal = 0;
+        this.FPHeal = 0;
         this.hit = [];
         this.status = [];
         this.hint = [];
@@ -36,12 +48,30 @@ export class Message implements IMessage {
         return "Action: " + this.action.join(" ") + " ";
     }
 
-    getDamage() {
-        return "[color=yellow]( Damage: " + this.damage + " )[/color]";
-    }
+    getDeltaHPLPFP() {
+        let msg = "[color=yellow](";
+        if(this.HPDamage > 0){
+            msg += " HP Damage: " + this.HPDamage;
+        }
+        if(this.LPDamage > 0){
+            msg += " Lust Damage: " + this.LPDamage;
+        }
+        if(this.FPDamage > 0){
+            msg += " Focus Damage: " + this.FPDamage;
+        }
+        if(this.HPHeal > 0){
+            msg += " HP Healed: " + this.HPHeal;
+        }
+        if(this.LPHeal > 0){
+            msg += " Lust Healed: " + this.LPHeal;
+        }
+        if(this.FPHeal > 0){
+            msg += " Focus Healed: " + this.FPHeal;
+        }
 
-    getHeal() {
-        return "[color=yellow]( Heal: " + this.heal + " )[/color]";
+        msg += "[/color]";
+
+        return msg;
     }
 
     getHit() {
@@ -72,6 +102,10 @@ export class Message implements IMessage {
         if (typeof line === "string") this.hit.push(line);
     }
 
+    addHint(line) {
+        if (typeof line === "string") this.hint.push(line);
+    }
+
     addStatus(line) {
         if (typeof line === "string") this.status.push(line);
     }
@@ -87,8 +121,7 @@ export class Message implements IMessage {
         var lines = [""];
 
         lines[0] += this.getAction();
-        if(this.damage != 0){ lines[0] += this.getDamage();}
-        if(this.heal != 0){ lines[0] += this.getHeal();}
+        lines[0] += this.getDeltaHPLPFP();
         if (lines[0] == "") lines = [];
 
         if (this.hit.length) lines.push(this.getHit());

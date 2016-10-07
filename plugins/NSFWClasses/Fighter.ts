@@ -218,9 +218,6 @@ export class Fighter implements IFighter{
             hp = this.hpPerHeart() - this.hp; //reduce the number if it overflows the bar
         }
         this.hp += hp;
-        if(hp != 0) {
-            this.fight.message.addInfo(`${this.name} [color=green]gained ${hp} HP![/color]`);
-        }
         if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.HPHealing);}
     }
 
@@ -234,9 +231,6 @@ export class Fighter implements IFighter{
             lust = this.lust; //reduce the number if it overflows the bar
         }
         this.lust += lust;
-        if(lust != 0) {
-            this.fight.message.addInfo(`${this.name} [color=green]was removed ${lust} LP![/color]`);
-        }
         if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.LustHealing);}
     }
 
@@ -250,9 +244,6 @@ export class Fighter implements IFighter{
             focus = this.maxFocus() - this.focus; //reduce the number if it overflows the bar
         }
         this.focus += focus;
-        if(focus != 0){
-            this.fight.message.addInfo(`${this.name} [color=green]gained ${focus} FP![/color]`);
-        }
         if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.FocusHealing);}
     }
 
@@ -263,17 +254,16 @@ export class Fighter implements IFighter{
         }
         if(triggerMods){this.triggerMods(TriggerMoment.Before, Trigger.HPDamage);}
         this.hp -= hp;
-        this.fight.message.addInfo(`${this.name} [color=red]lost ${hp} HP![/color]`);
         if(this.hp <= 0){
             this.triggerMods(TriggerMoment.Before, Trigger.HeartLoss);
             this.hp = 0;
             this.heartsRemaining--;
-            this.fight.message.addInfo(`[b][color=red]Heart broken![/color][/b] ${this.name} has ${this.heartsRemaining} hearts left.`);
+            this.fight.message.addHit(`[b][color=red]Heart broken![/color][/b] ${this.name} has ${this.heartsRemaining} hearts left.`);
             if(this.heartsRemaining > 0){
                 this.hp = this.hpPerHeart();
             }
             else if(this.heartsRemaining == 1){
-                this.fight.message.addInfo(`[b][color=red]Last heart[/color][/b] for ${this.name}!`);
+                this.fight.message.addHit(`[b][color=red]Last heart[/color][/b] for ${this.name}!`);
             }
             this.triggerMods(TriggerMoment.After, Trigger.HeartLoss);
         }
@@ -287,16 +277,15 @@ export class Fighter implements IFighter{
         }
         if(triggerMods){this.triggerMods(TriggerMoment.Before, Trigger.LustDamage);}
         this.lust += lust;
-        this.fight.message.addInfo(`${this.name} [color=red]gained ${lust} Lust![/color]`);
         if(this.lust >= this.lustPerOrgasm()){
             this.triggerMods(TriggerMoment.Before, Trigger.Orgasm);
             this.lust = 0;
             this.orgasmsRemaining--;
-            this.fight.message.addInfo(`[b][color=pink]Orgasm on the mat![/color][/b] ${this.name} has ${this.orgasmsRemaining} orgasms left.`);
+            this.fight.message.addHit(`[b][color=pink]Orgasm on the mat![/color][/b] ${this.name} has ${this.orgasmsRemaining} orgasms left.`);
             this.lust = 0;
             if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.Orgasm);}
             if(this.orgasmsRemaining == 1){
-                this.fight.message.addInfo(`[b][color=red]Last orgasm[/color][/b] for ${this.name}!`);
+                this.fight.message.addHit(`[b][color=red]Last orgasm[/color][/b] for ${this.name}!`);
             }
         }
         this.triggerMods(TriggerMoment.After, Trigger.LustDamage);
@@ -309,10 +298,9 @@ export class Fighter implements IFighter{
         }
         if(triggerMods){this.triggerMods(TriggerMoment.Before, Trigger.FocusDamage);}
         this.focus -= focusDamage;
-        this.fight.message.addInfo(`${this.name} [color=red]lost ${focusDamage} Focus![/color]`);
         if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.FocusDamage);}
         if(this.focus <= this.minFocus()) {
-            this.fight.message.addInfo(`${this.getStylizedName()} seems way too distracted to possibly continue the fight! Is it their submissiveness? Their morale? One thing's sure, they'll be soon too broken to continue fighting!`);
+            this.fight.message.addHit(`${this.getStylizedName()} seems way too distracted to possibly continue the fight! Is it their submissiveness? Their morale? One thing's sure, they'll be soon too broken to continue fighting!`);
         }
     }
 

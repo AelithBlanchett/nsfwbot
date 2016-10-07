@@ -142,7 +142,7 @@ export class FightAction{
                 result = this.actionTackle();
                 break;
             default:
-                this.attacker.fight.message.addInfo("WARNING! UNKNOWN ATTACK!");
+                this.attacker.fight.message.addHit("WARNING! UNKNOWN ATTACK!");
                 result = Trigger.None;
                 break;
         }
@@ -384,18 +384,18 @@ export class FightAction{
         fight.message.addInfo("\n");
         if(this.missed == false){
             if(this.requiresRoll == false){ //-1 == no roll
-                fight.message.addInfo(`The ${Action[this.type]} is [b][color=green]SUCCESSFUL![/color][/b]`);
+                fight.message.addHit(` SUCCESSFUL ${Action[this.type]}! `);
             }
             else{
-                fight.message.addInfo(`${this.attacker.name} rolled ${this.diceScore}, the ${Action[this.type]} attack [b][color=green]HITS![/color][/b]`);
+                fight.message.addHit(` HIT! `);
             }
         }
         else{
-            fight.message.addInfo(`${this.attacker.name} rolled ${this.diceScore}, the ${Action[this.type]} attack [b][color=red]MISSED![/color][/b]`);
+            fight.message.addHit(` MISS! `);
         }
 
         if(this.requiresRoll){
-            fight.message.addInfo(`${this.attacker.name} needed to roll ${this.requiredDiceScore()} for the${(this.tier != -1 ?" "+Tier[this.tier]:"")} ${Action[this.type]} attack to hit.`);
+            fight.message.addInfo(`Required roll: ${this.requiredDiceScore()}`);
         }
 
         fight.pastActions.push(this);
