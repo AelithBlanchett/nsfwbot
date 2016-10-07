@@ -381,8 +381,6 @@ export class Fight{
             this.message.addInfo(`[color=${Team[player.assignedTeam]}]${player.name}[/color] rolled a ${player.lastDiceRoll}`);
         }
 
-        this.sendMessage();
-
         arrSortedFightersByInitiative.sort((a,b):number => {
             return b.lastDiceRoll - a.lastDiceRoll;
         });

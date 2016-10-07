@@ -769,7 +769,7 @@ describe("The player(s)", () => {
                 doAction(cmd, "subhold", "Light").then(() => {
                     let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
                     waitUntil().interval(100).times(50).condition(condition).done(() => {
-                        if (this.currentPlayer.isInHold()) {
+                        if (cmd.fight.currentPlayer.isInHold()) {
                             done();
                         }
                         else {

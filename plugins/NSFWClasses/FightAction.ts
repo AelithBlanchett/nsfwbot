@@ -354,6 +354,7 @@ export class FightAction{
             this.hpDamageToDef = this.attackFormula(this.tier, Math.floor(this.attacker.power / Constants.tacklePowerDivider), this.defender.toughness, this.diceScore);
             let stunModifier = new StunModifier(this.defender, this.attacker, -((this.tier + 1) * Constants.dicePenaltyMultiplierWhileStunned), nbOfAttacksStunned);
             this.modifiers.push(stunModifier);
+            this.attacker.fight.message.addHit("STUNNED!");
         }
         return Trigger.Tackle;
     }
