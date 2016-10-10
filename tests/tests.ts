@@ -337,7 +337,7 @@ describe("The player(s)", () => {
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
                 var healedHp = (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").hpPerHeart() - initialHp);
-                if(healedHp == 0){
+                if(healedHp == 1){
                     done();
                 }
                 else{
@@ -355,8 +355,7 @@ describe("The player(s)", () => {
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healLP(10);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                var healedLp = (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").lustPerOrgasm() - initialLp);
-                if(healedLp == 0){
+                if(cmd.fight.fighterList.getFighterByName("Aelith Blanchette").lust == 0){
                     done();
                 }
                 else{
@@ -375,9 +374,9 @@ describe("The player(s)", () => {
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healLP(50);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                var healedLp = (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").lustPerOrgasm() - initialLp);
+                var healedLp = (initialLp - cmd.fight.fighterList.getFighterByName("Aelith Blanchette").lust);
                 var lifeAfter = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").lust;
-                if(lifeAfter == (initialLp+healedLp)){
+                if(lifeAfter == (initialLp-healedLp)){
                     done();
                 }
                 else{
@@ -396,7 +395,7 @@ describe("The player(s)", () => {
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healLP(1);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                var healedLp = (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").lustPerOrgasm() - initialLp);
+                var healedLp = (initialLp - cmd.fight.fighterList.getFighterByName("Aelith Blanchette").lust);
                 if(healedLp == 1){
                     done();
                 }
@@ -457,7 +456,7 @@ describe("The player(s)", () => {
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healFP(1);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                var healedHp = (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxFocus() - initialFp);
+                var healedHp = (initialFp - cmd.fight.fighterList.getFighterByName("Aelith Blanchette").focus);
                 if(healedHp == 1){
                     done();
                 }
