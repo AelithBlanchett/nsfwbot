@@ -336,7 +336,7 @@ describe("The player(s)", () => {
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healHP(1);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                var healedHp = (initialHp - cmd.fight.fighterList.getFighterByName("Aelith Blanchette").hp);
+                var healedHp = (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").hp - initialHp);
                 if(healedHp == 1){
                     done();
                 }
@@ -454,7 +454,7 @@ describe("The player(s)", () => {
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healFP(1);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                var healedHp = (initialFp - cmd.fight.fighterList.getFighterByName("Aelith Blanchette").focus);
+                var healedHp = (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").focus - initialFp);
                 if(healedHp == 1){
                     done();
                 }
