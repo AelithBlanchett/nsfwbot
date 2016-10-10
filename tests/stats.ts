@@ -300,6 +300,17 @@ describe("The player(s)", () => {
         });
     }
 
+    it("should check triggers", function(done){
+        let x = EnumEx.getNamesAndValues(Trigger);
+        for(var i = 0; i < x.length; i++){
+            for(var j = 0; j < x.length; j++) {
+                if((x[i].value & x[j].value) != 0){
+                    console.log(`FOUND ${x[i].name} with ${x[j].name} = ${(x[i].value & x[j].value)}`);
+                }
+            }
+        }
+    }, DEFAULT_TIMEOUT);
+
     it("calculates Random Light Brawl attacks to end the fight", function (done) {
         console.log("Random Dice:");
         calculateFor(Tier.Light, Action.Brawl, false, done);
@@ -329,17 +340,6 @@ describe("The player(s)", () => {
         console.log("NON-Random Dice:");
         calculateFor(Tier.Heavy, Action.Brawl, true, done);
     }, 100000);
-
-    it("should check triggers", function(done){
-        let x = EnumEx.getNamesAndValues(Trigger);
-        for(var i = 0; i < x.length; i++){
-            for(var j = 0; j < x.length; j++) {
-                if((x[i].value & x[j].value) != 0){
-                    console.log(`FOUND ${x[i].name} with ${x[j].name} = ${(x[i].value & x[j].value)}`);
-                }
-            }
-        }
-    }, DEFAULT_TIMEOUT);
 });
 
 jasmine.execute();

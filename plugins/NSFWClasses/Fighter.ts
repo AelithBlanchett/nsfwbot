@@ -230,7 +230,7 @@ export class Fighter implements IFighter{
         if(this.lust - lust < 0){
             lust = this.lust; //reduce the number if it overflows the bar
         }
-        this.lust += lust;
+        this.lust -= lust;
         if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.LustHealing);}
     }
 
@@ -292,10 +292,10 @@ export class Fighter implements IFighter{
     }
 
     hitFP(focusDamage:number, triggerMods:boolean = true) { //focusDamage CAN BE NEGATIVE to gain it
-        focusDamage = Math.floor(focusDamage);
         if(focusDamage <= 0){
             return;
         }
+        focusDamage = Math.floor(focusDamage);
         if(triggerMods){this.triggerMods(TriggerMoment.Before, Trigger.FocusDamage);}
         this.focus -= focusDamage;
         if(triggerMods){this.triggerMods(TriggerMoment.After, Trigger.FocusDamage);}

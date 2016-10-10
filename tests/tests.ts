@@ -336,7 +336,7 @@ describe("The player(s)", () => {
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healHP(1);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                var healedHp = (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").hpPerHeart() - initialHp);
+                var healedHp = (initialHp - cmd.fight.fighterList.getFighterByName("Aelith Blanchette").hp);
                 if(healedHp == 1){
                     done();
                 }
@@ -435,9 +435,7 @@ describe("The player(s)", () => {
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").healFP(50);
             cmd.fight.sendMessage();
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                var healedHp = (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxFocus() - initialFp);
-                var lifeAfter = cmd.fight.fighterList.getFighterByName("Aelith Blanchette").focus;
-                if(lifeAfter == (initialFp+healedHp)){
+                if(cmd.fight.fighterList.getFighterByName("Aelith Blanchette").focus  == cmd.fight.fighterList.getFighterByName("Aelith Blanchette").maxFocus()){
                     done();
                 }
                 else{
@@ -931,7 +929,7 @@ describe("The player(s)", () => {
                 doAction(cmd, "humhold", "Light").then(() => {
                     let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
                     waitUntil().interval(100).times(50).condition(condition).done(() => {
-                        if (wasMessageSent("the HumHold attack [b][color=green]HITS![/color][/b]")) {
+                        if (cmd.fight.pastActions[cmd.fight.pastActions.length - 1].type == Action.HumHold) {
                             done();
                         }
                         else {
@@ -970,7 +968,7 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-  it("should be dealing more focus damage with humiliation ", function(done){
+ it("should be dealing more focus damage with humiliation ", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
@@ -995,7 +993,7 @@ describe("The player(s)", () => {
                 fChatLibInstance.throwError(err);
             });
         });
-    },DEFAULT_TIMEOUT);
+    },DEFAULT_TIMEOUT+100000);
 
 
   it("should pickup an item and trigger bonus brawl modifier", function(done){
@@ -1071,7 +1069,7 @@ describe("The player(s)", () => {
                                 refillHPLPFP(cmd, "Aelith Blanchette");
                                 let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
                                 waitUntil().interval(100).times(50).condition(condition).done(() => {
-                                    if (wasMessageSent(`has too many items on them to possibly fight`)) {
+                                    if (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").isCompletelyBound()) {
                                         done();
                                     }
                                     else {
