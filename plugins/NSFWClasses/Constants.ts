@@ -82,6 +82,7 @@ export module Constants{
 
     export class Messages {
         static Ready = `[color=green]%s is now ready to get it on![/color]`;
+        static HitMessage = ` HIT! `;
     }
 
     export class SQL {

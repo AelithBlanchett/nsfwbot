@@ -387,7 +387,7 @@ export class FightAction{
                 fight.message.addHit(` SUCCESSFUL ${Action[this.type]}! `);
             }
             else{
-                fight.message.addHit(` HIT! `);
+                fight.message.addHit(Constants.Messages.HitMessage);
             }
         }
         else{
