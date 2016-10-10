@@ -300,7 +300,7 @@ describe("The player(s)", () => {
         });
     }
 
-    it("should check triggers", function(done){
+    it("should check triggers", function(){
         let x = EnumEx.getNamesAndValues(Trigger);
         for(var i = 0; i < x.length; i++){
             for(var j = 0; j < x.length; j++) {
@@ -309,7 +309,7 @@ describe("The player(s)", () => {
                 }
             }
         }
-    }, DEFAULT_TIMEOUT);
+    });
 
     it("calculates Random Light Brawl attacks to end the fight", function (done) {
         console.log("Random Dice:");

@@ -60,7 +60,7 @@ export class Fighter implements IFighter{
     consecutiveTurnsWithoutFocus:number = 0;
 
     constructor() {
-        this.dice = new Dice(10);
+        this.dice = new Dice(12);
     }
 
     load(name){
