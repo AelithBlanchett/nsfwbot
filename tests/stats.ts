@@ -267,40 +267,14 @@ describe("The player(s)", () => {
             let hpData = [].concat.apply([], res.map((x) => x[1]));
             let lpData = [].concat.apply([], res.map((x) => x[2]));
             let fpData = [].concat.apply([], res.map((x) => x[3]));
-            console.log(`
-            ${(nonRandom ? "Non-":"")}Random ${Tier[tier]} ${Action[attack]} attacks to end the fight:
-            Mean: ${stats.mean(turnsData)}
-            Median: ${stats.median(turnsData)}
-            Variance: ${stats.variance(turnsData)}
-            Standard deviation: ${stats.stdev(turnsData)}
-            90th percentile: ${stats.percentile(turnsData, 0.90)}
-
-            ${(nonRandom ? "Non-":"")}Random ${Tier[tier]} ${Action[attack]} attacks effect on HP:
-            Mean: ${stats.mean(hpData)}
-            Median: ${stats.median(hpData)}
-            Variance: ${stats.variance(hpData)}
-            Standard deviation: ${stats.stdev(hpData)}
-            90th percentile: ${stats.percentile(hpData, 0.90)}
-
-            ${(nonRandom ? "Non-":"")}Random ${Tier[tier]} ${Action[attack]} attacks effect on LP:
-            Mean: ${stats.mean(lpData)}
-            Median: ${stats.median(lpData)}
-            Variance: ${stats.variance(lpData)}
-            Standard deviation: ${stats.stdev(lpData)}
-            90th percentile: ${stats.percentile(lpData, 0.90)}
-
-            ${(nonRandom ? "Non-":"")}Random ${Tier[tier]} ${Action[attack]} attacks effect on FP:
-            Mean: ${stats.mean(fpData)}
-            Median: ${stats.median(fpData)}
-            Variance: ${stats.variance(fpData)}
-            Standard deviation: ${stats.stdev(fpData)}
-            90th percentile: ${stats.percentile(fpData, 0.90)}
-            `);
-            done();
+            console.log(`${(nonRandom ? "1":"0")};${Tier[tier]};${Action[attack]};${stats.mean(turnsData)};${stats.median(turnsData)};${stats.variance(turnsData)};${stats.stdev(turnsData)};${stats.percentile(turnsData, 0.90)};${stats.mean(hpData)};${stats.median(hpData)};${stats.variance(hpData)};${stats.stdev(hpData)};${stats.percentile(hpData, 0.90)};${stats.mean(lpData)};${stats.median(lpData)};${stats.variance(lpData)};${stats.stdev(lpData)};${stats.percentile(lpData, 0.90)};${stats.mean(fpData)};${stats.median(fpData)};${stats.variance(fpData)};${stats.stdev(fpData)};${stats.percentile(fpData, 0.90)}`);
+            if(done != null){
+                done();
+            }
         });
     }
 
-    it("should check triggers", function(){
+    xit("should check triggers", function(){
         let x = EnumEx.getNamesAndValues(Trigger);
         for(var i = 0; i < x.length; i++){
             for(var j = 0; j < x.length; j++) {
@@ -311,35 +285,16 @@ describe("The player(s)", () => {
         }
     });
 
-    it("calculates Random Light Brawl attacks to end the fight", function (done) {
-        console.log("Random Dice:");
-        calculateFor(Tier.Light, Action.Brawl, false, done);
-    }, 100000);
-
-    it("calculates Random Medium Brawl attacks to end the fight", function (done) {
-        console.log("Random Dice:");
-        calculateFor(Tier.Medium, Action.Brawl, false, done);
-    }, 100000);
-
-    it("calculates Random Heavy Brawl attacks to end the fight", function (done) {
-        console.log("Random Dice:");
-        calculateFor(Tier.Heavy, Action.Brawl, false, done);
-    }, 100000);
-
-    it("calculates NON-Random Light Brawl attacks to end the fight", function (done) {
-        console.log("NON-Random Dice:");
-        calculateFor(Tier.Light, Action.Brawl, true, done);
-    }, 100000);
-
-    it("calculates Random Medium Brawl attacks to end the fight", function (done) {
-        console.log("NON-Random Dice:");
-        calculateFor(Tier.Medium, Action.Brawl, true, done);
-    }, 100000);
-
-    it("calculates Random Heavy Brawl attacks to end the fight", function (done) {
-        console.log("NON-Random Dice:");
+    it("calculates Brawl attacks to end the fight", function (done) {
+        console.log(`Random;Tier;Attack;Mean;Median;Variance;Deviation;99thPercentile;HPMean;HPMedian;HPVariance;HPDeviation;HP99thPercentile;LPMean;LPMedian;LPVariance;LPDeviation;LP99tLPercentile;FPMean;FPMedian;FPVariance;FPDeviation;FP99tFPercentile`);
+        calculateFor(Tier.Light, Action.Brawl, false, null);
+        calculateFor(Tier.Medium, Action.Brawl, false, null);
+        calculateFor(Tier.Heavy, Action.Brawl, false, null);
+        calculateFor(Tier.Light, Action.Brawl, true, null);
+        calculateFor(Tier.Medium, Action.Brawl, true, null);
         calculateFor(Tier.Heavy, Action.Brawl, true, done);
     }, 100000);
+
 });
 
 jasmine.execute();
