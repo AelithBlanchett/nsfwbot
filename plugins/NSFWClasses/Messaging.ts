@@ -30,6 +30,10 @@ export class Message implements IMessage {
     error:Array<string>;
 
     constructor(){
+        this.clear();
+    }
+
+    clear(){
         this.action = [];
         this.LPDamage = 0;
         this.FPDamage = 0;
@@ -140,6 +144,8 @@ export class Message implements IMessage {
         if (this.error.length) lines.push(this.getError());
 
         message = lines.join("\n");
+
+        this.clear();
 
         return message;
     }
