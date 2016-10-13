@@ -20,6 +20,18 @@ export class Commands{
         }
         return Team.Unknown;
     }
+
+    public static addStat(args){
+        let stats = Utils.getEnumList(Stats);
+        for(let statId in stats){
+            stats[statId] = stats[statId].toLowerCase();
+        }
+        let indexOfStat = stats.indexOf(args.toLowerCase());
+        if(indexOfStat != -1){
+            return Stats[Stats[indexOfStat]];
+        }
+        return -1;
+    }
 }
 
 

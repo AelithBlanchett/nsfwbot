@@ -10,6 +10,7 @@ import Team = Constants.Team;
 import {Utils} from "./Utils";
 import Tier = Constants.Tier;
 import Action = Constants.Action;
+import {Stats} from "./Constants";
 
 export class CommandHandler implements ICommandHandler{
     fChatLibInstance:IFChatLib;
@@ -52,6 +53,56 @@ export class CommandHandler implements ICommandHandler{
                 }
                 else{
                     this.fChatLibInstance.sendPrivMessage(fighter.name, fighter.outputStats());
+                }
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]You are not registered.[/color]", this.channel);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
+    addStat(args:string, data:FChatResponse){
+        let parsedStat:Stats = Parser.Commands.addStat(args);
+        if(parsedStat == -1){
+            this.fChatLibInstance.sendMessage("[color=red]Stat not found.[/color]", this.channel);
+            return;
+        }
+        Fighter.exists(data.character).then(data =>{
+            if(data){
+                let fighter:Fighter = data as Fighter;
+                let res = fighter.addStat(parsedStat);
+                if(res == ""){
+                    this.fChatLibInstance.sendPrivMessage(fighter.name, `${Stats[parsedStat]} successfully upgraded by 1!`);
+                }
+                else{
+                    this.fChatLibInstance.sendPrivMessage(fighter.name, "[color=red]An error happened: "+res+"[/color]");
+                }
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]You are not registered.[/color]", this.channel);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
+    removeStat(args:string, data:FChatResponse){
+        let parsedStat:Stats = Parser.Commands.addStat(args);
+        if(parsedStat == -1){
+            this.fChatLibInstance.sendMessage("[color=red]Stat not found.[/color]", this.channel);
+            return;
+        }
+        Fighter.exists(data.character).then(data =>{
+            if(data){
+                let fighter:Fighter = data as Fighter;
+                let res = fighter.removeStat(parsedStat);
+                if(res == ""){
+                    this.fChatLibInstance.sendPrivMessage(fighter.name, `${Stats[parsedStat]} successfully decreased by 1!`);
+                }
+                else{
+                    this.fChatLibInstance.sendPrivMessage(fighter.name, "[color=red]An error happened: "+res+"[/color]");
                 }
             }
             else{

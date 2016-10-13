@@ -474,7 +474,8 @@ export class Fighter implements IFighter{
     }
 
     addStat(stat:Stats):any{
-        let theStat = this[stat];
+        let theStat = this[Stats[stat].toLowerCase()];
+        theStat++;
         let statTier = Utils.getStatTier(theStat);
         let amountToRemove = 0;
         if(statTier == StatTier.Bronze){
@@ -486,19 +487,27 @@ export class Fighter implements IFighter{
         else if(statTier == StatTier.Gold){
             amountToRemove = TokensWorth.Gold;
         }
+        else if(statTier == -1){
+            return "You can't increase this stat anymore.";
+        }
 
         if(amountToRemove != 0 && (this.tokens - amountToRemove >= 0)){
             this.tokens -= amountToRemove;
-            this[stat]++;
+            this[Stats[stat].toLowerCase()]++;
             this.update();
+            return "";
         }
         else{
-            return false;
+            return `Not enough ${StatTier[statTier]} tokens`;
         }
     }
 
     removeStat(stat:Stats):any{
-        let theStat = this[stat];
+        let theStat = this[Stats[stat].toLowerCase()];
+        theStat--;
+        if(theStat <= 0){
+            return "You can't decrease this stat anymore.";
+        }
         let statTier = Utils.getStatTier(theStat);
         let amountToGive = 0;
         if(statTier == StatTier.Bronze){
@@ -510,14 +519,18 @@ export class Fighter implements IFighter{
         else if(statTier == StatTier.Gold){
             amountToGive = TokensWorth.Gold;
         }
+        else if(statTier == -1){
+            return "You can't decrease this stat anymore.";
+        }
 
         if(amountToGive != 0){
             this.tokens += Math.floor(amountToGive/2);
-            this[stat]--;
+            this[Stats[stat].toLowerCase()]--;
             this.update();
+            return "";
         }
         else{
-            return false;
+            return "The number of tokens to give back was miscalculated, request denied.";
         }
     }
 

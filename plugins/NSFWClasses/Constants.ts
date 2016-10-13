@@ -179,7 +179,7 @@ export enum Team {
 
 export enum Stats {
     Power = 0,
-    Finesse = 1,
+    Sensuality = 1,
     Toughness = 2,
     Endurance = 3,
     Willpower = 4,
