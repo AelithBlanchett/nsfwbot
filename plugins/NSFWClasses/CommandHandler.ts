@@ -5,7 +5,7 @@ import {Fight} from "./Fight";
 import {IParserResponse} from "./interfaces/IParserResponse";
 import {ICommandHandler} from "./interfaces/ICommandHandler";
 import {IFChatLib} from "./interfaces/IFChatLib";
-import {Constants} from "./Constants";
+import * as Constants from "./Constants";
 import Team = Constants.Team;
 import {Utils} from "./Utils";
 import Tier = Constants.Tier;
@@ -23,7 +23,7 @@ export class CommandHandler implements ICommandHandler{
     }
 
     howtostart(args:string, data:FChatResponse){
-        this.fChatLibInstance.sendPrivMessage(data.character, Constants.startupGuide);
+        this.fChatLibInstance.sendPrivMessage(data.character, Constants.Messages.startupGuide);
     }
 
     register(args:string, data:FChatResponse){

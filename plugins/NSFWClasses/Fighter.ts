@@ -2,7 +2,7 @@ import {Dice} from "./Dice";
 import {Fight} from "./Fight";
 import {IFighter} from "./interfaces/IFighter";
 import {FightAction} from "./FightAction";
-import {Constants} from "./Constants";
+import * as Constants from "./Constants";
 import {Data} from "./Model";
 import {Utils} from "./Utils";
 import {Promise} from "es6-promise";
@@ -83,7 +83,7 @@ export class Fighter implements IFighter{
                     `toughness`, \
                     `endurance`, \
                     `willpower` \
-                    FROM `flistplugins`.?? WHERE name = ?", [Constants.fightersTableName, name], function(err, rows: Array<any>){
+                    FROM `flistplugins`.?? WHERE name = ?", [Constants.SQL.fightersTableName, name], function(err, rows: Array<any>){
                     if (rows != undefined && rows.length != 0) {
                         self.initFromData(rows);
                         fullfill(self);
@@ -118,7 +118,7 @@ export class Fighter implements IFighter{
         return new Promise<number>((resolve, reject) => {
             var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`sensuality` = ?,`dexterity` = ?,\
                 `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ? WHERE `id` = ?;";
-            sql = Data.db.format(sql, [Constants.fightersTableName, this.tokens, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate(), this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, this.id]);
+            sql = Data.db.format(sql, [Constants.SQL.fightersTableName, this.tokens, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate(), this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, this.id]);
             Data.db.query(sql, (err, result) => {
                 if (result) {
                     console.log("Updated "+this.name+"'s entry in the db.");
@@ -331,7 +331,7 @@ export class Fighter implements IFighter{
     }
 
     isBroken():boolean{
-        return this.consecutiveTurnsWithoutFocus >= Constants.maxTurnsWithoutFocus;
+        return this.consecutiveTurnsWithoutFocus >= Constants.Fight.Action.Globals.maxTurnsWithoutFocus;
     }
 
     isTechnicallyOut():boolean{
@@ -352,7 +352,7 @@ export class Fighter implements IFighter{
     }
 
     isCompletelyBound():boolean{
-        return this.bondageItemsOnSelf() >= Constants.maxBondageItemsOnSelf;
+        return this.bondageItemsOnSelf() >= Constants.Fight.Action.Globals.maxBondageItemsOnSelf;
     }
 
     isInHold():boolean{
@@ -377,7 +377,7 @@ export class Fighter implements IFighter{
 
     static create(name:string){
         return new Promise(function(resolve, reject) {
-            Data.db.query("INSERT INTO `flistplugins`.??(`name`) VALUES (?,?)", [Constants.fightersTableName, name], function (err, result) {
+            Data.db.query("INSERT INTO `flistplugins`.??(`name`) VALUES (?,?)", [Constants.SQL.fightersTableName, name], function (err, result) {
                 if (result) {
                     console.log("Added "+name+" to the roster: "+JSON.stringify(result));
                     resolve();
@@ -395,7 +395,7 @@ export class Fighter implements IFighter{
                 reject("Wrong stats passed.");
             }
             else {
-                Data.db.query("INSERT INTO `flistplugins`.??(`name`, `power`, `sensuality`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [Constants.fightersTableName, name, power, sensuality, dexterity, toughness, endurance, willpower], function (err, result) {
+                Data.db.query("INSERT INTO `flistplugins`.??(`name`, `power`, `sensuality`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [Constants.SQL.fightersTableName, name, power, sensuality, dexterity, toughness, endurance, willpower], function (err, result) {
                     if (result) {
                         console.log(JSON.stringify(result));
                         resolve();
@@ -437,7 +437,7 @@ export class Fighter implements IFighter{
                 `  ${this.lust}/${this.lustPerOrgasm()} [color=pink]Lust[/color]  |`+
                 `  ${this.orgasmsRemaining}/${this.maxOrgasms()} [color=pink]Orgasms[/color]  |`+
                 `  [color=red][sub]${this.minFocus()}[/sub][/color]|[b]${this.focus}[/b]|[color=orange][sub]${this.maxFocus()}[/sub][/color] Focus  |`+
-                `  ${this.bondageItemsOnSelf()}/${Constants.maxBondageItemsOnSelf} [color=black]Bondage Items[/color]  |`+
+                `  ${this.bondageItemsOnSelf()}/${Constants.Fight.Action.Globals.maxBondageItemsOnSelf} [color=black]Bondage Items[/color]  |`+
                 (this.target != undefined ? `  [color=red]Target:[/color] ${this.target.getStylizedName()}` : "")+
                 "\n";
     }
@@ -561,7 +561,7 @@ export class Fighter implements IFighter{
                     `toughness`, \
                     `endurance`, \
                     `willpower` \
-                    FROM `flistplugins`.?? WHERE name = ?", [Constants.fightersTableName, name], function (err, rows) {
+                    FROM `flistplugins`.?? WHERE name = ?", [Constants.SQL.fightersTableName, name], function (err, rows) {
                 if (rows != undefined && rows.length == 1) {
                     let myTempWrestler = new Fighter();
                     myTempWrestler.initFromData(rows);

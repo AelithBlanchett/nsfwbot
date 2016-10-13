@@ -4,7 +4,7 @@ import {FightAction} from "./FightAction";
 import {IFChatLib} from "./interfaces/IFChatLib";
 import {Utils} from "./Utils";
 import {Dictionary} from "./Dictionary";
-import {Constants} from "./Constants";
+import * as Constants from "./Constants";
 import Team = Constants.Team;
 import {FighterList} from "./FighterList";
 import BaseDamage = Constants.BaseDamage;
@@ -92,7 +92,7 @@ export class Fight{
                     new Promise((resolve, reject) => {
                         //Do the db
                         var sql = "INSERT INTO `flistplugins`.?? (`idFight`, `idFighter`) VALUES (?,?);";
-                        sql = Data.db.format(sql, [Constants.fightFightersTableName, idFight, idFighter]);
+                        sql = Data.db.format(sql, [Constants.SQL.fightFightersTableName, idFight, idFighter]);
                         Data.db.query(sql, function (err, results) {
                             if (err) {
                                 reject(err);
@@ -106,7 +106,7 @@ export class Fight{
 
                 Data.db.beginTransaction(err => {
                     var sql = "INSERT INTO `flistplugins`.?? (`idFightType`, `idStage`, `usedTeams`, `currentTurn`, `fighterList`) VALUES (?,?,?,?,?)";
-                    sql = Data.db.format(sql, [Constants.fightTableName, fight.fightType, 1, fight.usedTeams, fight.currentTurn, CircularJSON.stringify(fight.fighterList)]);
+                    sql = Data.db.format(sql, [Constants.SQL.fightTableName, fight.fightType, 1, fight.usedTeams, fight.currentTurn, CircularJSON.stringify(fight.fighterList)]);
                     Data.db.query(sql, (err, results) => {
                         if (err) {
                             Data.db.rollback(() => {
@@ -134,7 +134,7 @@ export class Fight{
             }
             else {
                 var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ? WHERE `idFight` = ?;";
-                sql = Data.db.format(sql, [Constants.fightTableName, fight.currentTurn, CircularJSON.stringify(fight.fighterList), fight.id]);
+                sql = Data.db.format(sql, [Constants.SQL.fightTableName, fight.currentTurn, CircularJSON.stringify(fight.fighterList), fight.id]);
                 Data.db.query(sql, (err, results) => {
                     if (err) {
                         reject(err);
@@ -150,7 +150,7 @@ export class Fight{
 
     static loadState(fightId:number, fight:Fight){
         var sql = "SELECT `idFight`,`idFightType`,`idStage`,`usedTeams`,`currentTurn`,`fighterList` FROM `flistplugins`.?? WHERE idFight = ?;";
-        sql = Data.db.format(sql, [Constants.fightTableName, fightId]);
+        sql = Data.db.format(sql, [Constants.SQL.fightTableName, fightId]);
         Data.db.query(sql, (err, results) => {
             if (err) {
             }
@@ -291,7 +291,7 @@ export class Fight{
         if (this.isFightOver()) { //Check for the ending
             this.outputStatus();
             var tokensToGiveToWinners:number = TokensPerWin[FightTier[this.getFightTier(this.winnerTeam)]];
-            var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.tokensPerLossMultiplier;
+            var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.Fight.Globals.tokensPerLossMultiplier;
             this.endFight(tokensToGiveToWinners, tokensToGiveToLosers);
         }
         else{
@@ -405,7 +405,7 @@ export class Fight{
     canTag(){
         let flag = true;
         let turnsSinceLastTag = (this.currentPlayer.lastTagTurn - this.currentTurn);
-        let turnsToWait = (Constants.turnsToWaitBetweenTwoTags * 2) - turnsSinceLastTag; // *2 because there are two fighters
+        let turnsToWait = (Constants.Fight.Action.Globals.turnsToWaitBetweenTwoTags * 2) - turnsSinceLastTag; // *2 because there are two fighters
         if(turnsToWait > 0){
             flag = false;
             this.message.addInfo(`[b][color=red]You can't tag yet. Turns left: ${turnsToWait}[/color][/b]`);
@@ -586,7 +586,7 @@ export class Fight{
         }
         this.sendMessage();
         if (this.isFightOver()) {
-            var tokensToGiveToWinners:number = TokensPerWin[FightTier[this.getFightTier(this.winnerTeam)]]*Constants.tokensPerLossMultiplier;
+            var tokensToGiveToWinners:number = TokensPerWin[FightTier[this.getFightTier(this.winnerTeam)]]*Constants.Fight.Globals.tokensPerLossMultiplier;
             this.endFight(tokensToGiveToWinners, 0);
         }
     }
@@ -632,7 +632,7 @@ export class Fight{
     static commitEndFightDb(fight, tokensToGiveToWinners, tokensToGiveToLosers){
         Data.db.beginTransaction(err =>{
             var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
-            sql = Data.db.format(sql, [Constants.fightTableName, fight.currentTurn, "", true, fight.winnerTeam, fight.id]);
+            sql = Data.db.format(sql, [Constants.SQL.fightTableName, fight.currentTurn, "", true, fight.winnerTeam, fight.id]);
             Data.db.query(sql, (err, results) => {
                 if(err){
                     Data.db.rollback(function(){
@@ -645,7 +645,7 @@ export class Fight{
                         fighter.totalFights++;
                         if(fighter.assignedTeam == fight.winnerTeam){
                             fighter.wins++;
-                            fight.message.addInfo(`Awarded ${tokensToGiveToWinners} ${Constants.currencyName} to ${fighter.getStylizedName()}`);
+                            fight.message.addInfo(`Awarded ${tokensToGiveToWinners} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
                             fighter.giveTokens(tokensToGiveToWinners)
                             callsToMake.push(fighter.update());
                         }
@@ -653,7 +653,7 @@ export class Fight{
                             if(fight.winnerTeam != Team.Unknown){
                                 fighter.losses++;
                             }
-                            fight.message.addInfo(`Awarded ${tokensToGiveToLosers} ${Constants.currencyName} to ${fighter.getStylizedName()}`);
+                            fight.message.addInfo(`Awarded ${tokensToGiveToLosers} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
                             fighter.giveTokens(tokensToGiveToLosers)
                             callsToMake.push(fighter.update());
                         }

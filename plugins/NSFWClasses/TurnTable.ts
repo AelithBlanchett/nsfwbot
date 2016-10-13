@@ -1,4 +1,4 @@
-import {Constants} from "./Constants";
+import * as Constants from "./Constants";
 import Team = Constants.Team;
 export class TurnTable extends Array<TeamPlayerId>{
 

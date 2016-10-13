@@ -1,6 +1,6 @@
 import {Utils} from "./Utils";
 import {Fight} from "./Fight";
-import {Constants} from "./Constants";
+import * as Constants from "./Constants";
 import Team = Constants.Team;
 import Tier = Constants.Tier;
 import Stats = Constants.Stats;

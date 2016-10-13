@@ -1,5 +1,5 @@
 import {Fighter} from "./Fighter";
-import {Constants} from "./Constants";
+import * as Constants from "./Constants";
 import Tier = Constants.Tier;
 import {Data} from "./Model";
 import BaseDamage = Constants.BaseDamage;
@@ -83,10 +83,10 @@ export class FightAction{
 
     requiredDiceScore():number{
         let scoreRequired = 0;
-        scoreRequired += (Constants.difficultyIncreasePerBondageItem * this.attacker.bondageItemsOnSelf()); //+2 difficulty per bondage item
+        scoreRequired += (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.attacker.bondageItemsOnSelf()); //+2 difficulty per bondage item
         scoreRequired -= this.attacker.dexterity;
         if(this.defender){
-            scoreRequired -= (Constants.difficultyIncreasePerBondageItem * this.defender.bondageItemsOnSelf()); //+2 difficulty per bondage item
+            scoreRequired -= (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.defender.bondageItemsOnSelf()); //+2 difficulty per bondage item
             scoreRequired += Math.floor(this.defender.dexterity*1.75);
         }
         scoreRequired += TierDifficulty[Tier[this.tier]];
@@ -241,7 +241,7 @@ export class FightAction{
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
             this.fpDamageToDef += this.tier + 1;
-            this.hpDamageToDef += this.attackFormula(this.tier, this.attacker.power * Constants.multiplierHighRiskAttack, this.defender.toughness, this.diceScore);
+            this.hpDamageToDef += this.attackFormula(this.tier, this.attacker.power * Constants.Fight.Action.Globals.multiplierHighRiskAttack, this.defender.toughness, this.diceScore);
         }
         else{
             this.missed = true;
@@ -259,7 +259,7 @@ export class FightAction{
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
             this.fpDamageToDef += this.tier + 1;
-            this.lpDamageToDef += this.attackFormula(this.tier, this.attacker.sensuality * Constants.multiplierHighRiskAttack, this.defender.endurance, this.diceScore);
+            this.lpDamageToDef += this.attackFormula(this.tier, this.attacker.sensuality * Constants.Fight.Action.Globals.multiplierHighRiskAttack, this.defender.endurance, this.diceScore);
         }
         else{
             this.missed = true;
@@ -321,7 +321,7 @@ export class FightAction{
     actionTag():Trigger{ //"skips" a turn
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Tag);
         this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
-        if(this.diceScore >= Constants.requiredScoreToTag) {
+        if(this.diceScore >= Constants.Fight.Action.RequiredScore.Tag) {
             this.attacker.lastTagTurn = this.atTurn;
             this.defender.lastTagTurn = this.atTurn;
             this.attacker.isInTheRing = false;
@@ -334,11 +334,11 @@ export class FightAction{
     actionRest():Trigger{ //"skips" a turn
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Rest);
         this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
-        if(this.diceScore >= Constants.requiredScoreToRest) {
+        if(this.diceScore >= Constants.Fight.Action.RequiredScore.Rest) {
             this.missed = false;
-            this.hpHealToAtk += this.attacker.hp * Constants.hpPercantageToHealOnRest;
-            this.lpHealToAtk += this.attacker.hp * Constants.lpPercantageToHealOnRest;
-            this.fpHealToAtk += this.attacker.hp * Constants.fpPointsToHealOnRest;
+            this.hpHealToAtk += this.attacker.hp * Constants.Fight.Action.Globals.hpPercentageToHealOnRest;
+            this.lpHealToAtk += this.attacker.hp * Constants.Fight.Action.Globals.lpPercentageToHealOnRest;
+            this.fpHealToAtk += this.attacker.hp * Constants.Fight.Action.Globals.fpPointsToHealOnRest;
         }
         return Trigger.Rest;
     }
@@ -351,8 +351,8 @@ export class FightAction{
             this.fpHealToAtk += this.tier + 1;
             this.fpDamageToDef += this.tier + 1;
             let nbOfAttacksStunned = this.tier + 1;
-            this.hpDamageToDef = this.attackFormula(this.tier, Math.floor(this.attacker.power / Constants.tacklePowerDivider), this.defender.toughness, this.diceScore);
-            let stunModifier = new StunModifier(this.defender, this.attacker, -((this.tier + 1) * Constants.dicePenaltyMultiplierWhileStunned), nbOfAttacksStunned);
+            this.hpDamageToDef = this.attackFormula(this.tier, Math.floor(this.attacker.power / Constants.Fight.Action.Globals.tacklePowerDivider), this.defender.toughness, this.diceScore);
+            let stunModifier = new StunModifier(this.defender, this.attacker, -((this.tier + 1) * Constants.Fight.Action.Globals.dicePenaltyMultiplierWhileStunned), nbOfAttacksStunned);
             this.modifiers.push(stunModifier);
             this.attacker.fight.message.addHit("STUNNED!");
         }
@@ -367,7 +367,7 @@ export class FightAction{
                 defenderId = action.defender.id;
             }
             var sql = Constants.SQL.commitFightAction;
-            sql = Data.db.format(sql, [Constants.actionTableName, action.fightId, action.atTurn, action.type, action.tier, action.isHold, action.diceScore, action.missed, attackerId, defenderId, action.hpDamageToDef, action.lpDamageToDef, action.fpDamageToDef, action.hpDamageToAtk, action.lpDamageToAtk, action.fpDamageToAtk, action.hpHealToDef, action.lpHealToDef, action.fpHealToDef, action.hpHealToAtk, action.lpHealToAtk, action.fpHealToAtk]);
+            sql = Data.db.format(sql, [Constants.SQL.actionTableName, action.fightId, action.atTurn, action.type, action.tier, action.isHold, action.diceScore, action.missed, attackerId, defenderId, action.hpDamageToDef, action.lpDamageToDef, action.fpDamageToDef, action.hpDamageToAtk, action.lpDamageToAtk, action.fpDamageToAtk, action.hpHealToDef, action.lpHealToDef, action.fpHealToDef, action.hpHealToAtk, action.lpHealToAtk, action.fpHealToAtk]);
             Data.db.query(sql, (err, results) => {
                 if (err) {
                     throw err;
@@ -540,7 +540,7 @@ export class FightAction{
         } else { //if there's only one team left in the fight, then we're sure it's over
             fight.outputStatus();
             var tokensToGiveToWinners:number = TokensPerWin[FightTier[fight.getFightTier(fight.winnerTeam)]];
-            var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.tokensPerLossMultiplier;
+            var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.Fight.Globals.tokensPerLossMultiplier;
             fight.endFight(tokensToGiveToWinners, tokensToGiveToLosers);
         }
     }

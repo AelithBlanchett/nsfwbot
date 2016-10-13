@@ -2,7 +2,7 @@ import {Fighter} from "../plugins/NSFWClasses/Fighter";
 import {Fight} from "../plugins/NSFWClasses/Fight";
 import {IFChatLib} from "../plugins/NSFWClasses/interfaces/IFChatLib";
 import {CommandHandler} from "../plugins/NSFWClasses/CommandHandler";
-import {Constants} from "../plugins/NSFWClasses/Constants";
+import * as Constants from "../plugins/NSFWClasses/Constants";
 import Tier = Constants.Tier;
 import {Utils} from "../plugins/NSFWClasses/Utils";
 import {FightAction} from "../plugins/NSFWClasses/FightAction";

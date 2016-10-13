@@ -1,6 +1,6 @@
 import {Fighter} from "./Fighter";
 import {FighterList} from "./FighterList";
-import {Constants} from "./Constants";
+import * as Constants from "./Constants";
 import Trigger = Constants.Trigger;
 import {Utils} from "./Utils";
 import Action = Constants.Action;

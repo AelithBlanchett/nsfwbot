@@ -2,7 +2,7 @@ import {Fighter} from "../plugins/NSFWClasses/Fighter";
 import {Fight} from "../plugins/NSFWClasses/Fight";
 import {IFChatLib} from "../plugins/NSFWClasses/interfaces/IFChatLib";
 import {CommandHandler} from "../plugins/NSFWClasses/CommandHandler";
-import {Constants} from "../plugins/NSFWClasses/Constants";
+import * as Constants from "../plugins/NSFWClasses/Constants";
 import Tier = Constants.Tier;
 import {Utils} from "../plugins/NSFWClasses/Utils";
 import {FightAction} from "../plugins/NSFWClasses/FightAction";
@@ -688,19 +688,19 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-  it(`should give a loss after ${Constants.maxTurnsWithoutFocus} turns without focus`, function(done){
+  it(`should give a loss after ${Constants.Fight.Action.Globals.maxTurnsWithoutFocus} turns without focus`, function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.fighterList.getFighterByName("Aelith Blanchette").focus = -100;
-            for(var i = 0; i < Constants.maxTurnsWithoutFocus; i++){
+            for(var i = 0; i < Constants.Fight.Action.Globals.maxTurnsWithoutFocus; i++){
                 cmd.fight.nextTurn();
             }
             if(cmd.fight.fighterList.getFighterByName("Aelith Blanchette").isBroken()){
                 done();
             }
             else{
-                done.fail(new Error(`Player was still alive after ${Constants.maxTurnsWithoutFocus} turns without focus`));
+                done.fail(new Error(`Player was still alive after ${Constants.Fight.Action.Globals.maxTurnsWithoutFocus} turns without focus`));
             }
         });
     },DEFAULT_TIMEOUT);
@@ -731,7 +731,7 @@ describe("The player(s)", () => {
         waitUntil().interval(10).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
             doAction(cmd, "subhold", "Light").then(() => {
-                for(var i = 0; i < Constants.initialNumberOfTurnsForHold; i++){
+                for(var i = 0; i < Constants.Fight.Action.Globals.initialNumberOfTurnsForHold; i++){
                     cmd.fight.nextTurn();
                     refillHPLPFP(cmd, "Aelith Blanchette");
                 }
