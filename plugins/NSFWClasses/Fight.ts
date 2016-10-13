@@ -412,6 +412,11 @@ export class Fight{
             this.message.addHit(`[b][color=red]You can't tag with this character. They're permanently out.[/color][/b]`);
             this.sendMessage();
         }
+        if(this.currentTarget.assignedTeam != this.currentPlayer.assignedTeam){
+            flag = false;
+            this.message.addHit(`[b][color=red]You can't tag with this character as they are not in your team.[/color][/b]`);
+            this.sendMessage();
+        }
         return flag;
     }
 
@@ -468,13 +473,26 @@ export class Fight{
     }
 
     validateTarget(){
-        if(this.currentTarget == undefined || this.currentTarget.isTechnicallyOut() || !this.currentTarget.isInTheRing){
+        if(this.currentTarget == undefined || this.currentTarget.isTechnicallyOut() || !this.currentTarget.isInTheRing || this.currentTarget == this.currentPlayer){
             if(this.fightType == FightType.Classic){
                 this.currentPlayer.target = this.fighterList.getRandomFighterNotInTeam(this.currentPlayer.assignedTeam);
             }
             else{
                 this.currentPlayer.target = this.fighterList.getRandomFighterNotInTeam(this.currentPlayer.assignedTeam);
             }
+        }
+    }
+
+    assignTarget(idFighter:number, name:string){
+        let theTarget = this.fighterList.getFighterByName(name);
+        if(theTarget != undefined){
+            this.fighterList.getFighterByID(idFighter).target = theTarget;
+            this.message.addInfo("Successfully set the target to "+name);
+            this.sendMessage();
+        }
+        else{
+            this.message.addError("Target not found.");
+            this.sendMessage();
         }
     }
 
@@ -490,11 +508,11 @@ export class Fight{
                     return;
                 }
                 if(action == Action.Tag){ //put in the condition any attacks that could focus allies
-                    if(!this.canTag())
-                        return;
                     if(customTarget != undefined && customTarget.assignedTeam == this.currentPlayer.assignedTeam){
                         this.currentPlayer.target = customTarget;
                     }
+                    if(!this.canTag())
+                        return;
                 }
                 else{
                     if(customTarget != undefined){

@@ -268,5 +268,28 @@ export class CommandHandler implements ICommandHandler{
         });
     };
 
+    target(args:string, data:FChatResponse){
+        if(this.fight == undefined || !this.fight.hasStarted || this.fight.hasEnded){
+            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
+            return false;
+        }
+        Fighter.exists(data.character).then(data =>{
+            if(data){
+                let fighter:Fighter = data as Fighter;
+                if(this.fight.fighterList.getFighterByID(fighter.id)){
+                    this.fight.assignTarget(fighter.id, args);
+                }
+                else{
+                    this.fChatLibInstance.sendMessage("[color=red]You are not participating in this fight.[/color]", this.channel);
+                }
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
 
 }

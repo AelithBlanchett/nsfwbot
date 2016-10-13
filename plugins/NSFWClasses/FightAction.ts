@@ -83,13 +83,21 @@ export class FightAction{
 
     requiredDiceScore():number{
         let scoreRequired = 0;
-        scoreRequired += (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.attacker.bondageItemsOnSelf()); //+2 difficulty per bondage item
-        scoreRequired -= this.attacker.dexterity;
-        if(this.defender){
-            scoreRequired -= (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.defender.bondageItemsOnSelf()); //+2 difficulty per bondage item
-            scoreRequired += Math.floor(this.defender.dexterity*1.75);
+        if(this.type == Constants.Action.Rest){
+            scoreRequired = Constants.Fight.Action.RequiredScore.Rest;
         }
-        scoreRequired += TierDifficulty[Tier[this.tier]];
+        else if(this.type == Constants.Action.Tag){
+            scoreRequired = Constants.Fight.Action.RequiredScore.Tag;
+        }
+        else{
+            scoreRequired += (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.attacker.bondageItemsOnSelf()); //+2 difficulty per bondage item
+            scoreRequired -= this.attacker.dexterity;
+            if(this.defender){
+                scoreRequired -= (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.defender.bondageItemsOnSelf()); //+2 difficulty per bondage item
+                scoreRequired += Math.floor(this.defender.dexterity*1.75);
+            }
+            scoreRequired += TierDifficulty[Tier[this.tier]];
+        }
         return scoreRequired;
     }
 
@@ -321,7 +329,7 @@ export class FightAction{
     actionTag():Trigger{ //"skips" a turn
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Tag);
         this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
-        if(this.diceScore >= Constants.Fight.Action.RequiredScore.Tag) {
+        if(this.diceScore >= this.requiredDiceScore()) {
             this.attacker.lastTagTurn = this.atTurn;
             this.defender.lastTagTurn = this.atTurn;
             this.attacker.isInTheRing = false;
@@ -334,7 +342,7 @@ export class FightAction{
     actionRest():Trigger{ //"skips" a turn
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Rest);
         this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
-        if(this.diceScore >= Constants.Fight.Action.RequiredScore.Rest) {
+        if(this.diceScore >= this.requiredDiceScore()) {
             this.missed = false;
             this.hpHealToAtk += this.attacker.hp * Constants.Fight.Action.Globals.hpPercentageToHealOnRest;
             this.lpHealToAtk += this.attacker.hp * Constants.Fight.Action.Globals.lpPercentageToHealOnRest;
@@ -381,8 +389,7 @@ export class FightAction{
     }
 
     commit(fight:Fight){
-        fight.message.addAction(Constants.Action[this.type]);
-
+        fight.message.addAction(`${Constants.Action[this.type]} on ${this.defender.getStylizedName()}`);
         if(this.missed == false){
             if(this.requiresRoll == false){ //-1 == no roll
                 fight.message.addHit(` SUCCESSFUL ${Action[this.type]}! `);
@@ -396,6 +403,7 @@ export class FightAction{
         }
 
         if(this.requiresRoll){
+            fight.message.addHint("Rolled: "+this.diceScore);
             fight.message.addHint(`Required roll: ${this.requiredDiceScore()}`);
         }
 
