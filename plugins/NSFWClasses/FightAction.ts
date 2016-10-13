@@ -381,7 +381,8 @@ export class FightAction{
     }
 
     commit(fight:Fight){
-        fight.message.addInfo("\n");
+        fight.message.addAction(Constants.Action[this.type]);
+
         if(this.missed == false){
             if(this.requiresRoll == false){ //-1 == no roll
                 fight.message.addHit(` SUCCESSFUL ${Action[this.type]}! `);
@@ -395,60 +396,60 @@ export class FightAction{
         }
 
         if(this.requiresRoll){
-            fight.message.addInfo(`Required roll: ${this.requiredDiceScore()}`);
+            fight.message.addHint(`Required roll: ${this.requiredDiceScore()}`);
         }
 
         fight.pastActions.push(this);
 
         if (this.hpDamageToDef > 0) {
             this.defender.hitHP(this.hpDamageToDef);
-            this.defender.fight.message.HPDamage = this.hpDamageToDef;
+            this.defender.fight.message.HPDamageDef = this.hpDamageToDef;
         }
         if (this.lpDamageToDef > 0) {
             this.defender.hitLP(this.lpDamageToDef);
-            this.defender.fight.message.LPDamage = this.lpDamageToDef;
+            this.defender.fight.message.LPDamageDef = this.lpDamageToDef;
         }
         if(this.fpDamageToDef > 0){
             this.defender.hitFP(this.fpDamageToDef);
-            this.defender.fight.message.FPDamage = this.fpDamageToDef;
+            this.defender.fight.message.FPDamageDef = this.fpDamageToDef;
         }
         if (this.hpHealToDef > 0) {
             this.defender.healHP(this.hpHealToDef);
-            this.defender.fight.message.HPHeal = this.hpHealToDef;
+            this.defender.fight.message.HPHealDef = this.hpHealToDef;
         }
         if (this.lpHealToDef > 0) {
             this.defender.healLP(this.lpHealToDef);
-            this.defender.fight.message.LPHeal = this.lpHealToDef;
+            this.defender.fight.message.LPHealDef = this.lpHealToDef;
         }
         if(this.fpHealToDef > 0){
             this.defender.healFP(this.fpHealToDef);
-            this.defender.fight.message.FPHeal = this.fpHealToDef;
+            this.defender.fight.message.FPHealDef = this.fpHealToDef;
         }
 
 
         if (this.hpDamageToAtk > 0) {
             this.attacker.hitHP(this.hpDamageToAtk);
-            this.attacker.fight.message.HPDamage = this.hpDamageToAtk;
+            this.attacker.fight.message.HPDamageAtk = this.hpDamageToAtk;
         }
         if (this.lpDamageToAtk > 0) {
             this.attacker.hitLP(this.lpDamageToAtk);
-            this.attacker.fight.message.FPHeal = this.lpDamageToAtk;
+            this.attacker.fight.message.LPDamageAtk = this.lpDamageToAtk;
         }
         if(this.fpDamageToAtk > 0){
             this.attacker.hitFP(this.fpDamageToAtk);
-            this.attacker.fight.message.FPHeal = this.fpDamageToAtk;
+            this.attacker.fight.message.FPDamageAtk = this.fpDamageToAtk;
         }
         if (this.hpHealToAtk > 0) {
             this.attacker.healHP(this.hpHealToAtk);
-            this.attacker.fight.message.FPHeal = this.hpHealToAtk;
+            this.attacker.fight.message.HPHealAtk = this.hpHealToAtk;
         }
         if (this.lpHealToAtk > 0) {
             this.attacker.healLP(this.lpHealToAtk);
-            this.attacker.fight.message.FPHeal = this.lpHealToAtk;
+            this.attacker.fight.message.LPHealAtk = this.lpHealToAtk;
         }
         if(this.fpHealToAtk > 0){
             this.attacker.healFP(this.fpHealToAtk);
-            this.attacker.fight.message.FPHeal = this.fpHealToAtk;
+            this.attacker.fight.message.FPHealAtk = this.fpHealToAtk;
         }
 
 
@@ -509,26 +510,26 @@ export class FightAction{
         }
 
         if(this.type == Action.Tag){
-            fight.message.addInfo(`[b][color=red]TAG![/color][/b] ${this.defender.name} enters inside the ring!`);
+            fight.message.addHit(`[b][color=red]TAG![/color][/b] ${this.defender.name} enters inside the ring!`);
         }
         else if(this.defender.isDead()){
-            fight.message.addInfo(`${this.defender.name} couldn't take the hits anymore! [b][color=red]They're out![/color][/b]`);
+            fight.message.addHit(`${this.defender.name} couldn't take the hits anymore! [b][color=red]They're out![/color][/b]`);
             this.defender.triggerPermanentOutsideRing();
         }
         else if(this.defender.isSexuallyExhausted()){
-            fight.message.addInfo(`${this.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
+            fight.message.addHit(`${this.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
             this.defender.triggerPermanentOutsideRing();
         }
         else if(this.defender.isBroken()){
-            fight.message.addInfo(`${this.defender.name} is too mentally exhausted to continue! [b][color=red]They're out![/color][/b]`);
+            fight.message.addHit(`${this.defender.name} is too mentally exhausted to continue! [b][color=red]They're out![/color][/b]`);
             this.defender.triggerPermanentOutsideRing();
         }
         else if(this.defender.isCompletelyBound()){
-            fight.message.addInfo(`${this.defender.name} has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`);
+            fight.message.addHit(`${this.defender.name} has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`);
             this.defender.triggerPermanentOutsideRing();
         }
         else if(!this.defender.isInTheRing || !this.attacker.isInTheRing){
-            fight.message.addInfo(`${this.defender.name} can't stay inside the ring anymore! [b][color=red]They're out![/color][/b]`);
+            fight.message.addHit(`${this.defender.name} can't stay inside the ring anymore! [b][color=red]They're out![/color][/b]`);
         }
 
         //Save it to the DB

@@ -122,10 +122,10 @@ export class Messages {
 
     static startMatchAnnounce = "[color=green]Everyone's ready, let's start the match![/color]";
     static startMatchStageAnnounce = "The fighters will meet in the... [color=red][b]%s![/b][/color]";
-    static startMatchFirstPlayer = "%s starts first for the %s team!";
-    static startMatchFollowedBy = "%s will follow for the %s team.";
+    static startMatchFirstPlayer = "%s starts first for the [color=%s]%s[/color] team!";
+    static startMatchFollowedBy = "%s will follow for the [color=%s]%s[/color] team.";
 
-    static outputStatusInfo = `\n[b]Turn #%s[/b] [color=%s]------ %s team ------[/color] It's [u]%s[/u]'s turn.\n`;
+    static outputStatusInfo = `[b]Turn #%s[/b] [color=%s]------ %s team ------[/color] It's [u]%s[/u]'s turn.\n`;
 
     static setCurrentPlayerOK = `Successfully changed %s's place with %s's!`;
     static setCurrentPlayerFail = "Couldn't switch the two wrestlers. The name is either wrong, this fighter is already in the ring or this fighter isn't able to fight right now.";

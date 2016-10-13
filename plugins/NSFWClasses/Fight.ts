@@ -209,7 +209,7 @@ export class Fight{
             var fighterInFight = this.fighterList.getFighterByName(fighter.name);
             if(fighterInFight && !fighterInFight.isReady){ //find fighter by its name property instead of comparing objects, which doesn't work.
                 fighterInFight.isReady = true;
-                this.message.addInfo(Utils.strFormat(Constants.Messages.Ready, fighter.getStylizedName()));
+                this.message.addInfo(Utils.strFormat(Constants.Messages.Ready, [fighter.getStylizedName()]));
                 this.sendMessage();
                 if(this.canStartMatch()){
                     this.startMatch();
@@ -221,7 +221,7 @@ export class Fight{
     }
 
     canStartMatch(){
-        let canGo = (this.fighterList.isEveryoneReady() && !this.hasStarted && this.fighterList.getAllUsedTeams().length >= this.usedTeams);
+        let canGo = (this.fighterList.isEveryoneReady() && !this.hasStarted && this.fighterList.getUsedTeams().length >= this.usedTeams);
         return canGo; //only start if everyone's ready and if the teams are balanced
     }
 
@@ -233,7 +233,7 @@ export class Fight{
         this.hasStarted = true;
         this.fighterList.shufflePlayers(); //random order for teams
 
-        this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchStageAnnounce, this.stage));
+        this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchStageAnnounce, [this.stage]));
 
         for(let i = 0; i < this.fighterList.maxPlayersPerTeam; i++){ //Prints as much names as there are team
             let fullStringVS = "[b]";
@@ -251,9 +251,9 @@ export class Fight{
 
         this.fighterList.reorderFightersByInitiative(this.rollAllDice(Trigger.InitiationRoll));
         this.currentTurn = 1;
-        this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchFirstPlayer, [this.currentPlayer.getStylizedName(), this.currentTeamName]));
+        this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchFirstPlayer, [this.currentPlayer.getStylizedName(), this.currentTeamName.toLowerCase(), this.currentTeamName]));
         for(let i = 1; i < this.fighterList.length; i++){
-            this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchFollowedBy, [this.fighterList[i].getStylizedName(), Team[this.fighterList[i].assignedTeam]]));
+            this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchFollowedBy, [this.fighterList[i].getStylizedName(), Team[this.fighterList[i].assignedTeam].toLowerCase(), Team[this.fighterList[i].assignedTeam]]));
             if(this.fightType == FightType.Tag) {
                 this.fighterList[i].isInTheRing = false;
             }
@@ -306,7 +306,7 @@ export class Fight{
     //Fighting info displays
 
     outputStatus(){
-        this.message.addInfo(Utils.strFormat(Constants.Messages.outputStatusInfo, [this.currentTurn.toString(), this.currentTeamName, this.currentTeamName, this.currentPlayer.getStylizedName()]));
+        this.message.addInfo(Utils.strFormat(Constants.Messages.outputStatusInfo, [this.currentTurn.toString(), this.currentTeamName.toLowerCase(), this.currentTeamName, this.currentPlayer.getStylizedName()]));
 
          for(let i = 0; i < this.fighterList.length; i++){ //Prints as much names as there are team
              let theFighter=this.fighterList[i];
@@ -376,7 +376,7 @@ export class Fight{
         for(let player of this.fighterList.getAlivePlayers()){
             player.lastDiceRoll = player.roll(10, event);
             arrSortedFightersByInitiative.push(player);
-            this.message.addInfo(Utils.strFormat(Constants.Messages.rollAllDiceEchoRoll, [player.getStylizedName(), player.lastDiceRoll.toString()]));
+            this.message.addHint(Utils.strFormat(Constants.Messages.rollAllDiceEchoRoll, [player.getStylizedName(), player.lastDiceRoll.toString()]));
         }
 
         arrSortedFightersByInitiative.sort((a,b):number => {
@@ -561,12 +561,12 @@ export class Fight{
     forfeit(fighter:Fighter){
         if(fighter != null){
             if(!fighter.isTechnicallyOut()){
-                this.message.addHit(Utils.strFormat(Constants.Messages.forfeitItemApply, fighter.getStylizedName()));
+                this.message.addHit(Utils.strFormat(Constants.Messages.forfeitItemApply, [fighter.getStylizedName()]));
                 for(var i = 0; i < 3; i++){
                     fighter.modifiers.push(new BondageModifier(fighter));
                 }
                 fighter.forfeits++;
-                this.message.addHit(Utils.strFormat(Constants.Messages.forfeitTooManyItems, fighter.getStylizedName()));
+                this.message.addHit(Utils.strFormat(Constants.Messages.forfeitTooManyItems, [fighter.getStylizedName()]));
                 fighter.triggerPermanentOutsideRing();
             }
             else{
@@ -619,7 +619,7 @@ export class Fight{
             this.winnerTeam = forceWinner;
         }
         if(this.winnerTeam != Team.Unknown){
-            this.message.addInfo(Utils.strFormat(Constants.Messages.endFightAnnounce, Team[this.winnerTeam]));
+            this.message.addInfo(Utils.strFormat(Constants.Messages.endFightAnnounce, [Team[this.winnerTeam]]));
             this.sendMessage();
         }
         Fight.commitEndFightDb(this, tokensToGiveToWinners, tokensToGiveToLosers);

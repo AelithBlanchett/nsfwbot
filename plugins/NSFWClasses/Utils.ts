@@ -12,8 +12,8 @@ export class Utils {
     }
 
 
-    static strFormat(str:string, params: Array<string> | string){
-        return vsprintf(str, [params]);
+    static strFormat(str:string, params: Array<string>){
+        return vsprintf(str, params);
     }
 
     static findIndex(array, attr, value) {
@@ -26,7 +26,7 @@ export class Utils {
     }
 
     static pad(width, string, padding) {
-        return (width <= string.length) ? string : Utils.pad(width, padding + string, padding)
+        return (width <= string.length) ? string : Utils.pad(width, string + padding, padding)
     }
 
     static shuffleArray(array) {

@@ -77,7 +77,7 @@ export class CommandHandler implements ICommandHandler{
     };
 
     join(args:string, data:FChatResponse){
-        if(this.fight == undefined){
+        if(this.fight == undefined || this.fight.hasEnded){
             this.fight = new Fight(this.fChatLibInstance, this.channel);
         }
         Fighter.exists(data.character).then(receivedData =>{
@@ -100,13 +100,12 @@ export class CommandHandler implements ICommandHandler{
     };
 
     ready(args:string, data:FChatResponse){
-        if(this.fight == undefined){
-            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight to join.[/color]", this.channel);
-            return false;
-        }
         if(this.fight.hasStarted){
             this.fChatLibInstance.sendMessage("[color=red]There is already a fight in progress.[/color]", this.channel);
             return false;
+        }
+        if(this.fight == undefined || this.fight.hasEnded){
+            this.fight = new Fight(this.fChatLibInstance, this.channel);
         }
         Fighter.exists(data.character).then(data =>{
             if(data){
@@ -218,7 +217,7 @@ export class CommandHandler implements ICommandHandler{
     };
 
     forfeit(args:string, data:FChatResponse){
-        if(this.fight == undefined || !this.fight.hasStarted){
+        if(this.fight == undefined || !this.fight.hasStarted || this.fight.hasEnded){
             this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
             return false;
         }
@@ -241,7 +240,7 @@ export class CommandHandler implements ICommandHandler{
     };
 
     draw(args:string, data:FChatResponse){
-        if(this.fight == undefined || !this.fight.hasStarted){
+        if(this.fight == undefined || !this.fight.hasStarted || this.fight.hasEnded){
             this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
             return false;
         }

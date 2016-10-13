@@ -1,11 +1,17 @@
 interface IMessage {
     action: Array<string>;
-    HPDamage:number;
-    LPDamage:number;
-    FPDamage:number;
-    HPHeal:number;
-    LPHeal:number;
-    FPHeal:number;
+    HPDamageAtk:number;
+    LPDamageAtk:number;
+    FPDamageAtk:number;
+    HPHealAtk:number;
+    LPHealAtk:number;
+    FPHealAtk:number;
+    HPDamageDef:number;
+    LPDamageDef:number;
+    FPDamageDef:number;
+    HPHealDef:number;
+    LPHealDef:number;
+    FPHealDef:number;
     hit: Array<string>;
     status: Array<string>;
     hint: Array<string>;
@@ -16,12 +22,18 @@ interface IMessage {
 
 export class Message implements IMessage {
     action:Array<string>;
-    HPDamage:number;
-    LPDamage:number;
-    FPDamage:number;
-    HPHeal:number;
-    LPHeal:number;
-    FPHeal:number;
+    HPDamageAtk:number;
+    LPDamageAtk:number;
+    FPDamageAtk:number;
+    HPHealAtk:number;
+    LPHealAtk:number;
+    FPHealAtk:number;
+    HPDamageDef:number;
+    LPDamageDef:number;
+    FPDamageDef:number;
+    HPHealDef:number;
+    LPHealDef:number;
+    FPHealDef:number;
     hit:Array<string>;
     status:Array<string>;
     hint:Array<string>;
@@ -35,11 +47,18 @@ export class Message implements IMessage {
 
     clear(){
         this.action = [];
-        this.LPDamage = 0;
-        this.FPDamage = 0;
-        this.HPHeal = 0;
-        this.LPHeal = 0;
-        this.FPHeal = 0;
+        this.HPDamageAtk = 0;
+        this.LPDamageAtk = 0;
+        this.FPDamageAtk = 0;
+        this.HPHealAtk = 0;
+        this.LPHealAtk = 0;
+        this.FPHealAtk = 0;
+        this.HPDamageDef = 0;
+        this.LPDamageDef = 0;
+        this.FPDamageDef = 0;
+        this.HPHealDef = 0;
+        this.LPHealDef = 0;
+        this.FPHealDef = 0;
         this.hit = [];
         this.status = [];
         this.hint = [];
@@ -49,45 +68,92 @@ export class Message implements IMessage {
     }
 
     getAction() {
-        return "Action: " + this.action.join(" ") + " ";
+        return "Action: [color=yellow]" + this.action.join(" ") + "[/color]";
     }
 
     getDeltaHPLPFP() {
-        let msg = "[color=yellow](";
-        if(this.HPDamage > 0){
-            msg += " HP Damage: " + this.HPDamage;
+        let isDifferentDef = false;
+        let msgAtk = "";
+        let msg = "Defender: [color=red](";
+        if(this.HPDamageDef > 0){
+            msg += " HP Damage: " + this.HPDamageDef;
+            isDifferentDef = true;
         }
-        if(this.LPDamage > 0){
-            msg += " Lust Damage: " + this.LPDamage;
+        if(this.LPDamageDef > 0){
+            msg += " Lust Damage: " + this.LPDamageDef;
+            isDifferentDef = true;
         }
-        if(this.FPDamage > 0){
-            msg += " Focus Damage: " + this.FPDamage;
+        if(this.FPDamageDef > 0){
+            msg += " Focus Damage: " + this.FPDamageDef;
+            isDifferentDef = true;
         }
-        if(this.HPHeal > 0){
-            msg += " HP Healed: " + this.HPHeal;
+        if(this.HPHealDef > 0){
+            msg += " HP Healed: " + this.HPHealDef;
+            isDifferentDef = true;
         }
-        if(this.LPHeal > 0){
-            msg += " Lust Healed: " + this.LPHeal;
+        if(this.LPHealDef > 0){
+            msg += " Lust Healed: " + this.LPHealDef;
+            isDifferentDef = true;
         }
-        if(this.FPHeal > 0){
-            msg += " Focus Healed: " + this.FPHeal;
+        if(this.FPHealDef > 0){
+            msg += " Focus Healed: " + this.FPHealDef;
+            isDifferentDef = true;
+        }
+        msg += ")[/color]";
+
+        if(!isDifferentDef){ //If there are no changes, then don't send the message
+            msg = "";
+        }
+        else{
+            msgAtk = "\n";
         }
 
-        msg += "[/color]";
+        let isDifferentAtk = false;
 
-        return msg;
+        msgAtk += "Attacker: [color=yellow](";
+        if(this.HPDamageAtk > 0){
+            msgAtk += " HP Damage: " + this.HPDamageAtk;
+            isDifferentAtk = true;
+        }
+        if(this.LPDamageAtk > 0){
+            msgAtk += " Lust Damage: " + this.LPDamageAtk;
+            isDifferentAtk = true;
+        }
+        if(this.FPDamageAtk > 0){
+            msgAtk += " Focus Damage: " + this.FPDamageAtk;
+            isDifferentAtk = true;
+        }
+        if(this.HPHealAtk > 0){
+            msgAtk += " HP Healed: " + this.HPHealAtk;
+            isDifferentAtk = true;
+        }
+        if(this.LPHealAtk > 0){
+            msgAtk += " Lust Healed: " + this.LPHealAtk;
+            isDifferentAtk = true;
+        }
+        if(this.FPHealAtk > 0){
+            msgAtk += " Focus Healed: " + this.FPHealAtk;
+            isDifferentAtk = true;
+        }
+        msgAtk += ")[/color]";
+
+        if(!isDifferentAtk){ //If there are no changes, then don't send the message
+            msgAtk = "";
+        }
+
+        return msg+""+msgAtk;
     }
 
     getHit() {
-        return "[color=red][b]" + this.hit.join("\n") + "[/b][/color]";
+        return "[color=red][b]" + this.hit.join("\n") + "[/b][/color]\n";
     }
 
     getHint() {
-        return "[color=cyan]" + this.hint.join("\n") + "[/color]";
+        return "[color=cyan]" + this.hint.join("\n") + "[/color]\n";
     }
 
     getSpecial() {
-        return "\n[color=red]" + this.special.join("\n") + "[/color]";
+        return "[color=red]" + this.special.join("\n") + "[/color]\n";
     }
 
     getStatus(){
@@ -95,7 +161,7 @@ export class Message implements IMessage {
     }
 
     getInfo(){
-        return "\n" + this.info.join("\n");
+        return this.info.join("\n");
     }
 
     getError() {
@@ -130,17 +196,16 @@ export class Message implements IMessage {
     getMessage() {
         let message = "";
 
-        var lines = [""];
+        var lines = [];
 
-        lines[0] += this.getAction();
-        lines[0] += this.getDeltaHPLPFP();
-        if (lines[0] == "") lines = [];
-
+        if (this.info.length) lines.push(this.getInfo());
+        if (this.action.length) lines.push(this.getAction());
         if (this.hit.length) lines.push(this.getHit());
         if (this.status.length) lines.push(this.getStatus());
+        let damages = this.getDeltaHPLPFP();
+        if(damages != "") lines.push(damages);
         if (this.hint.length) lines.push(this.getHint());
         if (this.special.length) lines.push(this.getSpecial());
-        if (this.info.length) lines.push(this.getInfo());
         if (this.error.length) lines.push(this.getError());
 
         message = lines.join("\n");

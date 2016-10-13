@@ -16,7 +16,7 @@ var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
 var jasmine = new Jasmine();
 var fChatLibInstance: any;
-var debug = false;
+var debug = true;
 var mockedClasses = [];
 var usedIndexes = [];
 var usedFighters = [];

@@ -377,7 +377,7 @@ export class Fighter implements IFighter{
 
     static create(name:string){
         return new Promise(function(resolve, reject) {
-            Data.db.query("INSERT INTO `flistplugins`.??(`name`) VALUES (?,?)", [Constants.SQL.fightersTableName, name], function (err, result) {
+            Data.db.query("INSERT INTO `flistplugins`.?? (`name`) VALUES ( ? )", [Constants.SQL.fightersTableName, name], function (err, result) {
                 if (result) {
                     console.log("Added "+name+" to the roster: "+JSON.stringify(result));
                     resolve();
@@ -432,14 +432,14 @@ export class Fighter implements IFighter{
     }
 
     outputStatus(){
-        return `${this.getStylizedName()} ${this.hp}/${this.hpPerHeart()} [color=red]HP[/color]  |`+
+        return  Utils.pad(64, `${this.getStylizedName()}:`," ") +
+                `  ${this.hp}/${this.hpPerHeart()} [color=red]HP[/color]  |`+
                 `  ${this.heartsRemaining}/${this.maxHearts()} [color=red]Hearts[/color]  |`+
                 `  ${this.lust}/${this.lustPerOrgasm()} [color=pink]Lust[/color]  |`+
                 `  ${this.orgasmsRemaining}/${this.maxOrgasms()} [color=pink]Orgasms[/color]  |`+
-                `  [color=red][sub]${this.minFocus()}[/sub][/color]|[b]${this.focus}[/b]|[color=orange][sub]${this.maxFocus()}[/sub][/color] Focus  |`+
-                `  ${this.bondageItemsOnSelf()}/${Constants.Fight.Action.Globals.maxBondageItemsOnSelf} [color=black]Bondage Items[/color]  |`+
-                (this.target != undefined ? `  [color=red]Target:[/color] ${this.target.getStylizedName()}` : "")+
-                "\n";
+                `  [color=red]${this.minFocus()}[/color]|[b]${this.focus}[/b]|[color=orange]${this.maxFocus()}[/color] Focus  |`+
+                `  ${this.bondageItemsOnSelf()}/${Constants.Fight.Action.Globals.maxBondageItemsOnSelf} [color=purple]Bondage Items[/color]  |`+
+                `  [color=red]Target:[/color] `+(this.target != undefined ? `${this.target.getStylizedName()}` : "None");
     }
 
     getStylizedName(){
@@ -453,7 +453,7 @@ export class Fighter implements IFighter{
             modifierBeginning = `[i]`;
             modifierEnding = `[/i]`;
         }
-        return `${modifierBeginning}[b][color=${Team[this.assignedTeam]}]${this.name}[/color][/b]${modifierEnding}`;
+        return `${modifierBeginning}[b][color=${Team[this.assignedTeam].toLowerCase()}]${this.name}[/color][/b]${modifierEnding}`;
     }
 
     initFromData(data:Array<any>){
