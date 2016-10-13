@@ -50,12 +50,12 @@ export class Fight{
     }
 
     changeMinTeamsInvolvedInFight(intNewNumberOfTeams:number){
-        if(intNewNumberOfTeams >= 2 ){
+        if(intNewNumberOfTeams >= 2){
             this.fighterList.minNumberOfTeamsThatPlay = intNewNumberOfTeams;
-            this.message.addInfo("Number of teams involved in the fight updated!.");
+            this.message.addInfo(Constants.Messages.changeMinTeamsInvolvedInFightOK);
         }
         else{
-            this.message.addInfo("The number of teams should be superior or equal than 2.");
+            this.message.addInfo(Constants.Messages.changeMinTeamsInvolvedInFightFail);
         }
         this.sendMessage();
     }
@@ -65,22 +65,22 @@ export class Fight{
             switch(type.toLowerCase()){
                 case "classic":
                     this.fightType = FightType.Classic;
-                    this.message.addInfo("Fight type successfully set to Classic.");
+                    this.message.addInfo(Constants.Messages.setFightTypeClassic);
                     break;
                 case "tag":
                 case "tagteam":
                 case "tag-team":
                     this.fightType = FightType.Tag;
-                    this.message.addInfo("Fight type successfully set to Tag-Team.");
+                    this.message.addInfo(Constants.Messages.setFightTypeTag);
                     break;
                 default:
                     this.fightType = FightType.Classic;
-                    this.message.addInfo("Type not found. Fight type resetted to Classic.");
+                    this.message.addInfo(Constants.Messages.setFightTypeNotFound);
                     break;
             }
         }
         else{
-            this.message.addInfo("Can't change the fight type if the fight has already started or is already finished.");
+            this.message.addInfo(Constants.Messages.setFightTypeFail);
         }
         this.sendMessage();
     }
@@ -209,8 +209,7 @@ export class Fight{
             var fighterInFight = this.fighterList.getFighterByName(fighter.name);
             if(fighterInFight && !fighterInFight.isReady){ //find fighter by its name property instead of comparing objects, which doesn't work.
                 fighterInFight.isReady = true;
-                var str = Utils.format(Constants.Messages.Ready, fighter.getStylizedName());
-                this.message.addInfo(str);
+                this.message.addInfo(Utils.strFormat(Constants.Messages.Ready, fighter.getStylizedName()));
                 this.sendMessage();
                 if(this.canStartMatch()){
                     this.startMatch();
@@ -230,11 +229,11 @@ export class Fight{
     //Fight logic
 
     startMatch(){
-        this.message.addInfo("\n[color=green]Everyone's ready, let's start the match![/color]");
+        this.message.addInfo(Constants.Messages.startMatchAnnounce);
         this.hasStarted = true;
         this.fighterList.shufflePlayers(); //random order for teams
 
-        this.message.addInfo(`The fighters will meet in the... [color=red][b]${this.stage}![/b][/color]`);
+        this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchStageAnnounce, this.stage));
 
         for(let i = 0; i < this.fighterList.maxPlayersPerTeam; i++){ //Prints as much names as there are team
             let fullStringVS = "[b]";
@@ -252,9 +251,9 @@ export class Fight{
 
         this.fighterList.reorderFightersByInitiative(this.rollAllDice(Trigger.InitiationRoll));
         this.currentTurn = 1;
-        this.message.addInfo(`${this.currentPlayer.getStylizedName()} starts first for the ${this.currentTeamName} team!`);
+        this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchFirstPlayer, [this.currentPlayer.getStylizedName(), this.currentTeamName]));
         for(let i = 1; i < this.fighterList.length; i++){
-            this.message.addInfo(`${this.fighterList[i].getStylizedName()} will follow for the ${Team[this.fighterList[i].assignedTeam]} team.`);
+            this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchFollowedBy, [this.fighterList[i].getStylizedName(), Team[this.fighterList[i].assignedTeam]]));
             if(this.fightType == FightType.Tag) {
                 this.fighterList[i].isInTheRing = false;
             }
@@ -307,7 +306,7 @@ export class Fight{
     //Fighting info displays
 
     outputStatus(){
-        this.message.addInfo(`\n[b]Turn #${this.currentTurn}[/b] [color=${this.currentTeamName}]------ ${this.currentTeamName} team ------[/color] It's [u]${this.currentPlayer.getStylizedName()}[/u]'s turn.\n`);
+        this.message.addInfo(Utils.strFormat(Constants.Messages.outputStatusInfo, [this.currentTurn.toString(), this.currentTeamName, this.currentTeamName, this.currentPlayer.getStylizedName()]));
 
          for(let i = 0; i < this.fighterList.length; i++){ //Prints as much names as there are team
              let theFighter=this.fighterList[i];
@@ -345,10 +344,10 @@ export class Fight{
             if(this.fighterList[index].assignedTeam == this.fighterList[0].assignedTeam && this.fighterList[index].isInTheRing == true && this.fightType == FightType.Tag){
                 this.fighterList[index].isInTheRing = false;
             }
-            this.message.addInfo(`Successfully changed ${temp.name}'s place with ${this.fighterList[0].name}'s!`)
+            this.message.addInfo(Utils.strFormat(Constants.Messages.setCurrentPlayerOK, [temp.name, this.fighterList[0].name]));
         }
         else{
-            this.message.addInfo("Couldn't switch the two wrestlers. The name is either wrong, this fighter is already in the ring or this fighter isn't able to fight right now.")
+            this.message.addInfo(Constants.Messages.setCurrentPlayerFail)
         }
     }
 
@@ -372,13 +371,12 @@ export class Fight{
     }
 
     //Dice rolling
-
     rollAllDice(event:Trigger):Array<Fighter>{
-        let arrSortedFightersByInitiative = new Array<Fighter>();
+        let arrSortedFightersByInitiative = [];
         for(let player of this.fighterList.getAlivePlayers()){
             player.lastDiceRoll = player.roll(10, event);
             arrSortedFightersByInitiative.push(player);
-            this.message.addInfo(`[color=${Team[player.assignedTeam]}]${player.name}[/color] rolled a ${player.lastDiceRoll}`);
+            this.message.addInfo(Utils.strFormat(Constants.Messages.rollAllDiceEchoRoll, [player.getStylizedName(), player.lastDiceRoll.toString()]));
         }
 
         arrSortedFightersByInitiative.sort((a,b):number => {
@@ -395,25 +393,23 @@ export class Fight{
 
 
     //Messaging
-    //TODO: Messaging
-
     sendMessage(){
         this.fChatLibInstance.sendMessage(this.message.getMessage(), this.channel);
     }
-    //attacks
 
+    //Attacks
     canTag(){
         let flag = true;
         let turnsSinceLastTag = (this.currentPlayer.lastTagTurn - this.currentTurn);
         let turnsToWait = (Constants.Fight.Action.Globals.turnsToWaitBetweenTwoTags * 2) - turnsSinceLastTag; // *2 because there are two fighters
         if(turnsToWait > 0){
             flag = false;
-            this.message.addInfo(`[b][color=red]You can't tag yet. Turns left: ${turnsToWait}[/color][/b]`);
+            this.message.addHit(`[b][color=red]You can't tag yet. Turns left: ${turnsToWait}[/color][/b]`);
             this.sendMessage();
         }
         if(!this.currentTarget.canMoveFromOrOffRing){
             flag = false;
-            this.message.addInfo(`[b][color=red]You can't tag with this character. They're permanently out.[/color][/b]`);
+            this.message.addHit(`[b][color=red]You can't tag with this character. They're permanently out.[/color][/b]`);
             this.sendMessage();
         }
         return flag;
@@ -423,32 +419,32 @@ export class Fight{
         let flag = true;
         if(action == undefined){
             flag = false;
-            this.message.addInfo(`[b][color=red]The last action hasn't been processed yet.[/color][/b]`);
+            this.message.addError(Constants.Messages.canAttackNoAction);
         }
         if(!this.waitingForAction){
             flag = false;
-            this.message.addInfo(`[b][color=red]The last action hasn't been processed yet.[/color][/b]`);
+            this.message.addError(Constants.Messages.canAttackNotWaitingForAction);
         }
         if(this.currentPlayer.isTechnicallyOut()){
             flag = false;
-            this.message.addInfo(`[b][color=red]You are out of this fight.[/color][/b]`);
+            this.message.addError(Constants.Messages.canAttackIsOut);
         }
         if(!this.currentPlayer.isInTheRing){
             flag = false;
-            this.message.addInfo(`[b][color=red]You cannot do that since you're not inside the ring.[/color][/b]`);
+            this.message.addError(Constants.Messages.canAttackIsOutOfTheRing);
         }
         if(!this.currentTarget.isInTheRing){
             flag = false;
-            this.message.addInfo(`[b][color=red]Your target isn't inside the ring.[/color][/b]`);
+            this.message.addError(Constants.Messages.canAttackTargetIsOutOfTheRing);
         }
         if(this.currentTarget.isTechnicallyOut()){
             flag = false;
-            this.message.addInfo(`[b][color=red]Your target is out of this fight.[/color][/b]`);
+            this.message.addError(Constants.Messages.canAttackTargetOutOfFight);
         }
         if(action == Action.SubHold || action == Action.SexHold || action == Action.HumHold || action == Action.Bondage){
             if(this.currentPlayer.isInHold()){
                 flag = false;
-                this.message.addInfo(`[b][color=red]You cannot do that since you're in a hold.[/color][/b]`);
+                this.message.addError(Constants.Messages.canAttackIsInHold);
             }
         }
         if(flag == false){
@@ -462,7 +458,7 @@ export class Fight{
         if(action == Action.HumHold || action == Action.Bondage){
             if(!this.currentTarget.isInSpecificHold(Constants.Modifier.SexHold)){
                 flag = false;
-                this.message.addInfo(`[b][color=red]You cannot do that since your target is not in a sexual hold.[/color][/b]`);
+                this.message.addError(Constants.Messages.checkAttackRequirementsNotInSexualHold);
             }
         }
         if(flag == false){
@@ -485,7 +481,7 @@ export class Fight{
     doAction(idFighter:number, action:Action, tier:Tier, customTarget?:Fighter){
         if(this.hasStarted && !this.hasEnded){
             if(this.currentPlayer == undefined || idFighter != this.currentPlayer.id){
-                this.message.addInfo(`[b][color=red]This isn't your turn.[/color][/b]`);
+                this.message.addError(Constants.Messages.doActionNotActorsTurn);
                 this.sendMessage();
             }
             else{
@@ -506,7 +502,7 @@ export class Fight{
                             this.currentPlayer.target = customTarget;
                         }
                         else{
-                            this.message.addInfo(`[b][color=red]The target for this attack can't be in your team.[/color][/b]`);
+                            this.message.addInfo(Constants.Messages.doActionTargetIsSameTeam);
                             this.sendMessage();
                             return;
                         }
@@ -534,10 +530,10 @@ export class Fight{
             }
         }
 
-        var lowestLoserTier;
+        var lowestLoserTier = -99;
         for(let fighter of this.fighterList){
             if(fighter.assignedTeam != winnerTeam){
-                if(lowestLoserTier == undefined){
+                if(lowestLoserTier == -99){
                     lowestLoserTier = fighter.tier();
                 }
                 else if(lowestLoserTier > fighter.tier()){
@@ -565,16 +561,16 @@ export class Fight{
     forfeit(fighter:Fighter){
         if(fighter != null){
             if(!fighter.isTechnicallyOut()){
-                this.message.addInfo(`${fighter.getStylizedName()} forfeits! Which means... 3 bondage items landing on them to punish them!`);
+                this.message.addHit(Utils.strFormat(Constants.Messages.forfeitItemApply, fighter.getStylizedName()));
                 for(var i = 0; i < 3; i++){
                     fighter.modifiers.push(new BondageModifier(fighter));
                 }
                 fighter.forfeits++;
-                this.message.addInfo(`${fighter.getStylizedName()} has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`);
+                this.message.addHit(Utils.strFormat(Constants.Messages.forfeitTooManyItems, fighter.getStylizedName()));
                 fighter.triggerPermanentOutsideRing();
             }
             else{
-                this.message.addInfo(`You are already out of the match. No need to forfeit.`);
+                this.message.addError(Constants.Messages.forfeitAlreadyOut);
                 this.sendMessage();
                 return;
             }
@@ -600,7 +596,7 @@ export class Fight{
             }
         }
         if(neededDrawFlags == drawFlags){
-            this.message.addInfo(`Everybody agrees, it's a draw!`);
+            this.message.addInfo(Constants.Messages.checkForDrawOK);
             this.sendMessage();
             let tokensToGive:number = this.currentTurn;
             if(tokensToGive > parseInt(TokensPerWin[FightTier.Bronze])){
@@ -609,7 +605,7 @@ export class Fight{
             this.endFight(0,tokensToGive, Team.Unknown); //0 because there isn't a winning team
         }
         else{
-            this.message.addInfo(`Waiting for the other players still in the fight to call the draw.`);
+            this.message.addInfo(Constants.Messages.checkForDrawWaiting);
             this.sendMessage();
         }
     }
@@ -623,7 +619,7 @@ export class Fight{
             this.winnerTeam = forceWinner;
         }
         if(this.winnerTeam != Team.Unknown){
-            this.message.addInfo(`${Team[this.winnerTeam]} team wins the fight!`);
+            this.message.addInfo(Utils.strFormat(Constants.Messages.endFightAnnounce, Team[this.winnerTeam]));
             this.sendMessage();
         }
         Fight.commitEndFightDb(this, tokensToGiveToWinners, tokensToGiveToLosers);

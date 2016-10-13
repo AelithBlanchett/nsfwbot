@@ -94,6 +94,10 @@ export class Message implements IMessage {
         return "\n" + this.info.join("\n");
     }
 
+    getError() {
+        return "[color=red][b]" + this.error.join("\n") + "[/b][/color]";
+    }
+
     addAction(line) {
         if (typeof line === "string") this.action.push(line);
     }
@@ -114,6 +118,10 @@ export class Message implements IMessage {
         if (typeof line === "string") this.info.push(line);
     }
 
+    addError(line){
+        if (typeof line === "string") this.error.push(line);
+    }
+
 
     getMessage() {
         let message = "";
@@ -129,6 +137,7 @@ export class Message implements IMessage {
         if (this.hint.length) lines.push(this.getHint());
         if (this.special.length) lines.push(this.getSpecial());
         if (this.info.length) lines.push(this.getInfo());
+        if (this.error.length) lines.push(this.getError());
 
         message = lines.join("\n");
 

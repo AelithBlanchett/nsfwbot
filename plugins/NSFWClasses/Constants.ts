@@ -113,6 +113,45 @@ export class Messages {
     `;
     static Ready = `[color=green]%s is now ready to get it on![/color]`;
     static HitMessage = ` HIT! `;
+    static changeMinTeamsInvolvedInFightOK = "Number of teams involved in the fight updated!.";
+    static changeMinTeamsInvolvedInFightFail = "The number of teams should be superior or equal than 2.";
+    static setFightTypeClassic = "Fight type successfully set to Classic.";
+    static setFightTypeTag = "Fight type successfully set to Tag-Team.";
+    static setFightTypeNotFound = "Type not found. Fight type resetted to Classic.";
+    static setFightTypeFail = "Can't change the fight type if the fight has already started or is already finished.";
+
+    static startMatchAnnounce = "[color=green]Everyone's ready, let's start the match![/color]";
+    static startMatchStageAnnounce = "The fighters will meet in the... [color=red][b]%s![/b][/color]";
+    static startMatchFirstPlayer = "%s starts first for the %s team!";
+    static startMatchFollowedBy = "%s will follow for the %s team.";
+
+    static outputStatusInfo = `\n[b]Turn #%s[/b] [color=%s]------ %s team ------[/color] It's [u]%s[/u]'s turn.\n`;
+
+    static setCurrentPlayerOK = `Successfully changed %s's place with %s's!`;
+    static setCurrentPlayerFail = "Couldn't switch the two wrestlers. The name is either wrong, this fighter is already in the ring or this fighter isn't able to fight right now.";
+
+    static rollAllDiceEchoRoll = "%s rolled a %s";
+
+    static canAttackNoAction = `The last action hasn't been processed yet.`;
+    static canAttackNotWaitingForAction = `The last action hasn't been processed yet.`;
+    static canAttackIsOut = `You are out of this fight.`;
+    static canAttackIsOutOfTheRing = `You cannot do that since you're not inside the ring.`;
+    static canAttackTargetIsOutOfTheRing = `Your target isn't inside the ring.`;
+    static canAttackTargetOutOfFight = `Your target is out of this fight.`;
+    static canAttackIsInHold = `You cannot do that since you're in a hold.`;
+
+    static checkAttackRequirementsNotInSexualHold = `You cannot do that since your target is not in a sexual hold.`;
+
+    static doActionNotActorsTurn = `This isn't your turn.`;
+    static doActionTargetIsSameTeam = "The target for this attack can't be in your team.";
+
+    static forfeitItemApply = `%s forfeits! Which means... 3 bondage items landing on them to punish them!`;
+    static forfeitTooManyItems = `%s has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`;
+    static forfeitAlreadyOut = `You are already out of the match. No need to forfeit.`;
+
+    static checkForDrawOK = `Everybody agrees, it's a draw!`;
+    static checkForDrawWaiting = `Waiting for the other players still in the fight to call the draw.`;
+    static endFightAnnounce = "%s team wins the fight!"
 }
 
 export enum ModifierType {

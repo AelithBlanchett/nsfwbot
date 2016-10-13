@@ -12,7 +12,7 @@ export class Utils {
     }
 
 
-    static format(str:string, params: Array<string> | string){
+    static strFormat(str:string, params: Array<string> | string){
         return vsprintf(str, [params]);
     }
 
