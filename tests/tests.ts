@@ -906,7 +906,7 @@ describe("The player(s)", () => {
             doAction(cmd, "humhold", "Light").then(() => {
                 let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
                 waitUntil().interval(100).times(50).condition(condition).done(() => {
-                    if (wasMessageSent("[b][color=red]You cannot do that since your target is not in a sexual hold.[/color][/b]")) {
+                    if (wasMessageSent(Constants.Messages.checkAttackRequirementsNotInSexualHold)) {
                         done();
                     }
                     else {
@@ -1102,7 +1102,7 @@ describe("The player(s)", () => {
                 doAction(cmd, "bondage", "Light").then(() => {
                     let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
                     waitUntil().interval(100).times(50).condition(condition).done(() => {
-                        if (wasMessageSent(`[b][color=red]You cannot do that since your target is not in a sexual hold.[/color][/b]`)) {
+                        if (wasMessageSent(Constants.Messages.checkAttackRequirementsNotInSexualHold)) {
                             done();
                         }
                         else {
