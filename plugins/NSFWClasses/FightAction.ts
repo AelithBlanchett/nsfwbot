@@ -24,6 +24,7 @@ import {SextoyPickupModifier} from "./CustomModifiers";
 import {DegradationModifier} from "./CustomModifiers";
 import {StunModifier} from "./CustomModifiers";
 import TriggerMoment = Constants.TriggerMoment;
+import {HighRiskMultipliers} from "./Constants";
 
 export class FightAction{
     id: number;
@@ -78,7 +79,16 @@ export class FightAction{
     }
 
     attackFormula(tier:Tier, actorAtk:number, targetDef:number, roll:number):number{
-        return BaseDamage[Tier[tier]]-(actorAtk-targetDef)+(Math.floor(roll/2));
+        var statDiff = 0;
+        if(actorAtk-targetDef > 0){
+            statDiff = (actorAtk-targetDef);
+        }
+        var diceBonus = 0;
+        var calculatedBonus = Math.floor(roll - TierDifficulty.Light);
+        if(calculatedBonus > 0){
+            diceBonus = calculatedBonus;
+        }
+        return BaseDamage[Tier[tier]] + statDiff + diceBonus;
     }
 
     requiredDiceScore():number{
@@ -92,9 +102,15 @@ export class FightAction{
         else{
             scoreRequired += (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.attacker.bondageItemsOnSelf()); //+2 difficulty per bondage item
             scoreRequired -= this.attacker.dexterity;
+            if(this.attacker.focus > 1){
+                scoreRequired -= Math.ceil(this.attacker.focus / 2);
+            }
             if(this.defender){
                 scoreRequired -= (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.defender.bondageItemsOnSelf()); //+2 difficulty per bondage item
                 scoreRequired += Math.floor(this.defender.dexterity*1.75);
+                if(this.defender.isStunned()){
+                    scoreRequired -= 4;
+                }
             }
             scoreRequired += TierDifficulty[Tier[this.tier]];
         }
@@ -112,6 +128,9 @@ export class FightAction{
                 break;
             case Action.Degradation:
                 result = this.actionDegradation();
+                break;
+            case Action.Escape:
+                result = this.actionEscape();
                 break;
             case Action.ForcedWorship:
                 result = this.actionForcedWorship();
@@ -146,8 +165,8 @@ export class FightAction{
             case Action.Tag:
                 result = this.actionTag();
                 break;
-            case Action.Tackle:
-                result = this.actionTackle();
+            case Action.Stun:
+                result = this.actionStun();
                 break;
             default:
                 this.attacker.fight.message.addHit("WARNING! UNKNOWN ATTACK!");
@@ -249,13 +268,13 @@ export class FightAction{
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
             this.fpDamageToDef += this.tier + 1;
-            this.hpDamageToDef += this.attackFormula(this.tier, this.attacker.power * Constants.Fight.Action.Globals.multiplierHighRiskAttack, this.defender.toughness, this.diceScore);
+            this.hpDamageToDef += Math.floor(this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore) * HighRiskMultipliers[Tier[this.tier]]);
         }
         else{
             this.missed = true;
             this.fpDamageToAtk += this.tier + 1;
             this.fpHealToDef += this.tier + 1;
-            this.hpDamageToAtk += this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, 0);
+            this.hpDamageToAtk += Math.floor(this.attackFormula(this.tier, this.attacker.power, this.attacker.toughness, 0) * (1 + (1 - HighRiskMultipliers[Tier[this.tier]])));
         }
         return Trigger.HighRiskAttack;
     }
@@ -267,13 +286,13 @@ export class FightAction{
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
             this.fpDamageToDef += this.tier + 1;
-            this.lpDamageToDef += this.attackFormula(this.tier, this.attacker.sensuality * Constants.Fight.Action.Globals.multiplierHighRiskAttack, this.defender.endurance, this.diceScore);
+            this.lpDamageToDef += Math.floor(this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore) * HighRiskMultipliers[Tier[this.tier]]);
         }
         else{
             this.missed = true;
             this.fpDamageToAtk += this.tier + 1;
             this.fpHealToDef += this.tier + 1;
-            this.lpDamageToAtk += this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, 0);
+            this.lpDamageToAtk += Math.floor(this.attackFormula(this.tier, this.attacker.sensuality, this.attacker.endurance, 0) * (1 + (1 - HighRiskMultipliers[Tier[this.tier]])));
         }
         return Trigger.HighRiskSexAttack;
     }
@@ -284,6 +303,7 @@ export class FightAction{
         this.lpDamageToAtk += (this.tier+1) * 2; //deal damage anyway. They're gonna be exposed!
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
+            this.fpHealToAtk += FocusDamageHum[Tier[this.tier]];
             this.fpDamageToDef += FocusDamageHum[Tier[this.tier]];
             this.lpDamageToDef += 1;
         }
@@ -345,26 +365,36 @@ export class FightAction{
         if(this.diceScore >= this.requiredDiceScore()) {
             this.missed = false;
             this.hpHealToAtk += this.attacker.hp * Constants.Fight.Action.Globals.hpPercentageToHealOnRest;
-            this.lpHealToAtk += this.attacker.hp * Constants.Fight.Action.Globals.lpPercentageToHealOnRest;
-            this.fpHealToAtk += this.attacker.hp * Constants.Fight.Action.Globals.fpPointsToHealOnRest;
+            this.lpHealToAtk += this.attacker.lust * Constants.Fight.Action.Globals.lpPercentageToHealOnRest;
+            this.fpHealToAtk += this.attacker.focus * Constants.Fight.Action.Globals.fpPointsToHealOnRest;
         }
         return Trigger.Rest;
     }
 
-    actionTackle():Trigger{
-        this.attacker.triggerMods(TriggerMoment.Before, Trigger.Tackle);
+    actionStun():Trigger{
+        this.attacker.triggerMods(TriggerMoment.Before, Trigger.Stun);
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
             this.fpDamageToDef += this.tier + 1;
             let nbOfAttacksStunned = this.tier + 1;
-            this.hpDamageToDef = this.attackFormula(this.tier, Math.floor(this.attacker.power / Constants.Fight.Action.Globals.tacklePowerDivider), this.defender.toughness, this.diceScore);
+            this.hpDamageToDef = this.attackFormula(this.tier, Math.floor(this.attacker.power / Constants.Fight.Action.Globals.stunPowerDivider), this.defender.toughness, this.diceScore);
             let stunModifier = new StunModifier(this.defender, this.attacker, -((this.tier + 1) * Constants.Fight.Action.Globals.dicePenaltyMultiplierWhileStunned), nbOfAttacksStunned);
             this.modifiers.push(stunModifier);
             this.attacker.fight.message.addHit("STUNNED!");
         }
-        return Trigger.Tackle;
+        return Trigger.Stun;
+    }
+
+    actionEscape():Trigger{
+        this.attacker.triggerMods(TriggerMoment.Before, Trigger.Escape);
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.dexterity;
+        if(this.diceScore >= this.requiredDiceScore()){
+            this.missed = false;
+            this.attacker.escapeHolds();
+        }
+        return Trigger.Escape;
     }
 
     static commitDb(action:FightAction){
@@ -544,7 +574,10 @@ export class FightAction{
         FightAction.commitDb(this);
 
         //check for fight ending status
-        if (!fight.isFightOver()) {
+        if(this.type == Action.Escape && this.missed == false){
+            fight.message.addHint(`This is still your turn ${this.attacker.getStylizedName()}, time to fight back!`);
+            fight.sendMessage();
+        } else if (!fight.isFightOver()) {
             fight.nextTurn();
         } else { //if there's only one team left in the fight, then we're sure it's over
             fight.outputStatus();

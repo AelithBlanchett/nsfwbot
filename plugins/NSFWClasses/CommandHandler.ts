@@ -219,6 +219,10 @@ export class CommandHandler implements ICommandHandler{
         this.actionHandler(Action.Degradation, true, false, args, data);
     };
 
+    escape(args:string, data:FChatResponse){
+        this.actionHandler(Action.Escape, false, false, args, data);
+    };
+
     forcedworship(args:string, data:FChatResponse){
         this.actionHandler(Action.ForcedWorship, true, false, args, data);
     };
@@ -259,8 +263,8 @@ export class CommandHandler implements ICommandHandler{
         this.actionHandler(Action.SextoyPickup, false, false, args, data);
     };
 
-    tackle(args:string, data:FChatResponse){
-        this.actionHandler(Action.Tackle, true, false, args, data);
+    stun(args:string, data:FChatResponse){
+        this.actionHandler(Action.Stun, true, false, args, data);
     };
 
     tag(args:string, data:FChatResponse){

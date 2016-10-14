@@ -16,7 +16,7 @@ var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
 var jasmine = new Jasmine();
 var fChatLibInstance: any;
-var debug = true;
+var debug = false;
 var mockedClasses = [];
 var usedIndexes = [];
 var usedFighters = [];
@@ -219,12 +219,12 @@ describe("The player(s)", () => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
     },DEFAULT_TIMEOUT);
 
-  it("should do a tackle and grant the stun modifier", function(done){
+  it("should do a stun and grant the stun modifier", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
-            doAction(cmd, "tackle", "Light").then(() => {
+            doAction(cmd, "stun", "Light").then(() => {
                 let condition = () => {return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);};
                 waitUntil().interval(100).times(50).condition(condition).done(() => {
                     if (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").modifiers.length > 0 &&
@@ -232,7 +232,7 @@ describe("The player(s)", () => {
                         done();
                     }
                     else {
-                        done.fail(new Error("Didn't do the tackle"));
+                        done.fail(new Error("Didn't do the stun"));
                     }
                 });
             }).catch(err => {
@@ -241,12 +241,12 @@ describe("The player(s)", () => {
         });
     },DEFAULT_TIMEOUT);
 
-  it("should do a tackle and grant the stun modifier, and reduce the dice roll", function(done){
+  it("should do a stun and grant the stun modifier, and reduce the dice roll", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1; }).done(() =>{
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
-            doAction(cmd, "tackle", "Light").then(() => {
+            doAction(cmd, "stun", "Light").then(() => {
                 doAction(cmd, "brawl", "Light").then(() => {
                     let condition = () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
@@ -256,7 +256,7 @@ describe("The player(s)", () => {
                             done();
                         }
                         else {
-                            done.fail(new Error("Didn't do the tackle"));
+                            done.fail(new Error("Didn't do the stun"));
                         }
                     });
                 });

@@ -10,11 +10,11 @@ import Team = Constants.Team;
 import FightTier = Constants.FightTier;
 import TokensWorth = Constants.TokensWorth;
 import Stats = Constants.Stats;
-import StatTier = Constants.StatTier;
 import {IModifier} from "./Modifier";
 import {Modifiers} from "./Modifier";
 import TriggerMoment = Constants.TriggerMoment;
 import Trigger = Constants.Trigger;
+import {ModifierType} from "./Constants";
 
 export class Fighter implements IFighter{
     id:number = -1;
@@ -185,27 +185,29 @@ export class Fighter implements IFighter{
     }
 
     hpPerHeart():number {
-        return (10 + this.power + this.sensuality + this.dexterity + (this.toughness * 2) + this.endurance);
+        return 35;
     }
 
     maxHearts():number {
-        return this.toughness;
+        let heartsSup = Math.ceil(this.toughness / 2);
+        return 4 + heartsSup;
     }
 
     lustPerOrgasm():number{
-        return (10 + this.power + this.sensuality + this.dexterity + this.toughness * +(this.endurance * 2));
+        return 35;
     }
 
     maxOrgasms():number {
-        return this.endurance;
+        let orgasmsSup = Math.ceil(this.endurance / 2);
+        return 4 + orgasmsSup;
     }
 
     minFocus():number {
-        return -1-this.willpower;
+        return -2 - this.willpower;
     }
 
     maxFocus():number {
-        return 1+this.willpower;
+        return 2 + this.willpower;
     }
 
     healHP(hp:number, triggerMods:boolean = true){
@@ -355,6 +357,16 @@ export class Fighter implements IFighter{
         return this.bondageItemsOnSelf() >= Constants.Fight.Action.Globals.maxBondageItemsOnSelf;
     }
 
+    isStunned():boolean{
+        let isStunned = false;
+        for(let mod of this.modifiers){
+            if(mod.receiver == this && mod.type == ModifierType.Stun){
+                isStunned = true;
+            }
+        }
+        return isStunned;
+    }
+
     isInHold():boolean{
         let isInHold = false;
         for(let mod of this.modifiers){
@@ -373,6 +385,14 @@ export class Fighter implements IFighter{
             }
         }
         return isInHold;
+    }
+
+    escapeHolds(){
+        for(let mod of this.modifiers){
+            if(mod.receiver == this && (mod.name == Constants.Modifier.SubHold || mod.name == Constants.Modifier.SexHold || mod.name == Constants.Modifier.HumHold )){
+                this.removeMod(mod.id);
+            }
+        }
     }
 
     static create(name:string){
@@ -476,19 +496,22 @@ export class Fighter implements IFighter{
     addStat(stat:Stats):any{
         let theStat = this[Stats[stat].toLowerCase()];
         theStat++;
-        let statTier = Utils.getStatTier(theStat);
+        if(theStat > Constants.Fighter.maxLevel){
+            return "You can't increase this stat anymore.";
+        }
+        let statTier = this.tier(+1);
         let amountToRemove = 0;
-        if(statTier == StatTier.Bronze){
+        if(statTier == FightTier.Bronze){
             amountToRemove = TokensWorth.Bronze;
         }
-        else if(statTier == StatTier.Silver){
+        else if(statTier == FightTier.Silver){
             amountToRemove = TokensWorth.Silver;
         }
-        else if(statTier == StatTier.Gold){
+        else if(statTier == FightTier.Gold){
             amountToRemove = TokensWorth.Gold;
         }
         else if(statTier == -1){
-            return "You can't increase this stat anymore.";
+            return "Tier not found.";
         }
 
         if(amountToRemove != 0 && (this.tokens - amountToRemove >= 0)){
@@ -498,29 +521,29 @@ export class Fighter implements IFighter{
             return "";
         }
         else{
-            return `Not enough ${StatTier[statTier]} tokens`;
+            return `Not enough ${FightTier[statTier]} tokens`;
         }
     }
 
     removeStat(stat:Stats):any{
         let theStat = this[Stats[stat].toLowerCase()];
         theStat--;
-        if(theStat <= 0){
+        if(theStat < Constants.Fighter.minLevel){
             return "You can't decrease this stat anymore.";
         }
-        let statTier = Utils.getStatTier(theStat);
+        let statTier = this.tier(-1);
         let amountToGive = 0;
-        if(statTier == StatTier.Bronze){
+        if(statTier == FightTier.Bronze){
             amountToGive = TokensWorth.Bronze;
         }
-        else if(statTier == StatTier.Silver){
+        else if(statTier == FightTier.Silver){
             amountToGive = TokensWorth.Silver;
         }
-        else if(statTier == StatTier.Gold){
+        else if(statTier == FightTier.Gold){
             amountToGive = TokensWorth.Gold;
         }
-        else if(statTier == -1){
-            return "You can't decrease this stat anymore.";
+        else{
+            return "Tier not found.";
         }
 
         if(amountToGive != 0){
@@ -545,14 +568,14 @@ export class Fighter implements IFighter{
         }
     }
 
-    tier():FightTier{
-        if(this.power <= 2 && this.sensuality <= 2 && this.dexterity <= 2 && this.toughness <= 2 && this.endurance <= 2 && this.willpower <= 2){
+    tier(offset:number = 0):FightTier{
+        if((this.power + this.sensuality + this.dexterity + this.toughness + this.endurance + this.willpower) + offset <= 12){
             return FightTier.Bronze;
         }
-        else if(this.power <= 4 && this.sensuality <= 4 && this.dexterity <= 4 && this.toughness <= 4 && this.endurance <= 4 && this.willpower <= 4){
+        else if((this.power + this.sensuality + this.dexterity + this.toughness + this.endurance + this.willpower) + offset <= 24){
             return FightTier.Silver;
         }
-        else if(this.power <= 6 && this.sensuality <= 6 && this.dexterity <= 6 && this.toughness <= 6 && this.endurance <= 6 && this.willpower <= 6){
+        else if((this.power + this.sensuality + this.dexterity + this.toughness + this.endurance + this.willpower) + offset <= 36){
             return FightTier.Gold;
         }
         return;

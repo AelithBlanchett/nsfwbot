@@ -13,8 +13,7 @@ export class SQL {
 }
 
 export class Fighter {
-    public static minLevel: number = 0;
-    public static maxLevelInit: number = 6;
+    public static minLevel: number = 1;
     public static maxLevel: number = 6;
 }
 
@@ -50,8 +49,8 @@ export namespace Fight {
             public static forcedLewdPercentageOfLPRemoved: number = 3;
             //HighRisk
             public static multiplierHighRiskAttack: number = 2;
-            //Tackle
-            public static tacklePowerDivider: number = 2;
+            //Stun
+            public static stunPowerDivider: number = 2;
             public static dicePenaltyMultiplierWhileStunned: number = 3;
 
 
@@ -199,6 +198,12 @@ export enum FightTier {
     Gold = 2
 }
 
+export enum HighRiskMultipliers {
+    Light = 2,
+    Medium = 1.5,
+    Heavy = 1.2
+}
+
 export enum StatTier {
     Bronze = 2,
     Silver = 4,
@@ -207,8 +212,8 @@ export enum StatTier {
 
 export enum BaseDamage {
     Light = 4,
-    Medium = 10,
-    Heavy = 18
+    Medium = 12,
+    Heavy = 20
 }
 
 export enum FocusDamageHumHold {
@@ -232,7 +237,8 @@ export enum Action {
     ForcedWorship,
     HighRisk,
     HighRiskSex,
-    Tackle
+    Stun,
+    Escape
 }
 
 export enum TierDifficulty {
@@ -324,15 +330,15 @@ export enum Trigger {
     ForcedWorshipAttack = 1 << 12,
     HighRiskAttack = 1 << 13,
     HighRiskSexAttack = 1 << 14,
-    Tackle = 1 << 15,
-    Attack = BrawlAttack | SexStrikeAttack | ForcedWorshipAttack | Tackle,
+    Stun = 1 << 15,
+    Attack = BrawlAttack | SexStrikeAttack | ForcedWorshipAttack | Stun,
     SubmissionHold = 1 << 16,
     Bondage = 1 << 17,
     Degradation = 1 << 18,
     HumiliationHold = 1 << 19,
     SexHoldAttack = 1 << 20,
     Hold = SubmissionHold | HumiliationHold | SexHoldAttack,
-    PowerBasedAttack = BrawlAttack | SubmissionHold | HighRiskAttack | Tackle,
+    PowerBasedAttack = BrawlAttack | SubmissionHold | HighRiskAttack | Stun,
 
     ItemPickup = 1 << 21,
     SextoyPickup = 1 << 22,
