@@ -15,6 +15,7 @@ import {Modifiers} from "./Modifier";
 import TriggerMoment = Constants.TriggerMoment;
 import Trigger = Constants.Trigger;
 import {ModifierType} from "./Constants";
+import {Tier} from "./Constants";
 
 export class Fighter implements IFighter{
     id:number = -1;
@@ -385,6 +386,16 @@ export class Fighter implements IFighter{
             }
         }
         return isInHold;
+    }
+
+    isInHoldOfTier():Tier{
+        let tier = Tier.None;
+        for(let mod of this.modifiers){
+            if(mod.receiver == this && (mod.name == Constants.Modifier.SubHold || mod.name == Constants.Modifier.SexHold || mod.name == Constants.Modifier.HumHold )){
+                tier = mod.tier;
+            }
+        }
+        return tier;
     }
 
     escapeHolds(){

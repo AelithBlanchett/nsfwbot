@@ -6,11 +6,13 @@ import {Utils} from "./Utils";
 import Action = Constants.Action;
 import ModifierType = Constants.ModifierType;
 import TriggerMoment = Constants.TriggerMoment;
+import {Tier} from "./Constants";
 var ES = require("es-abstract/es6.js");
 
 export interface IModifier{
     id: string;
     name:string;
+    tier:Tier;
     type:ModifierType;
     applier: Fighter;
     receiver: Fighter;
@@ -34,6 +36,7 @@ export interface IModifier{
 export class Modifier implements IModifier{
     id: string;
     name:string = "modifier";
+    tier:Tier;
     type:ModifierType;
     applier: Fighter;
     receiver: Fighter;
@@ -49,11 +52,12 @@ export class Modifier implements IModifier{
     parentIds: Array<string>;
     parentAction: Action;
 
-    constructor(receiver:Fighter, applier:Fighter, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number,
+    constructor(receiver:Fighter, applier:Fighter, tier:Tier, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number,
                 timeToTrigger:TriggerMoment, event:Trigger, parentIds:Array<string>, areMultipliers:boolean){
         this.id = Utils.generateUUID();
         this.receiver = receiver; //ALWAYS filled!
         this.applier = applier; //can be null
+        this.tier = tier;
         this.type = modType;
         this.hpDamage = hpDamage;
         this.lustDamage = lustDamage;

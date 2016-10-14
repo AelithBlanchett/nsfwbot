@@ -112,7 +112,9 @@ export class FightAction{
                     scoreRequired -= 4;
                 }
             }
-            scoreRequired += TierDifficulty[Tier[this.tier]];
+            if(this.tier != -1){
+                scoreRequired += TierDifficulty[Tier[this.tier]];
+            }
         }
         return scoreRequired;
     }
@@ -208,7 +210,7 @@ export class FightAction{
             this.fpHealToAtk += this.tier + 1;
             this.fpDamageToDef += this.tier + 1;
             let hpDamage = this.attackFormula(this.tier, this.attacker.power, this.defender.toughness, this.diceScore);
-            let holdModifier = new HoldModifier(this.defender, this.attacker, ModifierType.SubHold, hpDamage, 0, 0);
+            let holdModifier = new HoldModifier(this.defender, this.attacker, this.tier, ModifierType.SubHold, hpDamage, 0, 0);
             let brawlBonusAttacker = new BrawlBonusSubHoldModifier(this.attacker, [holdModifier.id]);
             let brawlBonusDefender = new BrawlBonusSubHoldModifier(this.defender, [holdModifier.id]);
             this.modifiers.push(holdModifier);
@@ -226,7 +228,7 @@ export class FightAction{
             this.fpHealToAtk += this.tier + 1;
             this.fpDamageToDef += this.tier + 1;
             let lustDamage = this.attackFormula(this.tier, this.attacker.sensuality, this.defender.endurance, this.diceScore);
-            let holdModifier = new HoldModifier(this.defender, this.attacker, ModifierType.SexHold, 0, lustDamage, 0);
+            let holdModifier = new HoldModifier(this.defender, this.attacker, this.tier, ModifierType.SexHold, 0, lustDamage, 0);
             let lustBonusAttacker = new LustBonusSexHoldModifier(this.attacker, [holdModifier.id]);
             let lustBonusDefender = new LustBonusSexHoldModifier(this.defender, [holdModifier.id]);
             this.modifiers.push(holdModifier);
@@ -243,7 +245,7 @@ export class FightAction{
             this.missed = false;
             this.fpHealToAtk += FocusDamageHum[Tier[this.tier]];
             let focusDamage = FocusDamageHum[Tier[this.tier]];
-            let holdModifier = new HoldModifier(this.defender, this.attacker, ModifierType.HumHold, 0, 0, focusDamage);
+            let holdModifier = new HoldModifier(this.defender, this.attacker, this.tier, ModifierType.HumHold, 0, 0, focusDamage);
             this.modifiers.push(holdModifier);
         }
         return Trigger.HumiliationHold;
@@ -361,6 +363,7 @@ export class FightAction{
 
     actionRest():Trigger{ //"skips" a turn
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Rest);
+        this.defender = null;
         this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()) {
             this.missed = false;
@@ -389,6 +392,8 @@ export class FightAction{
 
     actionEscape():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Escape);
+        this.defender = null;
+        this.tier = this.attacker.isInHoldOfTier();
         this.diceScore = this.attacker.dice.roll(1) + this.attacker.dexterity;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
@@ -419,7 +424,13 @@ export class FightAction{
     }
 
     commit(fight:Fight){
-        fight.message.addAction(`${Constants.Action[this.type]} on ${this.defender.getStylizedName()}`);
+        if(this.defender){
+            fight.message.addAction(`${Constants.Action[this.type]} on ${this.defender.getStylizedName()}`);
+        }
+        else{
+            fight.message.addAction(`${Constants.Action[this.type]}`);
+        }
+
         if(this.missed == false){
             if(this.requiresRoll == false){ //-1 == no roll
                 fight.message.addHit(` SUCCESSFUL ${Action[this.type]}! `);
@@ -547,27 +558,29 @@ export class FightAction{
             }
         }
 
-        if(this.type == Action.Tag){
+        if(this.missed == false && this.type == Action.Tag){
             fight.message.addHit(`[b][color=red]TAG![/color][/b] ${this.defender.name} enters inside the ring!`);
         }
-        else if(this.defender.isDead()){
-            fight.message.addHit(`${this.defender.name} couldn't take the hits anymore! [b][color=red]They're out![/color][/b]`);
-            this.defender.triggerPermanentOutsideRing();
-        }
-        else if(this.defender.isSexuallyExhausted()){
-            fight.message.addHit(`${this.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
-            this.defender.triggerPermanentOutsideRing();
-        }
-        else if(this.defender.isBroken()){
-            fight.message.addHit(`${this.defender.name} is too mentally exhausted to continue! [b][color=red]They're out![/color][/b]`);
-            this.defender.triggerPermanentOutsideRing();
-        }
-        else if(this.defender.isCompletelyBound()){
-            fight.message.addHit(`${this.defender.name} has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`);
-            this.defender.triggerPermanentOutsideRing();
-        }
-        else if(!this.defender.isInTheRing || !this.attacker.isInTheRing){
-            fight.message.addHit(`${this.defender.name} can't stay inside the ring anymore! [b][color=red]They're out![/color][/b]`);
+        else if(this.defender){
+            if (this.defender.isDead()) {
+                fight.message.addHit(`${this.defender.name} couldn't take the hits anymore! [b][color=red]They're out![/color][/b]`);
+                this.defender.triggerPermanentOutsideRing();
+            }
+            else if (this.defender.isSexuallyExhausted()) {
+                fight.message.addHit(`${this.defender.name} is too sexually exhausted to continue! [b][color=red]They're out![/color][/b]`);
+                this.defender.triggerPermanentOutsideRing();
+            }
+            else if (this.defender.isBroken()) {
+                fight.message.addHit(`${this.defender.name} is too mentally exhausted to continue! [b][color=red]They're out![/color][/b]`);
+                this.defender.triggerPermanentOutsideRing();
+            }
+            else if (this.defender.isCompletelyBound()) {
+                fight.message.addHit(`${this.defender.name} has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`);
+                this.defender.triggerPermanentOutsideRing();
+            }
+            else if (!this.defender.isInTheRing) {
+                fight.message.addHit(`${this.defender.name} can't stay inside the ring anymore! [b][color=red]They're out![/color][/b]`);
+            }
         }
 
         //Save it to the DB
