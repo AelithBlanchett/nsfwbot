@@ -101,13 +101,12 @@ export class FightAction{
         }
         else{
             scoreRequired += (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.attacker.bondageItemsOnSelf()); //+2 difficulty per bondage item
-            scoreRequired -= this.attacker.dexterity;
-            if(this.attacker.focus > 1){
-                scoreRequired -= Math.ceil(this.attacker.focus / 2);
-            }
             if(this.defender){
                 scoreRequired -= (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.defender.bondageItemsOnSelf()); //+2 difficulty per bondage item
-                scoreRequired += Math.floor(this.defender.dexterity*1.75);
+                scoreRequired += Math.floor(this.defender.dexterity / 2);
+                if(this.defender.focus < 0){
+                    scoreRequired += Math.floor(this.defender.focus / 2);
+                }
                 if(this.defender.isStunned()){
                     scoreRequired -= 4;
                 }
@@ -115,6 +114,9 @@ export class FightAction{
             if(this.tier != -1){
                 scoreRequired += TierDifficulty[Tier[this.tier]];
             }
+        }
+        if(scoreRequired < 0){
+            scoreRequired = 0;
         }
         return scoreRequired;
     }

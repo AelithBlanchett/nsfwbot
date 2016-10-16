@@ -468,7 +468,7 @@ export class Fighter implements IFighter{
                 `  ${this.heartsRemaining}/${this.maxHearts()} [color=red]Hearts[/color]  ------`+
                 `  ${this.lust}/${this.lustPerOrgasm()} [color=pink]Lust[/color]  |`+
                 `  ${this.orgasmsRemaining}/${this.maxOrgasms()} [color=pink]Orgasms[/color]  ------`+
-                `  [color=red]${this.minFocus()}[/color]|[b]${this.focus}[/b]|[color=orange]${this.maxFocus()}[/color] Focus  `+
+                `  [color=red]${this.minFocus()}[/color]|[b]${this.focus}[/b]|[color=orange]${this.maxFocus()}[/color] Focus  |`+
                 `  ${this.consecutiveTurnsWithoutFocus}/[color=orange]${Constants.Fight.Action.Globals.maxTurnsWithoutFocus}[/color] Turns Without Focus  ------`+
                 `  ${this.bondageItemsOnSelf()}/${Constants.Fight.Action.Globals.maxBondageItemsOnSelf} [color=purple]Bondage Items[/color]  ------`+
                 `  [color=red]Target:[/color] `+(this.target != undefined ? `${this.target.getStylizedName()}` : "None");

@@ -11,6 +11,7 @@ import {Utils} from "./Utils";
 import Tier = Constants.Tier;
 import Action = Constants.Action;
 import {Stats} from "./Constants";
+import {FightType} from "./Constants";
 
 export class CommandHandler implements ICommandHandler{
     fChatLibInstance:IFChatLib;
@@ -23,21 +24,27 @@ export class CommandHandler implements ICommandHandler{
         this.fight = new Fight(this.fChatLibInstance, this.channel);
     }
 
+    debug(args:string, data:FChatResponse){
+        if(this.fChatLibInstance.isUserChatOP(data.character, data.channel)){
+            eval(args);
+        }
+    }
+
     howtostart(args:string, data:FChatResponse){
-        this.fChatLibInstance.sendPrivMessage(data.character, Constants.Messages.startupGuide);
+        this.fChatLibInstance.sendPrivMessage(Constants.Messages.startupGuide, data.character);
     }
 
     register(args:string, data:FChatResponse){
         Fighter.exists(data.character).then(doesExist =>{
             if(!doesExist){
                 Fighter.create(data.character).then(()=>{
-                    this.fChatLibInstance.sendMessage("You are now registered! Welcome!", this.channel);
+                    this.fChatLibInstance.sendPrivMessage("You are now registered! Welcome!", data.character);
                 }).catch(err => {
                     this.fChatLibInstance.throwError(err);
                 });
             }
             else{
-                this.fChatLibInstance.sendMessage("[color=red]You are already registered.[/color]", this.channel);
+                this.fChatLibInstance.sendPrivMessage("[color=red]You are already registered.[/color]", data.character);
             }
         }).catch(err =>{
             console.log(err);
@@ -45,18 +52,18 @@ export class CommandHandler implements ICommandHandler{
     };
 
     stats(args:string, data:FChatResponse){
-        Fighter.exists(data.character).then(data =>{
-            if(data){
-                let fighter:Fighter = data as Fighter;
+        Fighter.exists(data.character).then(receivedData =>{
+            if(receivedData){
+                let fighter:Fighter = receivedData as Fighter;
                 if(fighter.areStatsPrivate == false){
-                    this.fChatLibInstance.sendMessage(fighter.outputStats(), this.channel);
+                    this.fChatLibInstance.sendPrivMessage(fighter.outputStats(), fighter.name);
                 }
                 else{
-                    this.fChatLibInstance.sendPrivMessage(fighter.name, fighter.outputStats());
+                    this.fChatLibInstance.sendPrivMessage(fighter.outputStats(), fighter.name);
                 }
             }
             else{
-                this.fChatLibInstance.sendMessage("[color=red]You are not registered.[/color]", this.channel);
+                this.fChatLibInstance.sendPrivMessage("[color=red]You are not registered.[/color]", data.character);
             }
         }).catch(err =>{
             this.fChatLibInstance.throwError(err);
@@ -66,22 +73,22 @@ export class CommandHandler implements ICommandHandler{
     addStat(args:string, data:FChatResponse){
         let parsedStat:Stats = Parser.Commands.addStat(args);
         if(parsedStat == -1){
-            this.fChatLibInstance.sendMessage("[color=red]Stat not found.[/color]", this.channel);
+            this.fChatLibInstance.sendPrivMessage("[color=red]Stat not found.[/color]", data.character);
             return;
         }
-        Fighter.exists(data.character).then(data =>{
-            if(data){
-                let fighter:Fighter = data as Fighter;
+        Fighter.exists(data.character).then(receivedData =>{
+            if(receivedData){
+                let fighter:Fighter = receivedData as Fighter;
                 let res = fighter.addStat(parsedStat);
                 if(res == ""){
-                    this.fChatLibInstance.sendPrivMessage(fighter.name, `${Stats[parsedStat]} successfully upgraded by 1!`);
+                    this.fChatLibInstance.sendPrivMessage(`${Stats[parsedStat]} successfully upgraded by 1!`,fighter.name);
                 }
                 else{
-                    this.fChatLibInstance.sendPrivMessage(fighter.name, "[color=red]An error happened: "+res+"[/color]");
+                    this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+res+"[/color]", fighter.name);
                 }
             }
             else{
-                this.fChatLibInstance.sendMessage("[color=red]You are not registered.[/color]", this.channel);
+                this.fChatLibInstance.sendPrivMessage("[color=red]You are not registered.[/color]", data.character);
             }
         }).catch(err =>{
             this.fChatLibInstance.throwError(err);
@@ -91,19 +98,59 @@ export class CommandHandler implements ICommandHandler{
     removeStat(args:string, data:FChatResponse){
         let parsedStat:Stats = Parser.Commands.addStat(args);
         if(parsedStat == -1){
-            this.fChatLibInstance.sendMessage("[color=red]Stat not found.[/color]", this.channel);
+            this.fChatLibInstance.sendPrivMessage("[color=red]Stat not found.[/color]", this.channel);
+            return;
+        }
+        Fighter.exists(data.character).then(receivedData =>{
+            if(receivedData){
+                let fighter:Fighter = receivedData as Fighter;
+                let res = fighter.removeStat(parsedStat);
+                if(res == ""){
+                    this.fChatLibInstance.sendPrivMessage(`${Stats[parsedStat]} successfully decreased by 1!`, fighter.name);
+                }
+                else{
+                    this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+res+"[/color]", fighter.name);
+                }
+            }
+            else{
+                this.fChatLibInstance.sendPrivMessage("[color=red]You are not registered.[/color]", data.character);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
+    getStats(args:string, data:FChatResponse){
+        if(args == ""){
+            args = data.character;
+        }
+        Fighter.exists(args).then(receivedData =>{
+            if(receivedData){
+                let fighter:Fighter = receivedData as Fighter;
+                if(fighter.name == data.character || (fighter.name == data.character && !fighter.areStatsPrivate)){
+                    this.fChatLibInstance.sendPrivMessage(fighter.outputStats(), data.character);
+                }
+                else{
+                    this.fChatLibInstance.sendPrivMessage("[color=red]This wrestler's stats are private.[/color]", data.character);
+                }
+            }
+            else{
+                this.fChatLibInstance.sendPrivMessage("[color=red]This wrestler is not registered.[/color]", data.character);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
+    setFightType(args:string, data:FChatResponse){
+        let parsedFT:FightType = Parser.Commands.setFightType(args);
+        if(parsedFT == -1){
+            this.fChatLibInstance.sendMessage("[color=red]Fight Type not found. Types: Classic, Tag. Example: !setFightType Tag[/color]", this.channel);
             return;
         }
         Fighter.exists(data.character).then(data =>{
             if(data){
-                let fighter:Fighter = data as Fighter;
-                let res = fighter.removeStat(parsedStat);
-                if(res == ""){
-                    this.fChatLibInstance.sendPrivMessage(fighter.name, `${Stats[parsedStat]} successfully decreased by 1!`);
-                }
-                else{
-                    this.fChatLibInstance.sendPrivMessage(fighter.name, "[color=red]An error happened: "+res+"[/color]");
-                }
+                this.fight.setFightType(args);
             }
             else{
                 this.fChatLibInstance.sendMessage("[color=red]You are not registered.[/color]", this.channel);
@@ -113,14 +160,49 @@ export class CommandHandler implements ICommandHandler{
         });
     };
 
-    getStats(args:string, data:FChatResponse){
-        Fighter.exists(args).then(receivedData =>{
+    hideMyStats(args:string, data:FChatResponse){
+        Fighter.exists(data.character).then(receivedData =>{
             if(receivedData){
-                let fighter:Fighter = receivedData as Fighter;
-                this.fChatLibInstance.sendPrivMessage(data.character, fighter.outputStats());
+                receivedData.areStatsPrivate = true;
+                receivedData.update();
+                this.fChatLibInstance.sendPrivMessage("[color=green]You stats are now private.[/color]", data.character);
             }
             else{
-                this.fChatLibInstance.sendPrivMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+                this.fChatLibInstance.sendPrivMessage("[color=red]You are not registered.[/color]", data.character);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
+    unhideMyStats(args:string, data:FChatResponse){
+        Fighter.exists(data.character).then(receivedData =>{
+            if(receivedData){
+                receivedData.areStatsPrivate = false;
+                receivedData.update();
+                this.fChatLibInstance.sendPrivMessage("[color=green]You stats are now private.[/color]", data.character);
+            }
+            else{
+                this.fChatLibInstance.sendPrivMessage("[color=red]You are not registered.[/color]", data.character);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
+
+    setTeamsCount(args:string, data:FChatResponse){
+        let parsedTeams:number = Parser.Commands.setTeamsCount(args);
+        if(parsedTeams <= 1){
+            this.fChatLibInstance.sendMessage("[color=red]The number of teams involved must be a numeral higher than 1.[/color]", this.channel);
+            return;
+        }
+        Fighter.exists(data.character).then(data =>{
+            if(data){
+                this.fight.setTeamsCount(parsedTeams);
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]You are not registered.[/color]", this.channel);
             }
         }).catch(err =>{
             this.fChatLibInstance.throwError(err);
@@ -143,7 +225,7 @@ export class CommandHandler implements ICommandHandler{
                 }
             }
             else{
-                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+                this.fChatLibInstance.sendMessage("[color=red]You are not registered.[/color]", this.channel);
             }
         }).catch(err =>{
             this.fChatLibInstance.throwError(err);
@@ -166,7 +248,7 @@ export class CommandHandler implements ICommandHandler{
                 }
             }
             else{
-                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+                this.fChatLibInstance.sendMessage("[color=red]You are not registered.[/color]", this.channel);
             }
         }).catch(err =>{
             this.fChatLibInstance.throwError(err);
@@ -271,23 +353,39 @@ export class CommandHandler implements ICommandHandler{
         this.actionHandler(Action.Tag, false, true, args, data);
     };
 
+    resetFight(args:string, data:FChatResponse){
+        if(this.fChatLibInstance.isUserChatOP(data.character, data.channel)){
+            this.fight = new Fight(this.fChatLibInstance, this.channel);
+        }
+        else{
+            this.fChatLibInstance.sendPrivMessage("[color=red]You're not an operator for this channel.[/color]", data.character);
+        }
+    };
+
     forfeit(args:string, data:FChatResponse){
         if(this.fight == undefined || !this.fight.hasStarted || this.fight.hasEnded){
-            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
+            this.fChatLibInstance.sendPrivMessage("[color=red]There isn't any fight going on.[/color]", data.character);
             return false;
         }
-        Fighter.exists(data.character).then(data =>{
-            if(data){
-                let fighter:Fighter = data as Fighter;
+        if(args != "" && !this.fChatLibInstance.isUserChatOP(data.character, data.channel)){
+            this.fChatLibInstance.sendPrivMessage("[color=red]You're not an operator for this channel. You can't force someone to forfeit.[/color]", data.character);
+            return false;
+        }
+        if(args == ""){
+            args = data.character;
+        }
+        Fighter.exists(args).then(receivedData =>{
+            if(receivedData){
+                let fighter:Fighter = receivedData as Fighter;
                 if(this.fight.fighterList.getFighterByID(fighter.id)){
                     this.fight.forfeit(fighter);
                 }
                 else{
-                    this.fChatLibInstance.sendMessage("[color=red]You are not participating in this fight.[/color]", this.channel);
+                    this.fChatLibInstance.sendPrivMessage("[color=red]You are not participating in this fight.[/color]", data.character);
                 }
             }
             else{
-                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+                this.fChatLibInstance.sendPrivMessage("[color=red]This wrestler is not registered.[/color]", data.character);
             }
         }).catch(err =>{
             this.fChatLibInstance.throwError(err);
@@ -296,15 +394,15 @@ export class CommandHandler implements ICommandHandler{
 
     draw(args:string, data:FChatResponse){
         if(this.fight == undefined || !this.fight.hasStarted || this.fight.hasEnded){
-            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
+            this.fChatLibInstance.sendPrivMessage("[color=red]There isn't any fight going on.[/color]", data.character);
             return false;
         }
-        Fighter.exists(data.character).then(data =>{
-            if(data){
-                let fighter:Fighter = data as Fighter;
+        Fighter.exists(data.character).then(receivedData =>{
+            if(receivedData){
+                let fighter:Fighter = receivedData as Fighter;
                 if(this.fight.fighterList.getFighterByID(fighter.id)){
                     if(fighter.wantsDraw){
-                        this.fChatLibInstance.sendMessage("[color=red]You are already waiting for the draw.[/color]", this.channel);
+                        this.fChatLibInstance.sendPrivMessage("[color=red]You are already waiting for the draw.[/color]", data.character);
                     }
                     else{
                         fighter.wantsDraw = true;
@@ -312,11 +410,11 @@ export class CommandHandler implements ICommandHandler{
                     }
                 }
                 else{
-                    this.fChatLibInstance.sendMessage("[color=red]You are not participating in this fight.[/color]", this.channel);
+                    this.fChatLibInstance.sendPrivMessage("[color=red]You are not participating in this fight.[/color]", data.character);
                 }
             }
             else{
-                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+                this.fChatLibInstance.sendPrivMessage("[color=red]This wrestler is not registered.[/color]", data.character);
             }
         }).catch(err =>{
             this.fChatLibInstance.throwError(err);
@@ -325,21 +423,21 @@ export class CommandHandler implements ICommandHandler{
 
     target(args:string, data:FChatResponse){
         if(this.fight == undefined || !this.fight.hasStarted || this.fight.hasEnded){
-            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
+            this.fChatLibInstance.sendPrivMessage("[color=red]There isn't any fight going on.[/color]", data.character);
             return false;
         }
-        Fighter.exists(data.character).then(data =>{
-            if(data){
-                let fighter:Fighter = data as Fighter;
+        Fighter.exists(data.character).then(receivedData =>{
+            if(receivedData){
+                let fighter:Fighter = receivedData as Fighter;
                 if(this.fight.fighterList.getFighterByID(fighter.id)){
                     this.fight.assignTarget(fighter.id, args);
                 }
                 else{
-                    this.fChatLibInstance.sendMessage("[color=red]You are not participating in this fight.[/color]", this.channel);
+                    this.fChatLibInstance.sendPrivMessage("[color=red]You are not participating in this fight.[/color]", data.character);
                 }
             }
             else{
-                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+                this.fChatLibInstance.sendPrivMessage("[color=red]This wrestler is not registered.[/color]", data.character);
             }
         }).catch(err =>{
             this.fChatLibInstance.throwError(err);

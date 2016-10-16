@@ -49,7 +49,7 @@ export class Fight{
         this.message = new Message();
     }
 
-    changeMinTeamsInvolvedInFight(intNewNumberOfTeams:number){
+    setTeamsCount(intNewNumberOfTeams:number){
         if(intNewNumberOfTeams >= 2){
             this.fighterList.minNumberOfTeamsThatPlay = intNewNumberOfTeams;
             this.message.addInfo(Constants.Messages.changeMinTeamsInvolvedInFightOK);

@@ -85,6 +85,20 @@ export class Modifier {
     static DegradationMalus = "degradation malus";
     static ItemPickupBonus = "bonus damage on item pickup";
     static SextoyPickupBonus = "bonus lust damage on sextoy pickup";
+    static Stun = "stun malus";
+}
+
+export enum ModifierType {
+    SubHoldBrawlBonus = 0,
+    SubHold = 1,
+    SexHoldLustBonus = 2,
+    SexHold = 3,
+    Bondage = 4,
+    HumHold = 5,
+    DegradationMalus = 6,
+    ItemPickupBonus = 7,
+    SextoyPickupBonus = 8,
+    Stun = 9
 }
 
 export class Messages {
@@ -151,19 +165,6 @@ export class Messages {
     static checkForDrawOK = `Everybody agrees, it's a draw!`;
     static checkForDrawWaiting = `Waiting for the other players still in the fight to call the draw.`;
     static endFightAnnounce = "%s team wins the fight!"
-}
-
-export enum ModifierType {
-    SubHoldBrawlBonus = 0,
-    SubHold = 1,
-    SexHoldLustBonus = 2,
-    SexHold = 3,
-    Bondage = 4,
-    HumHold = 5,
-    DegradationMalus = 6,
-    ItemPickupBonus = 7,
-    SextoyPickupBonus = 8,
-    Stun = 9
 }
 
 export enum Team {

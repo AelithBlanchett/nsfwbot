@@ -5,6 +5,7 @@ import Team = Constants.Team;
 import Tier = Constants.Tier;
 import Stats = Constants.Stats;
 import StatTier = Constants.StatTier;
+import {FightType} from "./Constants";
 var _ = require('lodash');
 
 export class Commands{
@@ -31,6 +32,25 @@ export class Commands{
             return Stats[Stats[indexOfStat]];
         }
         return -1;
+    }
+
+    public static setFightType(args){
+        let fightTypes = Utils.getEnumList(FightType);
+        for(let fightTypeId in fightTypes){
+            fightTypes[fightTypeId] = fightTypes[fightTypeId].toLowerCase();
+        }
+        let indexOfFightType = fightTypes.indexOf(args.toLowerCase());
+        if(indexOfFightType != -1){
+            return FightType[FightType[indexOfFightType]];
+        }
+        return -1;
+    }
+
+    public static setTeamsCount(args){
+        if(isNaN(args)){
+            return -1;
+        }
+        return Number(args);
     }
 }
 
