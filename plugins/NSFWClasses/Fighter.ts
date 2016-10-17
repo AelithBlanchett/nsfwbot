@@ -151,7 +151,7 @@ export class Fighter implements IFighter{
             result = this.dice.roll(1);
         }
         else{
-            result = this.dice.roll(times).reduce(function(a, b){return a+b;});
+            result = this.dice.roll(times);
         }
         this.triggerMods(TriggerMoment.After, event);
         return result;

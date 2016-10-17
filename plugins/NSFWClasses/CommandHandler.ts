@@ -255,102 +255,68 @@ export class CommandHandler implements ICommandHandler{
         });
     };
 
-    private actionHandler(actionType:Action, tierRequired:boolean, isCustomTargetInsteadOfTier:boolean, args:string, data:FChatResponse){
-        let tier = Tier.None;
-        let customTarget:Fighter = null;
-        if(this.fight == undefined || !this.fight.hasStarted){
-            this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
-            return false;
-        }
-        if(tierRequired){
-            tier = Utils.stringToEnum(Tier, args);
-            if(tier == -1){
-                this.fChatLibInstance.sendMessage(`[color=red]The tier is required, and neither Light, Medium or Heavy was specified. Example: !${Action[actionType]} Medium[/color]`, this.channel);
-                return false;
-            }
-        }
-        if(isCustomTargetInsteadOfTier){
-            customTarget = this.fight.fighterList.getFighterByName(args);
-            if(customTarget == null){
-                this.fChatLibInstance.sendMessage("[color=red]The character to tag with is required.[/color]", this.channel);
-                return false;
-            }
-        }
-        Fighter.exists(data.character).then(data =>{
-            if(data){
-                let fighter:Fighter = data as Fighter;
-                this.fight.doAction(fighter.id, actionType, tier as Tier, customTarget);
-            }
-            else{
-                this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
-            }
-        }).catch(err =>{
-            this.fChatLibInstance.throwError(err);
-        });
-    }
-
     bondage(args:string, data:FChatResponse){
-        this.actionHandler(Action.Bondage, false, false, args, data);
+        actionHandler(Action.Bondage, false, false, args, data);
     };
 
     brawl(args:string, data:FChatResponse){
-        this.actionHandler(Action.Brawl, true, false, args, data);
+        actionHandler(Action.Brawl, true, false, args, data);
     };
 
     degradation(args:string, data:FChatResponse){
-        this.actionHandler(Action.Degradation, true, false, args, data);
+        actionHandler(Action.Degradation, true, false, args, data);
     };
 
     escape(args:string, data:FChatResponse){
-        this.actionHandler(Action.Escape, false, false, args, data);
+        actionHandler(Action.Escape, false, false, args, data);
     };
 
     forcedworship(args:string, data:FChatResponse){
-        this.actionHandler(Action.ForcedWorship, true, false, args, data);
+        actionHandler(Action.ForcedWorship, true, false, args, data);
     };
 
     highrisk(args:string, data:FChatResponse){
-        this.actionHandler(Action.HighRisk, true, false, args, data);
+        actionHandler(Action.HighRisk, true, false, args, data);
     };
 
     highrisksex(args:string, data:FChatResponse){
-        this.actionHandler(Action.HighRiskSex, true, false, args, data);
+        actionHandler(Action.HighRiskSex, true, false, args, data);
     };
 
     humhold(args:string, data:FChatResponse){
-        this.actionHandler(Action.HumHold, true, false, args, data);
+        actionHandler(Action.HumHold, true, false, args, data);
     };
 
     itempickup(args:string, data:FChatResponse){
-        this.actionHandler(Action.ItemPickup, false, false, args, data);
+        actionHandler(Action.ItemPickup, false, false, args, data);
     };
 
     rest(args:string, data:FChatResponse){
-        this.actionHandler(Action.Rest, false, false, args, data);
+        actionHandler(Action.Rest, false, false, args, data);
     };
 
     sex(args:string, data:FChatResponse){
-        this.actionHandler(Action.SexStrike, true, false, args, data);
+        actionHandler(Action.SexStrike, true, false, args, data);
     };
 
     sexhold(args:string, data:FChatResponse){
-        this.actionHandler(Action.SexHold, true, false, args, data);
+        actionHandler(Action.SexHold, true, false, args, data);
     };
 
     subhold(args:string, data:FChatResponse){
-        this.actionHandler(Action.SubHold, true, false, args, data);
+        actionHandler(Action.SubHold, true, false, args, data);
     };
 
     sextoypickup(args:string, data:FChatResponse){
-        this.actionHandler(Action.SextoyPickup, false, false, args, data);
+        actionHandler(Action.SextoyPickup, false, false, args, data);
     };
 
     stun(args:string, data:FChatResponse){
-        this.actionHandler(Action.Stun, true, false, args, data);
+        actionHandler(Action.Stun, true, false, args, data);
     };
 
     tag(args:string, data:FChatResponse){
-        this.actionHandler(Action.Tag, false, true, args, data);
+        actionHandler(Action.Tag, false, true, args, data);
     };
 
     resetFight(args:string, data:FChatResponse){
@@ -445,4 +411,38 @@ export class CommandHandler implements ICommandHandler{
     };
 
 
+}
+
+var actionHandler = function(actionType:Action, tierRequired:boolean, isCustomTargetInsteadOfTier:boolean, args:string, data:FChatResponse){
+    let tier = Tier.None;
+    let customTarget:Fighter = null;
+    if(this.fight == undefined || !this.fight.hasStarted){
+        this.fChatLibInstance.sendMessage("[color=red]There isn't any fight going on.[/color]", this.channel);
+        return false;
+    }
+    if(tierRequired){
+        tier = Utils.stringToEnum(Tier, args);
+        if(tier == -1){
+            this.fChatLibInstance.sendMessage(`[color=red]The tier is required, and neither Light, Medium or Heavy was specified. Example: !${Action[actionType]} Medium[/color]`, this.channel);
+            return false;
+        }
+    }
+    if(isCustomTargetInsteadOfTier){
+        customTarget = this.fight.fighterList.getFighterByName(args);
+        if(customTarget == null){
+            this.fChatLibInstance.sendMessage("[color=red]The character to tag with is required.[/color]", this.channel);
+            return false;
+        }
+    }
+    Fighter.exists(data.character).then(data =>{
+        if(data){
+            let fighter:Fighter = data as Fighter;
+            this.fight.doAction(fighter.id, actionType, tier as Tier, customTarget);
+        }
+        else{
+            this.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", this.channel);
+        }
+    }).catch(err =>{
+        this.fChatLibInstance.throwError(err);
+    });
 }

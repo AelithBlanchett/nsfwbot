@@ -11,7 +11,7 @@
     "didyoumean": "*",
     "es-abstract": "^1.6.1",
     "es6-promise": "^4.0.3",
-    "fchatlib": "*",
+    "fchatlib": "^0.5.0",
     "jasmine": "2.2",
     "lodash": "*",
     "mysql": "*",
