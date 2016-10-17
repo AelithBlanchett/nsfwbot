@@ -22,6 +22,7 @@ export class CommandHandler implements ICommandHandler{
         this.fChatLibInstance = fChatLib;
         this.channel = chan;
         this.fight = new Fight(this.fChatLibInstance, this.channel);
+        this.fChatLibInstance.addPrivateMessageListener(privMsgEventHandler);
     }
 
     debug(args:string, data:FChatResponse){
@@ -413,6 +414,36 @@ export class CommandHandler implements ICommandHandler{
 
 }
 
+class PrivateCommandHandler {
+    fChatLibInstance:IFChatLib;
+
+    constructor(fChatLib) {
+        this.fChatLibInstance = fChatLib;
+    }
+
+    stats = CommandHandler.prototype.stats;
+    hideMyStats = CommandHandler.prototype.hideMyStats;
+    unhideMyStats = CommandHandler.prototype.unhideMyStats;
+    //getStats = CommandHandler.prototype.getStats;
+    //addStat = CommandHandler.prototype.addStat;
+    //removeStat = CommandHandler.prototype.removeStat;
+    howtostart = CommandHandler.prototype.howtostart;
+}
+
+var privMsgEventHandler = function(parent, data){
+
+    var privHandler = new PrivateCommandHandler(parent);
+
+    var opts = {
+        command: String(data.message.split(' ')[0]).replace('!', '').trim().toLowerCase(),
+        argument: data.message.substring(String(data.message.split(' ')[0]).length).trim()
+    };
+
+    if (typeof privHandler[opts.command] === 'function') {
+        privHandler[opts.command](opts.argument, data);
+    }
+};
+
 var actionHandler = function(cmd:CommandHandler, actionType:Action, tierRequired:boolean, isCustomTargetInsteadOfTier:boolean, args:string, data:FChatResponse){
     let tier = Tier.None;
     let customTarget:Fighter = null;
@@ -445,4 +476,5 @@ var actionHandler = function(cmd:CommandHandler, actionType:Action, tierRequired
     }).catch(err =>{
         cmd.fChatLibInstance.throwError(err);
     });
-}
+};
+

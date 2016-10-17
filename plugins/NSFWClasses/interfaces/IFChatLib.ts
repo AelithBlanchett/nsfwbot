@@ -3,4 +3,5 @@ export interface IFChatLib{
     throwError(s: string);
     sendPrivMessage(message: string, character: string);
     isUserChatOP(username: string, channel: string);
+    addPrivateMessageListener(fn: any);
 }
