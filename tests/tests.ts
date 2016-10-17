@@ -198,6 +198,12 @@ describe("The player(s)", () => {
                 if (debug) {
                     console.log("Sent PRIVMESSAGE " + message + " to " + character);
                 }
+            },
+            addPrivateMessageListener: function (fn: any){
+
+            },
+            isUserChatOP: function(username: string, channel: string){
+                return username == "Aelith Blanchette";
             }
         };
 
