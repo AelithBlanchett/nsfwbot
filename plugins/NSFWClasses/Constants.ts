@@ -101,6 +101,30 @@ export enum ModifierType {
     Stun = 9
 }
 
+export class Feature {
+    static KickStart = "Kick Start"; //TODO: Check if features are working, donner un moyen d'acheter les features, et savoir si oui ou non elles sont permanentes. Si non, alors combien d'utilisations
+    static SexyKickStart = "Sexy Kick Start";
+    static Sadist = "Sadist";
+    static CumSlut = "Cum Slut";
+    static RyonaEnthusiast = "Ryona Enthusiast";
+}
+
+export enum FeatureType {
+    KickStart = 0,
+    SexyKickStart = 1,
+    Sadist = 2,
+    CumSlut = 3,
+    RyonaEnthusiast = 4
+}
+
+export class FeatureExplain {
+    static KickStart = "They start with an offensive item in their hand, meaning to do more damage.";
+    static SexyKickStart = "They start with a sextoy in their hand, meaning to do more lust damage.";
+    static Sadist = "Dealing HP damage to the opponent will deal the same amount divided by two to the wearer's Lust.";
+    static CumSlut = "Increases all Lust damage done to the wearer by 3.";
+    static RyonaEnthusiast = "Taking HP damage also increases the wearer's Lust by the same amount divided by two.";
+}
+
 export class Messages {
     static startupGuide = `Note: Any commands written down there are starting with a ! and must be typed without the "".
     It's easy! First, you need to register.

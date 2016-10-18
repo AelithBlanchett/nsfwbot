@@ -450,6 +450,38 @@ export class FightAction{
             fight.message.addHint(`Required roll: ${this.requiredDiceScore()}`);
         }
 
+        //Features check
+        if(this.attacker.hasFeature(Constants.FeatureType.Sadist)){
+            this.lpDamageToAtk += Math.floor(this.hpDamageToDef / 2);
+        }
+        if(this.attacker.hasFeature(Constants.FeatureType.CumSlut)){
+            if(this.lpDamageToAtk > 0){
+                this.lpDamageToAtk += 3;
+            }
+        }
+        if(this.attacker.hasFeature(Constants.FeatureType.RyonaEnthusiast)){
+            if(this.hpDamageToAtk > 0){
+                this.lpDamageToAtk += Math.floor(this.hpDamageToAtk / 2);
+            }
+        }
+
+        //Defender
+        if(this.defender.hasFeature(Constants.FeatureType.Sadist)){
+            this.lpDamageToDef += Math.floor(this.hpDamageToAtk / 2);
+        }
+        if(this.defender.hasFeature(Constants.FeatureType.CumSlut)){
+            if(this.lpDamageToDef > 0){
+                this.lpDamageToDef += 3;
+            }
+        }
+        if(this.defender.hasFeature(Constants.FeatureType.RyonaEnthusiast)){
+            if(this.hpDamageToDef > 0){
+                this.lpDamageToDef += Math.floor(this.hpDamageToDef / 2);
+            }
+        }
+
+
+
         fight.pastActions.push(this);
 
         if (this.hpDamageToDef > 0) {

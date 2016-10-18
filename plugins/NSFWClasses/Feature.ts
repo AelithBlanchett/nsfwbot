@@ -1,26 +1,30 @@
 import {Modifier, IModifier} from "./Modifier";
 import {Utils} from "./Utils";
-import {ModifierType} from "./Constants";
+import * as Constants from "./Constants";
 import {ItemPickupModifier} from "./CustomModifiers";
 import {Fighter} from "./Fighter";
 import {Fight} from "./Fight";
+import {FeatureType} from "./Constants";
+import {SextoyPickupModifier} from "./CustomModifiers";
 var ES = require("es-abstract/es6.js");
 
 export class Feature{
     id:string;
-    modType: ModifierType;
+    type:FeatureType;
     modifier: Modifier;
     uses: number;
     permanent: boolean;
 
-    constructor(modType:ModifierType, uses:number, id?:string){
+    constructor(featureType:FeatureType, uses:number, id?:string){
         if(id){
             this.id = id;
         }
         else{
             this.id = Utils.generateUUID();
         }
-        this.modType = modType;
+
+        this.type = featureType;
+
         if(uses <= 0){
             this.uses = 0;
             this.permanent = true;
@@ -32,10 +36,31 @@ export class Feature{
 
     getModifier(fight:Fight, attacker?:Fighter, defender?:Fighter):IModifier{
         if(!this.isExpired()){
-            switch (this.modType){
-                case ModifierType.ItemPickupBonus:
+            switch (this.type){
+                case FeatureType.KickStart:
                     this.modifier = new ItemPickupModifier(attacker);
-                    fight.message.addHint(`${attacker.getStylizedName()} has the ${ModifierType[ModifierType.ItemPickupBonus]} feature!`);
+                    fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.KickStart} feature!`);
+                    fight.message.addHint(Constants.FeatureExplain.KickStart);
+                    break;
+                case FeatureType.SexyKickStart:
+                    this.modifier = new SextoyPickupModifier(attacker);
+                    fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.SexyKickStart} feature!`);
+                    fight.message.addHint(Constants.FeatureExplain.SexyKickStart);
+                    break;
+                case FeatureType.Sadist:
+                    this.modifier = null;
+                    fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.Sadist} feature!`);
+                    fight.message.addHint(Constants.FeatureExplain.Sadist);
+                    break;
+                case FeatureType.CumSlut:
+                    this.modifier = null;
+                    fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.CumSlut} feature!`);
+                    fight.message.addHint(Constants.FeatureExplain.CumSlut);
+                    break;
+                case FeatureType.RyonaEnthusiast:
+                    this.modifier = null;
+                    fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.RyonaEnthusiast} feature!`);
+                    fight.message.addHint(Constants.FeatureExplain.RyonaEnthusiast);
                     break;
             }
             this.uses--;
@@ -75,7 +100,7 @@ export class Features extends Array<Feature>{
     }
 
     add(feature:Feature):string{
-        let index = this.findIndex(x => x.modType == feature.modType);
+        let index = this.findIndex(x => x.type == feature.type);
         if(index == -1){
             this.push(feature);
             return "";
@@ -86,7 +111,7 @@ export class Features extends Array<Feature>{
     }
 
     remove(feature:Feature):string{
-        let index = this.findIndex(x => x.modType == feature.modType);
+        let index = this.findIndex(x => x.type == feature.type);
         if(index != -1){
             this.splice(index,1);
             return "";

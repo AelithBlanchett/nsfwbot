@@ -18,6 +18,7 @@ import {ModifierType} from "./Constants";
 import {Tier} from "./Constants";
 import {Feature} from "./Feature";
 import {Features} from "./Feature";
+import {FeatureType} from "./Constants";
 
 export class Fighter implements IFighter{
     id:number = -1;
@@ -477,6 +478,10 @@ export class Fighter implements IFighter{
 
     clearFeatures(feature:ModifierType):string{
         return this.features.clear();
+    }
+
+    hasFeature(featureType:FeatureType):boolean{
+        return this.features.findIndex(x => x.type == featureType) != -1;
     }
 
     outputStatus(){
