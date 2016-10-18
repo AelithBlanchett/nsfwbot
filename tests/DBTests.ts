@@ -12,6 +12,7 @@ import {Promise} from "es6-promise";
 import {ItemPickupModifier} from "../plugins/NSFWClasses/CustomModifiers";
 import {ModifierType} from "../plugins/NSFWClasses/Constants";
 import {Feature} from "../plugins/NSFWClasses/Feature";
+import {FeatureType} from "../plugins/NSFWClasses/Constants";
 var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
 var jasmine = new Jasmine();
@@ -113,7 +114,7 @@ describe("The database(s)", () => {
     it("should give ItemPickupBonus feature to Test2", function (done) {
         Fighter.exists("test2").then(x => {
             console.log(x.features);
-            x.features.push(new Feature(ModifierType.ItemPickupBonus, 1));
+            x.features.push(new Feature(FeatureType.KickStart, 1));
             console.log(x.features);
             x.update().then(updWorked => {
                 expect(updWorked).toBe(true);

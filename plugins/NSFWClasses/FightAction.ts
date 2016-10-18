@@ -466,19 +466,22 @@ export class FightAction{
         }
 
         //Defender
-        if(this.defender.hasFeature(Constants.FeatureType.Sadist)){
-            this.lpDamageToDef += Math.floor(this.hpDamageToAtk / 2);
-        }
-        if(this.defender.hasFeature(Constants.FeatureType.CumSlut)){
-            if(this.lpDamageToDef > 0){
-                this.lpDamageToDef += 3;
+        if(this.defender){
+            if(this.defender.hasFeature(Constants.FeatureType.Sadist)){
+                this.lpDamageToDef += Math.floor(this.hpDamageToAtk / 2);
+            }
+            if(this.defender.hasFeature(Constants.FeatureType.CumSlut)){
+                if(this.lpDamageToDef > 0){
+                    this.lpDamageToDef += 3;
+                }
+            }
+            if(this.defender.hasFeature(Constants.FeatureType.RyonaEnthusiast)){
+                if(this.hpDamageToDef > 0){
+                    this.lpDamageToDef += Math.floor(this.hpDamageToDef / 2);
+                }
             }
         }
-        if(this.defender.hasFeature(Constants.FeatureType.RyonaEnthusiast)){
-            if(this.hpDamageToDef > 0){
-                this.lpDamageToDef += Math.floor(this.hpDamageToDef / 2);
-            }
-        }
+
 
 
 
