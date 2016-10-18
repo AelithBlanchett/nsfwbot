@@ -14,6 +14,7 @@ export interface IFighter {
     toughness:number;
     endurance:number;
     willpower:number;
+    features:Array<any>;
 
 
 

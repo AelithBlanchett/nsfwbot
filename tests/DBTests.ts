@@ -9,6 +9,9 @@ import {FightAction} from "../plugins/NSFWClasses/FightAction";
 import Action = Constants.Action;
 import {Data} from "../plugins/NSFWClasses/Model";
 import {Promise} from "es6-promise";
+import {ItemPickupModifier} from "../plugins/NSFWClasses/CustomModifiers";
+import {ModifierType} from "../plugins/NSFWClasses/Constants";
+import {Feature} from "../plugins/NSFWClasses/Feature";
 var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
 var jasmine = new Jasmine();
@@ -93,6 +96,12 @@ describe("The database(s)", () => {
                 if (debug) {
                     console.log("Sent PRIVMESSAGE " + message + " to " + character);
                 }
+            },
+            addPrivateMessageListener: function (fn: any){
+
+            },
+            isUserChatOP: function(username: string, channel: string){
+                return username == "Aelith Blanchette";
             }
         };
 
@@ -101,7 +110,23 @@ describe("The database(s)", () => {
         spyOn(fChatLibInstance, 'sendPrivMessage').and.callThrough();
     });
 
-    it("should say Test is already there", function (done) {
+    it("should give ItemPickupBonus feature to Test2", function (done) {
+        Fighter.exists("test2").then(x => {
+            console.log(x.features);
+            x.features.push(new Feature(ModifierType.ItemPickupBonus, 1));
+            console.log(x.features);
+            x.update().then(updWorked => {
+                expect(updWorked).toBe(true);
+                done();
+            }).catch(err => {
+                done.fail(err);
+            });
+        }).catch(err => {
+            done.fail(err);
+        });
+    },500000);
+
+    xit("should say Test is already there", function (done) {
         Fighter.exists("test").then(x => {
             if(x.name == "test"){
                 done();
@@ -114,7 +139,7 @@ describe("The database(s)", () => {
         });
     },5000);
 
-    it("should say Test2 is already there", function (done) {
+    xit("should say Test2 is already there", function (done) {
         Fighter.exists("test2").then(x => {
             if(x.name == "test2"){
                 done();
@@ -127,7 +152,7 @@ describe("The database(s)", () => {
         });
     },5000);
 
-    it("should say Tewefwefwfwst2 doesn't exist", function (done) {
+    xit("should say Tewefwefwfwst2 doesn't exist", function (done) {
         Fighter.exists("Tewefwefwfwst2").then(x => {
             if(x == undefined){
                 done();
@@ -140,7 +165,7 @@ describe("The database(s)", () => {
         });
     },5000);
 
-    it("should update Test2's power to something else", function (done) {
+    xit("should update Test2's power to something else", function (done) {
         Fighter.exists("test2").then(x => {
             let randomId = -1;
             do{
@@ -158,7 +183,7 @@ describe("The database(s)", () => {
         });
     },500000);
 
-    it("should write a new action in the database", function (done) {
+    xit("should write a new action in the database", function (done) {
         Fighter.exists("test2").then(x => {
             let myAction = new FightAction(1, 1, 1, Action.Brawl, x);
             FightAction.commitDb(myAction).then(id => {
@@ -170,7 +195,7 @@ describe("The database(s)", () => {
         });
     },5000);
 
-    it("should write a new fight in the database", function (done) {
+    xit("should write a new fight in the database", function (done) {
         Fighter.exists("test2").then(x => {
             let myFight = new Fight(fChatLibInstance, "here", "hello");
             Fight.saveState(myFight).then(id => {
@@ -182,7 +207,7 @@ describe("The database(s)", () => {
         });
     },50000);
 
-    it("should tag successfully with Aelith", function(done){
+    xit("should tag successfully with Aelith", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings2vs2TagForDb(cmd);
         waitUntil().interval(2).times(5000).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "test") != -1; }).done(() =>{

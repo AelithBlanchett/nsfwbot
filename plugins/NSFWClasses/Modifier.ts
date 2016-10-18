@@ -19,6 +19,7 @@ export interface IModifier{
     hpDamage: number;
     lustDamage: number;
     focusDamage: number;
+    areDamageMultipliers: boolean;
     diceRoll: number;
     escapeRoll: number;
     uses: number;
@@ -29,7 +30,7 @@ export interface IModifier{
 
     isOver():boolean;
     trigger(moment: TriggerMoment, event:Trigger, objFightAction?:any):void;
-    willTriggerForEvent(moment: TriggerMoment, event:Trigger):void;
+    willTriggerForEvent(moment: TriggerMoment, event:Trigger):boolean;
     findIndex(predicate: (value: Modifier) => boolean, thisArg?: any): number;
 }
 

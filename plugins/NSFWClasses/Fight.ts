@@ -266,6 +266,18 @@ export class Fight{
                 }
             }
         }
+
+        //Features loading
+        for(let i = 0; i < this.fighterList.length; i++){
+            for(let feature of this.fighterList[i].features){
+                this.fighterList[i].modifiers.push(feature.getModifier(this, this.fighterList[i]));
+                if(feature.isExpired()){
+                    this.fighterList[i].removeFeature(feature);
+                    this.message.addHint("This feature has expired.");
+                }
+            }
+        }
+
         this.sendMessage();
         Fight.saveState(this);
         this.outputStatus();

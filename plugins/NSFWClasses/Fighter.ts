@@ -16,6 +16,8 @@ import TriggerMoment = Constants.TriggerMoment;
 import Trigger = Constants.Trigger;
 import {ModifierType} from "./Constants";
 import {Tier} from "./Constants";
+import {Feature} from "./Feature";
+import {Features} from "./Feature";
 
 export class Fighter implements IFighter{
     id:number = -1;
@@ -34,6 +36,7 @@ export class Fighter implements IFighter{
     endurance:number = 0;
     dexterity:number = 0;
     willpower:number = 0;
+    features:Features = new Features();
 
     modifiers:Modifiers = new Modifiers();
 
@@ -83,7 +86,9 @@ export class Fighter implements IFighter{
                     `dexterity`, \
                     `toughness`, \
                     `endurance`, \
-                    `willpower` \
+                    `willpower`, \
+                    `areStatsPrivate`, \
+                    `features` \
                     FROM `flistplugins`.?? WHERE name = ?", [Constants.SQL.fightersTableName, name], function(err, rows: Array<any>){
                     if (rows != undefined && rows.length != 0) {
                         self.initFromData(rows);
@@ -118,8 +123,8 @@ export class Fighter implements IFighter{
     updateInDb(){
         return new Promise<number>((resolve, reject) => {
             var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`sensuality` = ?,`dexterity` = ?,\
-                `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ? WHERE `id` = ?;";
-            sql = Data.db.format(sql, [Constants.SQL.fightersTableName, this.tokens, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate(), this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, this.id]);
+                `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ?, `features` = ? WHERE `id` = ?;";
+            sql = Data.db.format(sql, [Constants.SQL.fightersTableName, this.tokens, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate(), this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, JSON.stringify(this.features), this.id]);
             Data.db.query(sql, (err, result) => {
                 if (result) {
                     console.log("Updated "+this.name+"'s entry in the db.");
@@ -462,6 +467,18 @@ export class Fighter implements IFighter{
         return Math.floor(this.tokens/TokensWorth.Gold);
     }
 
+    addFeature(feature:Feature):string{
+        return this.features.add(feature);
+    }
+
+    removeFeature(feature:Feature):string{
+        return this.features.remove(feature);
+    }
+
+    clearFeatures(feature:ModifierType):string{
+        return this.features.clear();
+    }
+
     outputStatus(){
         return  Utils.pad(64, `${this.getStylizedName()}:`," ") +
                 `  ${this.hp}/${this.hpPerHeart()} [color=red]HP[/color]  |`+
@@ -502,6 +519,12 @@ export class Fighter implements IFighter{
         this.lust = 0;
         this.orgasmsRemaining = this.maxOrgasms();
         this.focus = this.willpower;
+        let tempFeatures = JSON.parse(row["features"]);
+        this.features = new Features();
+        for(let feat of tempFeatures){
+            let theFeature = new Feature(feat.modType, feat.uses, feat.id);
+            this.addFeature(theFeature);
+        }
     }
 
     addStat(stat:Stats):any{
@@ -608,7 +631,8 @@ export class Fighter implements IFighter{
                     `dexterity`, \
                     `toughness`, \
                     `endurance`, \
-                    `willpower` \
+                    `willpower`, \
+                    `features` \
                     FROM `flistplugins`.?? WHERE name = ?", [Constants.SQL.fightersTableName, name], function (err, rows) {
                 if (rows != undefined && rows.length == 1) {
                     let myTempWrestler = new Fighter();
