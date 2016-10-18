@@ -12,6 +12,10 @@ import {Promise} from "es6-promise";
 import {StunModifier} from "../plugins/NSFWClasses/CustomModifiers";
 import {EnumEx} from "../plugins/NSFWClasses/Utils";
 import Trigger = Constants.Trigger;
+import {Feature} from "../plugins/NSFWClasses/Feature";
+import {FeatureType} from "../plugins/NSFWClasses/Constants";
+import {ItemPickupModifier} from "../plugins/NSFWClasses/CustomModifiers";
+import {ModifierType} from "../plugins/NSFWClasses/Constants";
 var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
 var jasmine = new Jasmine();
@@ -216,6 +220,34 @@ describe("The player(s)", () => {
         spyOn(Fighter, 'exists').and.callThrough();
 
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+    }, DEFAULT_TIMEOUT);
+
+    it("should grant the ItemPickupModifier bonus for the KickStart feature", function (done) {
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        createFighter("TheTinaArmstrong");
+        let index = Utils.findIndex(usedFighters, "name", "TheTinaArmstrong");
+        if(index != -1){
+            usedFighters[index].features.push(new Feature(FeatureType.KickStart, 1));
+        }
+        initiateMatchSettings1vs1(cmd);
+
+        waitUntil().interval(2).times(500).condition(() => {
+            return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1;
+        }).done(() => {
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+                let condition = () => {
+                    return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
+                };
+                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    if (cmd.fight.fighterList.getFighterByName("TheTinaArmstrong").modifiers.length == 1
+                        && cmd.fight.fighterList.getFighterByName("TheTinaArmstrong").modifiers[0].type == ModifierType.ItemPickupBonus) {
+                        done();
+                    }
+                    else {
+                        done.fail(new Error("Didn't do the stun"));
+                    }
+                });
+        });
     }, DEFAULT_TIMEOUT);
 
     it("should do a stun and grant the stun modifier", function (done) {
