@@ -562,13 +562,22 @@ export class Fighter implements IFighter{
             "[b][color=cyan]Endurance[/color][/b]: " + this.endurance + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + this.wins + " - " + this.losses + "\n" +
             "[b][color=purple]Dexterity[/color][/b]: " + this.dexterity +  "      " + "[b][color=orange]Bronze tokens available[/color][/b]: " + this.bronzeTokens() +  " " + "[b][color=grey]Silver[/color][/b]: " + this.silverTokens() +  " " + "[b][color=yellow]Gold[/color][/b]: " + this.goldTokens() + "\n" +
             "[b][color=blue]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Total tokens[/color][/b]: " + this.tokens + "         [b][color=orange]Total spent[/color][/b]: "+this.tokensSpent+"\n"  +
-            "[b][color=red]Features[/color][/b]:[b]" + this.getFeaturesList() + "[/b]";
+            "[b][color=red]Features[/color][/b]:[b]" + this.getFeaturesList() + "[/b]\n" +
+            "[b][color=red]Achievements[/color][/b]:[b]" + this.getAchievementsList() + "[/b]";
     }
 
     getFeaturesList(){
         let strResult = [];
         for(let feature of this.features){
             strResult.push(`${Feature[FeatureType[feature.type]]} - ${feature.uses} uses left`);
+        }
+        return strResult.join(", ");
+    }
+
+    getAchievementsList(){
+        let strResult = [];
+        for(let achievementId of this.achievements){
+            strResult.push(`${Achievement[AchievementType[achievementId]]}`);
         }
         return strResult.join(", ");
     }
