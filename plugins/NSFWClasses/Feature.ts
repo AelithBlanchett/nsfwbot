@@ -103,15 +103,15 @@ export class Features extends Array<Feature>{
         let index = this.findIndex(x => x.type == feature.type);
         if(index == -1){
             this.push(feature);
-            return "";
         }
         else{
-            return "You can only have one feature of the same type at the same time.";
+            this[index].uses += feature.uses;
         }
+        return "";
     }
 
-    remove(feature:Feature):string{
-        let index = this.findIndex(x => x.type == feature.type);
+    remove(feature:FeatureType):string{
+        let index = this.findIndex(x => x.type == feature);
         if(index != -1){
             this.splice(index,1);
             return "";

@@ -452,8 +452,16 @@ export class Fighter implements IFighter{
             "[b][color=green]Toughness[/color][/b]: " + this.toughness + "\n" +
             "[b][color=cyan]Endurance[/color][/b]: " + this.endurance + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + this.wins + " - " + this.losses + "\n" +
             "[b][color=purple]Dexterity[/color][/b]: " + this.dexterity +  "      " + "[b][color=orange]Bronze tokens available[/color][/b]: " + this.bronzeTokens() +  " " + "[b][color=grey]Silver[/color][/b]: " + this.silverTokens() +  " " + "[b][color=yellow]Gold[/color][/b]: " + this.goldTokens() + "\n" +
-            "[b][color=blue]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Total tokens[/color][/b]: " + this.tokens + "\n";/*+ "\n\n"  +
-            "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]"*/
+            "[b][color=blue]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Total tokens[/color][/b]: " + this.tokens + "\n"  +
+            "[b][color=red]Perks&Handicaps[/color][/b]:[b]" + this.getFeaturesList() + "[/b]";
+    }
+
+    getFeaturesList(){
+        let strResult = [];
+        for(let feature of this.features){
+            strResult.push(`${Feature[FeatureType[feature.type]]} - ${feature.uses} uses left`);
+        }
+        return strResult.join(", ");
     }
 
     bronzeTokens():number{
@@ -468,12 +476,35 @@ export class Fighter implements IFighter{
         return Math.floor(this.tokens/TokensWorth.Gold);
     }
 
-    addFeature(feature:Feature):string{
-        return this.features.add(feature);
+    removeFeature(feature:FeatureType):string{
+        return this.features.remove(feature);
     }
 
-    removeFeature(feature:Feature):string{
-        return this.features.remove(feature);
+    addFeature(feature:Feature):string{
+        let amountToRemove = 0;
+        switch (feature.type){
+            case FeatureType.KickStart:
+            case FeatureType.SexyKickStart:
+                amountToRemove = 2 * feature.uses;
+                break;
+            case FeatureType.Sadist:
+            case FeatureType.RyonaEnthusiast:
+            case FeatureType.CumSlut:
+                //Free features
+                break;
+        }
+
+        if(this.tokens - amountToRemove >= 0){
+            let result = this.features.add(feature);
+            if(result == ""){
+                this.tokens -= amountToRemove;
+                this.update();
+            }
+            return result;
+        }
+        else{
+            return `Not enough tokens. Required: ${amountToRemove}.`;
+        }
     }
 
     clearFeatures(feature:ModifierType):string{

@@ -275,7 +275,7 @@ export class Fight{
                     this.fighterList[i].modifiers.push(modToAdd);
                 }
                 if(feature.isExpired()){
-                    this.fighterList[i].removeFeature(feature);
+                    this.fighterList[i].removeFeature(feature.type);
                     this.message.addHint("This feature has expired.");
                     this.fighterList[i].update();
                 }

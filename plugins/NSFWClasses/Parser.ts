@@ -6,6 +6,8 @@ import Tier = Constants.Tier;
 import Stats = Constants.Stats;
 import StatTier = Constants.StatTier;
 import {FightType} from "./Constants";
+import {FeatureType} from "./Constants";
+import {Feature} from "./Feature";
 var _ = require('lodash');
 
 export class Commands{
@@ -32,6 +34,36 @@ export class Commands{
             return Stats[Stats[indexOfStat]];
         }
         return -1;
+    }
+
+    public static getFeatureType(args, onlyType:boolean = false){
+        let result = {featureType: null, turns: -1, message: null};
+        let splittedArgs = args.split(" ");
+        let typeToSearch = splittedArgs[0];
+        let turns = 0;
+
+        if(splittedArgs.length > 1 && !onlyType){
+            if(isNaN(splittedArgs[1]) || splittedArgs[1] <= 0 || splittedArgs[1] > 10){
+                result.message = "The number of fights specified is invalid. It must be a number > 0 and <= 10";
+                return result;
+            }
+            else{
+                result.turns = splittedArgs[1];
+            }
+        }
+        else{
+            result.turns = 0;
+        }
+
+        let featTypes = Utils.getEnumList(FeatureType);
+        for(let featTypeId in featTypes){
+            featTypes[featTypeId] = featTypes[featTypeId].toLowerCase();
+        }
+        let indexOfFeatType = featTypes.indexOf(typeToSearch.toLowerCase());
+        if(indexOfFeatType != -1){
+            result.featureType =  FeatureType[FeatureType[indexOfFeatType]];
+        }
+        return result;
     }
 
     public static setFightType(args){
