@@ -101,8 +101,54 @@ export enum ModifierType {
     Stun = 9
 }
 
+export class Achievement {
+    static Rookie = "Win your first fight!";
+    static FiveFights = "Participate in 5 Fights";
+    static TenFights = "Participate in 10 fights";
+    static TwentyFights = "Participate in 20 fights";
+    static FortyFights = "Participate in 40 fights";
+    static WinFiveFights = "Win 5 Fights";
+    static WinTenFights = "Win 10 fights";
+    static WinTwentyFights = "Win 20 fights";
+    static WinThirtyFights = "Win 30 fights";
+    static WinFortyFights = "Win 40 fights";
+    static ReachedSilver = "Reached Silver Tier";
+    static ReachedGold = "Reached Gold Tier";
+}
+
+export enum AchievementType {
+    Rookie = 0,
+    FiveFights = 1,
+    TenFights = 2,
+    TwentyFights = 3,
+    FortyFights = 4,
+    WinFiveFights = 5,
+    WinTenFights = 6,
+    WinTwentyFights = 7,
+    WinThirtyFights = 8,
+    WinFortyFights = 9,
+    ReachedSilver = 10,
+    ReachedGold = 11
+}
+
+export class AchievementReward {
+    static Rookie = "10 tokens";
+    static FiveFights = "50 tokens";
+    static TenFights = "100 tokens";
+    static TwentyFights = "150 tokens";
+    static FortyFights = "200 tokens";
+
+    static WinFiveFights = "50 tokens";
+    static WinTenFights = "100 tokens";
+    static WinTwentyFights = "200 tokens";
+    static WinThirtyFights = "300 tokens";
+    static WinFortyFights = "400 tokens";
+    static ReachedSilver = "100 tokens";
+    static ReachedGold = "200 tokens";
+}
+
 export class Feature {
-    static KickStart = "Kick Start"; //TODO: Check if features are working, donner un moyen d'acheter les features, et savoir si oui ou non elles sont permanentes. Si non, alors combien d'utilisations
+    static KickStart = "Kick Start";
     static SexyKickStart = "Sexy Kick Start";
     static Sadist = "Sadist";
     static CumSlut = "Cum Slut";

@@ -63,6 +63,9 @@ export class Commands{
         if(indexOfFeatType != -1){
             result.featureType =  FeatureType[FeatureType[indexOfFeatType]];
         }
+        else{
+            result.message = "This feature doesn't exist.";
+        }
         return result;
     }
 

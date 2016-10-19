@@ -19,11 +19,16 @@ import {Tier} from "./Constants";
 import {Feature} from "./Feature";
 import {Features} from "./Feature";
 import {FeatureType} from "./Constants";
+import {Achievements} from "./Achievement";
+import {AchievementType} from "./Constants";
+import {Achievement} from "./Constants";
+import {AchievementReward} from "./Constants";
 
 export class Fighter implements IFighter{
     id:number = -1;
     name:string = "";
     tokens: number = 0;
+    tokensSpent: number = 0;
     wins: number = 0;
     losses: number = 0;
     forfeits: number = 0;
@@ -38,8 +43,8 @@ export class Fighter implements IFighter{
     dexterity:number = 0;
     willpower:number = 0;
     features:Features = new Features();
-
     modifiers:Modifiers = new Modifiers();
+    achievements:Achievements = new Achievements();
 
 
 
@@ -77,6 +82,7 @@ export class Fighter implements IFighter{
                     "SELECT `id`, \
                     `name`, \
                     `tokens`, \
+                    ´tokensSpent´, \
                     `wins`, \
                     `losses`, \
                     `forfeits`, \
@@ -89,7 +95,8 @@ export class Fighter implements IFighter{
                     `endurance`, \
                     `willpower`, \
                     `areStatsPrivate`, \
-                    `features` \
+                    `features`, \
+                    `achievements` \
                     FROM `flistplugins`.?? WHERE name = ?", [Constants.SQL.fightersTableName, name], function(err, rows: Array<any>){
                     if (rows != undefined && rows.length != 0) {
                         self.initFromData(rows);
@@ -105,6 +112,108 @@ export class Fighter implements IFighter{
                 reject("No name passed.");
             }
         });
+    }
+
+    checkAchievements(){
+        let strBase = "Achievements won: ";
+        let added = [];
+        let count = 0;
+
+        if(this.totalFights >= 5){
+            if(this.achievements.add(AchievementType.FiveFights) == ""){
+                this.giveTokens(50);
+                count++;
+                added.push(Achievement.FiveFights + " Reward: "+ AchievementReward.FiveFights);
+            }
+        }
+        if(this.totalFights >= 10){
+            if(this.achievements.add(AchievementType.TenFights) == "") {
+                this.giveTokens(100);
+                count++;
+                added.push(Achievement.TenFights + " Reward: "+ AchievementReward.TenFights);
+            }
+        }
+        if(this.totalFights >= 20){
+            if(this.achievements.add(AchievementType.TwentyFights) == "") {
+                this.giveTokens(150);
+                count++;
+                added.push(Achievement.TwentyFights + " Reward: "+ AchievementReward.TwentyFights);
+            }
+        }
+        if(this.totalFights >= 40){
+            if(this.achievements.add(AchievementType.FortyFights) == ""){
+                this.giveTokens(200);
+                count++;
+                added.push(Achievement.FortyFights + " Reward: "+ AchievementReward.FortyFights);
+            }
+        }
+
+        if(this.wins == 1){
+            if(this.achievements.add(AchievementType.Rookie) == ""){
+                this.giveTokens(10);
+                count++;
+                added.push(Achievement.Rookie + " Reward: "+ AchievementReward.Rookie);
+            }
+        }
+        if(this.wins >= 5){
+            if(this.achievements.add(AchievementType.WinFiveFights) == ""){
+                this.giveTokens(50);
+                count++;
+                added.push(Achievement.WinFiveFights + " Reward: "+ AchievementReward.WinFiveFights);
+            }
+        }
+        if(this.wins >= 10){
+            if(this.achievements.add(AchievementType.WinTenFights) == ""){
+                this.giveTokens(100);
+                count++;
+                added.push(Achievement.WinTenFights + " Reward: "+ AchievementReward.WinTenFights);
+            }
+        }
+        if(this.wins >= 20){
+            if(this.achievements.add(AchievementType.WinTwentyFights) == ""){
+                this.giveTokens(200);
+                count++;
+                added.push(Achievement.WinTwentyFights + " Reward: "+ AchievementReward.WinTwentyFights);
+            }
+        }
+        if(this.wins >= 20){
+            if(this.achievements.add(AchievementType.WinThirtyFights) == ""){
+                this.giveTokens(300);
+                count++;
+                added.push(Achievement.WinThirtyFights + " Reward: "+ AchievementReward.WinThirtyFights);
+            }
+        }
+        if(this.wins >= 40){
+            if(this.achievements.add(AchievementType.WinFortyFights) == ""){
+                this.giveTokens(400);
+                count++;
+                added.push(Achievement.WinFortyFights + " Reward: "+ AchievementReward.WinFortyFights);
+            }
+        }
+
+        if(this.tier() == FightTier.Silver){
+            if(this.achievements.add(AchievementType.ReachedSilver) == ""){
+                this.giveTokens(100);
+                count++;
+                added.push(Achievement.ReachedSilver + " Reward: "+ AchievementReward.ReachedSilver);
+            }
+        }
+        if(this.tier() == FightTier.Gold){
+            if(this.achievements.add(AchievementType.ReachedGold) == ""){
+                this.giveTokens(200);
+                count++;
+                added.push(Achievement.ReachedGold + " Reward: "+ AchievementReward.ReachedGold);
+            }
+        }
+
+        if(count > 0){
+            strBase += added.join(", ");
+        }
+        else{
+            strBase = "";
+        }
+
+        return strBase;
     }
 
     update():Promise<boolean>{
@@ -123,9 +232,9 @@ export class Fighter implements IFighter{
 
     updateInDb(){
         return new Promise<number>((resolve, reject) => {
-            var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`sensuality` = ?,`dexterity` = ?,\
+            var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`tokensSpent` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`sensuality` = ?,`dexterity` = ?,\
                 `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ?, `features` = ? WHERE `id` = ?;";
-            sql = Data.db.format(sql, [Constants.SQL.fightersTableName, this.tokens, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate(), this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, JSON.stringify(this.features), this.id]);
+            sql = Data.db.format(sql, [Constants.SQL.fightersTableName, this.tokens, this.tokensSpent, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate(), this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, JSON.stringify(this.features), this.id]);
             Data.db.query(sql, (err, result) => {
                 if (result) {
                     console.log("Updated "+this.name+"'s entry in the db.");
@@ -452,8 +561,8 @@ export class Fighter implements IFighter{
             "[b][color=green]Toughness[/color][/b]: " + this.toughness + "\n" +
             "[b][color=cyan]Endurance[/color][/b]: " + this.endurance + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + this.wins + " - " + this.losses + "\n" +
             "[b][color=purple]Dexterity[/color][/b]: " + this.dexterity +  "      " + "[b][color=orange]Bronze tokens available[/color][/b]: " + this.bronzeTokens() +  " " + "[b][color=grey]Silver[/color][/b]: " + this.silverTokens() +  " " + "[b][color=yellow]Gold[/color][/b]: " + this.goldTokens() + "\n" +
-            "[b][color=blue]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Total tokens[/color][/b]: " + this.tokens + "\n"  +
-            "[b][color=red]Perks&Handicaps[/color][/b]:[b]" + this.getFeaturesList() + "[/b]";
+            "[b][color=blue]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Total tokens[/color][/b]: " + this.tokens + "         [b][color=orange]Total spent[/color][/b]: "+this.tokensSpent+"\n"  +
+            "[b][color=red]Features[/color][/b]:[b]" + this.getFeaturesList() + "[/b]";
     }
 
     getFeaturesList(){
@@ -477,7 +586,11 @@ export class Fighter implements IFighter{
     }
 
     removeFeature(feature:FeatureType):string{
-        return this.features.remove(feature);
+        let result = this.features.remove(feature);
+        if(result == ""){
+            this.update();
+        }
+        return result;
     }
 
     addFeature(feature:Feature):string{
@@ -497,7 +610,7 @@ export class Fighter implements IFighter{
         if(this.tokens - amountToRemove >= 0){
             let result = this.features.add(feature);
             if(result == ""){
-                this.tokens -= amountToRemove;
+                this.removeTokens(amountToRemove);
                 this.update();
             }
             return result;
@@ -507,8 +620,12 @@ export class Fighter implements IFighter{
         }
     }
 
-    clearFeatures(feature:ModifierType):string{
-        return this.features.clear();
+    clearFeatures():string{
+        let result = this.features.clear();
+        if(result == ""){
+            this.update();
+        }
+        return result;
     }
 
     hasFeature(featureType:FeatureType):boolean{
@@ -559,7 +676,13 @@ export class Fighter implements IFighter{
         this.features = new Features();
         for(let feat of tempFeatures){
             let theFeature = new Feature(feat.modType, feat.uses, feat.id);
-            this.addFeature(theFeature);
+            this.features.add(theFeature);
+        }
+
+        let tempAchievements = JSON.parse(row["features"]);
+        this.achievements = new Achievements();
+        for(let achievement of tempAchievements){
+            this.achievements.add(achievement);
         }
     }
 
@@ -585,7 +708,7 @@ export class Fighter implements IFighter{
         }
 
         if(amountToRemove != 0 && (this.tokens - amountToRemove >= 0)){
-            this.tokens -= amountToRemove;
+            this.removeTokens(amountToRemove);
             this[Stats[stat].toLowerCase()]++;
             this.update();
             return "";
@@ -617,7 +740,7 @@ export class Fighter implements IFighter{
         }
 
         if(amountToGive != 0){
-            this.tokens += Math.floor(amountToGive/2);
+            this.giveTokens(Math.floor(amountToGive/2));
             this[Stats[stat].toLowerCase()]--;
             this.update();
             return "";
@@ -633,6 +756,7 @@ export class Fighter implements IFighter{
 
     removeTokens(amount){
         this.tokens -= amount;
+        this.tokensSpent += amount;
         if(this.tokens < 0){
             this.tokens = 0;
         }
@@ -656,6 +780,7 @@ export class Fighter implements IFighter{
             Data.db.query("SELECT `id`, \
                     `name`, \
                     `tokens`, \
+                    ´tokensSpent´, \
                     `wins`, \
                     `losses`, \
                     `forfeits`, \
@@ -668,7 +793,8 @@ export class Fighter implements IFighter{
                     `toughness`, \
                     `endurance`, \
                     `willpower`, \
-                    `features` \
+                    `features`, \
+                    `achievements` \
                     FROM `flistplugins`.?? WHERE name = ?", [Constants.SQL.fightersTableName, name], function (err, rows) {
                 if (rows != undefined && rows.length == 1) {
                     let myTempWrestler = new Fighter();
