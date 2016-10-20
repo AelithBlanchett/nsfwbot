@@ -330,9 +330,12 @@ export enum TokensWorth {
     Gold = 600
 }
 
-export enum FightType {
+export enum FightType { //TODO: implement that
     Classic = 0,
-    Tag = 1
+    Tag = 1,
+    LastManStanding = 2,
+    SexFight = 3,
+    Humiliation = 4
 }
 
 export const Arenas = [
