@@ -153,6 +153,7 @@ export class Feature {
     static Sadist = "Sadist";
     static CumSlut = "Cum Slut";
     static RyonaEnthusiast = "Ryona Enthusiast";
+    static DomSubLover = "Dom Sub Lover";
 }
 
 export enum FeatureType {
@@ -160,7 +161,8 @@ export enum FeatureType {
     SexyKickStart = 1,
     Sadist = 2,
     CumSlut = 3,
-    RyonaEnthusiast = 4
+    RyonaEnthusiast = 4,
+    DomSubLover = 5
 }
 
 export class FeatureExplain {
@@ -169,6 +171,7 @@ export class FeatureExplain {
     static Sadist = "Dealing HP damage to the opponent will deal the same amount divided by two to the wearer's Lust.";
     static CumSlut = "Increases all Lust damage done to the wearer by 3.";
     static RyonaEnthusiast = "Taking HP damage also increases the wearer's Lust by the same amount divided by two.";
+    static DomSubLover = "Replaces focus by submissiveness. Purely visual.";
 }
 
 export class Messages {

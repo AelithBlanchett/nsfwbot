@@ -41,7 +41,7 @@ export class CommandHandler implements ICommandHandler{
                 let fighter:Fighter = receivedData as Fighter;
                 let res = fighter.addFeature(new Feature(parsedFeatureArgs.featureType, parsedFeatureArgs.turns));
                 if(res == ""){
-                    this.fChatLibInstance.sendPrivMessage(`You successfully added the ${FeatureType[parsedFeatureArgs.featureType]} feature.`,fighter.name);
+                    this.fChatLibInstance.sendPrivMessage(`[color=green]You successfully added the ${FeatureType[parsedFeatureArgs.featureType]} feature.[/color]`,fighter.name);
                 }
                 else{
                     this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+res+"[/color]", fighter.name);
@@ -66,7 +66,7 @@ export class CommandHandler implements ICommandHandler{
                 let fighter:Fighter = receivedData as Fighter;
                 let res = fighter.addStat(parsedStat);
                 if(res == ""){
-                    this.fChatLibInstance.sendPrivMessage(`${Stats[parsedStat]} successfully upgraded by 1!`,fighter.name);
+                    this.fChatLibInstance.sendPrivMessage(`[color=green]${Stats[parsedStat]} successfully upgraded by 1![/color]`,fighter.name);
                 }
                 else{
                     this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+res+"[/color]", fighter.name);
@@ -86,7 +86,7 @@ export class CommandHandler implements ICommandHandler{
                 let fighter:Fighter = receivedData as Fighter;
                 let res = fighter.clearFeatures();
                 if(res == ""){
-                    this.fChatLibInstance.sendPrivMessage(`You successfully removed all your features.`,fighter.name);
+                    this.fChatLibInstance.sendPrivMessage(`[color=green]You successfully removed all your features.[/color]`,fighter.name);
                 }
                 else{
                     this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+res+"[/color]", fighter.name);
@@ -103,18 +103,6 @@ export class CommandHandler implements ICommandHandler{
     debug(args:string, data:FChatResponse){
         if(this.fChatLibInstance.isUserMaster(data.character, "")){
             eval(args);
-        }
-    }
-
-    addAchievement(args:string, data:FChatResponse){
-        if(this.fChatLibInstance.isUserMaster(data.character, "")){
-            Fighter.exists(data.character).then(receivedData => {
-                if (receivedData) {
-                    let fighter:Fighter = receivedData as Fighter;
-                    fighter.achievements.add(0);
-                    fighter.update();
-                }
-            });
         }
     }
 
@@ -168,10 +156,37 @@ export class CommandHandler implements ICommandHandler{
                 let fighter:Fighter = receivedData as Fighter;
                 let chosenTeam = Parser.Commands.join(args);
                 if(this.fight.join(fighter, chosenTeam)){
-                    this.fChatLibInstance.sendMessage(`[color=red]${fighter.name} stepped into the ring for the [color=${Team[fighter.assignedTeam]}]${Team[fighter.assignedTeam]}[/color] team! Waiting for everyone to be !ready.[/color]`, this.channel);
+                    this.fChatLibInstance.sendMessage(`[color=green]${fighter.name} stepped into the ring for the [color=${Team[fighter.assignedTeam]}]${Team[fighter.assignedTeam]}[/color] team! Waiting for everyone to be !ready.[/color]`, this.channel);
                 }
                 else{
                     this.fChatLibInstance.sendMessage("[color=red]You have already joined the fight.[/color]", this.channel);
+                }
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]You are not registered.[/color]", this.channel);
+            }
+        }).catch(err =>{
+            this.fChatLibInstance.throwError(err);
+        });
+    };
+
+    leave(args:string, data:FChatResponse){
+        if(this.fight == undefined || this.fight.hasEnded){
+            this.fChatLibInstance.sendMessage("[color=red]There is no fight in progress. You must either do !forfeit or !draw to leave the fight.[/color]", this.channel);
+            return false;
+        }
+        if(this.fight.hasStarted){
+            this.fChatLibInstance.sendMessage("[color=red]There is already a fight in progress. You must either do !forfeit or !draw to leave the fight.[/color]", this.channel);
+            return false;
+        }
+        Fighter.exists(data.character).then(data =>{
+            if(data){
+                let fighter:Fighter = data as Fighter;
+                if(this.fight.leave(fighter)){ //else, the match starts!
+                    this.fChatLibInstance.sendMessage("[color=green]You are now out of the fight.[/color]", this.channel);
+                }
+                else{
+                    this.fChatLibInstance.sendMessage("[color=red]You have already left the fight.[/color]", this.channel);
                 }
             }
             else{
@@ -209,7 +224,7 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(data.character).then(doesExist =>{
             if(!doesExist){
                 Fighter.create(data.character).then(()=>{
-                    this.fChatLibInstance.sendPrivMessage("You are now registered! Welcome!", data.character);
+                    this.fChatLibInstance.sendPrivMessage("[color=green]You are now registered! Welcome! Don't forget to type !howtostart here if you haven't read the quickstart guide yet.[/color]", data.character);
                 }).catch(err => {
                     this.fChatLibInstance.throwError(err);
                 });
@@ -234,7 +249,7 @@ export class CommandHandler implements ICommandHandler{
                 let fighter:Fighter = receivedData as Fighter;
                 let res = fighter.removeFeature(parsedFeatureArgs.featureType);
                 if(res == ""){
-                    this.fChatLibInstance.sendPrivMessage(`You successfully removed your ${FeatureType[parsedFeatureArgs.featureType]} feature.`,fighter.name);
+                    this.fChatLibInstance.sendPrivMessage(`[color=green]You successfully removed your ${FeatureType[parsedFeatureArgs.featureType]} feature.[/color]`,fighter.name);
                 }
                 else{
                     this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+res+"[/color]", fighter.name);
@@ -259,7 +274,7 @@ export class CommandHandler implements ICommandHandler{
                 let fighter:Fighter = receivedData as Fighter;
                 let res = fighter.removeStat(parsedStat);
                 if(res == ""){
-                    this.fChatLibInstance.sendPrivMessage(`${Stats[parsedStat]} successfully decreased by 1!`, fighter.name);
+                    this.fChatLibInstance.sendPrivMessage(`[color=green]${Stats[parsedStat]} successfully decreased by 1![/color]`, fighter.name);
                 }
                 else{
                     this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+res+"[/color]", fighter.name);

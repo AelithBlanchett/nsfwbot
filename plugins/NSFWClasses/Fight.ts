@@ -183,6 +183,19 @@ export class Fight{
 
     //Pre-fight utils
 
+    leave(fighter:Fighter){
+        if(!this.hasStarted){
+            let index = this.fighterList.findIndex(x => x.name == fighter.name);
+            if(index != -1){
+                fighter.assignedTeam = null;
+                fighter.fight = null;
+                this.fighterList.splice(index, 1);
+                return true;
+            }
+        }
+        return false;
+    }
+
     join(fighter:Fighter, team:Team){
         if(!this.hasStarted){
             if(!this.fighterList.getFighterByName(fighter.name)){ //find fighter by its name property instead of comparing objects, which doesn't work.
