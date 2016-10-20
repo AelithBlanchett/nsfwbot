@@ -562,8 +562,8 @@ export class Fighter implements IFighter{
             "[b][color=cyan]Endurance[/color][/b]: " + this.endurance + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + this.wins + " - " + this.losses + "\n" +
             "[b][color=purple]Dexterity[/color][/b]: " + this.dexterity +  "      " + "[b][color=orange]Bronze tokens available[/color][/b]: " + this.bronzeTokens() +  " " + "[b][color=grey]Silver[/color][/b]: " + this.silverTokens() +  " " + "[b][color=yellow]Gold[/color][/b]: " + this.goldTokens() + "\n" +
             "[b][color=blue]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Total tokens[/color][/b]: " + this.tokens + "         [b][color=orange]Total spent[/color][/b]: "+this.tokensSpent+"\n"  +
-            "[b][color=red]Features[/color][/b]:[b]" + this.getFeaturesList() + "[/b]\n" +
-            "[b][color=yellow]Achievements[/color][/b]:[b]" + this.getAchievementsList() + "[/b]";
+            "[b][color=red]Features[/color][/b]: [b]" + this.getFeaturesList() + "[/b]\n" +
+            "[b][color=yellow]Achievements[/color][/b]: [b]" + this.getAchievementsList() + "[/b]";
     }
 
     getFeaturesList(){
@@ -688,7 +688,7 @@ export class Fighter implements IFighter{
             this.features.add(theFeature);
         }
 
-        let tempAchievements = JSON.parse(row["features"]);
+        let tempAchievements = JSON.parse(row["achievements"]);
         this.achievements = new Achievements();
         for(let achievement of tempAchievements){
             this.achievements.add(achievement);

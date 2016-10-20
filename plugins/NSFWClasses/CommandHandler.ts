@@ -106,6 +106,18 @@ export class CommandHandler implements ICommandHandler{
         }
     }
 
+    addAchievement(args:string, data:FChatResponse){
+        if(this.fChatLibInstance.isUserMaster(data.character, "")){
+            Fighter.exists(data.character).then(receivedData => {
+                if (receivedData) {
+                    let fighter:Fighter = receivedData as Fighter;
+                    fighter.achievements.add(0);
+                    fighter.update();
+                }
+            });
+        }
+    }
+
     getstats(args:string, data:FChatResponse){
         if(args == ""){
             args = data.character;
