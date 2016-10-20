@@ -82,7 +82,7 @@ export class Fighter implements IFighter{
                     "SELECT `id`, \
                     `name`, \
                     `tokens`, \
-                    ´tokensSpent´, \
+                    `tokensSpent`, \
                     `wins`, \
                     `losses`, \
                     `forfeits`, \
@@ -233,8 +233,8 @@ export class Fighter implements IFighter{
     updateInDb(){
         return new Promise<number>((resolve, reject) => {
             var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`tokensSpent` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`sensuality` = ?,`dexterity` = ?,\
-                `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ?, `features` = ? WHERE `id` = ?;";
-            sql = Data.db.format(sql, [Constants.SQL.fightersTableName, this.tokens, this.tokensSpent, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate(), this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, JSON.stringify(this.features), this.id]);
+                `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ?, `features` = ?, `achievements` = ? WHERE `id` = ?;";
+            sql = Data.db.format(sql, [Constants.SQL.fightersTableName, this.tokens, this.tokensSpent, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate(), this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, JSON.stringify(this.features), JSON.stringify(this.achievements), this.id]);
             Data.db.query(sql, (err, result) => {
                 if (result) {
                     console.log("Updated "+this.name+"'s entry in the db.");
@@ -563,7 +563,7 @@ export class Fighter implements IFighter{
             "[b][color=purple]Dexterity[/color][/b]: " + this.dexterity +  "      " + "[b][color=orange]Bronze tokens available[/color][/b]: " + this.bronzeTokens() +  " " + "[b][color=grey]Silver[/color][/b]: " + this.silverTokens() +  " " + "[b][color=yellow]Gold[/color][/b]: " + this.goldTokens() + "\n" +
             "[b][color=blue]Willpower[/color][/b]: " + this.willpower +  "      " + "[b][color=orange]Total tokens[/color][/b]: " + this.tokens + "         [b][color=orange]Total spent[/color][/b]: "+this.tokensSpent+"\n"  +
             "[b][color=red]Features[/color][/b]:[b]" + this.getFeaturesList() + "[/b]\n" +
-            "[b][color=red]Achievements[/color][/b]:[b]" + this.getAchievementsList() + "[/b]";
+            "[b][color=yellow]Achievements[/color][/b]:[b]" + this.getAchievementsList() + "[/b]";
     }
 
     getFeaturesList(){
@@ -789,7 +789,7 @@ export class Fighter implements IFighter{
             Data.db.query("SELECT `id`, \
                     `name`, \
                     `tokens`, \
-                    ´tokensSpent´, \
+                    `tokensSpent`, \
                     `wins`, \
                     `losses`, \
                     `forfeits`, \
