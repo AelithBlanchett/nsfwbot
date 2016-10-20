@@ -660,6 +660,7 @@ export class Fight{
     }
 
     static commitEndFightDb(fight, tokensToGiveToWinners, tokensToGiveToLosers){
+
         Data.db.beginTransaction(err =>{
             var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
             sql = Data.db.format(sql, [Constants.SQL.fightTableName, fight.currentTurn, "", true, fight.winnerTeam, fight.id]);
@@ -687,6 +688,7 @@ export class Fight{
                             fighter.giveTokens(tokensToGiveToLosers)
                             callsToMake.push(fighter.update());
                         }
+                        fight.message.addInfo(fighter.checkAchievements());
                     }
                     Promise.all(callsToMake)
                         .then(_ => {
