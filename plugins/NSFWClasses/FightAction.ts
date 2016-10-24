@@ -627,6 +627,7 @@ export class FightAction{
         if(this.type == Action.Escape && this.missed == false){
             fight.message.addHint(`This is still your turn ${this.attacker.getStylizedName()}, time to fight back!`);
             fight.sendMessage();
+            fight.waitingForAction = true;
         } else if (!fight.isFightOver()) {
             fight.nextTurn();
         } else { //if there's only one team left in the fight, then we're sure it's over
