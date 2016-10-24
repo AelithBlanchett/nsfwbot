@@ -441,7 +441,8 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(args).then(receivedData =>{
             if(receivedData){
                 let fighter:Fighter = receivedData as Fighter;
-                if(this.fight.fighterList.getFighterByID(fighter.id)){
+                fighter = this.fight.fighterList.getFighterByID(fighter.id);
+                if(fighter){
                     this.fight.forfeit(fighter);
                 }
                 else{
