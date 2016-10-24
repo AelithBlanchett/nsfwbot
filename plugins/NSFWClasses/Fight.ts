@@ -659,6 +659,8 @@ export class Fight{
 
     endFight(tokensToGiveToWinners, tokensToGiveToLosers, forceWinner?:Team){
         this.hasEnded = true;
+        this.hasStarted = false;
+        
         if(!forceWinner){
             this.winnerTeam = this.fighterList.getUsedTeams()[0];
         }
