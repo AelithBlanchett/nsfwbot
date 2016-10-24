@@ -465,7 +465,8 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(data.character).then(receivedData =>{
             if(receivedData){
                 let fighter:Fighter = receivedData as Fighter;
-                if(this.fight.fighterList.getFighterByID(fighter.id)){
+                fighter = this.fight.fighterList.getFighterByID(fighter.id)
+                if(fighter) {
                     if(fighter.wantsDraw){
                         this.fChatLibInstance.sendPrivMessage("[color=red]You are already waiting for the draw.[/color]", data.character);
                     }
