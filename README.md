@@ -13,37 +13,23 @@ Not much here for the moment.
   - node tests.js
 And check if the tests are working correctly.
 
-3) Edit config file with your info
+3) Edit config file with your info, especially take care of the config.room and config.master
 
-4) npm start
+4) Edit the config.mysql.js to match your database's info
 
-5) Commands are automatically loaded
+5) Run the create.sql script in config/
 
-
-###Available commands:
-
-!addFeature, !addStats, !addfeature, !addstats, !b, !brawl, !current, !dbg, !deleteProfile, !deleteprofile, !e, !escape, !escapeHold, !escapehold, !exit, !fight, !flood, !forfeit, !getStats, !getstats, !giveUp, !giveup, !grapple, !grappling, !h, !help, !hit, !hold, !holds, !hp, !leave, !leaveFight, !leavefight, !list, !listops, !lust, !myStats, !mystats, !ready, !register, !reloadplugins, !removeFeature, !removeStats, !removefeature, !removestats, !reset, !restart, !s, !sex, !sextoys, !sexual, !stamina, !stats, !status, !submission, !submit, !surrender, !tapout, !toys, !unready, !wrestle
-
-Some commands are just aliases.
-
-
-###Adding, balancing and modifying values
-For the holds: > plugins/etc/holds.js
-
-For the sexual attacks: > plugins/etc/sexual.js
-
-For the brawl attacks: > plugins/etc/brawl.js
-
-For the features: > plugins/etc/features.js
-
-For the sextoys: > plugins/etc/sextoys.js
-
+4) Execute: node index.js
 
 
 #TODO
 
-- Some sexual moves are counted as holds, modify the current hold scheme to adapt it. (if the isInfinite parameter is set, don't count turns)
-- Read the code to fill this TODO
-- Add crossed out moves (some conditions are tricky)
-- Standardize the 'JSON' (not really json) files, with all the different parameters.
+-   Add a way to do table matches (Requires table-setup action and table-smash)
+-   Implement different kind of matches, HP only, LP only, FP only, Bondage only.
+-   Variable end match messages, suggesting how to finish
+-   Finish features implementation (Rename focus to submissiveness?)
+-   Use message constants
+-   Implement bondage, but not only in a sexhold
+-   Implement a way to inflict lust onto your own character
+
 
