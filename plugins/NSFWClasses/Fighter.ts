@@ -289,14 +289,14 @@ export class Fighter implements IFighter{
                         listOfModsToRemove.push(mod);
                     }
                     else if(mod.parentIds.indexOf(idMod) != -1){
-                        mod.parentIds.splice(mod.parentIds.indexOf(idMod));
+                        mod.parentIds.splice(mod.parentIds.indexOf(idMod), 1);
                     }
                 }
 
             }
         }
         for(let modIndex of listOfModsToRemove){
-            this.modifiers.splice(modIndex);
+            this.modifiers.splice(modIndex, 1);
         }
     }
 
