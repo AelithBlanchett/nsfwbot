@@ -222,6 +222,60 @@ describe("The player(s)", () => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
     }, DEFAULT_TIMEOUT);
 
+    it("should win the match with 3 bondage attacks and check if mods are not incorrectly", function (done) {
+        var cmd = new CommandHandler(fChatLibInstance, "here");
+        initiateMatchSettings1vs1(cmd);
+        waitUntil().interval(100).times(50).condition(() => {
+            return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1;
+        }).done(() => {
+            cmd.fight.setCurrentPlayer("TheTinaArmstrong");
+            doAction(cmd, "sexhold", "Light").then(() => {
+                cmd.fight.nextTurn();
+                refillHPLPFP(cmd, "Aelith Blanchette");
+                doAction(cmd, "bondage", "Light").then(() => {
+                    cmd.fight.nextTurn();
+                    refillHPLPFP(cmd, "Aelith Blanchette");
+                    doAction(cmd, "sexhold", "Light").then(() => {
+                        cmd.fight.nextTurn();
+                        refillHPLPFP(cmd, "Aelith Blanchette");
+                        doAction(cmd, "bondage", "Light").then(() => {
+                            refillHPLPFP(cmd, "Aelith Blanchette");
+                            doAction(cmd, "rest", "Light").then(() => {
+                                refillHPLPFP(cmd, "Aelith Blanchette");
+                                doAction(cmd, "bondage", "Light").then(() => {
+                                    refillHPLPFP(cmd, "Aelith Blanchette");
+                                    let condition = () => {
+                                        return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
+                                    };
+                                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                                        if (cmd.fight.fighterList.getFighterByName("Aelith Blanchette").isCompletelyBound()) {
+                                            done();
+                                        }
+                                        else {
+                                            done.fail(new Error("Did not say that the receiver must abandon because of bondage."));
+                                        }
+                                    });
+                                }).catch(err => {
+                                    fChatLibInstance.throwError(err);
+                                });
+                            }).catch(err => {
+                                fChatLibInstance.throwError(err);
+                            });
+                        }).catch(err => {
+                            fChatLibInstance.throwError(err);
+                        });
+                    }).catch(err => {
+                        fChatLibInstance.throwError(err);
+                    });
+                }).catch(err => {
+                    fChatLibInstance.throwError(err);
+                });
+            }).catch(err => {
+                fChatLibInstance.throwError(err);
+            });
+        });
+    }, DEFAULT_TIMEOUT + 10000);
+
     it("should grant the ItemPickupModifier bonus for the KickStart feature", function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         createFighter("TheTinaArmstrong");
