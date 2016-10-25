@@ -21,15 +21,3 @@ And check if the tests are working correctly.
 
 4) Execute: node index.js
 
-
-#TODO
-
--   Add a way to do table matches (Requires table-setup action and table-smash)
--   Implement different kind of matches, HP only, LP only, FP only, Bondage only.
--   Variable end match messages, suggesting how to finish
--   Finish features implementation (Rename focus to submissiveness?)
--   Use message constants
--   Implement bondage, but not only in a sexhold
--   Implement a way to inflict lust onto your own character
-
-
