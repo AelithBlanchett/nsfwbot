@@ -187,6 +187,9 @@ export class FightAction{
             case Action.Finish:
                 result = this.actionFinish();
                 break;
+            case Action.Masturbate:
+                result = this.actionMasturbate();
+                break;
             default:
                 this.attacker.fight.message.addHit("WARNING! UNKNOWN ATTACK!");
                 result = Trigger.None;
@@ -445,12 +448,20 @@ export class FightAction{
     }
 
     actionFinish():Trigger{
+        this.attacker.triggerMods(TriggerMoment.Before, Trigger.Finisher);
         this.tier = Tier.Heavy;
         if(this.diceScore >= this.requiredDiceScore()){
             this.defender.triggerPermanentOutsideRing();
         }
         this.attacker.fight.message.addHit(Utils.strFormat(Constants.Messages.finishMessage, [this.attacker.getStylizedName()]));
-        return Trigger.None;
+        return Trigger.Finisher;
+    }
+
+    actionMasturbate():Trigger{
+        this.defender = null;
+        this.requiresRoll = false;
+        this.lpDamageToAtk = 3;
+        return Trigger.PassiveAction;
     }
 
     static commitDb(action:FightAction){

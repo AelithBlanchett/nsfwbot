@@ -326,7 +326,8 @@ export enum Action {
     Escape,
     Submit,
     StrapToy,
-    Finish
+    Finish,
+    Masturbate
 }
 
 export enum StrapToyLPDamagePerTurn {
@@ -456,4 +457,5 @@ export enum Trigger {
     None = 1 << 29,
 
     StrapToy = 1 << 30,
+    Finisher = 1 << 31
 }

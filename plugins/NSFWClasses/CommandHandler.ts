@@ -429,6 +429,10 @@ export class CommandHandler implements ICommandHandler{
         actionHandler(this, Action.Finish, false, false, args, data);
     };
 
+    masturbate(args:string, data:FChatResponse){
+        actionHandler(this, Action.Masturbate, false, false, args, data);
+    };
+
     resetfight(args:string, data:FChatResponse){
         if(this.fChatLibInstance.isUserChatOP(data.character, data.channel)){
             this.fight = new Fight(this.fChatLibInstance, this.channel);
