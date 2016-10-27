@@ -797,14 +797,14 @@ describe("The player(s)", () => {
         });
     }, DEFAULT_TIMEOUT);
 
-    it("should do a highrisksex move", function (done) {
+    it("should do a penetration move", function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => {
             return cmd.fight.fighterList.findIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
-            doAction(cmd, "highrisksex", "Light").then(() => {
+            doAction(cmd, "penetration", "Light").then(() => {
                 if (wasLustHit(cmd, "Aelith Blanchette")) {
                     done();
                 }
