@@ -405,6 +405,10 @@ export class CommandHandler implements ICommandHandler{
         actionHandler(this, Action.SubHold, true, false, args, data);
     };
 
+    straptoy(args:string, data:FChatResponse){
+        actionHandler(this, Action.StrapToy, true, false, args, data);
+    };
+
     sextoypickup(args:string, data:FChatResponse){
         actionHandler(this, Action.SextoyPickup, false, false, args, data);
     };
@@ -415,6 +419,14 @@ export class CommandHandler implements ICommandHandler{
 
     tag(args:string, data:FChatResponse){
         actionHandler(this, Action.Tag, false, true, args, data);
+    };
+
+    submit(args:string, data:FChatResponse){
+        actionHandler(this, Action.Submit, false, false, args, data);
+    };
+
+    finish(args:string, data:FChatResponse){
+        actionHandler(this, Action.Finish, false, false, args, data);
     };
 
     resetfight(args:string, data:FChatResponse){

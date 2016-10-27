@@ -25,6 +25,9 @@ import {DegradationModifier} from "./CustomModifiers";
 import {StunModifier} from "./CustomModifiers";
 import TriggerMoment = Constants.TriggerMoment;
 import {HighRiskMultipliers} from "./Constants";
+import {Utils} from "./Utils";
+import {StrapToyModifier} from "./CustomModifiers";
+import {StrapToyLPDamagePerTurn} from "./Constants";
 
 export class FightAction{
     id: number;
@@ -93,6 +96,9 @@ export class FightAction{
 
     requiredDiceScore():number{
         let scoreRequired = 0;
+        if(this.type == Constants.Action.Finish){
+            scoreRequired += 6;
+        }
         if(this.type == Constants.Action.Rest){
             scoreRequired = Constants.Fight.Action.RequiredScore.Rest;
         }
@@ -171,6 +177,15 @@ export class FightAction{
                 break;
             case Action.Stun:
                 result = this.actionStun();
+                break;
+            case Action.Submit:
+                result = this.actionSubmit();
+                break;
+            case Action.StrapToy:
+                result = this.actionStrapToy();
+                break;
+            case Action.Finish:
+                result = this.actionFinish();
                 break;
             default:
                 this.attacker.fight.message.addHit("WARNING! UNKNOWN ATTACK!");
@@ -404,6 +419,40 @@ export class FightAction{
         return Trigger.Escape;
     }
 
+    actionSubmit():Trigger{
+        this.attacker.triggerMods(TriggerMoment.Before, Trigger.Submit);
+        this.requiresRoll = false;
+        this.defender = null;
+        this.attacker.triggerPermanentOutsideRing();
+        this.attacker.fight.message.addHit(Utils.strFormat(Constants.Messages.tapoutMessage, [this.attacker.getStylizedName()]));
+        return Trigger.Submit;
+    }
+
+    actionStrapToy():Trigger{
+        this.attacker.triggerMods(TriggerMoment.Before, Trigger.StrapToy);
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.sensuality;
+        if(this.diceScore >= this.requiredDiceScore()){
+            this.missed = false;
+            this.fpHealToAtk += this.tier + 1;
+            this.fpDamageToDef += this.tier + 1;
+            let nbOfTurnsWearingToy = this.tier + 1;
+            let lpDamage = StrapToyLPDamagePerTurn[Tier[this.tier]];
+            let strapToyModifier = new StrapToyModifier(this.defender, nbOfTurnsWearingToy, lpDamage);
+            this.modifiers.push(strapToyModifier);
+            this.attacker.fight.message.addHit("The sextoy started vibrating!");
+        }
+        return Trigger.StrapToy;
+    }
+
+    actionFinish():Trigger{
+        this.tier = Tier.Heavy;
+        if(this.diceScore >= this.requiredDiceScore()){
+            this.defender.triggerPermanentOutsideRing();
+        }
+        this.attacker.fight.message.addHit(Utils.strFormat(Constants.Messages.finishMessage, [this.attacker.getStylizedName()]));
+        return Trigger.None;
+    }
+
     static commitDb(action:FightAction){
         return new Promise<number>(function(resolve, reject) {
             let attackerId = action.attacker.id || null;
@@ -435,7 +484,7 @@ export class FightAction{
 
         if(this.missed == false){
             if(this.requiresRoll == false){ //-1 == no roll
-                fight.message.addHit(` SUCCESSFUL ${Action[this.type]}! `);
+                fight.message.addHit(` ${Action[this.type]}! `);
             }
             else{
                 fight.message.addHit(Constants.Messages.HitMessage);

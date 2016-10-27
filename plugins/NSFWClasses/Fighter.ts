@@ -23,6 +23,7 @@ import {Achievements} from "./Achievement";
 import {AchievementType} from "./Constants";
 import {Achievement} from "./Constants";
 import {AchievementReward} from "./Constants";
+import {FightType} from "./Constants";
 
 export class Fighter implements IFighter{
     id:number = -1;
@@ -453,10 +454,26 @@ export class Fighter implements IFighter{
     }
 
     isTechnicallyOut():boolean{
-        return (this.isSexuallyExhausted()
-        || this.isDead()
-        || this.isBroken()
-        || this.isCompletelyBound());
+        switch(this.fight.fightType){
+            case FightType.Classic:
+            case FightType.Tag:
+                return (
+                       this.isSexuallyExhausted()
+                    || this.isDead()
+                    || this.isBroken()
+                    || this.isCompletelyBound());
+            case FightType.LastManStanding:
+                return this.isDead();
+            case FightType.SexFight:
+                return this.isSexuallyExhausted();
+            case FightType.Humiliation:
+                return this.isBroken() || this.isCompletelyBound();
+            case FightType.Bondage:
+                return this.isCompletelyBound();
+            default:
+                return false;
+        }
+
     }
 
     bondageItemsOnSelf():number{

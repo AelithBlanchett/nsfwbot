@@ -98,7 +98,8 @@ export enum ModifierType {
     DegradationMalus = 6,
     ItemPickupBonus = 7,
     SextoyPickupBonus = 8,
-    Stun = 9
+    Stun = 9,
+    StrapToy = 10,
 }
 
 export class Achievement {
@@ -203,6 +204,10 @@ export class Messages {
     static changeMinTeamsInvolvedInFightFail = "The number of teams should be superior or equal than 2.";
     static setFightTypeClassic = "Fight type successfully set to Classic.";
     static setFightTypeTag = "Fight type successfully set to Tag-Team.";
+    static setFightTypeLMS = "Fight type successfully set to Last Man Standing.";
+    static setFightTypeHMatch = "Fight type successfully set to Humiliation Match.";
+    static setFightTypeSexFight = "Fight type successfully set to SexFight.";
+    static setFightTypeBondageMatch = "Fight type successfully set to SexFight.";
     static setFightTypeNotFound = "Type not found. Fight type resetted to Classic.";
     static setFightTypeFail = "Can't change the fight type if the fight has already started or is already finished.";
 
@@ -233,11 +238,17 @@ export class Messages {
 
     static forfeitItemApply = `%s forfeits! Which means... 3 bondage items landing on them to punish them!`;
     static forfeitTooManyItems = `%s has too many items on them to possibly fight! [b][color=red]They're out![/color][/b]`;
-    static forfeitAlreadyOut = `You are already out of the match. No need to forfeit.`;
+    static forfeitAlreadyOut = `You are already out of the match. No need to give up.`;
+
+    static tapoutMessage = `%s couldn't handle it anymore! They SUBMIT!`;
+
+    static finishMessage = `%s couldn't fight against that! They're out!`;
 
     static checkForDrawOK = `Everybody agrees, it's a draw!`;
     static checkForDrawWaiting = `Waiting for the other players still in the fight to call the draw.`;
-    static endFightAnnounce = "%s team wins the fight!"
+    static endFightAnnounce = "%s team wins the fight!";
+
+    static wrongMatchTypeForAction = "You can't %s in a %s match.";
 }
 
 export enum Team {
@@ -312,7 +323,16 @@ export enum Action {
     HighRisk,
     HighRiskSex,
     Stun,
-    Escape
+    Escape,
+    Submit,
+    StrapToy,
+    Finish
+}
+
+export enum StrapToyLPDamagePerTurn {
+    Light = 2,
+    Medium = 3,
+    Heavy = 4
 }
 
 export enum TierDifficulty {
@@ -333,12 +353,15 @@ export enum TokensWorth {
     Gold = 600
 }
 
-export enum FightType { //TODO: implement that
+export enum FightType {
     Classic = 0,
     Tag = 1,
     LastManStanding = 2,
     SexFight = 3,
-    Humiliation = 4
+    Humiliation = 4,
+    Tables = 5,
+    Bondage = 6,
+    Submission = 7
 }
 
 export const Arenas = [
@@ -424,10 +447,13 @@ export enum Trigger {
     Tag = 1 << 23,
     Escape = 1 << 24,
     Rest = 1 << 25,
+    Submit = 1 << 27,
     PassiveAction = Tag | Escape | Rest,
     AnyOffensiveAction = Attack | Hold,
     AnyAction = PassiveAction | AnyOffensiveAction,
 
-    OnTurnTick = 1 << 26,
-    None = 1 << 27
+    OnTurnTick = 1 << 28,
+    None = 1 << 29,
+
+    StrapToy = 1 << 30,
 }

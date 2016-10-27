@@ -73,6 +73,23 @@ export class Fight{
                     this.fightType = FightType.Tag;
                     this.message.addInfo(Constants.Messages.setFightTypeTag);
                     break;
+                case "lastmanstanding":
+                    this.fightType = FightType.LastManStanding;
+                    this.message.addInfo(Constants.Messages.setFightTypeLMS);
+                    break;
+                case "sex-fight":
+                case "sexfight":
+                    this.fightType = FightType.SexFight;
+                    this.message.addInfo(Constants.Messages.setFightTypeSexFight);
+                    break;
+                case "humiliation":
+                    this.fightType = FightType.Humiliation;
+                    this.message.addInfo(Constants.Messages.setFightTypeHMatch);
+                    break;
+                case "bondage":
+                    this.fightType = FightType.Humiliation;
+                    this.message.addInfo(Constants.Messages.setFightTypeBondageMatch);
+                    break;
                 default:
                     this.fightType = FightType.Classic;
                     this.message.addInfo(Constants.Messages.setFightTypeNotFound);
@@ -121,6 +138,7 @@ export class Fight{
                             }
                             Promise.all(callsToMake)
                                 .then(_ => Data.db.commit(() => {
+                                    fight.message.addHint("Fight number: #"+fight.id);
                                     resolve(fight.id);
                                 }))
                                 .catch((err) => {
@@ -495,6 +513,10 @@ export class Fight{
                 this.message.addError(Constants.Messages.checkAttackRequirementsNotInSexualHold);
             }
         }
+        if(action == Action.Submit && this.fightType == FightType.LastManStanding){
+            flag = false;
+            this.message.addError(Utils.strFormat(Constants.Messages.wrongMatchTypeForAction, ["submit", "Last Man Standing"]));
+        }
         if(flag == false){
             this.sendMessage();
         }
@@ -503,12 +525,7 @@ export class Fight{
 
     validateTarget(){
         if(this.currentTarget == undefined || this.currentTarget.isTechnicallyOut() || !this.currentTarget.isInTheRing || this.currentTarget == this.currentPlayer){
-            if(this.fightType == FightType.Classic){
-                this.currentPlayer.target = this.fighterList.getRandomFighterNotInTeam(this.currentPlayer.assignedTeam);
-            }
-            else{
-                this.currentPlayer.target = this.fighterList.getRandomFighterNotInTeam(this.currentPlayer.assignedTeam);
-            }
+            this.currentPlayer.target = this.fighterList.getRandomFighterNotInTeam(this.currentPlayer.assignedTeam);
         }
     }
 
@@ -631,6 +648,9 @@ export class Fight{
         if (this.isFightOver()) {
             var tokensToGiveToWinners:number = TokensPerWin[FightTier[this.getFightTier(this.winnerTeam)]]*Constants.Fight.Globals.tokensPerLossMultiplier;
             this.endFight(tokensToGiveToWinners, 0);
+        }
+        else{
+            this.nextTurn();
         }
     }
 

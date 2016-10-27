@@ -39,7 +39,13 @@ export class ItemPickupModifier extends Modifier {
 
 export class SextoyPickupModifier extends Modifier {
     constructor(receiver: Fighter, parentIds?:Array<string>){
-        super(receiver, null, Tier.None, ModifierType.SextoyPickupBonus, 0, Constants.Fight.Action.Globals.sextoyPickupMultiplier, 0, 0, 0, Constants.Fight.Action.Globals.sextoyPickupUses, Constants.TriggerMoment.After, Constants.Trigger.BrawlAttack, parentIds, true);
+        super(receiver, null, Tier.None, ModifierType.SextoyPickupBonus, 0, 0, 0, 0, 0, Constants.Fight.Action.Globals.sextoyPickupUses, Constants.TriggerMoment.After, Constants.Trigger.SexStrikeAttack, parentIds, true);
+    }
+}
+
+export class StrapToyModifier extends Modifier {
+    constructor(receiver: Fighter, turns:number, damagePerTurn:number, parentIds?:Array<string>){
+        super(receiver, null, Tier.None, ModifierType.StrapToy, 0, damagePerTurn, 0, 0, 0, turns, Constants.TriggerMoment.Any, Constants.Trigger.OnTurnTick, parentIds, true);
     }
 }
 
