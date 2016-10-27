@@ -148,8 +148,8 @@ export class FightAction{
             case Action.HighRisk:
                 result = this.actionHighRisk();
                 break;
-            case Action.HighRiskSex:
-                result = this.actionHighRiskSex();
+            case Action.Penetration:
+                result = this.actionPenetration();
                 break;
             case Action.HumHold:
                 result = this.actionHumHold();
@@ -298,9 +298,9 @@ export class FightAction{
         return Trigger.HighRiskAttack;
     }
 
-    actionHighRiskSex():Trigger{
-        this.attacker.triggerMods(TriggerMoment.Before, Trigger.HighRiskSexAttack);
-        this.diceScore = this.attacker.roll(1) + this.attacker.dexterity;
+    actionPenetration():Trigger{
+        this.attacker.triggerMods(TriggerMoment.Before, Trigger.Penetration);
+        this.diceScore = this.attacker.roll(1) + this.attacker.sensuality;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
@@ -313,7 +313,7 @@ export class FightAction{
             this.fpHealToDef += this.tier + 1;
             this.lpDamageToAtk += Math.floor(this.attackFormula(this.tier, this.attacker.sensuality, this.attacker.endurance, 0) * (1 + (1 - HighRiskMultipliers[Tier[this.tier]])));
         }
-        return Trigger.HighRiskSexAttack;
+        return Trigger.Penetration;
     }
 
     actionForcedWorship():Trigger{

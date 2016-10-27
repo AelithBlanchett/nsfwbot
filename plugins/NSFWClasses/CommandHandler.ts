@@ -377,8 +377,8 @@ export class CommandHandler implements ICommandHandler{
         actionHandler(this, Action.HighRisk, true, false, args, data);
     };
 
-    highrisksex(args:string, data:FChatResponse){
-        actionHandler(this, Action.HighRiskSex, true, false, args, data);
+    penetration(args:string, data:FChatResponse){
+        actionHandler(this, Action.Penetration, true, false, args, data);
     };
 
     humhold(args:string, data:FChatResponse){
