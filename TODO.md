@@ -2,6 +2,7 @@
 
 ##Important
 -   Rename STUFF
+-   Balance everything
 
 ###Next steps
 -   Do the goddamn' guide on Google Docs
