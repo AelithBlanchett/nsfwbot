@@ -32,7 +32,7 @@ export class Fight{
     stage:string;
     fighterList:FighterList;
     currentTurn:number = 0;
-    fightType:FightType = FightType.Classic;
+    fightType:FightType = FightType.Rumble;
     pastActions:Array<FightAction> = [];
     winnerTeam:Team = Team.Unknown;
     waitingForAction:boolean = true;
@@ -65,8 +65,8 @@ export class Fight{
         if(!this.hasStarted && !this.hasEnded){
             switch(type.toLowerCase()){
                 case "classic":
-                    this.fightType = FightType.Classic;
-                    this.message.addInfo(Constants.Messages.setFightTypeClassic);
+                    this.fightType = FightType.Rumble;
+                    this.message.addInfo(Constants.Messages.setFightTypeRumble);
                     break;
                 case "tag":
                 case "tagteam":
@@ -92,7 +92,7 @@ export class Fight{
                     this.message.addInfo(Constants.Messages.setFightTypeBondageMatch);
                     break;
                 default:
-                    this.fightType = FightType.Classic;
+                    this.fightType = FightType.Rumble;
                     this.message.addInfo(Constants.Messages.setFightTypeNotFound);
                     break;
             }
@@ -684,6 +684,10 @@ export class Fight{
         }
     }
 
+    pickFinisher(){
+        return Constants.finishers[Math.floor(Math.random() * Constants.finishers.length)];
+    }
+
     endFight(tokensToGiveToWinners, tokensToGiveToLosers, forceWinner?:Team){
         this.hasEnded = true;
         this.hasStarted = false;
@@ -696,6 +700,7 @@ export class Fight{
         }
         if(this.winnerTeam != Team.Unknown){
             this.message.addInfo(Utils.strFormat(Constants.Messages.endFightAnnounce, [Team[this.winnerTeam]]));
+            this.message.addHit("Finisher suggestion: " + this.pickFinisher());
             this.sendMessage();
         }
         Fight.commitEndFightDb(this, tokensToGiveToWinners, tokensToGiveToLosers);

@@ -314,7 +314,7 @@ export class CommandHandler implements ICommandHandler{
     setfighttype(args:string, data:FChatResponse){
         let parsedFT:FightType = Parser.Commands.setFightType(args);
         if(parsedFT == -1){
-            this.fChatLibInstance.sendMessage("[color=red]Fight Type not found. Types: Classic, Tag. Example: !setFightType Tag[/color]", this.channel);
+            this.fChatLibInstance.sendMessage("[color=red]Fight Type not found. Types: Rumble, Tag. Example: !setFightType Tag[/color]", this.channel);
             return;
         }
         Fighter.exists(data.character).then(data =>{

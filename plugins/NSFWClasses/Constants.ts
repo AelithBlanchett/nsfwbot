@@ -202,13 +202,13 @@ export class Messages {
     static HitMessage = ` HIT! `;
     static changeMinTeamsInvolvedInFightOK = "Number of teams involved in the fight updated!.";
     static changeMinTeamsInvolvedInFightFail = "The number of teams should be superior or equal than 2.";
-    static setFightTypeClassic = "Fight type successfully set to Classic.";
+    static setFightTypeRumble = "Fight type successfully set to Rumble.";
     static setFightTypeTag = "Fight type successfully set to Tag-Team.";
     static setFightTypeLMS = "Fight type successfully set to Last Man Standing.";
     static setFightTypeHMatch = "Fight type successfully set to Humiliation Match.";
     static setFightTypeSexFight = "Fight type successfully set to SexFight.";
     static setFightTypeBondageMatch = "Fight type successfully set to SexFight.";
-    static setFightTypeNotFound = "Type not found. Fight type resetted to Classic.";
+    static setFightTypeNotFound = "Type not found. Fight type resetted to Rumble.";
     static setFightTypeFail = "Can't change the fight type if the fight has already started or is already finished.";
 
     static startMatchAnnounce = "[color=green]Everyone's ready, let's start the match![/color]";
@@ -355,7 +355,7 @@ export enum TokensWorth {
 }
 
 export enum FightType {
-    Classic = 0,
+    Rumble = 0,
     Tag = 1,
     LastManStanding = 2,
     SexFight = 3,
@@ -396,6 +396,13 @@ export const Arenas = [
     "Zoo",
     "Slaughterhouse",
     "Junkyard"
+];
+
+export const finishers = [
+    "Cum on the loser's face",
+    "Tombstone Piledriver into the mats",
+    "Make the loser lick the mats",
+    "Smother"
 ];
 
 export enum TriggerMoment {

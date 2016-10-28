@@ -455,7 +455,7 @@ export class Fighter implements IFighter{
 
     isTechnicallyOut():boolean{
         switch(this.fight.fightType){
-            case FightType.Classic:
+            case FightType.Rumble:
             case FightType.Tag:
                 return (
                        this.isSexuallyExhausted()
