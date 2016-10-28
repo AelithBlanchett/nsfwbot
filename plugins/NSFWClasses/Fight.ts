@@ -38,6 +38,7 @@ export class Fight{
     waitingForAction:boolean = true;
 
     message:Message;
+    lastMessage:Message;
     fChatLibInstance:IFChatLib;
     channel:string;
 
@@ -437,10 +438,16 @@ export class Fight{
         return this.rollAllDice(event)[0];
     }
 
+    resendMessage(){
+        this.message = this.lastMessage;
+        this.sendMessage();
+    }
+
 
 
     //Messaging
     sendMessage(){
+        this.lastMessage = this.message;
         this.fChatLibInstance.sendMessage(this.message.getMessage(), this.channel);
     }
 

@@ -106,6 +106,15 @@ export class CommandHandler implements ICommandHandler{
         }
     }
 
+    status(args:string, data:FChatResponse){
+        if(this.fight == undefined || this.fight.hasEnded || !this.fight.hasStarted){
+            this.fChatLibInstance.sendPrivMessage("There is no match going on right now.", data.character);
+        }
+        else{
+            this.fight.resendMessage();
+        }
+    };
+
     getstats(args:string, data:FChatResponse){
         if(args == ""){
             args = data.character;
