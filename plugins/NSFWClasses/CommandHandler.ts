@@ -206,6 +206,21 @@ export class CommandHandler implements ICommandHandler{
         });
     };
 
+    loadfight(args:string, data:FChatResponse){
+        if(this.fight == undefined || this.fight.hasEnded || !this.fight.hasStarted){
+            this.fight = new Fight(this.fChatLibInstance, this.channel);
+            if(!isNaN(parseInt(args))){
+                Fight.loadState(parseInt(args), this.fight);
+            }
+            else{
+                this.fChatLibInstance.sendMessage("[color=red]Wrong fight id. It must be a number.[/color]", this.channel);
+            }
+        }
+        else{
+            this.fChatLibInstance.sendMessage("[color=red]There is already a fight in progress.[/color]", this.channel);
+        }
+    };
+
     ready(args:string, data:FChatResponse){
         if(this.fight.hasStarted){
             this.fChatLibInstance.sendMessage("[color=red]There is already a fight in progress.[/color]", this.channel);
