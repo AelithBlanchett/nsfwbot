@@ -3,6 +3,8 @@
 ##Important
 -   Rename STUFF
 -   Balance everything
+-   Re-do how tiers are determined. Number of points instead of palliers
+-   temporary Penalties on stats to force players to fight against newbs, and prevent grinding 
 
 ###Next steps
 -   Do the goddamn' guide on Google Docs
