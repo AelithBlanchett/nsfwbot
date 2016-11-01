@@ -450,7 +450,8 @@ export class FightAction{
     actionFinish():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Finisher);
         this.tier = Tier.Heavy;
-        if(this.diceScore >= this.requiredDiceScore()){
+        if((this.defender.heartsRemaining <= 1 || this.defender.orgasmsRemaining <= 1 || this.defender.consecutiveTurnsWithoutFocus == Constants.Fight.Action.Globals.maxTurnsWithoutFocus - 1) && this.diceScore >= this.requiredDiceScore()){
+            this.missed = false;
             this.defender.triggerPermanentOutsideRing();
         }
         this.attacker.fight.message.addHit(Utils.strFormat(Constants.Messages.finishMessage, [this.attacker.getStylizedName()]));
