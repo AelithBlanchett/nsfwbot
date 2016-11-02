@@ -3,7 +3,8 @@
 ##Important
 -   Rename STUFF
 -   Balance everything
--   Re-do how tiers are determined. Number of points instead of palliers
+-   Use TYPEORM for easier database implementation
+-   Refactor the fight class, use functions instead of just changing variables on the fly. It will clarify the code and easify modifications in the future. 
 -   temporary Penalties on stats to force players to fight against newbs, and prevent grinding 
 
 ###Next steps
