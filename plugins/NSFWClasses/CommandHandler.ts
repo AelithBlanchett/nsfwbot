@@ -111,7 +111,7 @@ export class CommandHandler implements ICommandHandler{
             this.fChatLibInstance.sendPrivMessage("There is no match going on right now.", data.character);
         }
         else{
-            this.fight.resendMessage();
+            this.fight.message.resend();
         }
     };
 
@@ -210,7 +210,8 @@ export class CommandHandler implements ICommandHandler{
         if(this.fight == undefined || this.fight.hasEnded || !this.fight.hasStarted){
             this.fight = new Fight(this.fChatLibInstance, this.channel);
             if(!isNaN(parseInt(args))){
-                Fight.loadState(parseInt(args), this.fight);
+                //TODO load things
+                //Fight.loadState(parseInt(args), this.fight);
             }
             else{
                 this.fChatLibInstance.sendMessage("[color=red]Wrong fight id. It must be a number.[/color]", this.channel);
@@ -481,7 +482,7 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(args).then(receivedData =>{
             if(receivedData){
                 let fighter:Fighter = receivedData as Fighter;
-                fighter = this.fight.fighterList.getFighterByID(fighter.id);
+                fighter = this.fight.getFighterByName(fighter.name);
                 if(fighter){
                     this.fight.forfeit(fighter);
                 }
@@ -505,7 +506,7 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(data.character).then(receivedData =>{
             if(receivedData){
                 let fighter:Fighter = receivedData as Fighter;
-                fighter = this.fight.fighterList.getFighterByID(fighter.id)
+                fighter = this.fight.getFighterByName(fighter.name)
                 if(fighter) {
                     if(fighter.wantsDraw){
                         this.fChatLibInstance.sendPrivMessage("[color=red]You are already waiting for the draw.[/color]", data.character);
@@ -535,8 +536,8 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(data.character).then(receivedData =>{
             if(receivedData){
                 let fighter:Fighter = receivedData as Fighter;
-                if(this.fight.fighterList.getFighterByID(fighter.id)){
-                    this.fight.assignTarget(fighter.id, args);
+                if (this.fight.getFighterByName(fighter.name)) {
+                    this.fight.assignTarget(fighter.name, args);
                 }
                 else{
                     this.fChatLibInstance.sendPrivMessage("[color=red]You are not participating in this fight.[/color]", data.character);
@@ -601,7 +602,7 @@ var actionHandler = function(cmd:CommandHandler, actionType:Action, tierRequired
         }
     }
     if(isCustomTargetInsteadOfTier){
-        customTarget = cmd.fight.fighterList.getFighterByName(args);
+        customTarget = cmd.fight.getFighterByName(args);
         if(customTarget == null){
             cmd.fChatLibInstance.sendMessage("[color=red]The character to tag with is required.[/color]", cmd.channel);
             return false;
@@ -610,7 +611,7 @@ var actionHandler = function(cmd:CommandHandler, actionType:Action, tierRequired
     Fighter.exists(data.character).then(data =>{
         if(data){
             let fighter:Fighter = data as Fighter;
-            cmd.fight.doAction(fighter.id, actionType, tier as Tier, customTarget);
+            cmd.fight.doAction(fighter.name, actionType, tier as Tier, customTarget);
         }
         else{
             cmd.fChatLibInstance.sendMessage("[color=red]This wrestler is not registered.[/color]", cmd.channel);

@@ -1,7 +1,6 @@
 import {Dice} from "../Dice";
 import {FightAction} from "../FightAction";
 export interface IFighter {
-    id:number;
     name:string;
     tokens: number;
     wins: number;

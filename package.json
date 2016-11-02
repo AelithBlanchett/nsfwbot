@@ -4,6 +4,7 @@
   "description": "A bot with a fighting mechanism plugin for fun times.",
   "main": "index.js",
   "dependencies": {
+    "@types/es6-promise": "0.0.32",
     "array.prototype.findindex": "^2.0.0",
     "async": "^2.0.1",
     "cappu-dice": "*",
@@ -16,12 +17,15 @@
     "lodash": "*",
     "mysql": "*",
     "promise": "^7.1.1",
+    "reflect-metadata": "^0.1.8",
+    "require-reload": "*",
     "sprintf-js": "^1.0.3",
+    "sqlite3": "^3.1.8",
     "stats-lite": "^2.0.3",
+    "typeorm": "0.0.2-alpha.69",
     "typescript": "^2.0",
     "typings": "*",
-    "wait-until": "*",
-    "require-reload": "*"
+    "wait-until": "*"
   },
   "devDependencies": {
     "@types/core-js": "^0.9.34",

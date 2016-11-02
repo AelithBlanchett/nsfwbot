@@ -24,32 +24,82 @@ import {AchievementType} from "./Constants";
 import {Achievement} from "./Constants";
 import {AchievementReward} from "./Constants";
 import {FightType} from "./Constants";
+import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, OneToMany} from "typeorm";
 
+@Table()
 export class Fighter implements IFighter{
-    id:number = -1;
+
+    @PrimaryColumn("string")
     name:string = "";
+
+    @Column("double")
     tokens: number = 0;
+
+    @Column("double")
     tokensSpent: number = 0;
+
+    @Column("int")
     wins: number = 0;
+
+    @Column("int")
     losses: number = 0;
+
+    @Column("int")
     forfeits: number = 0;
+
+    @Column("int")
     quits: number = 0;
+
+    @Column("int")
     totalFights: number = 0;
+
+    @Column()
     areStatsPrivate:boolean = true;
 
+    @Column("int")
     power:number = 0;
+
+    @Column("int")
     sensuality:number = 0;
+
+    @Column("int")
     toughness:number = 0;
+
+    @Column("int")
     endurance:number = 0;
+
+    @Column("int")
     dexterity:number = 0;
+
+    @Column("int")
     willpower:number = 0;
+
+    //TODO Instead of adding a custom object, add something more "natural"
+    @ManyToMany(type => Feature, feature => feature.obtainedBy)
+    @JoinTable()
     features:Features = new Features();
+
+    //TODO Instead of adding a custom object, add something more "natural"
+    @Column()
     modifiers:Modifiers = new Modifiers();
+
+    //TODO Instead of adding a custom object, add something more "natural"
+    @Column()
     achievements:Achievements = new Achievements();
 
+    @OneToMany(type => FightAction, action => action.attacker)
+    @JoinTable()
+    actionsDone:FightAction[] = [];
+
+    @OneToMany(type => FightAction, action => action.defender)
+    @JoinTable()
+    actionsInflicted:FightAction[] = [];
+
+    @ManyToMany(type => Fight, fight => fight.fighters)
+    fights:Fight[] = [];
 
 
-
+    //TODO: Separate Fighter from ActiveFighterState
     //during fight
     fight:Fight;
     dice: Dice;
@@ -234,8 +284,8 @@ export class Fighter implements IFighter{
     updateInDb(){
         return new Promise<number>((resolve, reject) => {
             var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`tokensSpent` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`sensuality` = ?,`dexterity` = ?,\
-                `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ?, `features` = ?, `achievements` = ? WHERE `id` = ?;";
-            sql = Data.db.format(sql, [Constants.SQL.fightersTableName, this.tokens, this.tokensSpent, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate(), this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, JSON.stringify(this.features), JSON.stringify(this.achievements), this.id]);
+                `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ?, `features` = ?, `achievements` = ? WHERE `name` = ?;";
+            sql = Data.db.format(sql, [Constants.SQL.fightersTableName, this.tokens, this.tokensSpent, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate(), this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, JSON.stringify(this.features), JSON.stringify(this.achievements), this.name]);
             Data.db.query(sql, (err, result) => {
                 if (result) {
                     console.log("Updated "+this.name+"'s entry in the db.");

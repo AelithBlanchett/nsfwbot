@@ -159,7 +159,7 @@ export class Modifier implements IModifier{
                 }
             }
 
-            this.receiver.fight.sendMessage();
+            this.receiver.fight.message.send();
             if(this.isOver()){
                 this.receiver.removeMod(this.id);
             }

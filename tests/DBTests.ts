@@ -186,7 +186,8 @@ describe("The database(s)", () => {
 
     xit("should write a new action in the database", function (done) {
         Fighter.exists("test2").then(x => {
-            let myAction = new FightAction(1, 1, 1, Action.Brawl, x);
+            let fight = new Fight(null, null);
+            let myAction = new FightAction(fight, 1, 1, Action.Brawl, x);
             FightAction.commitDb(myAction).then(id => {
                 expect(id).toBeGreaterThan(0);
                 done();
@@ -211,7 +212,9 @@ describe("The database(s)", () => {
     xit("should tag successfully with Aelith", function(done){
         var cmd = new CommandHandler(fChatLibInstance, "here");
         initiateMatchSettings2vs2TagForDb(cmd);
-        waitUntil().interval(2).times(5000).condition(() => { return cmd.fight.fighterList.findIndex(x => x.name == "test") != -1; }).done(() =>{
+        waitUntil().interval(2).times(5000).condition(() => {
+            return cmd.fight.findFighterIndex(x => x.name == "test") != -1;
+        }).done(() => {
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
                 cmd.fight.setCurrentPlayer("test");
                 cmd.tag("test2", {character: "test", channel: "here"});

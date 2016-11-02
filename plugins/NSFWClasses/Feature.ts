@@ -6,21 +6,30 @@ import {Fighter} from "./Fighter";
 import {Fight} from "./Fight";
 import {FeatureType} from "./Constants";
 import {SextoyPickupModifier} from "./CustomModifiers";
+import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, PrimaryGeneratedColumn} from "typeorm";
 var ES = require("es-abstract/es6.js");
 
+@Table()
 export class Feature{
-    id:string;
+
+    @PrimaryGeneratedColumn()
+    id:number;
+
+    @Column("int")
     type:FeatureType;
-    modifier: Modifier;
+
+    @Column("int")
     uses: number;
+
+    @Column("boolean")
     permanent: boolean;
 
-    constructor(featureType:FeatureType, uses:number, id?:string){
+    @ManyToMany(type => Fighter, fighter => fighter.features)
+    obtainedBy:Fighter[];
+
+    constructor(featureType:FeatureType, uses:number, id?:number) {
         if(id){
             this.id = id;
-        }
-        else{
-            this.id = Utils.generateUUID();
         }
 
         this.type = featureType;
@@ -35,30 +44,31 @@ export class Feature{
     }
 
     getModifier(fight:Fight, attacker?:Fighter, defender?:Fighter):IModifier{
+        let modifier:IModifier = null;
         if(!this.isExpired()){
             switch (this.type){
                 case FeatureType.KickStart:
-                    this.modifier = new ItemPickupModifier(attacker);
+                    modifier = new ItemPickupModifier(attacker);
                     fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.KickStart} feature!`);
                     fight.message.addHint(Constants.FeatureExplain.KickStart);
                     break;
                 case FeatureType.SexyKickStart:
-                    this.modifier = new SextoyPickupModifier(attacker);
+                    modifier = new SextoyPickupModifier(attacker);
                     fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.SexyKickStart} feature!`);
                     fight.message.addHint(Constants.FeatureExplain.SexyKickStart);
                     break;
                 case FeatureType.Sadist:
-                    this.modifier = null;
+                    modifier = null;
                     fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.Sadist} feature!`);
                     fight.message.addHint(Constants.FeatureExplain.Sadist);
                     break;
                 case FeatureType.CumSlut:
-                    this.modifier = null;
+                    modifier = null;
                     fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.CumSlut} feature!`);
                     fight.message.addHint(Constants.FeatureExplain.CumSlut);
                     break;
                 case FeatureType.RyonaEnthusiast:
-                    this.modifier = null;
+                    modifier = null;
                     fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.RyonaEnthusiast} feature!`);
                     fight.message.addHint(Constants.FeatureExplain.RyonaEnthusiast);
                     break;
@@ -68,7 +78,7 @@ export class Feature{
                 fight.message.addHint(`Uses left: ${this.uses}`);
             }
         }
-        return this.modifier;
+        return modifier;
     }
 
     isExpired():boolean{

@@ -28,35 +28,84 @@ import {HighRiskMultipliers} from "./Constants";
 import {Utils} from "./Utils";
 import {StrapToyModifier} from "./CustomModifiers";
 import {StrapToyLPDamagePerTurn} from "./Constants";
+import {Table, Column, PrimaryColumn, OneToMany, JoinTable, PrimaryGeneratedColumn, OneToOne, ManyToOne} from "typeorm";
 
+//TODO: Rename that to Action
 export class FightAction{
+
+    @PrimaryGeneratedColumn()
     id: number;
-    fightId: number;
+
+    @ManyToOne(type => Fight, fight => fight.pastActions)
+    fight:Fight;
+
+    @Column("int")
     atTurn: number;
+
+    @Column("int")
     type: Action;
+
+    @Column("int")
     tier: Tier;
+
+    @Column("boolean")
     isHold: boolean;
-    modifiers: Modifiers;
+
+    modifiers:Modifiers; //Do not need to store that in the DB
+
+    @ManyToOne(type => Fighter, fighter => fighter.actionsDone)
     attacker: Fighter;
+
+    @ManyToOne(type => Fighter, fighter => fighter.actionsDone)
     defender: Fighter;
+
+    @Column("int")
     hpDamageToDef: number;
+
+    @Column("int")
     lpDamageToDef: number;
+
+    @Column("int")
     fpDamageToDef: number;
+
+    @Column("int")
     hpDamageToAtk: number;
+
+    @Column("int")
     lpDamageToAtk: number;
+
+    @Column("int")
     fpDamageToAtk: number;
+
+    @Column("int")
     hpHealToDef: number;
+
+    @Column("int")
     lpHealToDef: number;
+
+    @Column("int")
     fpHealToDef: number;
+
+    @Column("int")
     hpHealToAtk: number;
+
+    @Column("int")
     lpHealToAtk: number;
+
+    @Column("int")
     fpHealToAtk: number;
+
+    @Column("int")
     diceScore: number;
+
+    @Column("boolean")
     missed: boolean;
+
+    @Column("boolean")
     requiresRoll: boolean;
 
-    constructor(fightId:number, currentTurn:number, tier:Tier, actionType:Action, attacker:Fighter, defender?:Fighter) {
-        this.fightId = fightId;
+    constructor(fight:Fight, currentTurn:number, tier:Tier, actionType:Action, attacker:Fighter, defender?:Fighter) {
+        this.fight = fight;
         this.isHold = false;
         this.modifiers = new Modifiers();
         this.missed = true;
@@ -96,9 +145,6 @@ export class FightAction{
 
     requiredDiceScore():number{
         let scoreRequired = 0;
-        if(this.type == Constants.Action.Finish){
-            scoreRequired += 6;
-        }
         if(this.type == Constants.Action.Rest){
             scoreRequired = Constants.Fight.Action.RequiredScore.Rest;
         }
@@ -106,10 +152,16 @@ export class FightAction{
             scoreRequired = Constants.Fight.Action.RequiredScore.Tag;
         }
         else{
+            if (this.type == Constants.Action.Finish) {
+                scoreRequired += 6;
+            }
+
             scoreRequired += (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.attacker.bondageItemsOnSelf()); //+2 difficulty per bondage item
+
             if(this.defender){
                 scoreRequired -= (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.defender.bondageItemsOnSelf()); //+2 difficulty per bondage item
                 scoreRequired += Math.floor(this.defender.dexterity / 2);
+
                 if(this.defender.focus < 0){
                     scoreRequired += Math.floor(this.defender.focus / 2);
                 }
@@ -117,6 +169,7 @@ export class FightAction{
                     scoreRequired -= 4;
                 }
             }
+
             if(this.tier != -1){
                 scoreRequired += TierDifficulty[Tier[this.tier]];
             }
@@ -467,13 +520,13 @@ export class FightAction{
 
     static commitDb(action:FightAction){
         return new Promise<number>(function(resolve, reject) {
-            let attackerId = action.attacker.id || null;
+            let attackerId = action.attacker.name || null;
             let defenderId = null;
             if(action.defender){
-                defenderId = action.defender.id;
+                defenderId = action.defender.name;
             }
             var sql = Constants.SQL.commitFightAction;
-            sql = Data.db.format(sql, [Constants.SQL.actionTableName, action.fightId, action.atTurn, action.type, action.tier, action.isHold, action.diceScore, action.missed, attackerId, defenderId, action.hpDamageToDef, action.lpDamageToDef, action.fpDamageToDef, action.hpDamageToAtk, action.lpDamageToAtk, action.fpDamageToAtk, action.hpHealToDef, action.lpHealToDef, action.fpHealToDef, action.hpHealToAtk, action.lpHealToAtk, action.fpHealToAtk]);
+            sql = Data.db.format(sql, [Constants.SQL.actionTableName, action.fight.id, action.atTurn, action.type, action.tier, action.isHold, action.diceScore, action.missed, attackerId, defenderId, action.hpDamageToDef, action.lpDamageToDef, action.fpDamageToDef, action.hpDamageToAtk, action.lpDamageToAtk, action.fpDamageToAtk, action.hpHealToDef, action.lpHealToDef, action.fpHealToDef, action.hpHealToAtk, action.lpHealToAtk, action.fpHealToAtk]);
             Data.db.query(sql, (err, results) => {
                 if (err) {
                     throw err;
@@ -687,9 +740,9 @@ export class FightAction{
         //check for fight ending status
         if(this.type == Action.Escape && this.missed == false){
             fight.message.addHint(`This is still your turn ${this.attacker.getStylizedName()}, time to fight back!`);
-            fight.sendMessage();
+            fight.message.send();
             fight.waitingForAction = true;
-        } else if (!fight.isFightOver()) {
+        } else if (!fight.isOver()) {
             fight.nextTurn();
         } else { //if there's only one team left in the fight, then we're sure it's over
             fight.outputStatus();

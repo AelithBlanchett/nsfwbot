@@ -1,4 +1,7 @@
+import {IFChatLib} from "./interfaces/IFChatLib";
 interface IMessage {
+    fChatLib:IFChatLib;
+    channel:string;
     action: Array<string>;
     HPDamageAtk:number;
     LPDamageAtk:number;
@@ -18,9 +21,12 @@ interface IMessage {
     special: Array<string>;
     info: Array<string>;
     error: Array<string>;
+    lastMessage: string;
 }
 
 export class Message implements IMessage {
+    fChatLib:IFChatLib;
+    channel:string;
     action:Array<string>;
     HPDamageAtk:number;
     LPDamageAtk:number;
@@ -40,9 +46,13 @@ export class Message implements IMessage {
     special:Array<string>;
     info:Array<string>;
     error:Array<string>;
+    lastMessage:string;
 
-    constructor(){
+    constructor(fChatLib:IFChatLib, channel:string) {
         this.clear();
+        this.fChatLib = fChatLib;
+        this.channel = channel;
+        this.lastMessage = null;
     }
 
     clear(){
@@ -210,8 +220,17 @@ export class Message implements IMessage {
 
         message = lines.join("\n");
 
-        this.clear();
-
         return message;
+    }
+
+    send() {
+        let message = this.getMessage();
+        this.lastMessage = message;
+        this.fChatLib.sendMessage(message, this.channel);
+        this.clear();
+    }
+
+    resend() {
+        this.fChatLib.sendMessage(this.lastMessage, this.channel);
     }
 }

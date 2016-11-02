@@ -1,6 +1,7 @@
 #TODO
 
 ##Important
+-   Separate CommandHandler / Fight logic
 -   Rename STUFF
 -   Balance everything
 -   Use TYPEORM for easier database implementation

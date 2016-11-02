@@ -22,43 +22,71 @@ import {BondageModifier} from "./CustomModifiers";
 import TriggerMoment = Constants.TriggerMoment;
 import {Message} from "./Messaging";
 var CircularJSON = require('circular-json');
+var ES = require("es-abstract/es6.js");
+import {Table, Column, PrimaryColumn, ManyToOne, JoinTable, PrimaryGeneratedColumn, ManyToMany} from "typeorm";
 
+//TODO Add table names
+@Table()
 export class Fight{
-    id:number = -1;
-    usedTeams:number = 2;
 
+    @PrimaryGeneratedColumn()
+    id:number = -1;
+
+    @Column("int")
+    requiredTeams:number = 2;
+
+    @Column("boolean")
     hasStarted:boolean = false;
+
+    @Column("boolean")
     hasEnded:boolean = false;
+
+    @Column("string")
     stage:string;
-    fighterList:FighterList;
+
+    @ManyToMany(type => Fighter, fighter => fighter.fights)
+    @JoinTable()
+    fighters:Fighter[] = [];
+
+    @Column("int")
     currentTurn:number = 0;
+
+    @Column("int")
     fightType:FightType = FightType.Rumble;
+
+    @ManyToOne(type => FightAction, fightAction => fightAction.fight)
+    @JoinTable()
     pastActions:Array<FightAction> = [];
+
+    @Column("int")
     winnerTeam:Team = Team.Unknown;
+
+    @Column("boolean")
     waitingForAction:boolean = true;
 
     message:Message;
     lastMessage:Message;
     fChatLibInstance:IFChatLib;
+
+    @Column("string")
     channel:string;
 
-    public constructor(fChatLibInstance:IFChatLib, channel:string, stage?:string) {
+    public constructor(fChatLibInstance?:IFChatLib, channel?:string, stage?:string) {
         this.stage = stage || this.pickStage();
         this.fChatLibInstance = fChatLibInstance;
         this.channel = channel;
-        this.fighterList = new FighterList(this.usedTeams);
-        this.message = new Message();
+        this.message = new Message(fChatLibInstance, channel);
     }
 
     setTeamsCount(intNewNumberOfTeams:number){
         if(intNewNumberOfTeams >= 2){
-            this.fighterList.minNumberOfTeamsThatPlay = intNewNumberOfTeams;
+            this.requiredTeams = intNewNumberOfTeams;
             this.message.addInfo(Constants.Messages.changeMinTeamsInvolvedInFightOK);
         }
         else{
             this.message.addInfo(Constants.Messages.changeMinTeamsInvolvedInFightFail);
         }
-        this.sendMessage();
+        this.message.send();
     }
 
     setFightType(type:string){
@@ -100,7 +128,7 @@ export class Fight{
         else{
             this.message.addInfo(Constants.Messages.setFightTypeFail);
         }
-        this.sendMessage();
+        this.message.send();
     }
 
     static saveState(fight){
@@ -167,48 +195,48 @@ export class Fight{
         });
     }
 
-    static loadState(fightId:number, fight:Fight){
-        var sql = "SELECT `idFight`,`idFightType`,`idStage`,`usedTeams`,`currentTurn`,`fighterList` FROM `flistplugins`.?? WHERE idFight = ?;";
-        sql = Data.db.format(sql, [Constants.SQL.fightTableName, fightId]);
-        Data.db.query(sql, (err, results) => {
-            if (err) {
-            }
-            else {
-                fight.id = fightId;
-                fight.fightType = results[0].idFightType;
-                fight.stage = "Virtual Arena";
-                fight.usedTeams = results[0].usedTeams;
-                fight.currentTurn = results[0].currentTurn;
-                fight.fighterList = new FighterList(fight.usedTeams);
-                //TODO: LOAD FORMER ACTIONS
+    static loadState(fightId:number, fight:Fight) {
+        //     var sql = "SELECT `idFight`,`idFightType`,`idStage`,`usedTeams`,`currentTurn`,`fighterList` FROM `flistplugins`.?? WHERE idFight = ?;";
+        //     sql = Data.db.format(sql, [Constants.SQL.fightTableName, fightId]);
+        //     Data.db.query(sql, (err, results) => {
+        //         if (err) {
+        //         }
+        //         else {
+        //             fight.id = fightId;
+        //             fight.fightType = results[0].idFightType;
+        //             fight.stage = "Virtual Arena";
+        //             fight.requiredTeams = results[0].usedTeams;
+        //             fight.currentTurn = results[0].currentTurn;
+        //             fight.fighterList = new FighterList(fight.usedTeams);
+        //             //TODO: LOAD FORMER ACTIONS
 
-                var oldParsedList = CircularJSON.parse(results[0].fighterList);
-                for(let nonParsedPlayer of oldParsedList){
-                    let player = new Fighter();
-                    for(let attrname in nonParsedPlayer){
-                        player[attrname] = nonParsedPlayer[attrname];
-                    }
-                    player.dice = new Dice(10);
-                    player.fight = fight;
-                    player.target = null;
-                    fight.fighterList.push(player);
-                }
+        //             var oldParsedList = CircularJSON.parse(results[0].fighterList);
+        //             for(let nonParsedPlayer of oldParsedList){
+        //                 let player = new Fighter();
+        //                 for(let attrname in nonParsedPlayer){
+        //                     player[attrname] = nonParsedPlayer[attrname];
+        //                 }
+        //                 player.dice = new Dice(10);
+        //                 player.fight = fight;
+        //                 player.target = null;
+        //                 fight.fighterList.push(player);
+        //             }
 
-                console.log("Successfully loaded  fight " + fight.id + " from database.");
-                fight.outputStatus();
-            }
-        });
+        //             console.log("Successfully loaded  fight " + fight.id + " from database.");
+        //             fight.outputStatus();
+        //         }
+        //     });
     }
 
     //Pre-fight utils
 
     leave(fighter:Fighter){
         if(!this.hasStarted){
-            let index = this.fighterList.findIndex(x => x.name == fighter.name);
+            let index = this.findFighterIndex(x => x.name == fighter.name);
             if(index != -1){
                 fighter.assignedTeam = null;
                 fighter.fight = null;
-                this.fighterList.splice(index, 1);
+                this.fighters.splice(index, 1);
                 return true;
             }
         }
@@ -217,16 +245,16 @@ export class Fight{
 
     join(fighter:Fighter, team:Team){
         if(!this.hasStarted){
-            if(!this.fighterList.getFighterByName(fighter.name)){ //find fighter by its name property instead of comparing objects, which doesn't work.
+            if (!this.getFighterByName(fighter.name)) { //find fighter by its name property instead of comparing objects, which doesn't work.
                 if(team != Team.Unknown){
                     fighter.assignedTeam = team;
                 }
                 else{
-                    fighter.assignedTeam = this.fighterList.getAvailableTeam();
+                    fighter.assignedTeam = this.getAvailableTeam();
                     //console.log(`assigned team ${fighter.assignedTeam} to ${fighter.name}`);
                 }
                 fighter.fight = this;
-                this.fighterList.push(fighter);
+                this.fighters.push(fighter);
                 return true;
             }
         }
@@ -235,16 +263,16 @@ export class Fight{
 
     setFighterReady(fighter:Fighter){
         if(!this.hasStarted){
-            if(!this.fighterList.getFighterByName(fighter.name)){
+            if (!this.getFighterByName(fighter.name)) {
                 this.join(fighter, Team.Unknown);
             }
-            var fighterInFight = this.fighterList.getFighterByName(fighter.name);
+            var fighterInFight = this.getFighterByName(fighter.name);
             if(fighterInFight && !fighterInFight.isReady){ //find fighter by its name property instead of comparing objects, which doesn't work.
                 fighterInFight.isReady = true;
                 this.message.addInfo(Utils.strFormat(Constants.Messages.Ready, [fighter.getStylizedName()]));
-                this.sendMessage();
-                if(this.canStartMatch()){
-                    this.startMatch();
+                this.message.send();
+                if (this.canStart()) {
+                    this.start();
                 }
                 return true;
             }
@@ -252,25 +280,25 @@ export class Fight{
         return false;
     }
 
-    canStartMatch(){
-        let canGo = (this.fighterList.isEveryoneReady() && !this.hasStarted && this.fighterList.getUsedTeams().length >= this.usedTeams);
+    canStart() {
+        let canGo = (this.isEveryoneReady() && !this.hasStarted && this.getTeamsStillInGame().length >= this.requiredTeams);
         return canGo; //only start if everyone's ready and if the teams are balanced
     }
 
 
     //Fight logic
 
-    startMatch(){
+    start() {
         this.message.addInfo(Constants.Messages.startMatchAnnounce);
         this.hasStarted = true;
-        this.fighterList.shufflePlayers(); //random order for teams
+        this.shufflePlayers(); //random order for teams
 
         this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchStageAnnounce, [this.stage]));
 
-        for(let i = 0; i < this.fighterList.maxPlayersPerTeam; i++){ //Prints as much names as there are team
+        for (let i = 0; i < this.maxPlayersPerTeam; i++) { //Prints as much names as there are team
             let fullStringVS = "[b]";
-            for(let j of this.fighterList.getUsedTeams()){
-                let theFighter=this.fighterList.getTeam(j)[i];
+            for (let j of this.getTeamsStillInGame()) {
+                let theFighter = this.getTeam(j)[i];
                 if(theFighter != undefined){
                     fullStringVS = `${fullStringVS} VS ${theFighter.getStylizedName()}`;
                 }
@@ -281,46 +309,46 @@ export class Fight{
         }
 
 
-        this.fighterList.reorderFightersByInitiative(this.rollAllDice(Trigger.InitiationRoll));
+        this.reorderFightersByInitiative(this.rollAllDice(Trigger.InitiationRoll));
         this.currentTurn = 1;
         this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchFirstPlayer, [this.currentPlayer.getStylizedName(), this.currentTeamName.toLowerCase(), this.currentTeamName]));
-        for(let i = 1; i < this.fighterList.length; i++){
-            this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchFollowedBy, [this.fighterList[i].getStylizedName(), Team[this.fighterList[i].assignedTeam].toLowerCase(), Team[this.fighterList[i].assignedTeam]]));
+        for (let i = 1; i < this.fighters.length; i++) {
+            this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchFollowedBy, [this.fighters[i].getStylizedName(), Team[this.fighters[i].assignedTeam].toLowerCase(), Team[this.fighters[i].assignedTeam]]));
             if(this.fightType == FightType.Tag) {
-                this.fighterList[i].isInTheRing = false;
+                this.fighters[i].isInTheRing = false;
             }
         }
         if(this.fightType == FightType.Tag){ //if it's a tag match, only allow the first player of the next team
-            for(let i = 1; i < this.fighterList.length; i++){
-                if(this.currentPlayer.assignedTeam != this.fighterList[i].assignedTeam){
-                    this.fighterList[i].isInTheRing = true;
+            for (let i = 1; i < this.fighters.length; i++) {
+                if (this.currentPlayer.assignedTeam != this.fighters[i].assignedTeam) {
+                    this.fighters[i].isInTheRing = true;
                     break;
                 }
             }
         }
 
         //Features loading
-        for(let i = 0; i < this.fighterList.length; i++){
-            for(let feature of this.fighterList[i].features){
-                let modToAdd = feature.getModifier(this, this.fighterList[i]);
+        for (let i = 0; i < this.fighters.length; i++) {
+            for (let feature of this.fighters[i].features) {
+                let modToAdd = feature.getModifier(this, this.fighters[i]);
                 if(modToAdd){
-                    this.fighterList[i].modifiers.push(modToAdd);
+                    this.fighters[i].modifiers.push(modToAdd);
                 }
                 if(feature.isExpired()){
-                    this.fighterList[i].removeFeature(feature.type);
+                    this.fighters[i].removeFeature(feature.type);
                     this.message.addHint("This feature has expired.");
-                    this.fighterList[i].update();
+                    this.fighters[i].update();
                 }
             }
         }
 
-        this.sendMessage();
+        this.message.send();
         Fight.saveState(this);
         this.outputStatus();
     }
 
     nextTurn(){
-        for(let fighter of this.fighterList){
+        for (let fighter of this.fighters) {
             fighter.triggerMods(TriggerMoment.Any, Trigger.OnTurnTick);
             if(!fighter.isInHold()){
                 fighter.healFP(1);
@@ -335,7 +363,7 @@ export class Fight{
         this.currentTurn++;
         this.outputStatus();
 
-        if (this.isFightOver()) { //Check for the ending
+        if (this.isOver()) { //Check for the ending
             this.outputStatus();
             var tokensToGiveToWinners:number = TokensPerWin[FightTier[this.getFightTier(this.winnerTeam)]];
             var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.Fight.Globals.tokensPerLossMultiplier;
@@ -347,8 +375,8 @@ export class Fight{
         }
     }
 
-    isFightOver():boolean{
-        return this.fighterList.getUsedTeams().length <= 1;
+    isOver():boolean {
+        return this.getTeamsStillInGame().length <= 1;
     }
 
     //Fighting info displays
@@ -356,43 +384,43 @@ export class Fight{
     outputStatus(){
         this.message.addInfo(Utils.strFormat(Constants.Messages.outputStatusInfo, [this.currentTurn.toString(), this.currentTeamName.toLowerCase(), this.currentTeamName, this.currentPlayer.getStylizedName()]));
 
-         for(let i = 0; i < this.fighterList.length; i++){ //Prints as much names as there are team
-             let theFighter=this.fighterList[i];
+        for (let i = 0; i < this.fighters.length; i++) { //Prints as much names as there are team
+            let theFighter = this.fighters[i];
              if(theFighter != undefined){
                  this.message.addStatus(theFighter.outputStatus());
              }
         }
 
-        this.sendMessage();
+        this.message.send();
     }
 
     get currentTeam():Team{
-        return this.fighterList.getAlivePlayers()[(this.currentTurn-1) % this.fighterList.aliveFighterCount].assignedTeam;
+        return this.getAlivePlayers()[(this.currentTurn - 1) % this.aliveFighterCount].assignedTeam;
     }
 
     get nextTeamToPlay():Team{
-        return this.fighterList.getAlivePlayers()[this.currentTurn % this.fighterList.aliveFighterCount].assignedTeam;
+        return this.getAlivePlayers()[this.currentTurn % this.aliveFighterCount].assignedTeam;
     }
 
     get currentPlayer():Fighter{
-        return this.fighterList.getAlivePlayers()[(this.currentTurn-1) % this.fighterList.aliveFighterCount];
+        return this.getAlivePlayers()[(this.currentTurn - 1) % this.aliveFighterCount];
     }
 
     get nextPlayer():Fighter{
-        return this.fighterList.getAlivePlayers()[this.currentTurn % this.fighterList.aliveFighterCount];
+        return this.getAlivePlayers()[this.currentTurn % this.aliveFighterCount];
     }
 
     setCurrentPlayer(fighterName:string){
-        let index = this.fighterList.findIndex((x) => x.name == fighterName && !x.isTechnicallyOut());
-        if(index != -1 && this.fighterList[0].name != fighterName){ //switch positions
-            var temp = this.fighterList[0];
-            this.fighterList[0] = this.fighterList[index];
-            this.fighterList[index] = temp;
-            this.fighterList[0].isInTheRing = true;
-            if(this.fighterList[index].assignedTeam == this.fighterList[0].assignedTeam && this.fighterList[index].isInTheRing == true && this.fightType == FightType.Tag){
-                this.fighterList[index].isInTheRing = false;
+        let index = this.findFighterIndex((x) => x.name == fighterName && !x.isTechnicallyOut());
+        if (index != -1 && this.fighters[0].name != fighterName) { //switch positions
+            var temp = this.fighters[0];
+            this.fighters[0] = this.fighters[index];
+            this.fighters[index] = temp;
+            this.fighters[0].isInTheRing = true;
+            if (this.fighters[index].assignedTeam == this.fighters[0].assignedTeam && this.fighters[index].isInTheRing == true && this.fightType == FightType.Tag) {
+                this.fighters[index].isInTheRing = false;
             }
-            this.message.addInfo(Utils.strFormat(Constants.Messages.setCurrentPlayerOK, [temp.name, this.fighterList[0].name]));
+            this.message.addInfo(Utils.strFormat(Constants.Messages.setCurrentPlayerOK, [temp.name, this.fighters[0].name]));
         }
         else{
             this.message.addInfo(Constants.Messages.setCurrentPlayerFail)
@@ -409,19 +437,19 @@ export class Fight{
     }
 
     assignRandomTargetToAllFighters():void{
-        for(let fighter of this.fighterList.getAlivePlayers()){
-            this.assignRandomTarget(fighter);
+        for (let fighter of this.getAlivePlayers()) {
+            this.assignRandomTargetToFighter(fighter);
         }
     }
 
-    assignRandomTarget(fighter:Fighter):void{
-        fighter.target = this.fighterList.getRandomFighterNotInTeam(fighter.assignedTeam);
+    assignRandomTargetToFighter(fighter:Fighter):void {
+        fighter.target = this.getRandomFighterNotInTeam(fighter.assignedTeam);
     }
 
     //Dice rolling
     rollAllDice(event:Trigger):Array<Fighter>{
         let arrSortedFightersByInitiative = [];
-        for(let player of this.fighterList.getAlivePlayers()){
+        for (let player of this.getAlivePlayers()) {
             player.lastDiceRoll = player.roll(10, event);
             arrSortedFightersByInitiative.push(player);
             this.message.addHint(Utils.strFormat(Constants.Messages.rollAllDiceEchoRoll, [player.getStylizedName(), player.lastDiceRoll.toString()]));
@@ -438,19 +466,6 @@ export class Fight{
         return this.rollAllDice(event)[0];
     }
 
-    resendMessage(){
-        this.message = this.lastMessage;
-        this.sendMessage();
-    }
-
-
-
-    //Messaging
-    sendMessage(){
-        this.lastMessage = this.message;
-        this.fChatLibInstance.sendMessage(this.message.getMessage(), this.channel);
-    }
-
     //Attacks
     canTag(){
         let flag = true;
@@ -459,17 +474,17 @@ export class Fight{
         if(turnsToWait > 0){
             flag = false;
             this.message.addHit(`[b][color=red]You can't tag yet. Turns left: ${turnsToWait}[/color][/b]`);
-            this.sendMessage();
+            this.message.send();
         }
         if(!this.currentTarget.canMoveFromOrOffRing){
             flag = false;
             this.message.addHit(`[b][color=red]You can't tag with this character. They're permanently out.[/color][/b]`);
-            this.sendMessage();
+            this.message.send();
         }
         if(this.currentTarget.assignedTeam != this.currentPlayer.assignedTeam){
             flag = false;
             this.message.addHit(`[b][color=red]You can't tag with this character as they are not in your team.[/color][/b]`);
-            this.sendMessage();
+            this.message.send();
         }
         return flag;
     }
@@ -507,7 +522,7 @@ export class Fight{
             }
         }
         if(flag == false){
-            this.sendMessage();
+            this.message.send();
         }
         return flag;
     }
@@ -525,35 +540,35 @@ export class Fight{
             this.message.addError(Utils.strFormat(Constants.Messages.wrongMatchTypeForAction, ["submit", "Last Man Standing"]));
         }
         if(flag == false){
-            this.sendMessage();
+            this.message.send();
         }
         return flag;
     }
 
     validateTarget(){
         if(this.currentTarget == undefined || this.currentTarget.isTechnicallyOut() || !this.currentTarget.isInTheRing || this.currentTarget == this.currentPlayer){
-            this.currentPlayer.target = this.fighterList.getRandomFighterNotInTeam(this.currentPlayer.assignedTeam);
+            this.currentPlayer.target = this.getRandomFighterNotInTeam(this.currentPlayer.assignedTeam);
         }
     }
 
-    assignTarget(idFighter:number, name:string){
-        let theTarget = this.fighterList.getFighterByName(name);
+    assignTarget(fighterName:string, name:string) {
+        let theTarget = this.getFighterByName(name);
         if(theTarget != undefined){
-            this.fighterList.getFighterByID(idFighter).target = theTarget;
+            this.getFighterByName(fighterName).target = theTarget;
             this.message.addInfo("Successfully set the target to "+name);
-            this.sendMessage();
+            this.message.send();
         }
         else{
             this.message.addError("Target not found.");
-            this.sendMessage();
+            this.message.send();
         }
     }
 
-    doAction(idFighter:number, action:Action, tier:Tier, customTarget?:Fighter){
+    doAction(fighterName:string, action:Action, tier:Tier, customTarget?:Fighter) {
         if(this.hasStarted && !this.hasEnded){
-            if(this.currentPlayer == undefined || idFighter != this.currentPlayer.id){
+            if (this.currentPlayer == undefined || fighterName != this.currentPlayer.name) {
                 this.message.addError(Constants.Messages.doActionNotActorsTurn);
-                this.sendMessage();
+                this.message.send();
             }
             else{
                 this.validateTarget();
@@ -574,7 +589,7 @@ export class Fight{
                         }
                         else{
                             this.message.addInfo(Constants.Messages.doActionTargetIsSameTeam);
-                            this.sendMessage();
+                            this.message.send();
                             return;
                         }
                     }
@@ -585,7 +600,7 @@ export class Fight{
                 this.waitingForAction = false;
                 let attacker = this.currentPlayer; // need to store them in case of turn-changing logic
                 let defender = this.currentTarget;
-                attacker.pendingAction = new FightAction(this.id, this.currentTurn, tier, action, attacker, defender);
+                attacker.pendingAction = new FightAction(this, this.currentTurn, tier, action, attacker, defender);
                 let eventToTriggerAfter = attacker.pendingAction.triggerAction(); //The specific trigger BEFORE is executed inside the attacks, see FightAction.ts
                 attacker.triggerMods(TriggerMoment.After, eventToTriggerAfter, attacker.pendingAction);
                 attacker.pendingAction.commit(this);
@@ -595,14 +610,14 @@ export class Fight{
 
     getFightTier(winnerTeam){
         var highestWinnerTier = FightTier.Bronze;
-        for(let fighter of this.fighterList.getTeam(winnerTeam)){
+        for (let fighter of this.getTeam(winnerTeam)) {
             if(fighter.tier() > highestWinnerTier){
                 highestWinnerTier = fighter.tier();
             }
         }
 
         var lowestLoserTier = -99;
-        for(let fighter of this.fighterList){
+        for (let fighter of this.fighters) {
             if(fighter.assignedTeam != winnerTeam){
                 if(lowestLoserTier == -99){
                     lowestLoserTier = fighter.tier();
@@ -642,17 +657,17 @@ export class Fight{
             }
             else{
                 this.message.addError(Constants.Messages.forfeitAlreadyOut);
-                this.sendMessage();
+                this.message.send();
                 return;
             }
         }
         else{
             this.message.addInfo(`You are not participating in the match. OH, and that message should NEVER happen.`);
-            this.sendMessage();
+            this.message.send();
             return;
         }
-        this.sendMessage();
-        if (this.isFightOver()) {
+        this.message.send();
+        if (this.isOver()) {
             var tokensToGiveToWinners:number = TokensPerWin[FightTier[this.getFightTier(this.winnerTeam)]]*Constants.Fight.Globals.tokensPerLossMultiplier;
             this.endFight(tokensToGiveToWinners, 0);
         }
@@ -662,16 +677,16 @@ export class Fight{
     }
 
     checkForDraw(){
-        let neededDrawFlags = this.fighterList.getAlivePlayers().length;
+        let neededDrawFlags = this.getAlivePlayers().length;
         let drawFlags = 0;
-        for(let fighter of this.fighterList.getAlivePlayers()){
+        for (let fighter of this.getAlivePlayers()) {
             if(fighter.wantsDraw){
                 drawFlags++;
             }
         }
         if(neededDrawFlags == drawFlags){
             this.message.addInfo(Constants.Messages.checkForDrawOK);
-            this.sendMessage();
+            this.message.send();
             let tokensToGive:number = this.currentTurn;
             if(tokensToGive > parseInt(TokensPerWin[FightTier.Bronze])){
                 tokensToGive = parseInt(TokensPerWin[FightTier.Bronze]);
@@ -680,7 +695,7 @@ export class Fight{
         }
         else{
             this.message.addInfo(Constants.Messages.checkForDrawWaiting);
-            this.sendMessage();
+            this.message.send();
         }
     }
 
@@ -693,7 +708,7 @@ export class Fight{
         this.hasStarted = false;
         
         if(!forceWinner){
-            this.winnerTeam = this.fighterList.getUsedTeams()[0];
+            this.winnerTeam = this.getTeamsStillInGame()[0];
         }
         else{
             this.winnerTeam = forceWinner;
@@ -701,57 +716,281 @@ export class Fight{
         if(this.winnerTeam != Team.Unknown){
             this.message.addInfo(Utils.strFormat(Constants.Messages.endFightAnnounce, [Team[this.winnerTeam]]));
             this.message.addHit("Finisher suggestion: " + this.pickFinisher());
-            this.sendMessage();
+            this.message.send();
         }
-        Fight.commitEndFightDb(this, tokensToGiveToWinners, tokensToGiveToLosers);
+
+        //TODO persist
+        //Fight.commitEndFightDb(this, tokensToGiveToWinners, tokensToGiveToLosers);
     }
 
-    static commitEndFightDb(fight, tokensToGiveToWinners, tokensToGiveToLosers){
+    static commitEndFightDb(fight, tokensToGiveToWinners, tokensToGiveToLosers) {
 
-        Data.db.beginTransaction(err =>{
-            var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
-            sql = Data.db.format(sql, [Constants.SQL.fightTableName, fight.currentTurn, "", true, fight.winnerTeam, fight.id]);
-            Data.db.query(sql, (err, results) => {
-                if(err){
-                    Data.db.rollback(function(){
+        //     Data.db.beginTransaction(err =>{
+        //         var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
+        //         sql = Data.db.format(sql, [Constants.SQL.fightTableName, fight.currentTurn, "", true, fight.winnerTeam, fight.id]);
+        //         Data.db.query(sql, (err, results) => {
+        //             if(err){
+        //                 Data.db.rollback(function(){
 
-                    });
-                }
-                else{
-                    var callsToMake = [];
-                    for(let fighter of fight.fighterList){
-                        fighter.totalFights++;
-                        if(fighter.assignedTeam == fight.winnerTeam){
-                            fighter.wins++;
-                            fight.message.addInfo(`Awarded ${tokensToGiveToWinners} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
-                            fighter.giveTokens(tokensToGiveToWinners)
-                            callsToMake.push(fighter.update());
-                        }
-                        else{
-                            if(fight.winnerTeam != Team.Unknown){
-                                fighter.losses++;
-                            }
-                            fight.message.addInfo(`Awarded ${tokensToGiveToLosers} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
-                            fighter.giveTokens(tokensToGiveToLosers)
-                            callsToMake.push(fighter.update());
-                        }
-                        fight.message.addInfo(fighter.checkAchievements());
-                    }
-                    Promise.all(callsToMake)
-                        .then(_ => {
-                            Data.db.commit(_ => {
-                                console.log(`Finished fight ${fight.id} and given all the according tokens successfully`);
-                                fight.sendMessage(); //send tokens message and everything
-                            });
-                        })
-                        .catch((err) => {
-                            console.log("There was an error during the fight ending:"+err);
-                            Data.db.rollback(function(){
-                            });
-                        });
-                }
-            });
-        });
+        //                 });
+        //             }
+        //             else{
+        //                 var callsToMake = [];
+        //                 for(let fighter of fight.fighterList){
+        //                     fighter.totalFights++;
+        //                     if(fighter.assignedTeam == fight.winnerTeam){
+        //                         fighter.wins++;
+        //                         fight.message.addInfo(`Awarded ${tokensToGiveToWinners} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
+        //                         fighter.giveTokens(tokensToGiveToWinners)
+        //                         callsToMake.push(fighter.update());
+        //                     }
+        //                     else{
+        //                         if(fight.winnerTeam != Team.Unknown){
+        //                             fighter.losses++;
+        //                         }
+        //                         fight.message.addInfo(`Awarded ${tokensToGiveToLosers} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
+        //                         fighter.giveTokens(tokensToGiveToLosers)
+        //                         callsToMake.push(fighter.update());
+        //                     }
+        //                     fight.message.addInfo(fighter.checkAchievements());
+        //                 }
+        //                 Promise.all(callsToMake)
+        //                     .then(_ => {
+        //                         Data.db.commit(_ => {
+        //                             console.log(`Finished fight ${fight.id} and given all the according tokens successfully`);
+        //                             fight.sendMessage(); //send tokens message and everything
+        //                         });
+        //                     })
+        //                     .catch((err) => {
+        //                         console.log("There was an error during the fight ending:"+err);
+        //                         Data.db.rollback(function(){
+        //                         });
+        //                     });
+        //             }
+        //         });
+        //     });
+    }
+
+
+    //FORMERLY FIGHTERLIST.TS
+
+    findFighterIndex(predicate:(value:Fighter) => boolean, thisArg?:any):number {
+        var list = ES.ToObject(this.fighters);
+        var length = ES.ToLength(ES.ToLength(list.length));
+        if (!ES.IsCallable(predicate)) {
+            throw new TypeError('Array#findIndex: predicate must be a function');
+        }
+        if (length === 0) return -1;
+        var thisArg = arguments[1];
+        for (var i = 0, value; i < length; i++) {
+            value = list[i];
+            if (ES.Call(predicate, thisArg, [value, i, list])) return i;
+        }
+        return -1;
+    }
+
+    reorderFightersByInitiative(arrFightersSortedByInitiative:Array<Fighter>) {
+        var index = 0;
+        for (let fighter of arrFightersSortedByInitiative) {
+            let indexToMoveInFront = this.getIndexOfPlayer(fighter);
+            var temp = this[index];
+            this.fighters[index] = this.fighters[indexToMoveInFront];
+            this.fighters[indexToMoveInFront] = temp;
+            index++;
+        }
+    }
+
+    getAlivePlayers():Array<Fighter> {
+        let arrPlayers = new Array<Fighter>();
+        for (let player of this.fighters) {
+            if (!player.isTechnicallyOut() && player.isInTheRing) {
+                arrPlayers.push(player);
+            }
+        }
+        return arrPlayers;
+    }
+
+    getFighterByName(name:string) {
+        let fighter = null;
+        for (let player of this.fighters) {
+            if (player.name == name) {
+                fighter = player;
+            }
+        }
+        return fighter;
+    }
+
+    getIndexOfPlayer(fighter:Fighter) {
+        let index = -1;
+        for (let i = 0; i < this.fighters.length; i++) {
+            if (this[i].name == fighter.name) {
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    getFirstPlayerIDAliveInTeam(team:Team, afterIndex:number = 0):number {
+        let fullTeam = this.getTeam(team);
+        var index = -1;
+        for (let i = afterIndex; i < fullTeam.length; i++) {
+            if (fullTeam[i] != undefined && !fullTeam[i].isTechnicallyOut() && fullTeam[i].isInTheRing) {
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    shufflePlayers():void {
+        for (var i = 0; i < this.fighters.length - 1; i++) {
+            var j = i + Math.floor(Math.random() * (this.fighters.length - i));
+
+            var temp = this.fighters[j];
+            this.fighters[j] = this.fighters[i];
+            this.fighters[i] = temp;
+        }
+    }
+
+    getTeam(team:Team):Array<Fighter> {
+        let teamList = new Array<Fighter>();
+        for (let player of this.fighters) {
+            if (player.assignedTeam == team) {
+                teamList.push(player);
+            }
+        }
+        return teamList;
+    }
+
+    getNumberOfPlayersInTeam(team:Team):number {
+        let count = 0;
+        let fullTeamCount = this.getTeam(team);
+        return fullTeamCount.length;
+    }
+
+    getAllUsedTeams():Array<Team> {
+        let usedTeams:Array<Team> = [];
+        for (let player of this.fighters) {
+            if (usedTeams.indexOf(player.assignedTeam) == -1) {
+                usedTeams.push(player.assignedTeam);
+            }
+        }
+        var teamIndex = 0;
+        while (usedTeams.length < this.requiredTeams) {
+            let teamToAdd = Team[Team[teamIndex]];
+            if (usedTeams.indexOf(teamToAdd)) {
+                usedTeams.push(teamToAdd);
+            }
+            teamIndex++;
+        }
+        return usedTeams;
+    }
+
+    getTeamsStillInGame():Array<Team> {
+        let usedTeams:Array<Team> = [];
+        for (let player of this.getAlivePlayers()) {
+            if (usedTeams.indexOf(player.assignedTeam) == -1) {
+                usedTeams.push(player.assignedTeam);
+            }
+        }
+        return usedTeams;
+    }
+
+    getTeamsIdList():Array<number> {
+        let arrResult = [];
+        for (var enumMember in Team) {
+            var isValueProperty = parseInt(enumMember, 10) >= 0;
+            if (isValueProperty) {
+                arrResult.push(enumMember);
+            }
+        }
+        return arrResult;
+    }
+
+    getRandomTeam():Team {
+        return this.getTeamsStillInGame()[Utils.getRandomInt(0, this.numberOfTeamsInvolved)];
+    }
+
+    get numberOfTeamsInvolved():number {
+        return this.getTeamsStillInGame().length;
+    }
+
+    get numberOfPlayersPerTeam():Array<number> {
+        let count = Array<number>();
+        for (let player of this.fighters) {
+            if (count[player.assignedTeam] == undefined) {
+                count[player.assignedTeam] = 1;
+            }
+            else {
+                count[player.assignedTeam] = count[player.assignedTeam] + 1;
+            }
+        }
+        return count;
+    }
+
+    get maxPlayersPerTeam():number { //returns 0 if there aren't any teams
+        let maxCount = 0;
+        for (let nb of this.numberOfPlayersPerTeam) {
+            if (nb > maxCount) {
+                maxCount = nb;
+            }
+        }
+        return maxCount;
+    }
+
+    isEveryoneReady():boolean {
+        let isEveryoneReady = true;
+        for (let fighter of this.fighters) {
+            if (!fighter.isReady) {
+                isEveryoneReady = false;
+            }
+        }
+        return isEveryoneReady;
+    }
+
+    getAvailableTeam():Team {
+        let teamToUse:Team = Team.Blue;
+        let arrPlayersCount = new Dictionary<Team, number>();
+        let usedTeams = this.getAllUsedTeams();
+        for (var teamId of usedTeams) {
+            arrPlayersCount.add(teamId as Team, this.getNumberOfPlayersInTeam(Team[Team[teamId]]));
+        }
+
+        let mostPlayersInTeam = Math.max(...arrPlayersCount.values());
+        let leastPlayersInTeam = Math.min(...arrPlayersCount.values());
+        let indexOfFirstEmptiestTeam = arrPlayersCount.values().indexOf(leastPlayersInTeam);
+
+        if (mostPlayersInTeam == leastPlayersInTeam || mostPlayersInTeam == -Infinity || leastPlayersInTeam == Infinity) {
+            teamToUse = Team.Blue;
+        }
+        else {
+            teamToUse = Team[Team[indexOfFirstEmptiestTeam]];
+        }
+
+        return teamToUse;
+    }
+
+    getRandomFighter():Fighter {
+        return this.getAlivePlayers()[Utils.getRandomInt(0, this.getAlivePlayers().length)];
+    }
+
+    getRandomFighterNotInTeam(team:Team):Fighter {
+        let tries = 0;
+        let fighter:Fighter;
+        while (tries < 99 && (fighter == undefined || fighter.assignedTeam == undefined || fighter.assignedTeam == team)) {
+            fighter = this.getRandomFighter();
+            tries++;
+        }
+        return fighter;
+    }
+
+
+    //Misc. shortcuts
+    get fighterCount():number {
+        return this.fighters.length;
+    }
+
+    get aliveFighterCount():number {
+        return this.getAlivePlayers().length;
     }
 
 }
