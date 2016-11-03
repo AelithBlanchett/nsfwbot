@@ -85,8 +85,8 @@ export class ActiveFighter extends Fighter {
     @UpdateDateColumn()
     updatedAt:Date;
 
-    constructor() {
-        super();
+    constructor(name:string) {
+        super(name);
         this.dice = new Dice(12);
         this.hp = this.hpPerHeart();
         this.heartsRemaining = this.maxHearts();
@@ -322,6 +322,10 @@ export class ActiveFighter extends Fighter {
 
     requestDraw() {
         this.wantsDraw = true;
+    }
+
+    unrequestDraw() {
+        this.wantsDraw = false;
     }
 
     isRequestingDraw():boolean {

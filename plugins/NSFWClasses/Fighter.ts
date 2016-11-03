@@ -117,6 +117,10 @@ export class Fighter implements IFighter{
     @UpdateDateColumn()
     updatedAt:Date;
 
+    constructor(name:string) {
+        //TODO load stuff from DB
+    }
+
     addAchievement(type:AchievementType){
         let added = false;
         let index = this.achievements.findIndex(x => x.type == type);

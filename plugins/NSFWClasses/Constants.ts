@@ -204,6 +204,8 @@ export class Messages {
     static endFightAnnounce = "%s team wins the fight!";
 
     static wrongMatchTypeForAction = "You can't %s in a %s match.";
+
+    static commandError = "[color=red]An error happened: %s[/color]";
 }
 
 export enum Team {

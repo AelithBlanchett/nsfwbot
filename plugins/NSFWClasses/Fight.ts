@@ -24,6 +24,7 @@ import {ActiveFighter} from "./ActiveFighter";
 import {OneToMany} from "typeorm/index";
 import {CreateDateColumn} from "typeorm/index";
 import {UpdateDateColumn} from "typeorm/index";
+import {Fighter} from "./Constants";
 
 @Table(Constants.SQL.fightTableName)
 export class Fight{
@@ -158,13 +159,15 @@ export class Fight{
 
     //Pre-fight utils
 
-    //TODO transition between Fighter and ActiveFighter
-    leave(fighter:ActiveFighter) {
+    leave(fighterName:string) {
         if(!this.hasStarted){
-            let index = this.findFighterIndex(x => x.name == fighter.name);
+            let index = this.getFighterIndex(fighterName);
             if(index != -1){
+                let fighter = this.fighters[index];
                 fighter.assignedTeam = null;
                 fighter.fight = null;
+                //TODO delete from DB
+
                 this.fighters.splice(index, 1);
                 return true;
             }
@@ -172,35 +175,39 @@ export class Fight{
         return false;
     }
 
-    //TODO transition between Fighter and ActiveFighter
-    join(fighter:ActiveFighter, team:Team) {
+    join(fighterName:string, team:Team) {
         if(!this.hasStarted){
-            if (!this.getFighterByName(fighter.name)) { //find fighter by its name property instead of comparing objects, which doesn't work.
+            if (!this.getFighterByName(fighterName)) { //find fighter by its name property instead of comparing objects, which doesn't work.
+                let activeFighter = new ActiveFighter(fighterName);
                 if(team != Team.Unknown){
-                    fighter.assignedTeam = team;
+                    activeFighter.assignedTeam = team;
                 }
                 else{
-                    fighter.assignedTeam = this.getAvailableTeam();
-                    //console.log(`assigned team ${fighter.assignedTeam} to ${fighter.name}`);
+                    team = this.getAvailableTeam();
+                    activeFighter.assignedTeam = team;
                 }
-                fighter.fight = this;
-                this.fighters.push(fighter);
+                activeFighter.fight = this;
+                this.fighters.push(activeFighter);
                 return true;
             }
+            else {
+                throw new Error("You have already joined the fight.");
+            }
         }
-        return false;
+        else {
+            throw new Error("The fight has already started");
+        }
     }
 
-    //TODO transition between Fighter and ActiveFighter
-    setFighterReady(fighter:ActiveFighter) {
+    setFighterReady(fighterName:string) {
         if(!this.hasStarted){
-            if (!this.getFighterByName(fighter.name)) {
-                this.join(fighter, Team.Unknown);
+            if (!this.getFighterByName(fighterName)) {
+                this.join(fighterName, Team.Unknown);
             }
-            var fighterInFight = this.getFighterByName(fighter.name);
+            var fighterInFight:ActiveFighter = this.getFighterByName(fighterName);
             if(fighterInFight && !fighterInFight.isReady){ //find fighter by its name property instead of comparing objects, which doesn't work.
                 fighterInFight.isReady = true;
-                this.message.addInfo(Utils.strFormat(Constants.Messages.Ready, [fighter.getStylizedName()]));
+                this.message.addInfo(Utils.strFormat(Constants.Messages.Ready, [fighterInFight.getStylizedName()]));
                 this.message.send();
                 if (this.canStart()) {
                     this.start();
@@ -276,6 +283,36 @@ export class Fight{
         this.message.send();
         Fight.saveState(this);
         this.outputStatus();
+    }
+
+    requestDraw(fighterName:string) {
+        let fighter = this.getFighterByName(fighterName);
+        if (fighter) {
+            if (fighter.isRequestingDraw()) {
+                fighter.requestDraw();
+            }
+            else {
+                throw new Error("You already have requested a draw.");
+            }
+        }
+        else {
+            throw new Error("You aren't in this fight.");
+        }
+    }
+
+    unrequestDraw(fighterName:string) {
+        let fighter = this.getFighterByName(fighterName);
+        if (fighter) {
+            if (fighter.isRequestingDraw()) {
+                fighter.unrequestDraw();
+            }
+            else {
+                throw new Error("You already have requested a draw.");
+            }
+        }
+        else {
+            throw new Error("You aren't in this fight.");
+        }
     }
 
     nextTurn(){
@@ -398,85 +435,58 @@ export class Fight{
     }
 
     //Attacks
-    canTag(){
-        let flag = true;
+    checkIfCanTag() {
         let turnsSinceLastTag = (this.currentPlayer.lastTagTurn - this.currentTurn);
         let turnsToWait = (Constants.Fight.Action.Globals.turnsToWaitBetweenTwoTags * 2) - turnsSinceLastTag; // *2 because there are two fighters
         if(turnsToWait > 0){
-            flag = false;
-            this.message.addHit(`[b][color=red]You can't tag yet. Turns left: ${turnsToWait}[/color][/b]`);
-            this.message.send();
+            throw new Error(`[b][color=red]You can't tag yet. Turns left: ${turnsToWait}[/color][/b]`);
         }
         if(!this.currentTarget.canMoveFromOrOffRing){
-            flag = false;
-            this.message.addHit(`[b][color=red]You can't tag with this character. They're permanently out.[/color][/b]`);
-            this.message.send();
+            throw new Error(`[b][color=red]You can't tag with this character. They're permanently out.[/color][/b]`);
         }
         if(this.currentTarget.assignedTeam != this.currentPlayer.assignedTeam){
-            flag = false;
-            this.message.addHit(`[b][color=red]You can't tag with this character as they are not in your team.[/color][/b]`);
-            this.message.send();
+            throw new Error(`[b][color=red]You can't tag with this character as they are not in your team.[/color][/b]`);
         }
-        return flag;
     }
 
     canAttack(action:ActionType) {
-        let flag = true;
         if(action == undefined){
-            flag = false;
-            this.message.addError(Constants.Messages.canAttackNoAction);
+            throw new Error(Constants.Messages.canAttackNoAction);
         }
         if(!this.waitingForAction){
-            flag = false;
-            this.message.addError(Constants.Messages.canAttackNotWaitingForAction);
+            throw new Error(Constants.Messages.canAttackNotWaitingForAction);
         }
         if(this.currentPlayer.isTechnicallyOut()){
-            flag = false;
-            this.message.addError(Constants.Messages.canAttackIsOut);
+            throw new Error(Constants.Messages.canAttackIsOut);
         }
         if(!this.currentPlayer.isInTheRing){
-            flag = false;
-            this.message.addError(Constants.Messages.canAttackIsOutOfTheRing);
+            throw new Error(Constants.Messages.canAttackIsOutOfTheRing);
         }
         if(!this.currentTarget.isInTheRing){
-            flag = false;
-            this.message.addError(Constants.Messages.canAttackTargetIsOutOfTheRing);
+            throw new Error(Constants.Messages.canAttackTargetIsOutOfTheRing);
         }
         if(this.currentTarget.isTechnicallyOut()){
-            flag = false;
-            this.message.addError(Constants.Messages.canAttackTargetOutOfFight);
+            throw new Error(Constants.Messages.canAttackTargetOutOfFight);
         }
         if (action == ActionType.SubHold || action == ActionType.SexHold || action == ActionType.HumHold || action == ActionType.Bondage) {
             if(this.currentPlayer.isInHold()){
-                flag = false;
-                this.message.addError(Constants.Messages.canAttackIsInHold);
+                throw new Error(Constants.Messages.canAttackIsInHold);
             }
         }
-        if(flag == false){
-            this.message.send();
-        }
-        return flag;
     }
 
     checkAttackRequirements(action:ActionType) {
-        let flag = true;
         if (action == ActionType.HumHold || action == ActionType.Bondage) {
             if(!this.currentTarget.isInSpecificHold(Constants.Modifier.SexHold)){
-                flag = false;
-                this.message.addError(Constants.Messages.checkAttackRequirementsNotInSexualHold);
+                throw new Error(Constants.Messages.checkAttackRequirementsNotInSexualHold);
             }
         }
         if (action == ActionType.Submit && this.fightType == FightType.LastManStanding) {
-            flag = false;
-            this.message.addError(Utils.strFormat(Constants.Messages.wrongMatchTypeForAction, ["submit", "Last Man Standing"]));
+            throw new Error(Utils.strFormat(Constants.Messages.wrongMatchTypeForAction, ["submit", "Last Man Standing"]));
         }
-        if(flag == false){
-            this.message.send();
-        }
-        return flag;
     }
 
-    validateTarget(){
+    assignValidTargetIfWrong() {
         if(this.currentTarget == undefined || this.currentTarget.isTechnicallyOut() || !this.currentTarget.isInTheRing || this.currentTarget == this.currentPlayer){
             this.currentPlayer.target = this.getRandomFighterNotInTeam(this.currentPlayer.assignedTeam);
         }
@@ -495,47 +505,77 @@ export class Fight{
         }
     }
 
-    doAction(fighterName:string, action:ActionType, tier:Tier, customTarget?:ActiveFighter) {
+    prepareAction(fighterName:string, actionType:ActionType, tierRequired:boolean, isCustomTargetInsteadOfTier:boolean, args:string) {
+        let tier = Tier.None;
+        let customTarget:string = null;
+        if (!this.hasStarted) {
+            throw new Error("There isn't any fight going on.");
+        }
+
+        if (this.currentPlayer == undefined || fighterName != this.currentPlayer.name) {
+            throw new Error(Constants.Messages.doActionNotActorsTurn);
+        }
+
+        if (tierRequired) {
+            tier = Utils.stringToEnum(Tier, args);
+            if (tier == -1) {
+                throw new Error(`The tier is required, and neither Light, Medium or Heavy was specified. Example: !${ActionType[actionType]} Medium`);
+            }
+        }
+        if (isCustomTargetInsteadOfTier) {
+            customTarget = args;
+            if (this.getFighterByName(args) == null) {
+                throw new Error("The character to tag with is required and wasn't found.");
+            }
+        }
+
+        if (this.getFighterByName(fighterName)) {
+            this.doAction(actionType, tier, customTarget);
+        }
+        else {
+            throw new Error("You aren't participating in this fight.");
+        }
+    }
+
+    doAction(action:ActionType, tier:Tier, customTarget:string) {
         if(this.hasStarted && !this.hasEnded){
-            if (this.currentPlayer == undefined || fighterName != this.currentPlayer.name) {
-                this.message.addError(Constants.Messages.doActionNotActorsTurn);
-                this.message.send();
+            this.assignValidTargetIfWrong();
+            if (!this.canAttack(action)) {
+                return;
             }
-            else{
-                this.validateTarget();
-                if(!this.canAttack(action)){
-                    return;
-                }
-                if (action == ActionType.Tag) { //put in the condition any attacks that could focus allies
-                    if(customTarget != undefined && customTarget.assignedTeam == this.currentPlayer.assignedTeam){
-                        this.currentPlayer.target = customTarget;
-                    }
-                    if(!this.canTag())
-                        return;
-                }
-                else{
-                    if(customTarget != undefined){
-                        if(customTarget.assignedTeam != this.currentPlayer.assignedTeam){
-                            this.currentPlayer.target = customTarget;
-                        }
-                        else{
-                            this.message.addInfo(Constants.Messages.doActionTargetIsSameTeam);
-                            this.message.send();
-                            return;
-                        }
+
+            if (action == ActionType.Tag) { //put in the condition any attacks that could focus allies
+
+                if (customTarget != null) {
+                    let target = this.getFighterByName(customTarget);
+                    if (target.assignedTeam == this.currentPlayer.assignedTeam) {
+                        this.currentPlayer.target = target;
                     }
                 }
-                if(!this.checkAttackRequirements(action)){
-                    return;
-                }
-                this.waitingForAction = false;
-                let attacker = this.currentPlayer; // need to store them in case of turn-changing logic
-                let defender = this.currentTarget;
-                attacker.pendingAction = new Action(this, this.currentTurn, tier, action, attacker, defender);
-                let eventToTriggerAfter = attacker.pendingAction.triggerAction(); //The specific trigger BEFORE is executed inside the attacks, see Action.ts
-                attacker.triggerMods(TriggerMoment.After, eventToTriggerAfter, attacker.pendingAction);
-                attacker.pendingAction.commit(this);
+                this.checkIfCanTag();
             }
+            else {
+                if (customTarget != null) {
+                    let target = this.getFighterByName(customTarget);
+                    if (target.assignedTeam != this.currentPlayer.assignedTeam) {
+                        this.currentPlayer.target = target;
+                    }
+                    else {
+                        throw new Error(Constants.Messages.doActionTargetIsSameTeam);
+                    }
+                }
+            }
+
+            this.checkAttackRequirements(action);
+
+            this.waitingForAction = false;
+            let attacker = this.currentPlayer; // need to store them in case of turn-changing logic
+            let defender = this.currentTarget;
+
+            attacker.pendingAction = new Action(this, this.currentTurn, tier, action, attacker, defender);
+            let eventToTriggerAfter = attacker.pendingAction.triggerAction(); //The specific trigger BEFORE is executed inside the attacks, see Action.ts
+            attacker.triggerMods(TriggerMoment.After, eventToTriggerAfter, attacker.pendingAction);
+            attacker.pendingAction.commit(this);
         }
     }
 
@@ -575,7 +615,8 @@ export class Fight{
         return Constants.Arenas[Math.floor(Math.random() * Constants.Arenas.length)];
     }
 
-    forfeit(fighter:ActiveFighter) {
+    forfeit(fighterName:string) {
+        let fighter = this.getFighterByName(fighterName);
         if(fighter != null){
             if(!fighter.isTechnicallyOut()){
                 this.message.addHit(Utils.strFormat(Constants.Messages.forfeitItemApply, [fighter.getStylizedName()]));
@@ -700,7 +741,7 @@ export class Fight{
     reorderFightersByInitiative(arrFightersSortedByInitiative:Array<ActiveFighter>) {
         var index = 0;
         for (let fighter of arrFightersSortedByInitiative) {
-            let indexToMoveInFront = this.getIndexOfPlayer(fighter);
+            let indexToMoveInFront = this.getFighterIndex(fighter.name);
             var temp = this[index];
             this.fighters[index] = this.fighters[indexToMoveInFront];
             this.fighters[indexToMoveInFront] = temp;
@@ -719,21 +760,27 @@ export class Fight{
     }
 
     getFighterByName(name:string) {
-        let fighter = null;
+        let fighter:ActiveFighter = null;
         for (let player of this.fighters) {
             if (player.name == name) {
                 fighter = player;
             }
         }
+        if (fighter == null) {
+            throw new Error("This fighter isn't participating in the fight.");
+        }
         return fighter;
     }
 
-    getIndexOfPlayer(fighter:ActiveFighter) {
+    getFighterIndex(fighterName:string) {
         let index = -1;
         for (let i = 0; i < this.fighters.length; i++) {
-            if (this[i].name == fighter.name) {
+            if (this[i].name == fighterName) {
                 index = i;
             }
+        }
+        if (index == -1) {
+            throw new Error("This fighter isn't participating in the fight.");
         }
         return index;
     }
@@ -760,7 +807,7 @@ export class Fight{
     }
 
     getTeam(team:Team):Array<ActiveFighter> {
-        let teamList = new Array<ActiveFighter>();
+        let teamList = [];
         for (let player of this.fighters) {
             if (player.assignedTeam == team) {
                 teamList.push(player);
