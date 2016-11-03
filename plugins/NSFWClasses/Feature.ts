@@ -6,7 +6,7 @@ import {Fighter} from "./Fighter";
 import {Fight} from "./Fight";
 import {FeatureType} from "./Constants";
 import {SextoyPickupModifier} from "./CustomModifiers";
-import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, PrimaryGeneratedColumn} from "typeorm";
+import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, PrimaryGeneratedColumn, ManyToOne} from "typeorm";
 var ES = require("es-abstract/es6.js");
 
 @Table()
@@ -24,7 +24,11 @@ export class Feature{
     @Column("boolean")
     permanent: boolean;
 
-    @ManyToMany(type => Fighter, fighter => fighter.features)
+    @ManyToOne(type => Fighter, fighter => fighter.features, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
     obtainedBy:Fighter[];
 
     constructor(featureType:FeatureType, uses:number, id?:number) {
@@ -81,6 +85,22 @@ export class Feature{
         return modifier;
     }
 
+    getCost():number{
+        let result = 0;
+        switch (this.type){
+            case FeatureType.KickStart:
+            case FeatureType.SexyKickStart:
+                result = 2 * feature.uses;
+                break;
+            case FeatureType.Sadist:
+            case FeatureType.RyonaEnthusiast:
+            case FeatureType.CumSlut:
+                //Free features
+                break;
+        }
+        return result;
+    }
+
     isExpired():boolean{
         if(!this.permanent){
             if(this.uses <= 0){
@@ -91,53 +111,4 @@ export class Feature{
     }
 
 
-}
-
-export class Features extends Array<Feature>{
-    findIndex(predicate: (value: Feature) => boolean, thisArg?: any): number{
-        var list = ES.ToObject(this);
-        var length = ES.ToLength(ES.ToLength(list.length));
-        if (!ES.IsCallable(predicate)) {
-            throw new TypeError('Array#findIndex: predicate must be a function');
-        }
-        if (length === 0) return -1;
-        var thisArg = arguments[1];
-        for (var i = 0, value; i < length; i++) {
-            value = list[i];
-            if (ES.Call(predicate, thisArg, [value, i, list])) return i;
-        }
-        return -1;
-    }
-
-    add(feature:Feature):string{
-        let index = this.findIndex(x => x.type == feature.type);
-        if(index == -1){
-            this.push(feature);
-        }
-        else{
-            this[index].uses += feature.uses;
-        }
-        return "";
-    }
-
-    remove(feature:FeatureType):string{
-        let index = this.findIndex(x => x.type == feature);
-        if(index != -1){
-            this.splice(index,1);
-            return "";
-        }
-        else{
-            return "You can only have one feature of the same type at the same time.";
-        }
-    }
-
-    clear():string{
-        if(this.length > 0){
-            this.splice(0, this.length);
-            return "";
-        }
-        else{
-            return "You didn't have any feature to remove.";
-        }
-    }
 }

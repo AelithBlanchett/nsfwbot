@@ -7,11 +7,9 @@ import {Fight} from "./Fight";
 import {Dice} from "./Dice";
 import TierDifficulty = Constants.TierDifficulty;
 import Trigger = Constants.Trigger;
-import {Modifier} from "./Modifier";
 import FocusDamageHum = Constants.FocusDamageHumHold;
 import TokensPerWin = Constants.TokensPerWin;
 import FightTier = Constants.FightTier;
-import {Modifiers} from "./Modifier";
 import {BondageModifier} from "./CustomModifiers";
 import {HoldModifier} from "./CustomModifiers";
 import ModifierType = Constants.ModifierType;
@@ -27,7 +25,8 @@ import {Utils} from "./Utils";
 import {StrapToyModifier} from "./CustomModifiers";
 import {StrapToyLPDamagePerTurn} from "./Constants";
 import "reflect-metadata";
-import {Table, Column, PrimaryColumn, OneToMany, JoinTable, PrimaryGeneratedColumn, OneToOne, ManyToOne} from "typeorm";
+import {Table, Column, PrimaryColumn, OneToMany, JoinTable, PrimaryGeneratedColumn, OneToOne, ManyToOne, ManyToMany} from "typeorm";
+import {Modifier} from "./Modifier";
 
 export enum ActionType {
     Brawl,
@@ -76,7 +75,12 @@ export class Action {
     @Column("boolean")
     isHold: boolean;
 
-    modifiers:Modifiers; //Do not need to store that in the DB
+    @OneToMany(type => Modifier, mod => mod.parentAction, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
+    modifiers:Modifier[]; //Do not need to store that in the DB
 
     @ManyToOne(type => Fighter, fighter => fighter.actionsDone, {
         cascadeInsert: true,
@@ -140,7 +144,7 @@ export class Action {
     constructor(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:Fighter, defender?:Fighter) {
         this.fight = fight;
         this.isHold = false;
-        this.modifiers = new Modifiers();
+        this.modifiers = [];
         this.missed = true;
         this.hpDamageToDef = 0;
         this.lpDamageToDef = 0;

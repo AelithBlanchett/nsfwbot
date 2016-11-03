@@ -39,7 +39,7 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(data.character).then(receivedData =>{
             if(receivedData){
                 let fighter:Fighter = receivedData as Fighter;
-                let res = fighter.addFeature(new Feature(parsedFeatureArgs.featureType, parsedFeatureArgs.turns));
+                let res = fighter.addFeature(parsedFeatureArgs.featureType, parsedFeatureArgs.turns);
                 if(res == ""){
                     this.fChatLibInstance.sendPrivMessage(`[color=green]You successfully added the ${FeatureType[parsedFeatureArgs.featureType]} feature.[/color]`,fighter.name);
                 }

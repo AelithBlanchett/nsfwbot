@@ -3,25 +3,19 @@ import {Fight} from "./Fight";
 import {IFighter} from "./interfaces/IFighter";
 import {Action} from "./Action";
 import * as Constants from "./Constants";
-import {Data} from "./Model";
 import {Utils} from "./Utils";
 import Team = Constants.Team;
 import FightTier = Constants.FightTier;
 import TokensWorth = Constants.TokensWorth;
 import Stats = Constants.Stats;
-import {IModifier} from "./Modifier";
-import {Modifiers} from "./Modifier";
+import {Modifier} from "./Modifier";
 import TriggerMoment = Constants.TriggerMoment;
 import Trigger = Constants.Trigger;
 import {ModifierType} from "./Constants";
 import {Tier} from "./Constants";
 import {Feature} from "./Feature";
-import {Features} from "./Feature";
 import {FeatureType} from "./Constants";
-import {Achievements} from "./Achievement";
-import {AchievementType} from "./Constants";
-import {Achievement} from "./Constants";
-import {AchievementReward} from "./Constants";
+import {Achievement, AchievementType, AchievementReward} from "./Achievement";
 import {FightType} from "./Constants";
 import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, OneToMany} from "typeorm";
 import {getConnectionManager} from "typeorm/index";
@@ -81,15 +75,15 @@ export class Fighter implements IFighter{
         cascadeRemove: true
     })
     @JoinTable()
-    features:Features[] = [];
+    features:Feature[] = [];
 
     //TODO Instead of adding a custom object, add something more "natural"
     @Column()
-    modifiers:Modifiers[] = [];
+    modifiers:Modifier[] = [];
 
     //TODO Instead of adding a custom object, add something more "natural"
     @Column()
-    achievements:Achievements[] = [];
+    achievements:Achievement[] = [];
 
     @OneToMany(type => Action, action => action.attacker, {
         cascadeInsert: true,
@@ -140,97 +134,22 @@ export class Fighter implements IFighter{
         this.dice = new Dice(12);
     }
 
+    addAchievement(type:AchievementType){
+        let added = false;
+        let index = this.achievements.findIndex(x => x.type == type);
+        if(index == -1){
+            this.achievements.push(new Achievement(type));
+            added = true;
+        }
+        return added;
+    }
+
     checkAchievements(){
         let strBase = "Achievements won: ";
         let added = [];
         let count = 0;
 
-        if(this.totalFights >= 5){
-            if(this.achievements.add(AchievementType.FiveFights) == ""){
-                this.giveTokens(50);
-                count++;
-                added.push(Achievement.FiveFights + " Reward: "+ AchievementReward.FiveFights);
-            }
-        }
-        if(this.totalFights >= 10){
-            if(this.achievements.add(AchievementType.TenFights) == "") {
-                this.giveTokens(100);
-                count++;
-                added.push(Achievement.TenFights + " Reward: "+ AchievementReward.TenFights);
-            }
-        }
-        if(this.totalFights >= 20){
-            if(this.achievements.add(AchievementType.TwentyFights) == "") {
-                this.giveTokens(150);
-                count++;
-                added.push(Achievement.TwentyFights + " Reward: "+ AchievementReward.TwentyFights);
-            }
-        }
-        if(this.totalFights >= 40){
-            if(this.achievements.add(AchievementType.FortyFights) == ""){
-                this.giveTokens(200);
-                count++;
-                added.push(Achievement.FortyFights + " Reward: "+ AchievementReward.FortyFights);
-            }
-        }
-
-        if(this.wins == 1){
-            if(this.achievements.add(AchievementType.Rookie) == ""){
-                this.giveTokens(10);
-                count++;
-                added.push(Achievement.Rookie + " Reward: "+ AchievementReward.Rookie);
-            }
-        }
-        if(this.wins >= 5){
-            if(this.achievements.add(AchievementType.WinFiveFights) == ""){
-                this.giveTokens(50);
-                count++;
-                added.push(Achievement.WinFiveFights + " Reward: "+ AchievementReward.WinFiveFights);
-            }
-        }
-        if(this.wins >= 10){
-            if(this.achievements.add(AchievementType.WinTenFights) == ""){
-                this.giveTokens(100);
-                count++;
-                added.push(Achievement.WinTenFights + " Reward: "+ AchievementReward.WinTenFights);
-            }
-        }
-        if(this.wins >= 20){
-            if(this.achievements.add(AchievementType.WinTwentyFights) == ""){
-                this.giveTokens(200);
-                count++;
-                added.push(Achievement.WinTwentyFights + " Reward: "+ AchievementReward.WinTwentyFights);
-            }
-        }
-        if(this.wins >= 20){
-            if(this.achievements.add(AchievementType.WinThirtyFights) == ""){
-                this.giveTokens(300);
-                count++;
-                added.push(Achievement.WinThirtyFights + " Reward: "+ AchievementReward.WinThirtyFights);
-            }
-        }
-        if(this.wins >= 40){
-            if(this.achievements.add(AchievementType.WinFortyFights) == ""){
-                this.giveTokens(400);
-                count++;
-                added.push(Achievement.WinFortyFights + " Reward: "+ AchievementReward.WinFortyFights);
-            }
-        }
-
-        if(this.tier() == FightTier.Silver){
-            if(this.achievements.add(AchievementType.ReachedSilver) == ""){
-                this.giveTokens(100);
-                count++;
-                added.push(Achievement.ReachedSilver + " Reward: "+ AchievementReward.ReachedSilver);
-            }
-        }
-        if(this.tier() == FightTier.Gold){
-            if(this.achievements.add(AchievementType.ReachedGold) == ""){
-                this.giveTokens(200);
-                count++;
-                added.push(Achievement.ReachedGold + " Reward: "+ AchievementReward.ReachedGold);
-            }
-        }
+        //TODO redo achievements, more factorized
 
         if(count > 0){
             strBase += added.join(", ");
@@ -566,8 +485,8 @@ export class Fighter implements IFighter{
 
     getAchievementsList(){
         let strResult = [];
-        for(let achievementId of this.achievements){
-            strResult.push(`${Achievement[AchievementType[achievementId]]}`);
+        for(let achievement of this.achievements){
+            strResult.push(`${achievement.description}`);
         }
         return strResult.join(", ");
     }
@@ -584,47 +503,40 @@ export class Fighter implements IFighter{
         return Math.floor(this.tokens/TokensWorth.Gold);
     }
 
-    removeFeature(feature:FeatureType):string{
-        let result = this.features.remove(feature);
-        if(result == ""){
+    removeFeature(type:FeatureType):void{
+        let index = this.features.findIndex(x => x.type == type);
+        if(index != -1){
+            this.features.splice(index, 1);
             this.update();
         }
-        return result;
+        else{
+            throw new Error("You don't have this feature, you can't remove it.");
+        }
     }
 
-    addFeature(feature:Feature):string{
-        let amountToRemove = 0;
-        switch (feature.type){
-            case FeatureType.KickStart:
-            case FeatureType.SexyKickStart:
-                amountToRemove = 2 * feature.uses;
-                break;
-            case FeatureType.Sadist:
-            case FeatureType.RyonaEnthusiast:
-            case FeatureType.CumSlut:
-                //Free features
-                break;
-        }
+    addFeature(type:FeatureType, turns:number){
+        let feature = new Feature(type, turns);
+        let amountToRemove = feature.getCost();
 
         if(this.tokens - amountToRemove >= 0){
-            let result = this.features.add(feature);
-            if(result == ""){
+            let index = this.features.findIndex(x => x.type == type);
+            if(index == -1){
+                this.features.push(feature);
                 this.removeTokens(amountToRemove);
                 this.update();
             }
-            return result;
+            else{
+                throw new Error("You already have this feature. You have to wait for it to expire before adding another of the same type.");
+            }
         }
         else{
-            return `Not enough tokens. Required: ${amountToRemove}.`;
+            throw new Error(`Not enough tokens. Required: ${amountToRemove}.`);
         }
     }
 
-    clearFeatures():string{
-        let result = this.features.clear();
-        if(result == ""){
-            this.update();
-        }
-        return result;
+    clearFeatures(){
+        this.features = [];
+        this.update();
     }
 
     hasFeature(featureType:FeatureType):boolean{
@@ -657,33 +569,33 @@ export class Fighter implements IFighter{
         return `${modifierBeginning}[b][color=${Team[this.assignedTeam].toLowerCase()}]${this.name}[/color][/b]${modifierEnding}`;
     }
 
-    initFromData(data:Array<any>){
-        let row = data[0];
-        for (let attribute in row)
-        {
-            if(this[attribute] != undefined){
-                this[attribute] = row[attribute];
-            }
-        }
-
-        this.hp = this.hpPerHeart();
-        this.heartsRemaining = this.maxHearts();
-        this.lust = 0;
-        this.orgasmsRemaining = this.maxOrgasms();
-        this.focus = this.willpower;
-        let tempFeatures = JSON.parse(row["features"]);
-        this.features = new Features();
-        for(let feat of tempFeatures){
-            let theFeature = new Feature(feat.modType, feat.uses, feat.id);
-            this.features.add(theFeature);
-        }
-
-        let tempAchievements = JSON.parse(row["achievements"]);
-        this.achievements = new Achievements();
-        for(let achievement of tempAchievements){
-            this.achievements.add(achievement);
-        }
-    }
+    // initFromData(data:Array<any>){
+    //     let row = data[0];
+    //     for (let attribute in row)
+    //     {
+    //         if(this[attribute] != undefined){
+    //             this[attribute] = row[attribute];
+    //         }
+    //     }
+    //
+    //     this.hp = this.hpPerHeart();
+    //     this.heartsRemaining = this.maxHearts();
+    //     this.lust = 0;
+    //     this.orgasmsRemaining = this.maxOrgasms();
+    //     this.focus = this.willpower;
+    //     let tempFeatures = JSON.parse(row["features"]);
+    //     this.features = new Features();
+    //     for(let feat of tempFeatures){
+    //         let theFeature = new Feature(feat.modType, feat.uses, feat.id);
+    //         this.features.add(theFeature);
+    //     }
+    //
+    //     let tempAchievements = JSON.parse(row["achievements"]);
+    //     this.achievements = new Achievements();
+    //     for(let achievement of tempAchievements){
+    //         this.achievements.add(achievement);
+    //     }
+    // }
 
     addStat(stat:Stats):any{
         let theStat = this[Stats[stat].toLowerCase()];

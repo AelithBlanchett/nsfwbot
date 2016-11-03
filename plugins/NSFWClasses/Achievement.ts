@@ -1,55 +1,58 @@
-import {Modifier, IModifier} from "./Modifier";
-import {Utils} from "./Utils";
-import * as Constants from "./Constants";
-import {Fighter} from "./Fighter";
-import {Fight} from "./Fight";
-import {AchievementType} from "./Constants";
-import {SextoyPickupModifier} from "./CustomModifiers";
-var ES = require("es-abstract/es6.js");
+export class Achievement {
+    type: AchievementType;
+    reward: AchievementReward;
+    name: string;
+    description: AchievementDescription;
 
-export class Achievements extends Array<AchievementType>{
-    findIndex(predicate: (value: AchievementType) => boolean, thisArg?: any): number{
-        var list = ES.ToObject(this);
-        var length = ES.ToLength(ES.ToLength(list.length));
-        if (!ES.IsCallable(predicate)) {
-            throw new TypeError('Array#findIndex: predicate must be a function');
-        }
-        if (length === 0) return -1;
-        var thisArg = arguments[1];
-        for (var i = 0, value; i < length; i++) {
-            value = list[i];
-            if (ES.Call(predicate, thisArg, [value, i, list])) return i;
-        }
-        return -1;
+    constructor(type: AchievementType){
+        this.type = type;
+        this.name = AchievementReward[AchievementReward[AchievementType[type]]]; //short name, the enumerator's name in fact
+        this.reward = AchievementReward[AchievementType[type]];
+        this.description = AchievementDescription[AchievementType[type]];
     }
+}
 
-    add(feature:AchievementType):string{
-        let index = this.findIndex(x => x == feature);
-        if(index == -1){
-            this.push(feature);
-            return "";
-        }
-        return "Already here.";
-    }
+export enum AchievementDescription{
+    Rookie = <any>"Win your first fight!",
+    FiveFights = <any>"Participate in 5 Fights",
+    TenFights = <any>"Participate in 10 fights",
+    TwentyFights = <any>"Participate in 20 fights",
+    FortyFights = <any>"Participate in 40 fights",
+    WinFiveFights = <any>"Win 5 Fights",
+    WinTenFights = <any>"Win 10 fights",
+    WinTwentyFights = <any>"Win 20 fights",
+    WinThirtyFights = <any>"Win 30 fights",
+    WinFortyFights = <any>"Win 40 fights",
+    ReachedSilver = <any>"Reached Silver Tier",
+    ReachedGold = <any>"Reached Gold Tier"
+}
 
-    remove(feature:AchievementType):string{
-        let index = this.findIndex(x => x == feature);
-        if(index != -1){
-            this.splice(index,1);
-            return "";
-        }
-        else{
-            return "You can only have one achievement of the same type at the same time.";
-        }
-    }
+export enum AchievementType {
+    Rookie = 0,
+    FiveFights = 1,
+    TenFights = 2,
+    TwentyFights = 3,
+    FortyFights = 4,
+    WinFiveFights = 5,
+    WinTenFights = 6,
+    WinTwentyFights = 7,
+    WinThirtyFights = 8,
+    WinFortyFights = 9,
+    ReachedSilver = 10,
+    ReachedGold = 11
+}
 
-    clear():string{
-        if(this.length > 0){
-            this.splice(0, this.length);
-            return "";
-        }
-        else{
-            return "You didn't have any achievement to remove.";
-        }
-    }
+export enum AchievementReward {
+    Rookie = <any>"10 tokens",
+    FiveFights = <any>"50 tokens",
+    TenFights = <any>"100 tokens",
+    TwentyFights = <any>"150 tokens",
+    FortyFights = <any>"200 tokens",
+    WinFiveFights = <any>"50 tokens",
+    WinTenFights = <any>"100 tokens",
+    WinTwentyFights = <any>"200 tokens",
+    WinThirtyFights = <any>"300 tokens",
+    WinFortyFights = <any>"400 tokens",
+    ReachedSilver = <any>"100 tokens",
+    ReachedGold = <any>"200 tokens"
 }

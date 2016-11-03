@@ -1,12 +1,12 @@
 import {Fighter} from "./Fighter";
-import {FighterList} from "./FighterList";
 import * as Constants from "./Constants";
 import Trigger = Constants.Trigger;
 import {Utils} from "./Utils";
 import ModifierType = Constants.ModifierType;
 import TriggerMoment = Constants.TriggerMoment;
 import {Tier} from "./Constants";
-import {ActionType} from "./Action";
+import {ActionType, Action} from "./Action";
+import {ManyToOne} from "typeorm";
 var ES = require("es-abstract/es6.js");
 
 export interface IModifier{
@@ -23,7 +23,7 @@ export interface IModifier{
     diceRoll: number;
     escapeRoll: number;
     uses: number;
-    parentAction: ActionType;
+    parentAction: Action;
     event:Trigger;
     timeToTrigger:TriggerMoment;
     parentIds: Array<string>;
@@ -31,7 +31,6 @@ export interface IModifier{
     isOver():boolean;
     trigger(moment: TriggerMoment, event:Trigger, objFightAction?:any):void;
     willTriggerForEvent(moment: TriggerMoment, event:Trigger):boolean;
-    findIndex(predicate: (value: Modifier) => boolean, thisArg?: any): number;
 }
 
 export class Modifier implements IModifier{
@@ -51,7 +50,13 @@ export class Modifier implements IModifier{
     event:Trigger;
     timeToTrigger:TriggerMoment;
     parentIds: Array<string>;
-    parentAction:ActionType;
+
+    @ManyToOne(type => Action, act => act.modifiers, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
+    parentAction:Action;
 
     constructor(receiver:Fighter, applier:Fighter, tier:Tier, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number,
                 timeToTrigger:TriggerMoment, event:Trigger, parentIds:Array<string>, areMultipliers:boolean){
@@ -71,21 +76,6 @@ export class Modifier implements IModifier{
         this.parentIds = parentIds;
         this.areDamageMultipliers = areMultipliers;
         this.name = Constants.Modifier[ModifierType[modType]];
-    }
-
-    findIndex(predicate: (value: Modifier) => boolean, thisArg?: any): number{
-        var list = ES.ToObject(this);
-        var length = ES.ToLength(ES.ToLength(list.length));
-        if (!ES.IsCallable(predicate)) {
-            throw new TypeError('Array#findIndex: predicate must be a function');
-        }
-        if (length === 0) return -1;
-        var thisArg = arguments[1];
-        for (var i = 0, value; i < length; i++) {
-            value = list[i];
-            if (ES.Call(predicate, thisArg, [value, i, list])) return i;
-        }
-        return -1;
     }
 
     isOver():boolean{
@@ -164,22 +154,5 @@ export class Modifier implements IModifier{
                 this.receiver.removeMod(this.id);
             }
         }
-    }
-}
-
-export class Modifiers extends Array<Modifier>{
-    findIndex(predicate: (value: Modifier) => boolean, thisArg?: any): number{
-        var list = ES.ToObject(this);
-        var length = ES.ToLength(ES.ToLength(list.length));
-        if (!ES.IsCallable(predicate)) {
-            throw new TypeError('Array#findIndex: predicate must be a function');
-        }
-        if (length === 0) return -1;
-        var thisArg = arguments[1];
-        for (var i = 0, value; i < length; i++) {
-            value = list[i];
-            if (ES.Call(predicate, thisArg, [value, i, list])) return i;
-        }
-        return -1;
     }
 }
