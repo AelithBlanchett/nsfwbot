@@ -64,8 +64,7 @@ function abstractDatabase() {
         });
     };
 
-    Fight.loadState = async function (id, fight) {
-        fight.id = id;
+    Fight.loadState = async function (id, fchatlib, channel) {
         return true;
     };
 }

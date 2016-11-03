@@ -151,28 +151,36 @@ export class Fight{
         await fightRepo.persist(fight);
     }
 
-    static async loadState(fightId:number, fight:Fight) {
+    static async loadState(fightId:number, fChatLib:IFChatLib, channel:string) {
         let connection = await Data.getDb();
         let fightRepo = connection.getRepository(Fight);
-        fight = await fightRepo.findOneById(fightId);
+        let fight = await fightRepo.findOneById(fightId);
+        fight.fChatLibInstance = fChatLib;
+        fight.channel = channel;
+        return fight;
     }
 
     //Pre-fight utils
 
-    leave(fighterName:string) {
+    async leave(fighterName:string) {
         if(!this.hasStarted){
             let index = this.getFighterIndex(fighterName);
             if(index != -1){
                 let fighter = this.fighters[index];
-                fighter.assignedTeam = null;
-                fighter.fight = null;
-                //TODO delete from DB
-
                 this.fighters.splice(index, 1);
-                return true;
+
+                //delete from DB
+                try {
+                    let connection = await Data.getDb();
+                    let activeFighterRepo = connection.getRepository(ActiveFighter);
+                    let activeFighterToRemove = await activeFighterRepo.findOne({name: fighter.name, fight: this});
+                    await activeFighterRepo.remove(activeFighterToRemove);
+                }
+                catch (ex) {
+                    this.fChatLibInstance.throwError(Utils.strFormat(Constants.Messages.commandError, ex.message));
+                }
             }
         }
-        return false;
     }
 
     join(fighterName:string, team:Team) {
