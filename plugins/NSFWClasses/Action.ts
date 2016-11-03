@@ -27,6 +27,8 @@ import {StrapToyLPDamagePerTurn} from "./Constants";
 import "reflect-metadata";
 import {Table, Column, PrimaryColumn, OneToMany, JoinTable, PrimaryGeneratedColumn, OneToOne, ManyToOne, ManyToMany} from "typeorm";
 import {Modifier} from "./Modifier";
+import {CreateDateColumn} from "typeorm/index";
+import {UpdateDateColumn} from "typeorm/index";
 
 export enum ActionType {
     Brawl,
@@ -140,6 +142,12 @@ export class Action {
 
     @Column("boolean")
     requiresRoll: boolean;
+
+    @CreateDateColumn()
+    createdAt:Date;
+
+    @UpdateDateColumn()
+    updatedAt:Date;
 
     constructor(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:Fighter, defender?:Fighter) {
         this.fight = fight;

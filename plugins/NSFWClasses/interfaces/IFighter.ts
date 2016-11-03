@@ -14,17 +14,5 @@ export interface IFighter {
     endurance:number;
     willpower:number;
     features:Array<any>;
-
-
-
-
-    //during fight
-    isReady:boolean;
-    hp:number;
-    heartsRemaining:number;
-    lust:number;
-    orgasmsRemaining:number;
-    focus:number;
-    dice: Dice;
-
+    achievements:Array<any>;
 }

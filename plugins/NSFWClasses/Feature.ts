@@ -7,6 +7,8 @@ import {Fight} from "./Fight";
 import {FeatureType} from "./Constants";
 import {SextoyPickupModifier} from "./CustomModifiers";
 import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, PrimaryGeneratedColumn, ManyToOne} from "typeorm";
+import {CreateDateColumn} from "typeorm/index";
+import {UpdateDateColumn} from "typeorm/index";
 var ES = require("es-abstract/es6.js");
 
 @Table()
@@ -30,6 +32,12 @@ export class Feature{
         cascadeRemove: true
     })
     obtainedBy:Fighter[];
+
+    @CreateDateColumn()
+    createdAt:Date;
+
+    @UpdateDateColumn()
+    updatedAt:Date;
 
     constructor(featureType:FeatureType, uses:number, id?:number) {
         if(id){

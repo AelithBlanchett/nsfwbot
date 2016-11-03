@@ -1,4 +1,3 @@
-import {Fighter} from "./Fighter";
 import {Dice} from "./Dice";
 import {Action, ActionType} from "./Action";
 import {IFChatLib} from "./interfaces/IFChatLib";
@@ -22,6 +21,10 @@ import {Message} from "./Messaging";
 var CircularJSON = require('circular-json');
 var ES = require("es-abstract/es6.js");
 import {Table, Column, PrimaryColumn, ManyToOne, JoinTable, PrimaryGeneratedColumn, ManyToMany} from "typeorm";
+import {ActiveFighter} from "./ActiveFighter";
+import {OneToMany} from "typeorm/index";
+import {CreateDateColumn} from "typeorm/index";
+import {UpdateDateColumn} from "typeorm/index";
 
 @Table(Constants.SQL.fightTableName)
 export class Fight{
@@ -41,13 +44,13 @@ export class Fight{
     @Column("string")
     stage:string;
 
-    @ManyToMany(type => Fighter, fighter => fighter.fights, {
+    @OneToMany(type => ActiveFighter, fighter => fighter.fight, {
         cascadeInsert: true,
         cascadeUpdate: true,
         cascadeRemove: true
     })
     @JoinTable()
-    fighters:Fighter[] = [];
+    fighters:ActiveFighter[] = [];
 
     @Column("int")
     currentTurn:number = 0;
@@ -75,6 +78,12 @@ export class Fight{
 
     @Column("string")
     channel:string;
+
+    @CreateDateColumn()
+    createdAt:Date;
+
+    @UpdateDateColumn()
+    updatedAt:Date;
 
     public constructor(fChatLibInstance?:IFChatLib, channel?:string, stage?:string) {
         this.stage = stage || this.pickStage();
@@ -150,7 +159,7 @@ export class Fight{
 
     //Pre-fight utils
 
-    leave(fighter:Fighter){
+    leave(fighter:ActiveFighter) {
         if(!this.hasStarted){
             let index = this.findFighterIndex(x => x.name == fighter.name);
             if(index != -1){
@@ -163,7 +172,7 @@ export class Fight{
         return false;
     }
 
-    join(fighter:Fighter, team:Team){
+    join(fighter:ActiveFighter, team:Team) {
         if(!this.hasStarted){
             if (!this.getFighterByName(fighter.name)) { //find fighter by its name property instead of comparing objects, which doesn't work.
                 if(team != Team.Unknown){
@@ -181,7 +190,7 @@ export class Fight{
         return false;
     }
 
-    setFighterReady(fighter:Fighter){
+    setFighterReady(fighter:ActiveFighter) {
         if(!this.hasStarted){
             if (!this.getFighterByName(fighter.name)) {
                 this.join(fighter, Team.Unknown);
@@ -322,11 +331,11 @@ export class Fight{
         return this.getAlivePlayers()[this.currentTurn % this.aliveFighterCount].assignedTeam;
     }
 
-    get currentPlayer():Fighter{
+    get currentPlayer():ActiveFighter {
         return this.getAlivePlayers()[(this.currentTurn - 1) % this.aliveFighterCount];
     }
 
-    get nextPlayer():Fighter{
+    get nextPlayer():ActiveFighter {
         return this.getAlivePlayers()[this.currentTurn % this.aliveFighterCount];
     }
 
@@ -352,7 +361,7 @@ export class Fight{
         return Team[this.currentTeam];
     }
 
-    get currentTarget():Fighter{
+    get currentTarget():ActiveFighter {
         return this.currentPlayer.target;
     }
 
@@ -362,12 +371,12 @@ export class Fight{
         }
     }
 
-    assignRandomTargetToFighter(fighter:Fighter):void {
+    assignRandomTargetToFighter(fighter:ActiveFighter):void {
         fighter.target = this.getRandomFighterNotInTeam(fighter.assignedTeam);
     }
 
     //Dice rolling
-    rollAllDice(event:Trigger):Array<Fighter>{
+    rollAllDice(event:Trigger):Array<ActiveFighter> {
         let arrSortedFightersByInitiative = [];
         for (let player of this.getAlivePlayers()) {
             player.lastDiceRoll = player.roll(10, event);
@@ -382,7 +391,7 @@ export class Fight{
         return arrSortedFightersByInitiative;
     }
 
-    rollAllGetWinner(event:Trigger):Fighter{
+    rollAllGetWinner(event:Trigger):ActiveFighter {
         return this.rollAllDice(event)[0];
     }
 
@@ -484,7 +493,7 @@ export class Fight{
         }
     }
 
-    doAction(fighterName:string, action:ActionType, tier:Tier, customTarget?:Fighter) {
+    doAction(fighterName:string, action:ActionType, tier:Tier, customTarget?:ActiveFighter) {
         if(this.hasStarted && !this.hasEnded){
             if (this.currentPlayer == undefined || fighterName != this.currentPlayer.name) {
                 this.message.addError(Constants.Messages.doActionNotActorsTurn);
@@ -564,7 +573,7 @@ export class Fight{
         return Constants.Arenas[Math.floor(Math.random() * Constants.Arenas.length)];
     }
 
-    forfeit(fighter:Fighter){
+    forfeit(fighter:ActiveFighter) {
         if(fighter != null){
             if(!fighter.isTechnicallyOut()){
                 this.message.addHit(Utils.strFormat(Constants.Messages.forfeitItemApply, [fighter.getStylizedName()]));
@@ -671,7 +680,7 @@ export class Fight{
 
     //FORMERLY FIGHTERLIST.TS
 
-    findFighterIndex(predicate:(value:Fighter) => boolean, thisArg?:any):number {
+    findFighterIndex(predicate:(value:ActiveFighter) => boolean, thisArg?:any):number {
         var list = ES.ToObject(this.fighters);
         var length = ES.ToLength(ES.ToLength(list.length));
         if (!ES.IsCallable(predicate)) {
@@ -686,7 +695,7 @@ export class Fight{
         return -1;
     }
 
-    reorderFightersByInitiative(arrFightersSortedByInitiative:Array<Fighter>) {
+    reorderFightersByInitiative(arrFightersSortedByInitiative:Array<ActiveFighter>) {
         var index = 0;
         for (let fighter of arrFightersSortedByInitiative) {
             let indexToMoveInFront = this.getIndexOfPlayer(fighter);
@@ -697,8 +706,8 @@ export class Fight{
         }
     }
 
-    getAlivePlayers():Array<Fighter> {
-        let arrPlayers = new Array<Fighter>();
+    getAlivePlayers():Array<ActiveFighter> {
+        let arrPlayers = new Array<ActiveFighter>();
         for (let player of this.fighters) {
             if (!player.isTechnicallyOut() && player.isInTheRing) {
                 arrPlayers.push(player);
@@ -717,7 +726,7 @@ export class Fight{
         return fighter;
     }
 
-    getIndexOfPlayer(fighter:Fighter) {
+    getIndexOfPlayer(fighter:ActiveFighter) {
         let index = -1;
         for (let i = 0; i < this.fighters.length; i++) {
             if (this[i].name == fighter.name) {
@@ -748,8 +757,8 @@ export class Fight{
         }
     }
 
-    getTeam(team:Team):Array<Fighter> {
-        let teamList = new Array<Fighter>();
+    getTeam(team:Team):Array<ActiveFighter> {
+        let teamList = new Array<ActiveFighter>();
         for (let player of this.fighters) {
             if (player.assignedTeam == team) {
                 teamList.push(player);
@@ -866,13 +875,13 @@ export class Fight{
         return teamToUse;
     }
 
-    getRandomFighter():Fighter {
+    getRandomFighter():ActiveFighter {
         return this.getAlivePlayers()[Utils.getRandomInt(0, this.getAlivePlayers().length)];
     }
 
-    getRandomFighterNotInTeam(team:Team):Fighter {
+    getRandomFighterNotInTeam(team:Team):ActiveFighter {
         let tries = 0;
-        let fighter:Fighter;
+        let fighter:ActiveFighter;
         while (tries < 99 && (fighter == undefined || fighter.assignedTeam == undefined || fighter.assignedTeam == team)) {
             fighter = this.getRandomFighter();
             tries++;
