@@ -183,10 +183,11 @@ export class Fight{
         }
     }
 
-    join(fighterName:string, team:Team) {
+    async join(fighterName:string, team:Team) {
         if(!this.hasStarted){
             if (!this.getFighterByName(fighterName)) { //find fighter by its name property instead of comparing objects, which doesn't work.
-                let activeFighter = new ActiveFighter(fighterName);
+                let activeFighter = new ActiveFighter(fighterName, this);
+                activeFighter = await ActiveFighter.load(activeFighter.name);
                 if(team != Team.Unknown){
                     activeFighter.assignedTeam = team;
                 }

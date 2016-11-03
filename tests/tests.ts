@@ -41,7 +41,7 @@ function getMock(mockedClass) {
 
 function abstractDatabase() {
 
-    Fighter.exists = async function (name) {
+    Fighter.load = async function (name) {
         return new Promise(function (resolve, reject) {
             resolve(createFighter(name));
         });
@@ -623,7 +623,7 @@ describe("The player(s)", () => {
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         x.join("", data);
-        expect(Fighter.exists).toHaveBeenCalled();
+        expect(Fighter.load).toHaveBeenCalled();
     }, DEFAULT_TIMEOUT);
 
     it("should not be joining a match twice", function (done) { //5

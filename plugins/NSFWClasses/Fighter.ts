@@ -23,6 +23,7 @@ import {TableInheritance} from "typeorm/index";
 import {DiscriminatorColumn} from "typeorm/index";
 import {CreateDateColumn} from "typeorm/index";
 import {UpdateDateColumn} from "typeorm/index";
+import {Data} from "./Model";
 
 @Table()
 @TableInheritance("class-table")
@@ -83,26 +84,7 @@ export class Fighter implements IFighter{
     features:Feature[] = [];
 
     @Column()
-    modifiers:Modifier[] = [];
-
-    @Column()
     achievements:Achievement[] = [];
-
-    @OneToMany(type => Action, action => action.attacker, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
-    @JoinTable()
-    actionsDone:Action[] = [];
-
-    @OneToMany(type => Action, action => action.defender, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
-    @JoinTable()
-    actionsInflicted:Action[] = [];
 
     @ManyToMany(type => Fight, fight => fight.fighters, {
         cascadeInsert: true,
@@ -118,7 +100,7 @@ export class Fighter implements IFighter{
     updatedAt:Date;
 
     constructor(name:string) {
-        //TODO load stuff from DB
+        this.name = name;
     }
 
     addAchievement(type:AchievementType){
@@ -355,9 +337,17 @@ export class Fighter implements IFighter{
         return;
     }
 
-    static async exists(name:string) {
-        let myFighter = getConnectionManager().get().getRepository(Fighter).findOneById(name);
+    static async load(name:string) {
+        let connection = await Data.getDb();
+        let fightersRepo = connection.getRepository(Fighter);
+        let myFighter = await fightersRepo.findOneById(name);
         return myFighter;
+    }
+
+    static async create(name:string) {
+        let connection = await Data.getDb();
+        let fightersRepo = connection.getRepository(Fighter);
+        await fightersRepo.persist(new Fighter(name));
     }
 
 }

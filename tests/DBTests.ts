@@ -111,7 +111,7 @@ describe("The database(s)", () => {
     });
 
     it("should give ItemPickupBonus feature to Test2", function (done) {
-        Fighter.exists("test2").then(x => {
+        Fighter.load("test2").then(x => {
             console.log(x.features);
             x.features.push(new Feature(FeatureType.KickStart, 1));
             console.log(x.features);
@@ -127,7 +127,7 @@ describe("The database(s)", () => {
     },500000);
 
     xit("should say Test is already there", function (done) {
-        Fighter.exists("test").then(x => {
+        Fighter.load("test").then(x => {
             if(x.name == "test"){
                 done();
             }
@@ -140,7 +140,7 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should say Test2 is already there", function (done) {
-        Fighter.exists("test2").then(x => {
+        Fighter.load("test2").then(x => {
             if(x.name == "test2"){
                 done();
             }
@@ -153,7 +153,7 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should say Tewefwefwfwst2 doesn't exist", function (done) {
-        Fighter.exists("Tewefwefwfwst2").then(x => {
+        Fighter.load("Tewefwefwfwst2").then(x => {
             if(x == undefined){
                 done();
             }
@@ -166,7 +166,7 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should update Test2's power to something else", function (done) {
-        Fighter.exists("test2").then(x => {
+        Fighter.load("test2").then(x => {
             let randomId = -1;
             do{
                 randomId = Utils.getRandomInt(1,6);
@@ -198,7 +198,7 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should write a new fight in the database", function (done) {
-        Fighter.exists("test2").then(x => {
+        Fighter.load("test2").then(x => {
             let myFight = new Fight(fChatLibInstance, "here", "hello");
             Fight.saveState(myFight).then(id => {
                 expect(id).toBeGreaterThan(0);

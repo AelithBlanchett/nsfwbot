@@ -18,6 +18,8 @@ import {ManyToOne} from "typeorm/index";
 import {OneToOne} from "typeorm/index";
 import {CreateDateColumn} from "typeorm/index";
 import {UpdateDateColumn} from "typeorm/index";
+import {Modifier} from "./Modifier";
+import {Data} from "./Model";
 
 @ClassTableChild()
 export class ActiveFighter extends Fighter {
@@ -29,7 +31,6 @@ export class ActiveFighter extends Fighter {
         cascadeRemove: true
     })
     fight:Fight;
-    dice:Dice;
 
     @OneToOne(type => ActiveFighter, {
         cascadeInsert: true,
@@ -71,8 +72,6 @@ export class ActiveFighter extends Fighter {
     @Column("int")
     lastTagTurn:number = 9999999;
 
-    pendingAction:Action;
-
     @Column("boolean")
     wantsDraw:boolean = false;
 
@@ -85,14 +84,54 @@ export class ActiveFighter extends Fighter {
     @UpdateDateColumn()
     updatedAt:Date;
 
-    constructor(name:string) {
+    @Column()
+    modifiers:Modifier[] = [];
+
+    @OneToMany(type => Action, action => action.attacker, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
+    @JoinTable()
+    actionsDone:Action[] = [];
+
+    @OneToMany(type => Action, action => action.defender, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
+    @JoinTable()
+    actionsInflicted:Action[] = [];
+
+    //Objects, do not need to store
+    pendingAction:Action;
+    dice:Dice;
+
+    constructor(name:string, fight:Fight) {
         super(name);
-        this.dice = new Dice(12);
-        this.hp = this.hpPerHeart();
-        this.heartsRemaining = this.maxHearts();
-        this.lust = 0;
-        this.orgasmsRemaining = this.maxOrgasms();
-        this.focus = this.willpower;
+        this.fight = fight;
+    }
+
+    static async load(name:string, fight?:Fight) {
+        let connection = await Data.getDb();
+        let fightersRepo = connection.getRepository(ActiveFighter);
+        let myFighter:ActiveFighter;
+
+        if (fight == null) {
+            myFighter = await fightersRepo.findOneById(name);
+            myFighter.hp = myFighter.hpPerHeart();
+            myFighter.heartsRemaining = myFighter.maxHearts();
+            myFighter.lust = 0;
+            myFighter.orgasmsRemaining = myFighter.maxOrgasms();
+            myFighter.focus = myFighter.willpower;
+        }
+        else {
+            myFighter = await fightersRepo.findOne({name: name, fight: fight});
+        }
+
+        myFighter.dice = new Dice(12);
+
+        return myFighter;
     }
 
     //returns dice score
