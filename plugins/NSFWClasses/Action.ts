@@ -7,9 +7,7 @@ import {Fight} from "./Fight";
 import {Dice} from "./Dice";
 import TierDifficulty = Constants.TierDifficulty;
 import Trigger = Constants.Trigger;
-import Action = Constants.Action;
 import {Modifier} from "./Modifier";
-import {Promise} from "es6-promise";
 import FocusDamageHum = Constants.FocusDamageHumHold;
 import TokensPerWin = Constants.TokensPerWin;
 import FightTier = Constants.FightTier;
@@ -30,20 +28,46 @@ import {StrapToyModifier} from "./CustomModifiers";
 import {StrapToyLPDamagePerTurn} from "./Constants";
 import {Table, Column, PrimaryColumn, OneToMany, JoinTable, PrimaryGeneratedColumn, OneToOne, ManyToOne} from "typeorm";
 
-//TODO: Rename that to Action
-export class FightAction{
+export enum ActionType {
+    Brawl,
+    SexStrike,
+    Tag,
+    Rest,
+    SubHold,
+    SexHold,
+    Bondage,
+    HumHold,
+    ItemPickup,
+    SextoyPickup,
+    Degradation,
+    ForcedWorship,
+    HighRisk,
+    Penetration,
+    Stun,
+    Escape,
+    Submit,
+    StrapToy,
+    Finish,
+    Masturbate
+}
+
+export class Action {
 
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(type => Fight, fight => fight.pastActions)
+    @ManyToOne(type => Fight, fight => fight.pastActions, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
     fight:Fight;
 
     @Column("int")
     atTurn: number;
 
     @Column("int")
-    type: Action;
+    type:ActionType;
 
     @Column("int")
     tier: Tier;
@@ -53,10 +77,18 @@ export class FightAction{
 
     modifiers:Modifiers; //Do not need to store that in the DB
 
-    @ManyToOne(type => Fighter, fighter => fighter.actionsDone)
+    @ManyToOne(type => Fighter, fighter => fighter.actionsDone, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
     attacker: Fighter;
 
-    @ManyToOne(type => Fighter, fighter => fighter.actionsDone)
+    @ManyToOne(type => Fighter, fighter => fighter.actionsDone, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
     defender: Fighter;
 
     @Column("int")
@@ -104,7 +136,7 @@ export class FightAction{
     @Column("boolean")
     requiresRoll: boolean;
 
-    constructor(fight:Fight, currentTurn:number, tier:Tier, actionType:Action, attacker:Fighter, defender?:Fighter) {
+    constructor(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:Fighter, defender?:Fighter) {
         this.fight = fight;
         this.isHold = false;
         this.modifiers = new Modifiers();
@@ -145,14 +177,14 @@ export class FightAction{
 
     requiredDiceScore():number{
         let scoreRequired = 0;
-        if(this.type == Constants.Action.Rest){
+        if (this.type == ActionType.Rest) {
             scoreRequired = Constants.Fight.Action.RequiredScore.Rest;
         }
-        else if(this.type == Constants.Action.Tag){
+        else if (this.type == ActionType.Tag) {
             scoreRequired = Constants.Fight.Action.RequiredScore.Tag;
         }
         else{
-            if (this.type == Constants.Action.Finish) {
+            if (this.type == ActionType.Finish) {
                 scoreRequired += 6;
             }
 
@@ -183,64 +215,64 @@ export class FightAction{
     triggerAction():Trigger{
         let result;
         switch (this.type) {
-            case Action.Brawl:
+            case ActionType.Brawl:
                 result = this.actionBrawl();
                 break;
-            case Action.Bondage:
+            case ActionType.Bondage:
                 result = this.actionBondage();
                 break;
-            case Action.Degradation:
+            case ActionType.Degradation:
                 result = this.actionDegradation();
                 break;
-            case Action.Escape:
+            case ActionType.Escape:
                 result = this.actionEscape();
                 break;
-            case Action.ForcedWorship:
+            case ActionType.ForcedWorship:
                 result = this.actionForcedWorship();
                 break;
-            case Action.HighRisk:
+            case ActionType.HighRisk:
                 result = this.actionHighRisk();
                 break;
-            case Action.Penetration:
+            case ActionType.Penetration:
                 result = this.actionPenetration();
                 break;
-            case Action.HumHold:
+            case ActionType.HumHold:
                 result = this.actionHumHold();
                 break;
-            case Action.ItemPickup:
+            case ActionType.ItemPickup:
                 result = this.actionItemPickup();
                 break;
-            case Action.SexStrike:
+            case ActionType.SexStrike:
                 result = this.actionSexStrike();
                 break;
-            case Action.SubHold:
+            case ActionType.SubHold:
                 result = this.actionSubHold();
                 break;
-            case Action.SexHold:
+            case ActionType.SexHold:
                 result = this.actionSexHold();
                 break;
-            case Action.SextoyPickup:
+            case ActionType.SextoyPickup:
                 result = this.actionSextoyPickup();
                 break;
-            case Action.Rest:
+            case ActionType.Rest:
                 result = this.actionRest();
                 break;
-            case Action.Tag:
+            case ActionType.Tag:
                 result = this.actionTag();
                 break;
-            case Action.Stun:
+            case ActionType.Stun:
                 result = this.actionStun();
                 break;
-            case Action.Submit:
+            case ActionType.Submit:
                 result = this.actionSubmit();
                 break;
-            case Action.StrapToy:
+            case ActionType.StrapToy:
                 result = this.actionStrapToy();
                 break;
-            case Action.Finish:
+            case ActionType.Finish:
                 result = this.actionFinish();
                 break;
-            case Action.Masturbate:
+            case ActionType.Masturbate:
                 result = this.actionMasturbate();
                 break;
             default:
@@ -518,33 +550,18 @@ export class FightAction{
         return Trigger.PassiveAction;
     }
 
-    static commitDb(action:FightAction){
-        return new Promise<number>(function(resolve, reject) {
-            let attackerId = action.attacker.name || null;
-            let defenderId = null;
-            if(action.defender){
-                defenderId = action.defender.name;
-            }
-            var sql = Constants.SQL.commitFightAction;
-            sql = Data.db.format(sql, [Constants.SQL.actionTableName, action.fight.id, action.atTurn, action.type, action.tier, action.isHold, action.diceScore, action.missed, attackerId, defenderId, action.hpDamageToDef, action.lpDamageToDef, action.fpDamageToDef, action.hpDamageToAtk, action.lpDamageToAtk, action.fpDamageToAtk, action.hpHealToDef, action.lpHealToDef, action.fpHealToDef, action.hpHealToAtk, action.lpHealToAtk, action.fpHealToAtk]);
-            Data.db.query(sql, (err, results) => {
-                if (err) {
-                    throw err;
-                }
-                else {
-                    action.id = results.insertId;
-                    resolve(results.insertId);
-                }
-            });
-        });
+    static async commitDb(action:Action) {
+        let connection = await Data.getDb();
+        let fightActionRepo = connection.getRepository(Action);
+        await fightActionRepo.persist(action);
     }
 
     commit(fight:Fight){
         if(this.defender){
-            fight.message.addAction(`${Constants.Action[this.type]} on ${this.defender.getStylizedName()}`);
+            fight.message.addAction(`${ActionType[this.type]} on ${this.defender.getStylizedName()}`);
         }
         else{
-            fight.message.addAction(`${Constants.Action[this.type]}`);
+            fight.message.addAction(`${ActionType[this.type]}`);
         }
 
         if(this.missed == false){
@@ -654,7 +671,7 @@ export class FightAction{
 
 
         if(this.modifiers.length > 0){
-            if(this.type == Action.SubHold || this.type == Action.SexHold || this.type == Action.HumHold){ //for any holds, do the stacking here
+            if (this.type == ActionType.SubHold || this.type == ActionType.SexHold || this.type == ActionType.HumHold) { //for any holds, do the stacking here
                 let indexOfNewHold = this.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold || x.name == Constants.Modifier.SexHold || x.name == Constants.Modifier.HumHold);
                 let indexOfAlreadyExistantHoldForDefender = this.defender.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold || x.name == Constants.Modifier.SexHold || x.name == Constants.Modifier.HumHold);
                 if(indexOfAlreadyExistantHoldForDefender != -1){
@@ -709,7 +726,7 @@ export class FightAction{
             }
         }
 
-        if(this.missed == false && this.type == Action.Tag){
+        if (this.missed == false && this.type == ActionType.Tag) {
             fight.message.addHit(`[b][color=red]TAG![/color][/b] ${this.defender.name} enters inside the ring!`);
         }
         else if(this.defender){
@@ -735,10 +752,10 @@ export class FightAction{
         }
 
         //Save it to the DB
-        FightAction.commitDb(this);
+        Action.commitDb(this);
 
         //check for fight ending status
-        if(this.type == Action.Escape && this.missed == false){
+        if (this.type == ActionType.Escape && this.missed == false) {
             fight.message.addHint(`This is still your turn ${this.attacker.getStylizedName()}, time to fight back!`);
             fight.message.send();
             fight.waitingForAction = true;

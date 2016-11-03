@@ -1,5 +1,5 @@
 import {Dice} from "../Dice";
-import {FightAction} from "../FightAction";
+import {Action} from "../Action";
 export interface IFighter {
     name:string;
     tokens: number;

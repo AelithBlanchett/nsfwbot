@@ -9,12 +9,12 @@ import * as Constants from "./Constants";
 import Team = Constants.Team;
 import {Utils} from "./Utils";
 import Tier = Constants.Tier;
-import Action = Constants.Action;
 import {Stats} from "./Constants";
 import {FightType} from "./Constants";
 import {FeatureType} from "./Constants";
 import {Feature} from "./Feature";
 import {EnumEx} from "./Utils";
+import {ActionType} from "./Action";
 
 export class CommandHandler implements ICommandHandler{
     fChatLibInstance:IFChatLib;
@@ -245,21 +245,22 @@ export class CommandHandler implements ICommandHandler{
         });
     };
 
-    register(args:string, data:FChatResponse){
-        Fighter.exists(data.character).then(doesExist =>{
-            if(!doesExist){
-                Fighter.create(data.character).then(()=>{
-                    this.fChatLibInstance.sendPrivMessage("[color=green]You are now registered! Welcome! Don't forget to type !howtostart here if you haven't read the quickstart guide yet.[/color]", data.character);
-                }).catch(err => {
-                    this.fChatLibInstance.throwError(err);
-                });
+    async register(args:string, data:FChatResponse) {
+        let doesFighterExist = await Fighter.exists(data.character);
+        if (!doesFighterExist) {
+            let fighter = new Fighter();
+            fighter.name = data.character;
+            let updateSucceeded = await fighter.update();
+            if (updateSucceeded) {
+                this.fChatLibInstance.sendPrivMessage("[color=green]You are now registered! Welcome! Don't forget to type !howtostart here if you haven't read the quickstart guide yet.[/color]", data.character);
             }
             else{
-                this.fChatLibInstance.sendPrivMessage("[color=red]You are already registered.[/color]", data.character);
+                this.fChatLibInstance.sendPrivMessage("[color=red]Something went wrong.[/color]", data.character);
             }
-        }).catch(err =>{
-            console.log(err);
-        });
+        }
+        else {
+            this.fChatLibInstance.sendPrivMessage("[color=red]You are already registered.[/color]", data.character);
+        }
     };
 
     removefeature(args:string, data:FChatResponse){
@@ -379,83 +380,83 @@ export class CommandHandler implements ICommandHandler{
     };
 
     bondage(args:string, data:FChatResponse){
-        actionHandler(this, Action.Bondage, false, false, args, data);
+        actionHandler(this, ActionType.Bondage, false, false, args, data);
     };
 
     brawl(args:string, data:FChatResponse){
-        actionHandler(this, Action.Brawl, true, false, args, data);
+        actionHandler(this, ActionType.Brawl, true, false, args, data);
     };
 
     degradation(args:string, data:FChatResponse){
-        actionHandler(this, Action.Degradation, true, false, args, data);
+        actionHandler(this, ActionType.Degradation, true, false, args, data);
     };
 
     escape(args:string, data:FChatResponse){
-        actionHandler(this, Action.Escape, false, false, args, data);
+        actionHandler(this, ActionType.Escape, false, false, args, data);
     };
 
     forcedworship(args:string, data:FChatResponse){
-        actionHandler(this, Action.ForcedWorship, true, false, args, data);
+        actionHandler(this, ActionType.ForcedWorship, true, false, args, data);
     };
 
     highrisk(args:string, data:FChatResponse){
-        actionHandler(this, Action.HighRisk, true, false, args, data);
+        actionHandler(this, ActionType.HighRisk, true, false, args, data);
     };
 
     penetration(args:string, data:FChatResponse){
-        actionHandler(this, Action.Penetration, true, false, args, data);
+        actionHandler(this, ActionType.Penetration, true, false, args, data);
     };
 
     humhold(args:string, data:FChatResponse){
-        actionHandler(this, Action.HumHold, true, false, args, data);
+        actionHandler(this, ActionType.HumHold, true, false, args, data);
     };
 
     itempickup(args:string, data:FChatResponse){
-        actionHandler(this, Action.ItemPickup, false, false, args, data);
+        actionHandler(this, ActionType.ItemPickup, false, false, args, data);
     };
 
     rest(args:string, data:FChatResponse){
-        actionHandler(this, Action.Rest, false, false, args, data);
+        actionHandler(this, ActionType.Rest, false, false, args, data);
     };
 
     sex(args:string, data:FChatResponse){
-        actionHandler(this, Action.SexStrike, true, false, args, data);
+        actionHandler(this, ActionType.SexStrike, true, false, args, data);
     };
 
     sexhold(args:string, data:FChatResponse){
-        actionHandler(this, Action.SexHold, true, false, args, data);
+        actionHandler(this, ActionType.SexHold, true, false, args, data);
     };
 
     subhold(args:string, data:FChatResponse){
-        actionHandler(this, Action.SubHold, true, false, args, data);
+        actionHandler(this, ActionType.SubHold, true, false, args, data);
     };
 
     straptoy(args:string, data:FChatResponse){
-        actionHandler(this, Action.StrapToy, true, false, args, data);
+        actionHandler(this, ActionType.StrapToy, true, false, args, data);
     };
 
     sextoypickup(args:string, data:FChatResponse){
-        actionHandler(this, Action.SextoyPickup, false, false, args, data);
+        actionHandler(this, ActionType.SextoyPickup, false, false, args, data);
     };
 
     stun(args:string, data:FChatResponse){
-        actionHandler(this, Action.Stun, true, false, args, data);
+        actionHandler(this, ActionType.Stun, true, false, args, data);
     };
 
     tag(args:string, data:FChatResponse){
-        actionHandler(this, Action.Tag, false, true, args, data);
+        actionHandler(this, ActionType.Tag, false, true, args, data);
     };
 
     submit(args:string, data:FChatResponse){
-        actionHandler(this, Action.Submit, false, false, args, data);
+        actionHandler(this, ActionType.Submit, false, false, args, data);
     };
 
     finish(args:string, data:FChatResponse){
-        actionHandler(this, Action.Finish, false, false, args, data);
+        actionHandler(this, ActionType.Finish, false, false, args, data);
     };
 
     masturbate(args:string, data:FChatResponse){
-        actionHandler(this, Action.Masturbate, false, false, args, data);
+        actionHandler(this, ActionType.Masturbate, false, false, args, data);
     };
 
     resetfight(args:string, data:FChatResponse){
@@ -587,7 +588,7 @@ var privMsgEventHandler = function(parent, data){
     }
 };
 
-var actionHandler = function(cmd:CommandHandler, actionType:Action, tierRequired:boolean, isCustomTargetInsteadOfTier:boolean, args:string, data:FChatResponse){
+var actionHandler = function (cmd:CommandHandler, actionType:ActionType, tierRequired:boolean, isCustomTargetInsteadOfTier:boolean, args:string, data:FChatResponse) {
     let tier = Tier.None;
     let customTarget:Fighter = null;
     if(cmd.fight == undefined || !cmd.fight.hasStarted){
@@ -597,7 +598,7 @@ var actionHandler = function(cmd:CommandHandler, actionType:Action, tierRequired
     if(tierRequired){
         tier = Utils.stringToEnum(Tier, args);
         if(tier == -1){
-            cmd.fChatLibInstance.sendMessage(`[color=red]The tier is required, and neither Light, Medium or Heavy was specified. Example: !${Action[actionType]} Medium[/color]`, cmd.channel);
+            cmd.fChatLibInstance.sendMessage(`[color=red]The tier is required, and neither Light, Medium or Heavy was specified. Example: !${ActionType[actionType]} Medium[/color]`, cmd.channel);
             return false;
         }
     }

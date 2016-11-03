@@ -3,10 +3,10 @@ import {FighterList} from "./FighterList";
 import * as Constants from "./Constants";
 import Trigger = Constants.Trigger;
 import {Utils} from "./Utils";
-import Action = Constants.Action;
 import ModifierType = Constants.ModifierType;
 import TriggerMoment = Constants.TriggerMoment;
 import {Tier} from "./Constants";
+import {ActionType} from "./Action";
 var ES = require("es-abstract/es6.js");
 
 export interface IModifier{
@@ -23,7 +23,7 @@ export interface IModifier{
     diceRoll: number;
     escapeRoll: number;
     uses: number;
-    parentAction: Action;
+    parentAction: ActionType;
     event:Trigger;
     timeToTrigger:TriggerMoment;
     parentIds: Array<string>;
@@ -51,7 +51,7 @@ export class Modifier implements IModifier{
     event:Trigger;
     timeToTrigger:TriggerMoment;
     parentIds: Array<string>;
-    parentAction: Action;
+    parentAction:ActionType;
 
     constructor(receiver:Fighter, applier:Fighter, tier:Tier, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number,
                 timeToTrigger:TriggerMoment, event:Trigger, parentIds:Array<string>, areMultipliers:boolean){

@@ -5,7 +5,7 @@
 //import * as Constants from "../plugins/NSFWClasses/Constants";
 //import Tier = Constants.Tier;
 //import {Utils} from "../plugins/NSFWClasses/Utils";
-//import {FightAction} from "../plugins/NSFWClasses/FightAction";
+//import {Action} from "../plugins/NSFWClasses/Action";
 //import Action = Constants.Action;
 //import {Data} from "../plugins/NSFWClasses/Model";
 //import {Promise} from "es6-promise";
@@ -47,7 +47,7 @@
 //        });
 //    };
 //
-//    FightAction.commitDb = function(action){
+//    Action.commitDb = function(action){
 //        return new Promise<number>(function(resolve, reject) {
 //            action.id = Utils.getRandomInt(0,1000000);
 //            resolve(action.id);
@@ -231,7 +231,7 @@
 //            return (fight.hasStarted && !fight.hasEnded && fight.waitingForAction && fight.fighterList[0] != undefined && fight.fighterList[1] != undefined);
 //        }).done((res) => {
 //            while(res && !fight.hasEnded) {
-//                fight.fighters[0].pendingAction = new FightAction(1, 1, tier, action, fight.fighterList[0], fight.fighterList[1]);
+//                fight.fighters[0].pendingAction = new Action(1, 1, tier, action, fight.fighterList[0], fight.fighterList[1]);
 //                if(nonRandom)
 //                {
 //                    fight.fighters[0].pendingAction.missed = false;

@@ -307,29 +307,6 @@ export enum FocusDamageHumHold {
     Heavy = 4
 }
 
-export enum Action {
-    Brawl,
-    SexStrike,
-    Tag,
-    Rest,
-    SubHold,
-    SexHold,
-    Bondage,
-    HumHold,
-    ItemPickup,
-    SextoyPickup,
-    Degradation,
-    ForcedWorship,
-    HighRisk,
-    Penetration,
-    Stun,
-    Escape,
-    Submit,
-    StrapToy,
-    Finish,
-    Masturbate
-}
-
 export enum StrapToyLPDamagePerTurn {
     Light = 2,
     Medium = 3,

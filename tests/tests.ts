@@ -5,10 +5,8 @@ import {CommandHandler} from "../plugins/NSFWClasses/CommandHandler";
 import * as Constants from "../plugins/NSFWClasses/Constants";
 import Tier = Constants.Tier;
 import {Utils} from "../plugins/NSFWClasses/Utils";
-import {FightAction} from "../plugins/NSFWClasses/FightAction";
-import Action = Constants.Action;
+import {Action, ActionType} from "../plugins/NSFWClasses/Action";
 import {Data} from "../plugins/NSFWClasses/Model";
-import {Promise} from "es6-promise";
 import {StunModifier} from "../plugins/NSFWClasses/CustomModifiers";
 import {EnumEx} from "../plugins/NSFWClasses/Utils";
 import Trigger = Constants.Trigger;
@@ -43,30 +41,30 @@ function getMock(mockedClass) {
 
 function abstractDatabase() {
 
-    Fighter.exists = function (name) {
+    Fighter.exists = async function (name) {
         return new Promise(function (resolve, reject) {
             resolve(createFighter(name));
         });
     };
 
-    FightAction.commitDb = function (action) {
+    Action.commitDb = async function (action) {
         return new Promise<number>(function (resolve, reject) {
             action.id = Utils.getRandomInt(0, 1000000);
             resolve(action.id);
         });
     };
 
-    Fight.commitEndFightDb = function (fight) {
+    Fight.commitDb = async function (fight) {
         return true;
     };
 
-    Fight.saveState = function (fight) {
+    Fight.saveState = async function (fight) {
         return new Promise<number>(function (resolve, reject) {
             resolve(Utils.getRandomInt(0, 1000000));
         });
     };
 
-    Fight.loadState = function (id, fight) {
+    Fight.loadState = async function (id, fight) {
         fight.id = id;
         return true;
     };
@@ -1147,7 +1145,7 @@ describe("The player(s)", () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                     };
                     waitUntil().interval(100).times(50).condition(condition).done(() => {
-                        if (cmd.fight.pastActions[cmd.fight.pastActions.length - 1].type == Action.HumHold) {
+                        if (cmd.fight.pastActions[cmd.fight.pastActions.length - 1].type == ActionType.HumHold) {
                             done();
                         }
                         else {

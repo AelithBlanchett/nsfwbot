@@ -1,6 +1,6 @@
 import {Fighter} from "./Fighter";
 import {Dice} from "./Dice";
-import {FightAction} from "./FightAction";
+import {Action, ActionType} from "./Action";
 import {IFChatLib} from "./interfaces/IFChatLib";
 import {Utils} from "./Utils";
 import {Dictionary} from "./Dictionary";
@@ -14,9 +14,7 @@ import {Data} from "./Model";
 import FightTier = Constants.FightTier;
 import TokensPerWin = Constants.TokensPerWin;
 import Trigger = Constants.Trigger;
-import Action = Constants.Action;
 import {Modifier} from "./Modifier";
-import {Promise} from "es6-promise";
 import ModifierType = Constants.ModifierType;
 import {BondageModifier} from "./CustomModifiers";
 import TriggerMoment = Constants.TriggerMoment;
@@ -25,8 +23,7 @@ var CircularJSON = require('circular-json');
 var ES = require("es-abstract/es6.js");
 import {Table, Column, PrimaryColumn, ManyToOne, JoinTable, PrimaryGeneratedColumn, ManyToMany} from "typeorm";
 
-//TODO Add table names
-@Table()
+@Table(Constants.SQL.fightTableName)
 export class Fight{
 
     @PrimaryGeneratedColumn()
@@ -44,7 +41,11 @@ export class Fight{
     @Column("string")
     stage:string;
 
-    @ManyToMany(type => Fighter, fighter => fighter.fights)
+    @ManyToMany(type => Fighter, fighter => fighter.fights, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
     @JoinTable()
     fighters:Fighter[] = [];
 
@@ -54,9 +55,13 @@ export class Fight{
     @Column("int")
     fightType:FightType = FightType.Rumble;
 
-    @ManyToOne(type => FightAction, fightAction => fightAction.fight)
+    @ManyToOne(type => Action, fightAction => fightAction.fight, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
     @JoinTable()
-    pastActions:Array<FightAction> = [];
+    pastActions:Array<Action> = [];
 
     @Column("int")
     winnerTeam:Team = Team.Unknown;
@@ -131,101 +136,16 @@ export class Fight{
         this.message.send();
     }
 
-    static saveState(fight){
-        return new Promise<number>((resolve, reject) => {
-            if (fight.id == -1) {
-                var mysqlDataUpdate = function (idFight, idFighter) {
-                    new Promise((resolve, reject) => {
-                        //Do the db
-                        var sql = "INSERT INTO `flistplugins`.?? (`idFight`, `idFighter`) VALUES (?,?);";
-                        sql = Data.db.format(sql, [Constants.SQL.fightFightersTableName, idFight, idFighter]);
-                        Data.db.query(sql, function (err, results) {
-                            if (err) {
-                                reject(err);
-                            }
-                            else {
-                                resolve();
-                            }
-                        });
-                    });
-                };
-
-                Data.db.beginTransaction(err => {
-                    var sql = "INSERT INTO `flistplugins`.?? (`idFightType`, `idStage`, `usedTeams`, `currentTurn`, `fighterList`) VALUES (?,?,?,?,?)";
-                    sql = Data.db.format(sql, [Constants.SQL.fightTableName, fight.fightType, 1, fight.usedTeams, fight.currentTurn, CircularJSON.stringify(fight.fighterList)]);
-                    Data.db.query(sql, (err, results) => {
-                        if (err) {
-                            Data.db.rollback(() => {
-                                reject(err);
-                            });
-                        }
-                        else {
-                            fight.id = results.insertId;
-                            var callsToMake = [];
-                            for (let fighter of fight.fighterList) {
-                                callsToMake.push(mysqlDataUpdate(results.insertId, fighter.id));
-                            }
-                            Promise.all(callsToMake)
-                                .then(_ => Data.db.commit(() => {
-                                    fight.message.addHint("Fight number: #"+fight.id);
-                                    resolve(fight.id);
-                                }))
-                                .catch((err) => {
-                                    Data.db.rollback(() => {
-                                        reject(err);
-                                    });
-                                });
-                        }
-                    });
-                });
-            }
-            else {
-                var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ? WHERE `idFight` = ?;";
-                sql = Data.db.format(sql, [Constants.SQL.fightTableName, fight.currentTurn, CircularJSON.stringify(fight.fighterList), fight.id]);
-                Data.db.query(sql, (err, results) => {
-                    if (err) {
-                        reject(err);
-                    }
-                    else {
-                        console.log("Successfully updated fight " + fight.id + " to database.");
-                        resolve(fight.id);
-                    }
-                });
-            }
-        });
+    static async saveState(fight) {
+        let connection = await Data.getDb();
+        let fightRepo = connection.getRepository(Fight);
+        await fightRepo.persist(fight);
     }
 
-    static loadState(fightId:number, fight:Fight) {
-        //     var sql = "SELECT `idFight`,`idFightType`,`idStage`,`usedTeams`,`currentTurn`,`fighterList` FROM `flistplugins`.?? WHERE idFight = ?;";
-        //     sql = Data.db.format(sql, [Constants.SQL.fightTableName, fightId]);
-        //     Data.db.query(sql, (err, results) => {
-        //         if (err) {
-        //         }
-        //         else {
-        //             fight.id = fightId;
-        //             fight.fightType = results[0].idFightType;
-        //             fight.stage = "Virtual Arena";
-        //             fight.requiredTeams = results[0].usedTeams;
-        //             fight.currentTurn = results[0].currentTurn;
-        //             fight.fighterList = new FighterList(fight.usedTeams);
-        //             //TODO: LOAD FORMER ACTIONS
-
-        //             var oldParsedList = CircularJSON.parse(results[0].fighterList);
-        //             for(let nonParsedPlayer of oldParsedList){
-        //                 let player = new Fighter();
-        //                 for(let attrname in nonParsedPlayer){
-        //                     player[attrname] = nonParsedPlayer[attrname];
-        //                 }
-        //                 player.dice = new Dice(10);
-        //                 player.fight = fight;
-        //                 player.target = null;
-        //                 fight.fighterList.push(player);
-        //             }
-
-        //             console.log("Successfully loaded  fight " + fight.id + " from database.");
-        //             fight.outputStatus();
-        //         }
-        //     });
+    static async loadState(fightId:number, fight:Fight) {
+        let connection = await Data.getDb();
+        let fightRepo = connection.getRepository(Fight);
+        fight = await fightRepo.findOneById(fightId);
     }
 
     //Pre-fight utils
@@ -489,7 +409,7 @@ export class Fight{
         return flag;
     }
 
-    canAttack(action:Action){
+    canAttack(action:ActionType) {
         let flag = true;
         if(action == undefined){
             flag = false;
@@ -515,7 +435,7 @@ export class Fight{
             flag = false;
             this.message.addError(Constants.Messages.canAttackTargetOutOfFight);
         }
-        if(action == Action.SubHold || action == Action.SexHold || action == Action.HumHold || action == Action.Bondage){
+        if (action == ActionType.SubHold || action == ActionType.SexHold || action == ActionType.HumHold || action == ActionType.Bondage) {
             if(this.currentPlayer.isInHold()){
                 flag = false;
                 this.message.addError(Constants.Messages.canAttackIsInHold);
@@ -527,15 +447,15 @@ export class Fight{
         return flag;
     }
 
-    checkAttackRequirements(action:Action) {
+    checkAttackRequirements(action:ActionType) {
         let flag = true;
-        if(action == Action.HumHold || action == Action.Bondage){
+        if (action == ActionType.HumHold || action == ActionType.Bondage) {
             if(!this.currentTarget.isInSpecificHold(Constants.Modifier.SexHold)){
                 flag = false;
                 this.message.addError(Constants.Messages.checkAttackRequirementsNotInSexualHold);
             }
         }
-        if(action == Action.Submit && this.fightType == FightType.LastManStanding){
+        if (action == ActionType.Submit && this.fightType == FightType.LastManStanding) {
             flag = false;
             this.message.addError(Utils.strFormat(Constants.Messages.wrongMatchTypeForAction, ["submit", "Last Man Standing"]));
         }
@@ -564,7 +484,7 @@ export class Fight{
         }
     }
 
-    doAction(fighterName:string, action:Action, tier:Tier, customTarget?:Fighter) {
+    doAction(fighterName:string, action:ActionType, tier:Tier, customTarget?:Fighter) {
         if(this.hasStarted && !this.hasEnded){
             if (this.currentPlayer == undefined || fighterName != this.currentPlayer.name) {
                 this.message.addError(Constants.Messages.doActionNotActorsTurn);
@@ -575,7 +495,7 @@ export class Fight{
                 if(!this.canAttack(action)){
                     return;
                 }
-                if(action == Action.Tag){ //put in the condition any attacks that could focus allies
+                if (action == ActionType.Tag) { //put in the condition any attacks that could focus allies
                     if(customTarget != undefined && customTarget.assignedTeam == this.currentPlayer.assignedTeam){
                         this.currentPlayer.target = customTarget;
                     }
@@ -600,8 +520,8 @@ export class Fight{
                 this.waitingForAction = false;
                 let attacker = this.currentPlayer; // need to store them in case of turn-changing logic
                 let defender = this.currentTarget;
-                attacker.pendingAction = new FightAction(this, this.currentTurn, tier, action, attacker, defender);
-                let eventToTriggerAfter = attacker.pendingAction.triggerAction(); //The specific trigger BEFORE is executed inside the attacks, see FightAction.ts
+                attacker.pendingAction = new Action(this, this.currentTurn, tier, action, attacker, defender);
+                let eventToTriggerAfter = attacker.pendingAction.triggerAction(); //The specific trigger BEFORE is executed inside the attacks, see Action.ts
                 attacker.triggerMods(TriggerMoment.After, eventToTriggerAfter, attacker.pendingAction);
                 attacker.pendingAction.commit(this);
             }
@@ -719,56 +639,33 @@ export class Fight{
             this.message.send();
         }
 
+        for (let fighter of this.fighters) {
+            fighter.totalFights++;
+            if (fighter.assignedTeam == this.winnerTeam) {
+                fighter.wins++;
+                this.message.addInfo(`Awarded ${tokensToGiveToWinners} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
+                fighter.giveTokens(tokensToGiveToWinners);
+            }
+            else {
+                if (this.winnerTeam != Team.Unknown) {
+                    fighter.losses++;
+                }
+                this.message.addInfo(`Awarded ${tokensToGiveToLosers} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
+                fighter.giveTokens(tokensToGiveToLosers);
+            }
+            this.message.addInfo(fighter.checkAchievements());
+        }
+
+        //TODO save fighters
+
         //TODO persist
-        //Fight.commitEndFightDb(this, tokensToGiveToWinners, tokensToGiveToLosers);
+        Fight.commitDb(this);
     }
 
-    static commitEndFightDb(fight, tokensToGiveToWinners, tokensToGiveToLosers) {
-
-        //     Data.db.beginTransaction(err =>{
-        //         var sql = "UPDATE `flistplugins`.?? SET `currentTurn` = ?, `fighterList` = ?, `hasEnded` = ?, `winnerTeam` = ? WHERE `idFight` = ?;";
-        //         sql = Data.db.format(sql, [Constants.SQL.fightTableName, fight.currentTurn, "", true, fight.winnerTeam, fight.id]);
-        //         Data.db.query(sql, (err, results) => {
-        //             if(err){
-        //                 Data.db.rollback(function(){
-
-        //                 });
-        //             }
-        //             else{
-        //                 var callsToMake = [];
-        //                 for(let fighter of fight.fighterList){
-        //                     fighter.totalFights++;
-        //                     if(fighter.assignedTeam == fight.winnerTeam){
-        //                         fighter.wins++;
-        //                         fight.message.addInfo(`Awarded ${tokensToGiveToWinners} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
-        //                         fighter.giveTokens(tokensToGiveToWinners)
-        //                         callsToMake.push(fighter.update());
-        //                     }
-        //                     else{
-        //                         if(fight.winnerTeam != Team.Unknown){
-        //                             fighter.losses++;
-        //                         }
-        //                         fight.message.addInfo(`Awarded ${tokensToGiveToLosers} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
-        //                         fighter.giveTokens(tokensToGiveToLosers)
-        //                         callsToMake.push(fighter.update());
-        //                     }
-        //                     fight.message.addInfo(fighter.checkAchievements());
-        //                 }
-        //                 Promise.all(callsToMake)
-        //                     .then(_ => {
-        //                         Data.db.commit(_ => {
-        //                             console.log(`Finished fight ${fight.id} and given all the according tokens successfully`);
-        //                             fight.sendMessage(); //send tokens message and everything
-        //                         });
-        //                     })
-        //                     .catch((err) => {
-        //                         console.log("There was an error during the fight ending:"+err);
-        //                         Data.db.rollback(function(){
-        //                         });
-        //                     });
-        //             }
-        //         });
-        //     });
+    static async commitDb(fight) {
+        let connection = await Data.getDb();
+        let fightRepo = connection.getRepository(Fight);
+        await fightRepo.persist(fight);
     }
 
 

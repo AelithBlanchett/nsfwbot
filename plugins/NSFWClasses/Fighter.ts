@@ -1,11 +1,10 @@
 import {Dice} from "./Dice";
 import {Fight} from "./Fight";
 import {IFighter} from "./interfaces/IFighter";
-import {FightAction} from "./FightAction";
+import {Action} from "./Action";
 import * as Constants from "./Constants";
 import {Data} from "./Model";
 import {Utils} from "./Utils";
-import {Promise} from "es6-promise";
 import Team = Constants.Team;
 import FightTier = Constants.FightTier;
 import TokensWorth = Constants.TokensWorth;
@@ -25,6 +24,7 @@ import {Achievement} from "./Constants";
 import {AchievementReward} from "./Constants";
 import {FightType} from "./Constants";
 import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, OneToMany} from "typeorm";
+import {getConnectionManager} from "typeorm/index";
 
 @Table()
 export class Fighter implements IFighter{
@@ -75,7 +75,11 @@ export class Fighter implements IFighter{
     willpower:number = 0;
 
     //TODO Instead of adding a custom object, add something more "natural"
-    @ManyToMany(type => Feature, feature => feature.obtainedBy)
+    @ManyToMany(type => Feature, feature => feature.obtainedBy, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
     @JoinTable()
     features:Features = new Features();
 
@@ -87,15 +91,27 @@ export class Fighter implements IFighter{
     @Column()
     achievements:Achievements = new Achievements();
 
-    @OneToMany(type => FightAction, action => action.attacker)
+    @OneToMany(type => Action, action => action.attacker, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
     @JoinTable()
-    actionsDone:FightAction[] = [];
+    actionsDone:Action[] = [];
 
-    @OneToMany(type => FightAction, action => action.defender)
+    @OneToMany(type => Action, action => action.defender, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
     @JoinTable()
-    actionsInflicted:FightAction[] = [];
+    actionsInflicted:Action[] = [];
 
-    @ManyToMany(type => Fight, fight => fight.fighters)
+    @ManyToMany(type => Fight, fight => fight.fighters, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
     fights:Fight[] = [];
 
 
@@ -116,53 +132,12 @@ export class Fighter implements IFighter{
     isInTheRing:boolean = true;
     canMoveFromOrOffRing = true;
     lastTagTurn:number = 9999999;
-    pendingAction:FightAction;
+    pendingAction:Action;
     wantsDraw:boolean = false;
     consecutiveTurnsWithoutFocus:number = 0;
 
     constructor() {
         this.dice = new Dice(12);
-    }
-
-    load(name){
-        return new Promise((fullfill, reject) => {
-            let self = this;
-            if (name != undefined) {
-                //load mysql
-                Data.db.query(
-                    "SELECT `id`, \
-                    `name`, \
-                    `tokens`, \
-                    `tokensSpent`, \
-                    `wins`, \
-                    `losses`, \
-                    `forfeits`, \
-                    `quits`, \
-                    `totalFights`, \
-                    `power`, \
-                    `sensuality`, \
-                    `dexterity`, \
-                    `toughness`, \
-                    `endurance`, \
-                    `willpower`, \
-                    `areStatsPrivate`, \
-                    `features`, \
-                    `achievements` \
-                    FROM `flistplugins`.?? WHERE name = ?", [Constants.SQL.fightersTableName, name], function(err, rows: Array<any>){
-                    if (rows != undefined && rows.length != 0) {
-                        self.initFromData(rows);
-                        fullfill(self);
-                    }
-                    else{
-                        reject("Fighter not found");
-                    }
-                });
-            }
-            else {
-                //error
-                reject("No name passed.");
-            }
-        });
     }
 
     checkAchievements(){
@@ -267,35 +242,8 @@ export class Fighter implements IFighter{
         return strBase;
     }
 
-    update():Promise<boolean>{
-        return new Promise<boolean>((res, rej) =>{
-            this.updateInDb().then(() => {
-                this.load(this.name).then( () =>{
-                    res(true);
-                }).catch(err => {
-                    rej(false);
-                });
-            }).catch(err => {
-                rej(false);
-            });
-        });
-    }
+    async update() {
 
-    updateInDb(){
-        return new Promise<number>((resolve, reject) => {
-            var sql = "UPDATE `flistplugins`.?? SET `tokens` = ?,`tokensSpent` = ?,`wins` = ?,`losses` = ?,`forfeits` = ?,`quits` = ?,`totalFights` = ?,`winRate` = ?,`power` = ?,`sensuality` = ?,`dexterity` = ?,\
-                `toughness` = ?,`endurance` = ?,`willpower` = ?,`areStatsPrivate` = ?, `features` = ?, `achievements` = ? WHERE `name` = ?;";
-            sql = Data.db.format(sql, [Constants.SQL.fightersTableName, this.tokens, this.tokensSpent, this.wins, this.losses, this.forfeits, this.quits, this.totalFights, this.winRate(), this.power, this.sensuality, this.dexterity, this.toughness, this.endurance, this.willpower, this.areStatsPrivate, JSON.stringify(this.features), JSON.stringify(this.achievements), this.name]);
-            Data.db.query(sql, (err, result) => {
-                if (result) {
-                    console.log("Updated "+this.name+"'s entry in the db.");
-                    resolve(result.affectedRows);
-                }
-                else {
-                    reject("Unable to update fighter "+this.name+ " " + err);
-                }
-            });
-        });
     }
 
     winRate():number{
@@ -588,39 +536,6 @@ export class Fighter implements IFighter{
         }
     }
 
-    static create(name:string){
-        return new Promise(function(resolve, reject) {
-            Data.db.query("INSERT INTO `flistplugins`.?? (`name`) VALUES ( ? )", [Constants.SQL.fightersTableName, name], function (err, result) {
-                if (result) {
-                    console.log("Added "+name+" to the roster: "+JSON.stringify(result));
-                    resolve();
-                }
-                else {
-                    reject("Unable to create fighter. " + err);
-                }
-            });
-        });
-    }
-
-    static createRaw(name:string, power:number, sensuality: number, dexterity:number, toughness:number, endurance:number, willpower:number){
-        return new Promise(function(resolve, reject) {
-            if (!(power != undefined && sensuality != undefined && dexterity != undefined && toughness != undefined && endurance != undefined && willpower != undefined)) {
-                reject("Wrong stats passed.");
-            }
-            else {
-                Data.db.query("INSERT INTO `flistplugins`.??(`name`, `power`, `sensuality`, `dexterity`, `toughness`,`endurance`, `willpower`) VALUES (?,?,?,?,?,?)", [Constants.SQL.fightersTableName, name, power, sensuality, dexterity, toughness, endurance, willpower], function (err, result) {
-                    if (result) {
-                        console.log(JSON.stringify(result));
-                        resolve();
-                    }
-                    else {
-                        reject("Unable to create fighter. " + err);
-                    }
-                });
-            }
-        });
-    }
-
     outputStats():string{
         return "[b]" + this.name + "[/b]'s stats" + "\n" +
             "[b][color=red]Power[/color][/b]:  " + this.power + "      " + "    --            [b][color=red]Hearts[/color][/b]: " + this.maxHearts() + " * " + this.hpPerHeart() +" [b][color=red]HP[/color] per heart[/b]"+"\n" +
@@ -851,42 +766,9 @@ export class Fighter implements IFighter{
         return;
     }
 
-    static exists(name:string){
-        return new Promise<Fighter>(function(resolve, reject) {
-            Data.db.query("SELECT `id`, \
-                    `name`, \
-                    `tokens`, \
-                    `tokensSpent`, \
-                    `wins`, \
-                    `losses`, \
-                    `forfeits`, \
-                    `quits`, \
-                    `areStatsPrivate`, \
-                    `totalFights`, \
-                    `power`, \
-                    `sensuality`, \
-                    `dexterity`, \
-                    `toughness`, \
-                    `endurance`, \
-                    `willpower`, \
-                    `features`, \
-                    `achievements` \
-                    FROM `flistplugins`.?? WHERE name = ?", [Constants.SQL.fightersTableName, name], function (err, rows) {
-                if (rows != undefined && rows.length == 1) {
-                    let myTempWrestler = new Fighter();
-                    myTempWrestler.initFromData(rows);
-                    resolve(myTempWrestler);
-                }
-                else{
-                    if(err){
-                        reject(err);
-                    }
-                    else{
-                        resolve(null);
-                    }
-                }
-            });
-        });
+    static async exists(name:string) {
+        let myFighter = getConnectionManager().get().getRepository(Fighter).findOneById(name);
+        return myFighter;
     }
 
 }

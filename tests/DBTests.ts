@@ -5,8 +5,7 @@ import {CommandHandler} from "../plugins/NSFWClasses/CommandHandler";
 import * as Constants from "../plugins/NSFWClasses/Constants";
 import Tier = Constants.Tier;
 import {Utils} from "../plugins/NSFWClasses/Utils";
-import {FightAction} from "../plugins/NSFWClasses/FightAction";
-import Action = Constants.Action;
+import {Action, ActionType} from "../plugins/NSFWClasses/Action";
 import {Data} from "../plugins/NSFWClasses/Model";
 import {Promise} from "es6-promise";
 import {ItemPickupModifier} from "../plugins/NSFWClasses/CustomModifiers";
@@ -41,37 +40,37 @@ describe("The database(s)", () => {
 
     function resetData(){
         return new Promise((resolve, reject) => {
-            var subRequestFights = "SELECT flistplugins.nsfw_fights.idFight FROM flistplugins.nsfw_fights LEFT JOIN flistplugins.nsfw_fightfighters ON flistplugins.nsfw_fights.idFight = flistplugins.nsfw_fightfighters.idFight\
-            WHERE idFighter IS NULL OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4";
-            var sqlResetFightsActions = "DELETE FROM flistplugins.nsfw_actions where idFight IN ("+subRequestFights+") OR idAttacker = 1 OR idAttacker = 2 OR idAttacker = 3 OR idAttacker = 4 OR idDefender = 1 OR idDefender = 2 OR idDefender = 3 OR idDefender = 4";
-            var sqlResetFightFighters = "DELETE FROM flistplugins.nsfw_fightfighters where idFight IN ("+subRequestFights+") OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4;";
-            var sqlResetFights = "DELETE flistplugins.nsfw_fights.* FROM flistplugins.nsfw_fights \
-            WHERE idFight IN ("+subRequestFights+") idFighter IS NULL OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4;"; //clear all fights linked to the 4 fighters
-            var sqlResetTestFighters = "DELETE FROM flistplugins.nsfw_fighters where name = 'test' OR name = 'test2' OR name = 'test3' OR name = 'test4';";
-            var sqlAddTestFighter1 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('1', 'test', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
-            var sqlAddTestFighter2 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('2', 'test2', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
-            var sqlAddTestFighter3 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('3', 'test3', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
-            var sqlAddTestFighter4 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('4', 'test4', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
-            var addFight = "INSERT INTO `flistplugins`.`nsfw_fights` (`idFight`, `idFightType`,  `idStage`, `usedTeams`, `currentTurn`, `fighterList`, `hasEnded`) VALUES (1,1, 1,2, 2, '', 0);";
-            Data.db.query(sqlResetFightsActions, (err, result) => {
-                Data.db.query(sqlResetFightFighters, (err, result) => {
-                    Data.db.query(sqlResetFights, (err, result) => {
-                        Data.db.query(sqlResetTestFighters, (err, result) => {
-                            Data.db.query(sqlAddTestFighter1, (err, result) => {
-                                Data.db.query(sqlAddTestFighter2, (err, result) => {
-                                    Data.db.query(sqlAddTestFighter3, (err, result) => {
-                                        Data.db.query(sqlAddTestFighter4, (err, result) => {
-                                            Data.db.query(addFight, (err, result) => {
-                                                resolve();
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            });
+            //var subRequestFights = "SELECT flistplugins.nsfw_fights.idFight FROM flistplugins.nsfw_fights LEFT JOIN flistplugins.nsfw_fightfighters ON flistplugins.nsfw_fights.idFight = flistplugins.nsfw_fightfighters.idFight\
+            //WHERE idFighter IS NULL OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4";
+            //var sqlResetFightsActions = "DELETE FROM flistplugins.nsfw_actions where idFight IN ("+subRequestFights+") OR idAttacker = 1 OR idAttacker = 2 OR idAttacker = 3 OR idAttacker = 4 OR idDefender = 1 OR idDefender = 2 OR idDefender = 3 OR idDefender = 4";
+            //var sqlResetFightFighters = "DELETE FROM flistplugins.nsfw_fightfighters where idFight IN ("+subRequestFights+") OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4;";
+            //var sqlResetFights = "DELETE flistplugins.nsfw_fights.* FROM flistplugins.nsfw_fights \
+            //WHERE idFight IN ("+subRequestFights+") idFighter IS NULL OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4;"; //clear all fights linked to the 4 fighters
+            //var sqlResetTestFighters = "DELETE FROM flistplugins.nsfw_fighters where name = 'test' OR name = 'test2' OR name = 'test3' OR name = 'test4';";
+            //var sqlAddTestFighter1 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('1', 'test', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
+            //var sqlAddTestFighter2 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('2', 'test2', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
+            //var sqlAddTestFighter3 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('3', 'test3', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
+            //var sqlAddTestFighter4 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('4', 'test4', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
+            //var addFight = "INSERT INTO `flistplugins`.`nsfw_fights` (`idFight`, `idFightType`,  `idStage`, `usedTeams`, `currentTurn`, `fighterList`, `hasEnded`) VALUES (1,1, 1,2, 2, '', 0);";
+            //Data.db.query(sqlResetFightsActions, (err, result) => {
+            //    Data.db.query(sqlResetFightFighters, (err, result) => {
+            //        Data.db.query(sqlResetFights, (err, result) => {
+            //            Data.db.query(sqlResetTestFighters, (err, result) => {
+            //                Data.db.query(sqlAddTestFighter1, (err, result) => {
+            //                    Data.db.query(sqlAddTestFighter2, (err, result) => {
+            //                        Data.db.query(sqlAddTestFighter3, (err, result) => {
+            //                            Data.db.query(sqlAddTestFighter4, (err, result) => {
+            //                                Data.db.query(addFight, (err, result) => {
+            //                                    resolve();
+            //                                });
+            //                            });
+            //                        });
+            //                    });
+            //                });
+            //            });
+            //        });
+            //    });
+            //});
         });
     }
 
@@ -187,8 +186,8 @@ describe("The database(s)", () => {
     xit("should write a new action in the database", function (done) {
         Fighter.exists("test2").then(x => {
             let fight = new Fight(null, null);
-            let myAction = new FightAction(fight, 1, 1, Action.Brawl, x);
-            FightAction.commitDb(myAction).then(id => {
+            let myAction = new Action(fight, 1, 1, ActionType.Brawl, x);
+            Action.commitDb(myAction).then(id => {
                 expect(id).toBeGreaterThan(0);
                 done();
             }).catch(err => {
