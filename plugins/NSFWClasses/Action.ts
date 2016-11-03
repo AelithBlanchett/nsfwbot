@@ -26,6 +26,7 @@ import {HighRiskMultipliers} from "./Constants";
 import {Utils} from "./Utils";
 import {StrapToyModifier} from "./CustomModifiers";
 import {StrapToyLPDamagePerTurn} from "./Constants";
+import "reflect-metadata";
 import {Table, Column, PrimaryColumn, OneToMany, JoinTable, PrimaryGeneratedColumn, OneToOne, ManyToOne} from "typeorm";
 
 export enum ActionType {

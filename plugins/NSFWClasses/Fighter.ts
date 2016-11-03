@@ -81,15 +81,15 @@ export class Fighter implements IFighter{
         cascadeRemove: true
     })
     @JoinTable()
-    features:Features = new Features();
+    features:Features[] = [];
 
     //TODO Instead of adding a custom object, add something more "natural"
     @Column()
-    modifiers:Modifiers = new Modifiers();
+    modifiers:Modifiers[] = [];
 
     //TODO Instead of adding a custom object, add something more "natural"
     @Column()
-    achievements:Achievements = new Achievements();
+    achievements:Achievements[] = [];
 
     @OneToMany(type => Action, action => action.attacker, {
         cascadeInsert: true,
