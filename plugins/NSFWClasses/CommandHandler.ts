@@ -467,11 +467,11 @@ export class CommandHandler implements ICommandHandler{
                 let fighter:Fighter = receivedData as Fighter;
                 fighter = this.fight.fighterList.getFighterByID(fighter.id)
                 if(fighter) {
-                    if(fighter.wantsDraw){
+                    if(fighter.isRequestingDraw()) {
                         this.fChatLibInstance.sendPrivMessage("[color=red]You are already waiting for the draw.[/color]", data.character);
                     }
                     else{
-                        fighter.wantsDraw = true;
+                        fighter.requestDraw();
                         this.fight.checkForDraw();
                     }
                 }

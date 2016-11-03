@@ -469,6 +469,14 @@ export class Fighter implements IFighter{
         return bondageModCount;
     }
 
+    requestDraw() {
+        this.wantsDraw = true;
+    }
+    
+    isRequestingDraw():boolean {
+        return this.wantsDraw;
+    }
+    
     isCompletelyBound():boolean{
         return this.bondageItemsOnSelf() >= Constants.Fight.Action.Globals.maxBondageItemsOnSelf;
     }
