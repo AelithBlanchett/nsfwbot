@@ -1,15 +1,17 @@
 #TODO
 
 ##Important
--   Separate CommandHandler / Fight logic
--   Rename STUFF
--   Balance everything
--   Use TYPEORM for easier database implementation
+-   Separate the Fighter entity from the 'augmented' one used in fights with hp, lp and stuff
+-   Re-arrange CommandHandler / Fight logic
+-   Factorise everything
 -   Refactor the fight class, use functions instead of just changing variables on the fly. It will clarify the code and easify modifications in the future. 
--   temporary Penalties on stats to force players to fight against newbs, and prevent grinding 
+
 
 ###Next steps
+-   Rename STUFF
+-   Balance everything
 -   Do the goddamn' guide on Google Docs
+-   Temporary penalties on stats to force players to fight against newbs, and prevent grinding
 
 ####Optional
 -   Rename/add stages
