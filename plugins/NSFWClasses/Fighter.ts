@@ -68,7 +68,6 @@ export class Fighter implements IFighter{
     @Column("int")
     willpower:number = 0;
 
-    //TODO Instead of adding a custom object, add something more "natural"
     @ManyToMany(type => Feature, feature => feature.obtainedBy, {
         cascadeInsert: true,
         cascadeUpdate: true,
@@ -77,11 +76,9 @@ export class Fighter implements IFighter{
     @JoinTable()
     features:Feature[] = [];
 
-    //TODO Instead of adding a custom object, add something more "natural"
     @Column()
     modifiers:Modifier[] = [];
 
-    //TODO Instead of adding a custom object, add something more "natural"
     @Column()
     achievements:Achievement[] = [];
 
@@ -146,12 +143,9 @@ export class Fighter implements IFighter{
 
     checkAchievements(){
         let strBase = "Achievements won: ";
-        let added = [];
-        let count = 0;
+        let added = Achievement.checkAll(this);
 
-        //TODO redo achievements, more factorized
-
-        if(count > 0){
+        if(added.length > 0){
             strBase += added.join(", ");
         }
         else{

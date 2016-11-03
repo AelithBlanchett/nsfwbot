@@ -1,15 +1,56 @@
+import {EnumEx} from "./Utils";
+import {Fighter} from "./Fighter";
 export class Achievement {
     type: AchievementType;
     reward: AchievementReward;
     name: string;
     description: AchievementDescription;
+    condition: string;
 
     constructor(type: AchievementType){
         this.type = type;
         this.name = AchievementReward[AchievementReward[AchievementType[type]]]; //short name, the enumerator's name in fact
         this.reward = AchievementReward[AchievementType[type]];
         this.description = AchievementDescription[AchievementType[type]];
+        this.condition = AchievementCondition[AchievementType[type]];
     }
+
+    static getAll():Achievement[]{
+        let achievements:Achievement[] = [];
+        let types = EnumEx.getValues(AchievementType);
+        for(let type of types){
+            achievements.push(new Achievement(type));
+        }
+        return achievements;
+    }
+
+    static checkAll(fighter:Fighter):string[]{
+        let addedInfo = [];
+        let achievements = Achievement.getAll();
+
+        for(let achievement of achievements){
+            if(eval(achievement.condition)){ // super dangerous, I know
+                fighter.giveTokens(achievement.reward);
+                addedInfo.push(achievement.description + " Reward: "+ achievement.reward + " tokens.");
+            }
+        }
+        return addedInfo;
+    }
+}
+
+export enum AchievementCondition{
+    Rookie = <any>"fighter.totalFights >= 1",
+    FiveFights = <any>"fighter.totalFights >= 5",
+    TenFights = <any>"fighter.totalFights >= 10",
+    TwentyFights = <any>"fighter.totalFights >= 20",
+    FortyFights = <any>"fighter.totalFights >= 40",
+    WinFiveFights = <any>"fighter.wins >= 5",
+    WinTenFights = <any>"fighter.wins >= 10",
+    WinTwentyFights = <any>"fighter.wins >= 20",
+    WinThirtyFights = <any>"fighter.wins >= 30",
+    WinFortyFights = <any>"fighter.wins >= 40",
+    ReachedSilver = <any>"fighter.tier() >= FightTier.Silver",
+    ReachedGold = <any>"fighter.tier() >= FightTier.Gold"
 }
 
 export enum AchievementDescription{
@@ -43,16 +84,31 @@ export enum AchievementType {
 }
 
 export enum AchievementReward {
-    Rookie = <any>"10 tokens",
-    FiveFights = <any>"50 tokens",
-    TenFights = <any>"100 tokens",
-    TwentyFights = <any>"150 tokens",
-    FortyFights = <any>"200 tokens",
-    WinFiveFights = <any>"50 tokens",
-    WinTenFights = <any>"100 tokens",
-    WinTwentyFights = <any>"200 tokens",
-    WinThirtyFights = <any>"300 tokens",
-    WinFortyFights = <any>"400 tokens",
-    ReachedSilver = <any>"100 tokens",
-    ReachedGold = <any>"200 tokens"
+    Rookie = 10,
+    FiveFights = 50,
+    TenFights = 100,
+    TwentyFights = 150,
+    FortyFights = 200,
+    WinFiveFights = 50,
+    WinTenFights = 100,
+    WinTwentyFights = 200,
+    WinThirtyFights = 300,
+    WinFortyFights = 400,
+    ReachedSilver = 100,
+    ReachedGold = 200
 }
+//
+// export enum AchievementReward {
+//     Rookie = <any>"10 tokens",
+//     FiveFights = <any>"50 tokens",
+//     TenFights = <any>"100 tokens",
+//     TwentyFights = <any>"150 tokens",
+//     FortyFights = <any>"200 tokens",
+//     WinFiveFights = <any>"50 tokens",
+//     WinTenFights = <any>"100 tokens",
+//     WinTwentyFights = <any>"200 tokens",
+//     WinThirtyFights = <any>"300 tokens",
+//     WinFortyFights = <any>"400 tokens",
+//     ReachedSilver = <any>"100 tokens",
+//     ReachedGold = <any>"200 tokens"
+// }

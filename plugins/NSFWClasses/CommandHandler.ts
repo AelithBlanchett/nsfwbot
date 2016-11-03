@@ -39,12 +39,12 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(data.character).then(receivedData =>{
             if(receivedData){
                 let fighter:Fighter = receivedData as Fighter;
-                let res = fighter.addFeature(parsedFeatureArgs.featureType, parsedFeatureArgs.turns);
-                if(res == ""){
+                try{
+                    fighter.addFeature(parsedFeatureArgs.featureType, parsedFeatureArgs.turns);
                     this.fChatLibInstance.sendPrivMessage(`[color=green]You successfully added the ${FeatureType[parsedFeatureArgs.featureType]} feature.[/color]`,fighter.name);
                 }
-                else{
-                    this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+res+"[/color]", fighter.name);
+                catch(ex){
+                    this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+ex.message+"[/color]", fighter.name);
                 }
             }
             else{
@@ -84,12 +84,12 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(data.character).then(receivedData =>{
             if(receivedData){
                 let fighter:Fighter = receivedData as Fighter;
-                let res = fighter.clearFeatures();
-                if(res == ""){
+                try{
+                    fighter.clearFeatures();
                     this.fChatLibInstance.sendPrivMessage(`[color=green]You successfully removed all your features.[/color]`,fighter.name);
                 }
-                else{
-                    this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+res+"[/color]", fighter.name);
+                catch(ex){
+                    this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+ex.message+"[/color]", fighter.name);
                 }
             }
             else{
@@ -273,12 +273,12 @@ export class CommandHandler implements ICommandHandler{
         Fighter.exists(data.character).then(receivedData =>{
             if(receivedData){
                 let fighter:Fighter = receivedData as Fighter;
-                let res = fighter.removeFeature(parsedFeatureArgs.featureType);
-                if(res == ""){
+                try{
+                    fighter.removeFeature(parsedFeatureArgs.featureType);
                     this.fChatLibInstance.sendPrivMessage(`[color=green]You successfully removed your ${FeatureType[parsedFeatureArgs.featureType]} feature.[/color]`,fighter.name);
                 }
-                else{
-                    this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+res+"[/color]", fighter.name);
+                catch(ex){
+                    this.fChatLibInstance.sendPrivMessage("[color=red]An error happened: "+ex.message+"[/color]", fighter.name);
                 }
             }
             else{
