@@ -7,6 +7,7 @@ import TriggerMoment = Constants.TriggerMoment;
 import {Tier} from "./Constants";
 import {ActionType, Action} from "./Action";
 import {ManyToOne} from "typeorm";
+import {ActiveFighter} from "./ActiveFighter";
 var ES = require("es-abstract/es6.js");
 
 export interface IModifier{
@@ -14,8 +15,8 @@ export interface IModifier{
     name:string;
     tier:Tier;
     type:ModifierType;
-    applier: Fighter;
-    receiver: Fighter;
+    applier: ActiveFighter;
+    receiver: ActiveFighter;
     hpDamage: number;
     lustDamage: number;
     focusDamage: number;
@@ -38,8 +39,8 @@ export class Modifier implements IModifier{
     name:string = "modifier";
     tier:Tier;
     type:ModifierType;
-    applier: Fighter;
-    receiver: Fighter;
+    applier:ActiveFighter;
+    receiver:ActiveFighter;
     hpDamage: number;
     lustDamage: number;
     focusDamage: number;
@@ -58,7 +59,7 @@ export class Modifier implements IModifier{
     })
     parentAction:Action;
 
-    constructor(receiver:Fighter, applier:Fighter, tier:Tier, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage: number, diceRoll: number, escapeRoll: number, uses:number,
+    constructor(receiver:ActiveFighter, applier:ActiveFighter, tier:Tier, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage:number, diceRoll:number, escapeRoll:number, uses:number,
                 timeToTrigger:TriggerMoment, event:Trigger, parentIds:Array<string>, areMultipliers:boolean){
         this.id = Utils.generateUUID();
         this.receiver = receiver; //ALWAYS filled!

@@ -9,6 +9,7 @@ import {SextoyPickupModifier} from "./CustomModifiers";
 import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, PrimaryGeneratedColumn, ManyToOne} from "typeorm";
 import {CreateDateColumn} from "typeorm/index";
 import {UpdateDateColumn} from "typeorm/index";
+import {ActiveFighter} from "./ActiveFighter";
 var ES = require("es-abstract/es6.js");
 
 @Table()
@@ -55,7 +56,7 @@ export class Feature{
         }
     }
 
-    getModifier(fight:Fight, attacker?:Fighter, defender?:Fighter):IModifier{
+    getModifier(fight:Fight, attacker?:ActiveFighter, defender?:ActiveFighter):IModifier {
         let modifier:IModifier = null;
         if(!this.isExpired()){
             switch (this.type){

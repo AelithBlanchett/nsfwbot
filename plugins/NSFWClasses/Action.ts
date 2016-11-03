@@ -29,6 +29,7 @@ import {Table, Column, PrimaryColumn, OneToMany, JoinTable, PrimaryGeneratedColu
 import {Modifier} from "./Modifier";
 import {CreateDateColumn} from "typeorm/index";
 import {UpdateDateColumn} from "typeorm/index";
+import {ActiveFighter} from "./ActiveFighter";
 
 export enum ActionType {
     Brawl,
@@ -84,19 +85,19 @@ export class Action {
     })
     modifiers:Modifier[]; //Do not need to store that in the DB
 
-    @ManyToOne(type => Fighter, fighter => fighter.actionsDone, {
+    @ManyToOne(type => ActiveFighter, fighter => fighter.actionsDone, {
         cascadeInsert: true,
         cascadeUpdate: true,
         cascadeRemove: true
     })
-    attacker: Fighter;
+    attacker:ActiveFighter;
 
-    @ManyToOne(type => Fighter, fighter => fighter.actionsDone, {
+    @ManyToOne(type => ActiveFighter, fighter => fighter.actionsDone, {
         cascadeInsert: true,
         cascadeUpdate: true,
         cascadeRemove: true
     })
-    defender: Fighter;
+    defender:ActiveFighter;
 
     @Column("int")
     hpDamageToDef: number;
@@ -149,7 +150,7 @@ export class Action {
     @UpdateDateColumn()
     updatedAt:Date;
 
-    constructor(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:Fighter, defender?:Fighter) {
+    constructor(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:ActiveFighter, defender?:ActiveFighter) {
         this.fight = fight;
         this.isHold = false;
         this.modifiers = [];

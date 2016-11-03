@@ -31,7 +31,11 @@ export class ActiveFighter extends Fighter {
     fight:Fight;
     dice:Dice;
 
-    @OneToOne(type => ActiveFighter)
+    @OneToOne(type => ActiveFighter, {
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: true
+    })
     target:ActiveFighter;
 
     @Column("int")
@@ -131,32 +135,6 @@ export class ActiveFighter extends Fighter {
         for (let modIndex of listOfModsToRemove) {
             this.modifiers.splice(modIndex, 1);
         }
-    }
-
-    hpPerHeart():number {
-        return 35;
-    }
-
-    maxHearts():number {
-        let heartsSup = Math.ceil(this.toughness / 2);
-        return 4 + heartsSup;
-    }
-
-    lustPerOrgasm():number {
-        return 35;
-    }
-
-    maxOrgasms():number {
-        let orgasmsSup = Math.ceil(this.endurance / 2);
-        return 4 + orgasmsSup;
-    }
-
-    minFocus():number {
-        return -2 - this.willpower;
-    }
-
-    maxFocus():number {
-        return 2 + this.willpower;
     }
 
     healHP(hp:number, triggerMods:boolean = true) {

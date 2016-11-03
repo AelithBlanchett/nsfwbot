@@ -184,16 +184,17 @@ describe("The database(s)", () => {
     },500000);
 
     xit("should write a new action in the database", function (done) {
-        Fighter.exists("test2").then(x => {
-            let fight = new Fight(null, null);
-            let myAction = new Action(fight, 1, 1, ActionType.Brawl, x);
-            Action.commitDb(myAction).then(id => {
-                expect(id).toBeGreaterThan(0);
-                done();
-            }).catch(err => {
-                done.fail(err);
-            });
-        });
+        //TODO: Adapt to active fighter
+        //Fighter.exists("test2").then(x => {
+        //    let fight = new Fight(null, null);
+        //    let myAction = new Action(fight, 1, 1, ActionType.Brawl, x);
+        //    Action.commitDb(myAction).then(id => {
+        //        expect(id).toBeGreaterThan(0);
+        //        done();
+        //    }).catch(err => {
+        //        done.fail(err);
+        //    });
+        //});
     },5000);
 
     xit("should write a new fight in the database", function (done) {

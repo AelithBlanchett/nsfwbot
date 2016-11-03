@@ -156,6 +156,32 @@ export class Fighter implements IFighter{
         return winRate;
     }
 
+    hpPerHeart():number {
+        return 35;
+    }
+
+    maxHearts():number {
+        let heartsSup = Math.ceil(this.toughness / 2);
+        return 4 + heartsSup;
+    }
+
+    lustPerOrgasm():number {
+        return 35;
+    }
+
+    maxOrgasms():number {
+        let orgasmsSup = Math.ceil(this.endurance / 2);
+        return 4 + orgasmsSup;
+    }
+
+    minFocus():number {
+        return -2 - this.willpower;
+    }
+
+    maxFocus():number {
+        return 2 + this.willpower;
+    }
+
     outputStats():string{
         return "[b]" + this.name + "[/b]'s stats" + "\n" +
             "[b][color=red]Power[/color][/b]:  " + this.power + "      " + "    --            [b][color=red]Hearts[/color][/b]: " + this.maxHearts() + " * " + this.hpPerHeart() +" [b][color=red]HP[/color] per heart[/b]"+"\n" +

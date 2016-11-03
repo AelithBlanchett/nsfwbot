@@ -5,7 +5,6 @@ import {Utils} from "./Utils";
 import {Dictionary} from "./Dictionary";
 import * as Constants from "./Constants";
 import Team = Constants.Team;
-import {FighterList} from "./FighterList";
 import BaseDamage = Constants.BaseDamage;
 import Tier = Constants.Tier;
 import FightType = Constants.FightType;
@@ -159,6 +158,7 @@ export class Fight{
 
     //Pre-fight utils
 
+    //TODO transition between Fighter and ActiveFighter
     leave(fighter:ActiveFighter) {
         if(!this.hasStarted){
             let index = this.findFighterIndex(x => x.name == fighter.name);
@@ -172,6 +172,7 @@ export class Fight{
         return false;
     }
 
+    //TODO transition between Fighter and ActiveFighter
     join(fighter:ActiveFighter, team:Team) {
         if(!this.hasStarted){
             if (!this.getFighterByName(fighter.name)) { //find fighter by its name property instead of comparing objects, which doesn't work.
@@ -190,6 +191,7 @@ export class Fight{
         return false;
     }
 
+    //TODO transition between Fighter and ActiveFighter
     setFighterReady(fighter:ActiveFighter) {
         if(!this.hasStarted){
             if (!this.getFighterByName(fighter.name)) {
