@@ -300,7 +300,7 @@ export class Fighter implements IFighter{
     }
 
     hpPerHeart():number {
-        return 35;
+        return 15 + (this.power + this.sensuality + this.endurance + this.dexterity + this.willpower + (this.toughness * 5));
     }
 
     maxHearts():number {
@@ -309,7 +309,7 @@ export class Fighter implements IFighter{
     }
 
     lustPerOrgasm():number{
-        return 35;
+        return 15 + (this.power + this.sensuality + this.toughness + this.dexterity + this.willpower + (this.endurance * 5));
     }
 
     maxOrgasms():number {
