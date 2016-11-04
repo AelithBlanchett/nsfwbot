@@ -1,36 +1,22 @@
-import {Dice} from "./Dice";
-import {Fight} from "./Fight";
-import {IFighter} from "./interfaces/IFighter";
-import {Action} from "./Action";
-import * as Constants from "./Constants";
-import {Utils} from "./Utils";
-import Team = Constants.Team;
-import FightTier = Constants.FightTier;
-import TokensWorth = Constants.TokensWorth;
-import Stats = Constants.Stats;
-import {Modifier} from "./Modifier";
-import TriggerMoment = Constants.TriggerMoment;
-import Trigger = Constants.Trigger;
-import {ModifierType} from "./Constants";
-import {Tier} from "./Constants";
+import {Table, TableInheritance, DiscriminatorColumn, PrimaryColumn, Column, ManyToMany, JoinTable, CreateDateColumn, UpdateDateColumn} from "typeorm/index";
 import {Feature} from "./Feature";
+import {IFighter} from "./interfaces/IFighter";
+import {Achievement} from "./Achievement";
+import {AchievementType} from "./Achievement";
 import {FeatureType} from "./Constants";
-import {Achievement, AchievementType, AchievementReward} from "./Achievement";
-import {FightType} from "./Constants";
-import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, OneToMany} from "typeorm";
-import {getConnectionManager} from "typeorm/index";
-import {TableInheritance} from "typeorm/index";
-import {DiscriminatorColumn} from "typeorm/index";
-import {CreateDateColumn} from "typeorm/index";
-import {UpdateDateColumn} from "typeorm/index";
+import * as Constants from "./Constants";
+import {TokensWorth} from "./Constants";
+import {Stats} from "./Constants";
+import {FightTier} from "./Constants";
 import {Data} from "./Model";
+import {Index} from "typeorm/index";
 
 @Table()
 @TableInheritance("class-table")
-@DiscriminatorColumn({name: "type", type: "string"})
 export class Fighter implements IFighter{
 
     @PrimaryColumn("string")
+    @Index()
     name:string = "";
 
     @Column("double")
@@ -83,15 +69,15 @@ export class Fighter implements IFighter{
     @JoinTable()
     features:Feature[] = [];
 
-    @Column()
+    @Column("simple_array")
     achievements:Achievement[] = [];
 
-    @ManyToMany(type => Fight, fight => fight.fighters, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
-    fights:Fight[] = [];
+    //@ManyToMany(type => Fight, fight => fight.fighters, {
+    //    cascadeInsert: true,
+    //    cascadeUpdate: true,
+    //    cascadeRemove: true
+    //})
+    //fights:Fight[] = [];
 
     @CreateDateColumn()
     createdAt:Date;

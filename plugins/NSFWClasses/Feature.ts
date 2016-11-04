@@ -1,16 +1,12 @@
 import {Modifier, IModifier} from "./Modifier";
 import {Utils} from "./Utils";
 import * as Constants from "./Constants";
-import {ItemPickupModifier} from "./CustomModifiers";
+import {ItemPickupModifier, SextoyPickupModifier} from "./CustomModifiers";
 import {Fighter} from "./Fighter";
 import {Fight} from "./Fight";
 import {FeatureType} from "./Constants";
-import {SextoyPickupModifier} from "./CustomModifiers";
-import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, PrimaryGeneratedColumn, ManyToOne} from "typeorm";
-import {CreateDateColumn} from "typeorm/index";
-import {UpdateDateColumn} from "typeorm/index";
-import {ActiveFighter} from "./ActiveFighter";
-var ES = require("es-abstract/es6.js");
+import "reflect-metadata";
+import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn} from "typeorm";
 
 @Table()
 export class Feature{
@@ -56,43 +52,43 @@ export class Feature{
         }
     }
 
-    getModifier(fight:Fight, attacker?:ActiveFighter, defender?:ActiveFighter):IModifier {
-        let modifier:IModifier = null;
-        if(!this.isExpired()){
-            switch (this.type){
-                case FeatureType.KickStart:
-                    modifier = new ItemPickupModifier(attacker);
-                    fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.KickStart} feature!`);
-                    fight.message.addHint(Constants.FeatureExplain.KickStart);
-                    break;
-                case FeatureType.SexyKickStart:
-                    modifier = new SextoyPickupModifier(attacker);
-                    fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.SexyKickStart} feature!`);
-                    fight.message.addHint(Constants.FeatureExplain.SexyKickStart);
-                    break;
-                case FeatureType.Sadist:
-                    modifier = null;
-                    fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.Sadist} feature!`);
-                    fight.message.addHint(Constants.FeatureExplain.Sadist);
-                    break;
-                case FeatureType.CumSlut:
-                    modifier = null;
-                    fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.CumSlut} feature!`);
-                    fight.message.addHint(Constants.FeatureExplain.CumSlut);
-                    break;
-                case FeatureType.RyonaEnthusiast:
-                    modifier = null;
-                    fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.RyonaEnthusiast} feature!`);
-                    fight.message.addHint(Constants.FeatureExplain.RyonaEnthusiast);
-                    break;
-            }
-            this.uses--;
-            if(!this.permanent){
-                fight.message.addHint(`Uses left: ${this.uses}`);
-            }
-        }
-        return modifier;
-    }
+    //getModifier(fight:Fight, attacker?:ActiveFighter, defender?:ActiveFighter):IModifier {
+    //    let modifier:IModifier = null;
+    //    if(!this.isExpired()){
+    //        switch (this.type){
+    //            case FeatureType.KickStart:
+    //                modifier = new ItemPickupModifier(attacker);
+    //                fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.KickStart} feature!`);
+    //                fight.message.addHint(Constants.FeatureExplain.KickStart);
+    //                break;
+    //            case FeatureType.SexyKickStart:
+    //                modifier = new SextoyPickupModifier(attacker);
+    //                fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.SexyKickStart} feature!`);
+    //                fight.message.addHint(Constants.FeatureExplain.SexyKickStart);
+    //                break;
+    //            case FeatureType.Sadist:
+    //                modifier = null;
+    //                fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.Sadist} feature!`);
+    //                fight.message.addHint(Constants.FeatureExplain.Sadist);
+    //                break;
+    //            case FeatureType.CumSlut:
+    //                modifier = null;
+    //                fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.CumSlut} feature!`);
+    //                fight.message.addHint(Constants.FeatureExplain.CumSlut);
+    //                break;
+    //            case FeatureType.RyonaEnthusiast:
+    //                modifier = null;
+    //                fight.message.addHint(`${attacker.getStylizedName()} has the ${Constants.Feature.RyonaEnthusiast} feature!`);
+    //                fight.message.addHint(Constants.FeatureExplain.RyonaEnthusiast);
+    //                break;
+    //        }
+    //        this.uses--;
+    //        if(!this.permanent){
+    //            fight.message.addHint(`Uses left: ${this.uses}`);
+    //        }
+    //    }
+    //    return modifier;
+    //}
 
     getCost():number{
         let result = 0;

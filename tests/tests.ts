@@ -16,6 +16,7 @@ import {ItemPickupModifier} from "../plugins/NSFWClasses/CustomModifiers";
 import {ModifierType} from "../plugins/NSFWClasses/Constants";
 var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
+import "reflect-metadata";
 var jasmine = new Jasmine();
 var fChatLibInstance:any;
 var debug = false;

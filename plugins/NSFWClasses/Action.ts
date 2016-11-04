@@ -59,11 +59,11 @@ export class Action {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(type => Fight, fight => fight.pastActions, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
+    //@ManyToOne(type => Fight, fight => fight.pastActions, {
+    //    cascadeInsert: true,
+    //    cascadeUpdate: true,
+    //    cascadeRemove: true
+    //})
     fight:Fight;
 
     @Column("int")
@@ -85,18 +85,18 @@ export class Action {
     })
     modifiers:Modifier[]; //Do not need to store that in the DB
 
-    @ManyToOne(type => ActiveFighter, fighter => fighter.actionsDone, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
+    //@ManyToOne(type => ActiveFighter, fighter => fighter.actionsDone, {
+    //    cascadeInsert: true,
+    //    cascadeUpdate: true,
+    //    cascadeRemove: true
+    //})
     attacker:ActiveFighter;
 
-    @ManyToOne(type => ActiveFighter, fighter => fighter.actionsDone, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
+    //@ManyToOne(type => ActiveFighter, fighter => fighter.actionsDone, {
+    //    cascadeInsert: true,
+    //    cascadeUpdate: true,
+    //    cascadeRemove: true
+    //})
     defender:ActiveFighter;
 
     @Column("int")

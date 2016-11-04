@@ -1,6 +1,5 @@
-import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, OneToMany} from "typeorm";
+import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, OneToMany, OneToOne, UpdateDateColumn, CreateDateColumn, ManyToOne, SingleTableChild} from "typeorm";
 import {getConnectionManager} from "typeorm/index";
-import {Fighter} from "./Fighter";
 import {Dice} from "./Dice";
 import {Fight} from "./Fight";
 import {Team} from "./Constants";
@@ -13,18 +12,19 @@ import {ModifierType} from "./Constants";
 import {Tier} from "./Constants";
 import {Utils} from "./Utils";
 import {FeatureType} from "./Constants";
-import {ClassTableChild} from "typeorm/index";
-import {ManyToOne} from "typeorm/index";
-import {OneToOne} from "typeorm/index";
-import {CreateDateColumn} from "typeorm/index";
-import {UpdateDateColumn} from "typeorm/index";
 import {Modifier} from "./Modifier";
 import {Data} from "./Model";
+import {Fighter} from "./Fighter";
+import "reflect-metadata";
+import {ClassTableChild} from "typeorm/index";
+import {JoinColumn} from "typeorm/index";
+import {Index} from "typeorm/index";
 
 @ClassTableChild()
 export class ActiveFighter extends Fighter {
 
-    @PrimaryColumn()
+    //No primary key. sad.
+    @Index()
     @ManyToOne(type => Fight, fight => fight.fighters, {
         cascadeInsert: true,
         cascadeUpdate: true,
@@ -32,11 +32,6 @@ export class ActiveFighter extends Fighter {
     })
     fight:Fight;
 
-    @OneToOne(type => ActiveFighter, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
     target:ActiveFighter;
 
     @Column("int")
@@ -84,23 +79,23 @@ export class ActiveFighter extends Fighter {
     @UpdateDateColumn()
     updatedAt:Date;
 
-    @Column()
+    @Column("simple_array")
     modifiers:Modifier[] = [];
 
-    @OneToMany(type => Action, action => action.attacker, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
-    @JoinTable()
+    //@OneToMany(type => Action, action => action.attacker, {
+    //    cascadeInsert: true,
+    //    cascadeUpdate: true,
+    //    cascadeRemove: true
+    //})
+    //@JoinTable()
     actionsDone:Action[] = [];
 
-    @OneToMany(type => Action, action => action.defender, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
-    @JoinTable()
+    //@OneToMany(type => Action, action => action.defender, {
+    //    cascadeInsert: true,
+    //    cascadeUpdate: true,
+    //    cascadeRemove: true
+    //})
+    //@JoinTable()
     actionsInflicted:Action[] = [];
 
     //Objects, do not need to store

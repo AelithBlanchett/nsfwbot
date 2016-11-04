@@ -38,8 +38,9 @@ function initiateMatchSettings2vs2TagForDb(cmdHandler){
 
 describe("The database(s)", () => {
 
-    function resetData(){
+    function resetData2() {
         return new Promise((resolve, reject) => {
+
             //var subRequestFights = "SELECT flistplugins.nsfw_fights.idFight FROM flistplugins.nsfw_fights LEFT JOIN flistplugins.nsfw_fightfighters ON flistplugins.nsfw_fights.idFight = flistplugins.nsfw_fightfighters.idFight\
             //WHERE idFighter IS NULL OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4";
             //var sqlResetFightsActions = "DELETE FROM flistplugins.nsfw_actions where idFight IN ("+subRequestFights+") OR idAttacker = 1 OR idAttacker = 2 OR idAttacker = 3 OR idAttacker = 4 OR idDefender = 1 OR idDefender = 2 OR idDefender = 3 OR idDefender = 4";
@@ -72,6 +73,10 @@ describe("The database(s)", () => {
             //    });
             //});
         });
+    }
+
+    async function resetData() {
+        return await Fighter.create("Aelith Blanchette");
     }
 
     beforeAll(function(done) {
@@ -110,7 +115,13 @@ describe("The database(s)", () => {
         spyOn(fChatLibInstance, 'sendPrivMessage').and.callThrough();
     });
 
-    it("should give ItemPickupBonus feature to Test2", function (done) {
+    it("should load Aelith Blanchette", async function (done) {
+        let fighter = await Fighter.load("Aelith Blanchette");
+        expect(fighter.name).toBe("Aelith Blanchette");
+        done();
+    });
+
+    xit("should give ItemPickupBonus feature to Test2", function (done) {
         Fighter.load("test2").then(x => {
             console.log(x.features);
             x.features.push(new Feature(FeatureType.KickStart, 1));

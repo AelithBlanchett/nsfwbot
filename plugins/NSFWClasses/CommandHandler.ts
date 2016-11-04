@@ -1,6 +1,6 @@
+import {Fighter} from "./Fighter";
 import {Dice} from "./Dice";
 import * as Parser from "./Parser";
-import {Fighter} from "./Fighter";
 import {Fight} from "./Fight";
 import {IParserResponse} from "./interfaces/IParserResponse";
 import {ICommandHandler} from "./interfaces/ICommandHandler";

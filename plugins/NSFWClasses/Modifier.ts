@@ -9,6 +9,7 @@ import {ActionType, Action} from "./Action";
 import {ManyToOne} from "typeorm";
 import {ActiveFighter} from "./ActiveFighter";
 var ES = require("es-abstract/es6.js");
+import "reflect-metadata";
 
 export interface IModifier{
     id: string;

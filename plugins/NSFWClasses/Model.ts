@@ -8,7 +8,7 @@ export class Data {
 
     static async getDb():Promise<Connection> {
         if (!getConnectionManager().has("default")) {
-            await getConnectionManager().createAndConnect(require('../../config/config.mysql.js'));
+            return await getConnectionManager().createAndConnect(require('../../config/config.mysql.js'));
         }
         return getConnectionManager().get("default");
     }
