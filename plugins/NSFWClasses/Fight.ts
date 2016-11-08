@@ -239,6 +239,7 @@ export class Fight{
 
     start() {
         this.message.addInfo(Constants.Messages.startMatchAnnounce);
+        this.currentTurn = 1;
         this.hasStarted = true;
         this.shufflePlayers(); //random order for teams
 
@@ -259,7 +260,6 @@ export class Fight{
 
 
         this.reorderFightersByInitiative(this.rollAllDice(Trigger.InitiationRoll));
-        this.currentTurn = 1;
         this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchFirstPlayer, [this.currentPlayer.getStylizedName(), this.currentTeamName.toLowerCase(), this.currentTeamName]));
         for (let i = 1; i < this.fighters.length; i++) {
             this.message.addInfo(Utils.strFormat(Constants.Messages.startMatchFollowedBy, [this.fighters[i].getStylizedName(), Team[this.fighters[i].assignedTeam].toLowerCase(), Team[this.fighters[i].assignedTeam]]));
@@ -761,7 +761,7 @@ export class Fight{
     }
 
     getAlivePlayers():Array<ActiveFighter> {
-        let arrPlayers = new Array<ActiveFighter>();
+        let arrPlayers = [];
         for (let player of this.fighters) {
             if (!player.isTechnicallyOut() && player.isInTheRing) {
                 arrPlayers.push(player);
@@ -778,7 +778,7 @@ export class Fight{
             }
         }
         if (fighter == null) {
-            throw new Error("This fighter isn't participating in the fight.");
+            //throw new Error("This fighter isn't participating in the fight.");
         }
         return fighter;
     }
@@ -791,7 +791,7 @@ export class Fight{
             }
         }
         if (index == -1) {
-            throw new Error("This fighter isn't participating in the fight.");
+            //throw new Error("This fighter isn't participating in the fight.");
         }
         return index;
     }

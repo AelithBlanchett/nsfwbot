@@ -114,17 +114,19 @@ export class ActiveFighter extends Fighter {
 
         if (fight == null) {
             myFighter = await fightersRepo.findOneById(name);
-            myFighter.hp = myFighter.hpPerHeart();
-            myFighter.heartsRemaining = myFighter.maxHearts();
-            myFighter.lust = 0;
-            myFighter.orgasmsRemaining = myFighter.maxOrgasms();
-            myFighter.focus = myFighter.willpower;
+            if(myFighter != null){
+                myFighter.hp = myFighter.hpPerHeart();
+                myFighter.heartsRemaining = myFighter.maxHearts();
+                myFighter.lust = 0;
+                myFighter.orgasmsRemaining = myFighter.maxOrgasms();
+                myFighter.focus = myFighter.willpower;
+                myFighter.dice = new Dice(12);
+            }
         }
         else {
             myFighter = await fightersRepo.findOne({name: name, fight: fight});
+            myFighter.dice = new Dice(12);
         }
-
-        myFighter.dice = new Dice(12);
 
         return myFighter;
     }
