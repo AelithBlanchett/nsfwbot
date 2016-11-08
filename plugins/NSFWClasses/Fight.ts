@@ -382,7 +382,11 @@ export class Fight{
     }
 
     get currentPlayer():ActiveFighter {
-        return this.getAlivePlayers()[(this.currentTurn - 1) % this.aliveFighterCount];
+        let curTurn = 1;
+        if(this.currentTurn > 0){
+            curTurn = this.currentTurn - 1;
+        }
+        return this.getAlivePlayers()[curTurn % this.aliveFighterCount];
     }
 
     get nextPlayer():ActiveFighter {

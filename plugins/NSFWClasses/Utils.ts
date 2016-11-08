@@ -13,6 +13,9 @@ export class Utils {
 
 
     static strFormat(str:string, params: Array<string>){
+        if(typeof params == "string"){
+            params = [params];
+        }
         return vsprintf(str, params);
     }
 
