@@ -43,13 +43,13 @@ function getMock(mockedClass) {
 
 function abstractDatabase() {
 
-    ActiveFighter.load = async function (name) {
+    Fighter.load = async function (name) {
         return new Promise(function (resolve, reject) {
             resolve(createFighter(name));
         });
     };
 
-    Fighter.load = async function (name) {
+    ActiveFighter.load = async function (name) {
         return new Promise(function (resolve, reject) {
             resolve(createFighter(name));
         });
@@ -227,7 +227,8 @@ describe("The player(s)", () => {
         spyOn(fChatLibInstance, 'sendMessage').and.callThrough();
         spyOn(fChatLibInstance, 'throwError').and.callThrough();
         spyOn(fChatLibInstance, 'sendPrivMessage').and.callThrough();
-        //spyOn(ActiveFighter, 'exists').and.callThrough();
+        spyOn(ActiveFighter, 'load').and.callThrough();
+        spyOn(Fighter, 'load').and.callThrough();
 
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
     }, DEFAULT_TIMEOUT);
