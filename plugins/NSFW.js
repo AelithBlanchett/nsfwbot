@@ -1259,7 +1259,7 @@ function attackPrepare(actionType, actionId, isSimulation) {
                 minDmg = 1;
                 break;
             case "medium":
-                minDmg = 3;
+                minDmg = 4;
                 break;
             case "heavy":
                 minDmg = 6;
