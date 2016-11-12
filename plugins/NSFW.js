@@ -972,9 +972,14 @@ function roll() {
             currentFight.diceResult = parseInt(Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2])) / 2) + diceScore);
             break;
         case "sexual":
-        case "sexualhold":
             typeUsed1 = "expertise";
             currentFight.diceResult = parseInt(parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + diceScore);
+            break;
+        case "sexualhold":
+            typeUsed1 = "expertise";
+            typeUsed2 = "agility";
+            currentFight.diceResult = parseInt(Math.floor((parseInt(currentFighters[currentFight.whoseturn][typeUsed1]) + parseInt(currentFighters[currentFight.whoseturn][typeUsed2])) / 2) + diceScore);
+            currentFight.actionIsHold = true;
             break;
         case "humiliation":
             typeUsed1 = "expertise";
@@ -1240,6 +1245,7 @@ function attackPrepare(actionType, actionId, isSimulation) {
             break;
         case "sexualhold":
             typeUsed1 = "expertise";
+            typeUsed2 = "agility";
             typeDefender = "endurance";
             isSexual = 1;
             isHold = true;
