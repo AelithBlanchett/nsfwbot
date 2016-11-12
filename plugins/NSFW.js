@@ -1,6 +1,8 @@
 "use strict";
 var debug = false; //2.0
 var _this;
+var didyoumean = require('didyoumean');
+didyoumean.caseSensitive = true;
 var redis = require("redis");
 var client = redis.createClient(6379, "127.0.0.1");
 
@@ -48,6 +50,19 @@ var CommandHandler = (function () {
             var result = arr.splice(0, 2);
             result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
 
+            // Unlike !set, !setFight does accept hp and lust to mean the fight's hp and lust.
+            var valid_stats = ['maxLust', 'maxHp', 'endurance', 'expertise', 'agility', 'toughness', 'determination', 'strength', 'hp', 'lust'];
+            var correction = didyoumean(result[0], valid_stats);
+            if(correction != result[0]) {
+                if(correction === null) {
+                    _this.fChatLibInstance.sendMessage("I don't recognise the stat " + result[0] + ", sorry!", _this.channel);
+                } else {
+                    _this.fChatLibInstance.sendMessage("I don't recognise the stat " + result[0] + ", did you mean " + correction + " instead?", _this.channel);
+                }
+                
+                return;
+            }
+            
             if (result.length == 3 && result[0] != "" && !isNaN(result[1]) && !isNaN(result[2])) {
                 client.hgetall(currentFighters[result[2]].character, function (err, char) {
                     if (char != null) {
@@ -75,6 +90,20 @@ var CommandHandler = (function () {
             var result = arr.splice(0, 2);
             result.push(arr.join(' ')); //split the string (with 3 arguments) only in 3 parts (stat, number, character)
 
+            // Check we even received a valid stat.
+            // hp and lust are only valid in setFight, they are not valid here.
+            var valid_stats = ['maxLust', 'maxHp', 'endurance', 'expertise', 'agility', 'toughness', 'determination', 'strength'];
+            var correction = didyoumean(result[0], valid_stats);
+            if(correction != result[0]) {
+                if(correction === null) {
+                    _this.fChatLibInstance.sendMessage("I don't recognise the stat " + result[0] + ", sorry!", _this.channel);
+                } else {
+                    _this.fChatLibInstance.sendMessage("I don't recognise the stat " + result[0] + ", did you mean " + correction + " instead?", _this.channel);
+                }
+                
+                return;
+            }
+            
             if (result.length == 3 && result[0] != "" && !isNaN(result[1]) && result[2] != "") {
                 client.hgetall(result[2], function (err, char) {
                     if (char != null) {
