@@ -6,7 +6,6 @@ import {IParserResponse} from "./interfaces/IParserResponse";
 import {ICommandHandler} from "./interfaces/ICommandHandler";
 import {IFChatLib} from "./interfaces/IFChatLib";
 import * as Constants from "./Constants";
-import Team = Constants.Team;
 import {Utils} from "./Utils";
 import Tier = Constants.Tier;
 import {Stats} from "./Constants";
@@ -15,6 +14,7 @@ import {FeatureType} from "./Constants";
 import {Feature} from "./Feature";
 import {EnumEx} from "./Utils";
 import {ActionType} from "./Action";
+import {Team} from "./Constants";
 
 export class CommandHandler implements ICommandHandler {
     fChatLibInstance:IFChatLib;
@@ -148,12 +148,14 @@ export class CommandHandler implements ICommandHandler {
         let fighter = await Fighter.load(data.character);
         if (fighter != undefined) {
             let chosenTeam = Parser.Commands.join(args);
-            if (this.fight.join(data.character, chosenTeam)) {
-                this.fChatLibInstance.sendMessage(`[color=green]${data.character} stepped into the ring for the [color=${Team[chosenTeam]}]${Team[chosenTeam]}[/color] team! Waiting for everyone to be !ready.[/color]`, this.channel);
+            try {
+                let assignedTeam:number = await this.fight.join(data.character, chosenTeam);
+                this.fChatLibInstance.sendMessage(`[color=green]${data.character} stepped into the ring for the [color=${Team[assignedTeam]}]${Team[assignedTeam]}[/color] team! Waiting for everyone to be !ready.[/color]`, this.channel);
             }
-            else {
-                this.fChatLibInstance.sendMessage("[color=red]You have already joined the fight.[/color]", this.channel);
+            catch (err) {
+                this.fChatLibInstance.sendMessage("[color=red]" + err.message + "[/color]", this.channel);
             }
+
         }
         else {
             this.fChatLibInstance.sendMessage("[color=red]You are not registered.[/color]", this.channel);
@@ -212,7 +214,7 @@ export class CommandHandler implements ICommandHandler {
         }
         let fighter = await Fighter.load(data.character);
         if (fighter != undefined) {
-            if (!this.fight.setFighterReady(data.character)) { //else, the match starts!
+            if (!await this.fight.setFighterReady(data.character)) { //else, the match starts!
                 this.fChatLibInstance.sendMessage("[color=red]You are already ready.[/color]", this.channel);
             }
         }
@@ -225,7 +227,7 @@ export class CommandHandler implements ICommandHandler {
         let doesFighterExist = await Fighter.load(data.character);
         if (!doesFighterExist) {
             try {
-                Fighter.create(data.character);
+                await Fighter.create(data.character);
                 this.fChatLibInstance.sendPrivMessage("[color=green]You are now registered! Welcome! Don't forget to type !howtostart here if you haven't read the quickstart guide yet.[/color]", data.character);
             }
             catch (ex) {

@@ -185,7 +185,7 @@ export class Fight{
         }
     }
 
-    async join(fighterName:string, team:Team) {
+    async join(fighterName:string, team:Team):Promise<number> {
         if(!this.hasStarted){
             if (!this.getFighterByName(fighterName)) { //find fighter by its name property instead of comparing objects, which doesn't work.
                 let activeFighter = new ActiveFighter(fighterName, this);
@@ -199,7 +199,7 @@ export class Fight{
                 }
                 activeFighter.fight = this;
                 this.fighters.push(activeFighter);
-                return true;
+                return team;
             }
             else {
                 throw new Error("You have already joined the fight.");
@@ -210,10 +210,10 @@ export class Fight{
         }
     }
 
-    setFighterReady(fighterName:string) {
+    async setFighterReady(fighterName:string) {
         if(!this.hasStarted){
             if (!this.getFighterByName(fighterName)) {
-                this.join(fighterName, Team.Unknown);
+                await this.join(fighterName, Team.Unknown);
             }
             var fighterInFight:ActiveFighter = this.getFighterByName(fighterName);
             if(fighterInFight && !fighterInFight.isReady){ //find fighter by its name property instead of comparing objects, which doesn't work.
@@ -381,12 +381,16 @@ export class Fight{
         return this.getAlivePlayers()[this.currentTurn % this.aliveFighterCount].assignedTeam;
     }
 
-    get currentPlayer():ActiveFighter {
+    get currentPlayerIndex():number {
         let curTurn = 1;
         if(this.currentTurn > 0){
             curTurn = this.currentTurn - 1;
         }
-        return this.getAlivePlayers()[curTurn % this.aliveFighterCount];
+        return curTurn % this.aliveFighterCount;
+    }
+
+    get currentPlayer():ActiveFighter {
+        return this.getAlivePlayers()[this.currentPlayerIndex];
     }
 
     get nextPlayer():ActiveFighter {
@@ -395,15 +399,15 @@ export class Fight{
 
     setCurrentPlayer(fighterName:string){
         let index = this.findFighterIndex((x) => x.name == fighterName && !x.isTechnicallyOut());
-        if (index != -1 && this.fighters[0].name != fighterName) { //switch positions
-            var temp = this.fighters[0];
-            this.fighters[0] = this.fighters[index];
+        if (index != -1 && this.fighters[this.currentPlayerIndex].name != fighterName) { //switch positions
+            var temp = this.fighters[this.currentPlayerIndex];
+            this.fighters[this.currentPlayerIndex] = this.fighters[index];
             this.fighters[index] = temp;
-            this.fighters[0].isInTheRing = true;
-            if (this.fighters[index].assignedTeam == this.fighters[0].assignedTeam && this.fighters[index].isInTheRing == true && this.fightType == FightType.Tag) {
+            this.fighters[this.currentPlayerIndex].isInTheRing = true;
+            if (this.fighters[index].assignedTeam == this.fighters[this.currentPlayerIndex].assignedTeam && this.fighters[index].isInTheRing == true && this.fightType == FightType.Tag) {
                 this.fighters[index].isInTheRing = false;
             }
-            this.message.addInfo(Utils.strFormat(Constants.Messages.setCurrentPlayerOK, [temp.name, this.fighters[0].name]));
+            this.message.addInfo(Utils.strFormat(Constants.Messages.setCurrentPlayerOK, [temp.name, this.fighters[this.currentPlayerIndex].name]));
         }
         else{
             this.message.addInfo(Constants.Messages.setCurrentPlayerFail)
@@ -477,17 +481,28 @@ export class Fight{
         if(!this.currentPlayer.isInTheRing){
             throw new Error(Constants.Messages.canAttackIsOutOfTheRing);
         }
-        if(!this.currentTarget.isInTheRing){
-            throw new Error(Constants.Messages.canAttackTargetIsOutOfTheRing);
-        }
-        if(this.currentTarget.isTechnicallyOut()){
-            throw new Error(Constants.Messages.canAttackTargetOutOfFight);
-        }
+        //if(!this.currentTarget.isInTheRing){
+        //    throw new Error(Constants.Messages.canAttackTargetIsOutOfTheRing);
+        //}
+        //if(this.currentTarget.isTechnicallyOut()){
+        //    throw new Error(Constants.Messages.canAttackTargetOutOfFight);
+        //}
         if (action == ActionType.SubHold || action == ActionType.SexHold || action == ActionType.HumHold || action == ActionType.Bondage) {
             if(this.currentPlayer.isInHold()){
                 throw new Error(Constants.Messages.canAttackIsInHold);
             }
         }
+        return true;
+    }
+
+    isTargetValid() {
+        if (!this.currentTarget.isInTheRing) {
+            throw new Error(Constants.Messages.canAttackTargetIsOutOfTheRing);
+        }
+        if (this.currentTarget.isTechnicallyOut()) {
+            throw new Error(Constants.Messages.canAttackTargetOutOfFight);
+        }
+        return true;
     }
 
     checkAttackRequirements(action:ActionType) {
@@ -579,6 +594,7 @@ export class Fight{
                         throw new Error(Constants.Messages.doActionTargetIsSameTeam);
                     }
                 }
+                this.isTargetValid();
             }
 
             this.checkAttackRequirements(action);
@@ -757,7 +773,7 @@ export class Fight{
         var index = 0;
         for (let fighter of arrFightersSortedByInitiative) {
             let indexToMoveInFront = this.getFighterIndex(fighter.name);
-            var temp = this[index];
+            var temp = this.fighters[index];
             this.fighters[index] = this.fighters[indexToMoveInFront];
             this.fighters[indexToMoveInFront] = temp;
             index++;
@@ -790,7 +806,7 @@ export class Fight{
     getFighterIndex(fighterName:string) {
         let index = -1;
         for (let i = 0; i < this.fighters.length; i++) {
-            if (this[i].name == fighterName) {
+            if (this.fighters[i].name == fighterName) {
                 index = i;
             }
         }

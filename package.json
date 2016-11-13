@@ -14,6 +14,7 @@
     "es6-promise": "^4.0.3",
     "fchatlib": "^0.6.0",
     "jasmine": "2.2",
+    "jasmine-es6": "^0.4.0",
     "lodash": "*",
     "mysql": "*",
     "promise": "^7.1.1",

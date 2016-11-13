@@ -105,6 +105,8 @@ export class ActiveFighter extends Fighter {
     constructor(name:string, fight:Fight) {
         super(name);
         this.fight = fight;
+        this.dice = new Dice(12);
+        this.pendingAction = null;
     }
 
     static async load(name:string, fight?:Fight) {

@@ -1,5 +1,7 @@
 import {EnumEx} from "./Utils";
 import {Fighter} from "./Fighter";
+import {FightTier} from "./Constants";
+
 export class Achievement {
     type: AchievementType;
     reward: AchievementReward;
@@ -28,6 +30,9 @@ export class Achievement {
         let addedInfo = [];
         let achievements = Achievement.getAll();
 
+        //useless statements to make sure typescript loads the FightTier class
+        let x = FightTier.Bronze;
+
         for(let achievement of achievements){
             if(eval(achievement.condition)){ // super dangerous, I know
                 fighter.giveTokens(achievement.reward);
@@ -49,8 +54,8 @@ export enum AchievementCondition{
     WinTwentyFights = <any>"fighter.wins >= 20",
     WinThirtyFights = <any>"fighter.wins >= 30",
     WinFortyFights = <any>"fighter.wins >= 40",
-    ReachedSilver = <any>"fighter.tier() >= FightTier.Silver",
-    ReachedGold = <any>"fighter.tier() >= FightTier.Gold"
+    ReachedSilver = <any>"fighter.tier() >= Constants_1.FightTier.Silver",
+    ReachedGold = <any>"fighter.tier() >= Constants_1.FightTier.Gold"
 }
 
 export enum AchievementDescription{
