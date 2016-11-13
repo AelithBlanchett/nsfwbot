@@ -61,7 +61,7 @@ export namespace Fight {
             public static itemPickupUses: number = 1;
             public static itemPickupMultiplier: number = 1.5;
 
-            public static sextoyPickupUses: number = 1;
+            public static sextoyPickupUses:number = 2;
             public static sextoyPickupMultiplier: number = 1.5;
 
             public static degradationUses: number = 1;

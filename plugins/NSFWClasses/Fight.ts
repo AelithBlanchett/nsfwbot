@@ -26,6 +26,7 @@ import {CreateDateColumn} from "typeorm/index";
 import {UpdateDateColumn} from "typeorm/index";
 import {Fighter} from "./Constants";
 import {Index} from "typeorm/index";
+import {Feature} from "./Feature";
 
 @Table(Constants.SQL.fightTableName)
 export class Fight{
@@ -277,19 +278,19 @@ export class Fight{
         }
 
         //Features loading TODO
-        //for (let i = 0; i < this.fighters.length; i++) {
-        //    for (let feature of this.fighters[i].features) {
-        //        let modToAdd = feature.getModifier(this, this.fighters[i]);
-        //        if(modToAdd){
-        //            this.fighters[i].modifiers.push(modToAdd);
-        //        }
-        //        if(feature.isExpired()){
-        //            this.fighters[i].removeFeature(feature.type);
-        //            this.message.addHint("This feature has expired.");
-        //            this.fighters[i].update();
-        //        }
-        //    }
-        //}
+        for (let i = 0; i < this.fighters.length; i++) {
+            for (let feature of this.fighters[i].features) {
+                let modToAdd = feature.getModifier(this, this.fighters[i]);
+                if (modToAdd) {
+                    this.fighters[i].modifiers.push(modToAdd);
+                }
+                if (feature.isExpired()) {
+                    this.fighters[i].removeFeature(feature.type);
+                    this.message.addHint("This feature has expired.");
+                    this.fighters[i].update();
+                }
+            }
+        }
 
         this.message.send();
         Fight.saveState(this);
@@ -299,7 +300,7 @@ export class Fight{
     requestDraw(fighterName:string) {
         let fighter = this.getFighterByName(fighterName);
         if (fighter) {
-            if (fighter.isRequestingDraw()) {
+            if (!fighter.isRequestingDraw()) {
                 fighter.requestDraw();
             }
             else {

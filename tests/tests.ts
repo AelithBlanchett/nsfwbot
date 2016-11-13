@@ -112,14 +112,14 @@ function doAction(cmd:CommandHandler, action:string, target:string = "", conditi
             };
         }
         waitUntil().interval(10).times(50).condition(condition).done((res) => {
-            if(res){
+            if (res) {
                 cmd.fight.currentPlayer.dice.addMod(50);
                 cmd[action](target, {character: cmd.fight.currentPlayer.name, channel: "here"});
                 waitUntil().interval(100).times(50).condition(condition).done(() => {
                     resolve();
                 });
             }
-            else{
+            else {
                 reject("Couldn't execute action. Is the fight started and waiting for action?");
             }
         });
@@ -207,10 +207,10 @@ describe("The player(s)", () => {
                     console.log("Sent PRIVMESSAGE " + message + " to " + character);
                 }
             },
-            addPrivateMessageListener: function (fn: any){
+            addPrivateMessageListener: function (fn:any) {
 
             },
-            isUserChatOP: function(username: string, channel: string){
+            isUserChatOP: function (username:string, channel:string) {
                 return username == "Aelith Blanchette";
             }
         };
@@ -742,7 +742,7 @@ describe("The player(s)", () => {
                     return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                 };
                 waitUntil().interval(100).times(50).condition(condition).done(() => {
-                    if (wasMessageSent(Constants.Messages.checkAttackRequirementsNotInSexualHold)) {
+                    if (wasPrivMessageSent(Constants.Messages.checkAttackRequirementsNotInSexualHold)) {
                         done();
                     }
                     else {
@@ -966,7 +966,7 @@ describe("The player(s)", () => {
                     return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                 };
                 waitUntil().interval(100).times(50).condition(condition).done(() => {
-                    if (wasMessageSent(Constants.Messages.checkAttackRequirementsNotInSexualHold)) {
+                    if (wasPrivMessageSent(Constants.Messages.checkAttackRequirementsNotInSexualHold)) {
                         done();
                     }
                     else {
@@ -1013,14 +1013,14 @@ describe("The player(s)", () => {
                 cmd.fight.nextTurn();
                 doAction(cmd, "draw", "").then(() => {
                     let condition = () => {
-                        return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
+                        return (cmd.fight.hasEnded);
                     };
                     waitUntil().interval(100).times(50).condition(condition).done(() => {
                         if (wasMessageSent("Everybody agrees, it's a draw!")) {
                             done();
                         }
                         else {
-                            done.fail(new Error("Did not say that the attacker must apply a sexhold for a bondage attack."));
+                            done.fail(new Error("Did not say that there's a draw."));
                         }
                     });
                 });
@@ -1089,7 +1089,7 @@ describe("The player(s)", () => {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         createFighter("TheTinaArmstrong");
         let index = Utils.findIndex(usedFighters, "name", "TheTinaArmstrong");
-        if(index != -1){
+        if (index != -1) {
             usedFighters[index].features.push(new Feature(FeatureType.KickStart, 1));
         }
         await initiateMatchSettings1vs1(cmd);
