@@ -11,6 +11,7 @@ import {ItemPickupModifier} from "../plugins/NSFWClasses/CustomModifiers";
 import {ModifierType} from "../plugins/NSFWClasses/Constants";
 import {Feature} from "../plugins/NSFWClasses/Feature";
 import {FeatureType} from "../plugins/NSFWClasses/Constants";
+import {ActiveFighter} from "../plugins/NSFWClasses/ActiveFighter";
 var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
 var jasmine = new Jasmine();
@@ -20,68 +21,30 @@ var mockedClasses = [];
 var usedIndexes = [];
 var usedFighters = [];
 
-function initiateMatchSettings2vs2TagForDb(cmdHandler){
-    return new Promise((resolve, reject) => {
+async function initiateMatchSettings2vs2TagForDb(cmdHandler) {
         cmdHandler.fight.setFightType("tagteam");
-        cmdHandler.join("Red", {character: "test2", channel: "here"});
-        cmdHandler.join("Purple", {character: "test3", channel: "here"});
-        cmdHandler.join("Purple", {character: "test4", channel: "here"});
-        cmdHandler.join("Red", {character: "test", channel: "here"});
-        cmdHandler.ready("Red", {character: "test3", channel: "here"});
-        cmdHandler.ready("Red", {character: "test4", channel: "here"});
-        cmdHandler.ready("Red", {character: "test", channel: "here"});
-        cmdHandler.ready("Red", {character: "test2", channel: "here"});
-        resolve();
-    });
+    await cmdHandler.join("Red", {character: "test2", channel: "here"});
+    await cmdHandler.join("Purple", {character: "test3", channel: "here"});
+    await cmdHandler.join("Purple", {character: "test4", channel: "here"});
+    await cmdHandler.join("Red", {character: "test1", channel: "here"});
+    await cmdHandler.ready("Red", {character: "test3", channel: "here"});
+    await cmdHandler.ready("Red", {character: "test4", channel: "here"});
+    await cmdHandler.ready("Red", {character: "test1", channel: "here"});
+    await cmdHandler.ready("Red", {character: "test2", channel: "here"});
 }
 
 describe("The database(s)", () => {
 
-    function resetData2() {
-        return new Promise((resolve, reject) => {
-
-            //var subRequestFights = "SELECT flistplugins.nsfw_fights.idFight FROM flistplugins.nsfw_fights LEFT JOIN flistplugins.nsfw_fightfighters ON flistplugins.nsfw_fights.idFight = flistplugins.nsfw_fightfighters.idFight\
-            //WHERE idFighter IS NULL OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4";
-            //var sqlResetFightsActions = "DELETE FROM flistplugins.nsfw_actions where idFight IN ("+subRequestFights+") OR idAttacker = 1 OR idAttacker = 2 OR idAttacker = 3 OR idAttacker = 4 OR idDefender = 1 OR idDefender = 2 OR idDefender = 3 OR idDefender = 4";
-            //var sqlResetFightFighters = "DELETE FROM flistplugins.nsfw_fightfighters where idFight IN ("+subRequestFights+") OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4;";
-            //var sqlResetFights = "DELETE flistplugins.nsfw_fights.* FROM flistplugins.nsfw_fights \
-            //WHERE idFight IN ("+subRequestFights+") idFighter IS NULL OR idFighter = 1 OR idFighter = 2 OR idFighter = 3 OR idFighter = 4;"; //clear all fights linked to the 4 fighters
-            //var sqlResetTestFighters = "DELETE FROM flistplugins.nsfw_fighters where name = 'test' OR name = 'test2' OR name = 'test3' OR name = 'test4';";
-            //var sqlAddTestFighter1 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('1', 'test', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
-            //var sqlAddTestFighter2 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('2', 'test2', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
-            //var sqlAddTestFighter3 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('3', 'test3', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
-            //var sqlAddTestFighter4 = "INSERT INTO flistplugins.nsfw_fighters VALUES ('4', 'test4', '0', '0', '0', '0', '0', '0', '0.00', '1', '1', '1', '1', '1', '1', '1', '0');";
-            //var addFight = "INSERT INTO `flistplugins`.`nsfw_fights` (`idFight`, `idFightType`,  `idStage`, `usedTeams`, `currentTurn`, `fighterList`, `hasEnded`) VALUES (1,1, 1,2, 2, '', 0);";
-            //Data.db.query(sqlResetFightsActions, (err, result) => {
-            //    Data.db.query(sqlResetFightFighters, (err, result) => {
-            //        Data.db.query(sqlResetFights, (err, result) => {
-            //            Data.db.query(sqlResetTestFighters, (err, result) => {
-            //                Data.db.query(sqlAddTestFighter1, (err, result) => {
-            //                    Data.db.query(sqlAddTestFighter2, (err, result) => {
-            //                        Data.db.query(sqlAddTestFighter3, (err, result) => {
-            //                            Data.db.query(sqlAddTestFighter4, (err, result) => {
-            //                                Data.db.query(addFight, (err, result) => {
-            //                                    resolve();
-            //                                });
-            //                            });
-            //                        });
-            //                    });
-            //                });
-            //            });
-            //        });
-            //    });
-            //});
-        });
-    }
-
     async function resetData() {
-        return await Fighter.create("Aelith Blanchette");
+        await Fighter.create("test1");
+        await Fighter.create("test2");
+        await Fighter.create("test3");
+        await Fighter.create("test4");
     }
 
-    beforeAll(function(done) {
-        resetData().then(() => {
-            done();
-        });
+    beforeAll(async function (done) {
+        await resetData();
+        done();
     },5000);
 
     beforeEach(function () {
@@ -114,7 +77,7 @@ describe("The database(s)", () => {
         spyOn(fChatLibInstance, 'sendPrivMessage').and.callThrough();
     });
 
-    it("should load Aelith Blanchette", async function (done) {
+    xit("should load Aelith Blanchette", async function (done) {
         let fighter = await Fighter.load("Aelith Blanchette");
         expect(fighter.name).toBe("Aelith Blanchette");
         done();
@@ -122,9 +85,7 @@ describe("The database(s)", () => {
 
     xit("should give ItemPickupBonus feature to Test2", function (done) {
         Fighter.load("test2").then(x => {
-            console.log(x.features);
             x.features.push(new Feature(FeatureType.KickStart, 1));
-            console.log(x.features);
             x.update().then(updWorked => {
                 expect(updWorked).toBe(true);
                 done();
@@ -136,9 +97,9 @@ describe("The database(s)", () => {
         });
     },500000);
 
-    xit("should say Test is already there", function (done) {
-        Fighter.load("test").then(x => {
-            if(x.name == "test"){
+    xit("should say test1 is already there", function (done) {
+        Fighter.load("test1").then(x => {
+            if (x.name == "test1") {
                 done();
             }
             else{
@@ -193,47 +154,46 @@ describe("The database(s)", () => {
         });
     },500000);
 
-    xit("should write a new action in the database", function (done) {
-        //TODO: Adapt to active fighter
-        //Fighter.exists("test2").then(x => {
-        //    let fight = new Fight(null, null);
-        //    let myAction = new Action(fight, 1, 1, ActionType.Brawl, x);
-        //    Action.commitDb(myAction).then(id => {
-        //        expect(id).toBeGreaterThan(0);
-        //        done();
-        //    }).catch(err => {
-        //        done.fail(err);
-        //    });
-        //});
-    },5000);
+    //xit("should write a new action in the database", async function (done) {
+    //    ActiveFighter.load("test2").then(x => {
+    //        let fight = new Fight(null, null);
+    //        let myAction = new Action(fight, 1, 1, ActionType.Brawl, x);
+    //        Action.commitDb(myAction).then(id => {
+    //            expect(id).toBeGreaterThan(0);
+    //            done();
+    //        }).catch(err => {
+    //            done.fail(err);
+    //        });
+    //    });
+    //},5000);
+    //
+    //it("should write a new fight in the database", function (done) {
+    //    Fighter.load("test2").then(x => {
+    //        let myFight = new Fight(fChatLibInstance, "here", "hello");
+    //        Fight.saveState(myFight).then(id => {
+    //            expect(id).toBeGreaterThan(0);
+    //            done();
+    //        }).catch(err => {
+    //            done.fail(err);
+    //        });
+    //    });
+    //},50000);
 
-    xit("should write a new fight in the database", function (done) {
-        Fighter.load("test2").then(x => {
-            let myFight = new Fight(fChatLibInstance, "here", "hello");
-            Fight.saveState(myFight).then(id => {
-                expect(id).toBeGreaterThan(0);
-                done();
-            }).catch(err => {
-                done.fail(err);
-            });
-        });
-    },50000);
-
-    xit("should tag successfully with Aelith", function(done){
+    it("should tag successfully with Aelith", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
-        initiateMatchSettings2vs2TagForDb(cmd);
-        waitUntil().interval(2).times(5000).condition(() => {
-            return cmd.fight.findFighterIndex(x => x.name == "test") != -1;
+        await initiateMatchSettings2vs2TagForDb(cmd);
+        waitUntil().interval(10).times(50).condition(() => {
+            return cmd.fight.findFighterIndex(x => x.name == "test1") != -1;
         }).done(() => {
             waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                cmd.fight.setCurrentPlayer("test");
-                cmd.tag("test2", {character: "test", channel: "here"});
+                cmd.fight.setCurrentPlayer("test1");
+                cmd.tag("test2", {character: "test1", channel: "here"});
                 waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.currentPlayer != undefined && cmd.fight.currentPlayer.name != "test2");}).done(() =>{
                     done();
                 });
             });
         });
-    },8000);
+    }, 80000);
 });
 
 jasmine.execute();

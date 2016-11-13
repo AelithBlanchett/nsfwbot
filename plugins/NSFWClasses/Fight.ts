@@ -189,8 +189,7 @@ export class Fight{
     async join(fighterName:string, team:Team):Promise<number> {
         if(!this.hasStarted){
             if (!this.getFighterByName(fighterName)) { //find fighter by its name property instead of comparing objects, which doesn't work.
-                let activeFighter = new ActiveFighter(fighterName, this);
-                activeFighter = await ActiveFighter.load(activeFighter.name);
+                let activeFighter = await ActiveFighter.load(fighterName, true, this);
                 if(team != Team.Unknown){
                     activeFighter.assignedTeam = team;
                 }
@@ -198,7 +197,6 @@ export class Fight{
                     team = this.getAvailableTeam();
                     activeFighter.assignedTeam = team;
                 }
-                activeFighter.fight = this;
                 this.fighters.push(activeFighter);
                 return team;
             }
@@ -216,7 +214,7 @@ export class Fight{
             if (!this.getFighterByName(fighterName)) {
                 await this.join(fighterName, Team.Unknown);
             }
-            var fighterInFight:ActiveFighter = this.getFighterByName(fighterName);
+            var fighterInFight:ActiveFighter = this.getFighterByName(fighterName) as ActiveFighter;
             if(fighterInFight && !fighterInFight.isReady){ //find fighter by its name property instead of comparing objects, which doesn't work.
                 fighterInFight.isReady = true;
                 this.message.addInfo(Utils.strFormat(Constants.Messages.Ready, [fighterInFight.getStylizedName()]));
@@ -739,9 +737,6 @@ export class Fight{
             this.message.addInfo(fighter.checkAchievements());
         }
 
-        //TODO save fighters?
-
-        //TODO persist
         Fight.commitDb(this);
     }
 
@@ -751,8 +746,6 @@ export class Fight{
         await fightRepo.persist(fight);
     }
 
-
-    //FORMERLY FIGHTERLIST.TS
 
     findFighterIndex(predicate:(value:ActiveFighter) => boolean, thisArg?:any):number {
         var list = ES.ToObject(this.fighters);
@@ -790,7 +783,7 @@ export class Fight{
         return arrPlayers;
     }
 
-    getFighterByName(name:string) {
+    getFighterByName(name:string):ActiveFighter {
         let fighter:ActiveFighter = null;
         for (let player of this.fighters) {
             if (player.name == name) {

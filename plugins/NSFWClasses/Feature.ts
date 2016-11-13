@@ -53,7 +53,6 @@ export class Feature{
         }
     }
 
-    //TODO MAY HAVE TO REMOVE ACTIVEFIGHTER SINCE IT BUGS
     getModifier(fight:Fight, attacker?:ActiveFighter, defender?:ActiveFighter):IModifier {
         let modifier:IModifier = null;
         if (!this.isExpired()) {

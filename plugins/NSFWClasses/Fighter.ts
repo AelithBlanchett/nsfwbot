@@ -10,6 +10,7 @@ import {Stats} from "./Constants";
 import {FightTier} from "./Constants";
 import {Data} from "./Model";
 import {Index} from "typeorm/index";
+import {Fight} from "./Fight";
 
 @Table()
 @TableInheritance("class-table")
@@ -114,7 +115,10 @@ export class Fighter implements IFighter{
     }
 
     async update() {
-
+        let connection = await Data.getDb();
+        let fightersRepo = connection.getRepository(Fighter);
+        fightersRepo.persist(this);
+        return true;
     }
 
     winRate():number{
@@ -323,7 +327,7 @@ export class Fighter implements IFighter{
         return;
     }
 
-    static async load(name:string) {
+    static async load(name:string, isInitialization:boolean = true, fight:Fight = null) {
         let connection = await Data.getDb();
         let fightersRepo = connection.getRepository(Fighter);
         let myFighter = await fightersRepo.findOneById(name);

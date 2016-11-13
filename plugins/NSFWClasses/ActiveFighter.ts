@@ -109,25 +109,33 @@ export class ActiveFighter extends Fighter {
         this.pendingAction = null;
     }
 
-    static async load(name:string, fight?:Fight) {
+    static async load(name:string, isInitialization:boolean = true, fight:Fight = null) {
         let connection = await Data.getDb();
-        let fightersRepo = connection.getRepository(ActiveFighter);
+        let myNonActiveFighter:Fighter;
         let myFighter:ActiveFighter;
 
-        if (fight == null) {
-            myFighter = await fightersRepo.findOneById(name);
-            if(myFighter != null){
+        if (isInitialization == true) {
+            let fightersRepo = connection.getRepository(Fighter);
+            myNonActiveFighter = await super.load(name);
+            if (myNonActiveFighter != null) {
+                myFighter = myNonActiveFighter as ActiveFighter;
                 myFighter.hp = myFighter.hpPerHeart();
                 myFighter.heartsRemaining = myFighter.maxHearts();
                 myFighter.lust = 0;
                 myFighter.orgasmsRemaining = myFighter.maxOrgasms();
                 myFighter.focus = myFighter.willpower;
                 myFighter.dice = new Dice(12);
+                myFighter.fight = fight;
             }
         }
-        else {
-            myFighter = await fightersRepo.findOne({name: name, fight: fight});
+        else if (fight != null) {
+            let activeFightersRepo = connection.getRepository(ActiveFighter);
+            myFighter = await activeFightersRepo.findOne({name: name, fight: fight});
             myFighter.dice = new Dice(12);
+            myFighter.fight = fight;
+        }
+        else {
+            throw new Error("Is not a fighter init nor a fight load, what's happening then?");
         }
 
         return myFighter;
