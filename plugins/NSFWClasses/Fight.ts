@@ -277,7 +277,6 @@ export class Fight{
             }
         }
 
-        //Features loading TODO
         for (let i = 0; i < this.fighters.length; i++) {
             for (let feature of this.fighters[i].features) {
                 let modToAdd = feature.getModifier(this, this.fighters[i]);
@@ -740,7 +739,7 @@ export class Fight{
             this.message.addInfo(fighter.checkAchievements());
         }
 
-        //TODO save fighters
+        //TODO save fighters?
 
         //TODO persist
         Fight.commitDb(this);

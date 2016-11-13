@@ -1,13 +1,13 @@
 #TODO
 
 ##Important
--   Separate the Fighter entity from the 'augmented' one used in fights with hp, lp and stuff
 -   Re-arrange CommandHandler / Fight logic
 -   Factorise everything
 -   Refactor the fight class, use functions instead of just changing variables on the fly. It will clarify the code and easify modifications in the future. 
 
 
 ###Next steps
+-   Add admin commands
 -   Rename STUFF
 -   Balance everything
 -   Do the goddamn' guide on Google Docs
@@ -23,6 +23,7 @@
     Ladder/Cage
 
 #Needs testing
+*   Separate the Fighter entity from the 'augmented' one used in fights with hp, lp and stuff
 *   Add tap out/submit move
 *   Finish features implementation
 *   Add pin move
@@ -31,3 +32,6 @@
 *   Add !status back by saving the last message that's been sent
 *   Variable end match messages, suggesting how to finish
 *   Add command to load saved fight with ID
+
+#Done
+
