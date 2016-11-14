@@ -54,6 +54,8 @@ export enum ActionType {
     Masturbate
 }
 
+//TODO FIND OUT WHY THE FUCK IT DOESNT FUCKING WORK
+//@Table()
 export class Action {
 
     @PrimaryGeneratedColumn()
