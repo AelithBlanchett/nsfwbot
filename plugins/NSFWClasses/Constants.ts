@@ -209,6 +209,7 @@ export class Messages {
 }
 
 export enum Team {
+    White = undefined,
     Unknown = -1,
     Blue = 0,
     Red = 1,

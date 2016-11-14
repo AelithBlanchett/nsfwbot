@@ -43,13 +43,13 @@ function getMock(mockedClass) {
 
 function abstractDatabase() {
 
-    Fighter.load = async function (name) {
+    Fighter.loadFromDb = async function (name) {
         return new Promise(function (resolve, reject) {
             resolve(createFighter(name));
         });
     };
 
-    ActiveFighter.load = async function (name) {
+    ActiveFighter.loadFromDb = async function (name) {
         return new Promise(function (resolve, reject) {
             resolve(createFighter(name));
         });
@@ -258,7 +258,7 @@ describe("The player(s)", () => {
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         await x.join("", data);
-        expect(Fighter.load).toHaveBeenCalled();
+        expect(Fighter.loadFromDb).toHaveBeenCalled();
         done();
     }, DEFAULT_TIMEOUT);
 

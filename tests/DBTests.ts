@@ -78,13 +78,13 @@ describe("The database(s)", () => {
     });
 
     xit("should load Aelith Blanchette", async function (done) {
-        let fighter = await Fighter.load("Aelith Blanchette");
+        let fighter = await Fighter.loadFromDb("Aelith Blanchette");
         expect(fighter.name).toBe("Aelith Blanchette");
         done();
     });
 
     xit("should give ItemPickupBonus feature to Test2", function (done) {
-        Fighter.load("test2").then(x => {
+        Fighter.loadFromDb("test2").then(x => {
             x.features.push(new Feature(FeatureType.KickStart, 1));
             x.update().then(updWorked => {
                 expect(updWorked).toBe(true);
@@ -98,7 +98,7 @@ describe("The database(s)", () => {
     },500000);
 
     xit("should say test1 is already there", function (done) {
-        Fighter.load("test1").then(x => {
+        Fighter.loadFromDb("test1").then(x => {
             if (x.name == "test1") {
                 done();
             }
@@ -111,7 +111,7 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should say Test2 is already there", function (done) {
-        Fighter.load("test2").then(x => {
+        Fighter.loadFromDb("test2").then(x => {
             if(x.name == "test2"){
                 done();
             }
@@ -124,7 +124,7 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should say Tewefwefwfwst2 doesn't exist", function (done) {
-        Fighter.load("Tewefwefwfwst2").then(x => {
+        Fighter.loadFromDb("Tewefwefwfwst2").then(x => {
             if(x == undefined){
                 done();
             }
@@ -137,7 +137,7 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should update Test2's power to something else", function (done) {
-        Fighter.load("test2").then(x => {
+        Fighter.loadFromDb("test2").then(x => {
             let randomId = -1;
             do{
                 randomId = Utils.getRandomInt(1,6);
@@ -180,17 +180,27 @@ describe("The database(s)", () => {
     //},50000);
 
     it("should tag successfully with Aelith", async function (done) {
+        debug = true;
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings2vs2TagForDb(cmd);
         waitUntil().interval(10).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "test1") != -1;
         }).done(() => {
-            waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.hasStarted && cmd.fight.waitingForAction);}).done(() =>{
-                cmd.fight.setCurrentPlayer("test1");
-                cmd.tag("test2", {character: "test1", channel: "here"});
-                waitUntil().interval(100).times(50).condition(() => {return (cmd.fight.currentPlayer != undefined && cmd.fight.currentPlayer.name != "test2");}).done(() =>{
-                    done();
-                });
+            waitUntil().interval(100).times(50).condition(() => {
+                return (cmd.fight.hasStarted && cmd.fight.waitingForAction);
+            }).done((res) => {
+                if (res) {
+                    cmd.fight.setCurrentPlayer("test1");
+                    cmd.tag("test2", {character: "test1", channel: "here"});
+                    waitUntil().interval(100).times(50).condition(() => {
+                        return (cmd.fight.currentPlayer != undefined && cmd.fight.currentPlayer.name != "test2");
+                    }).done(() => {
+                        done();
+                    });
+                }
+                else {
+                    done.fail(res);
+                }
             });
         });
     }, 80000);

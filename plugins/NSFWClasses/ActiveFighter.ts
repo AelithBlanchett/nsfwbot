@@ -102,43 +102,65 @@ export class ActiveFighter extends Fighter {
     pendingAction:Action;
     dice:Dice;
 
-    constructor(name:string, fight:Fight) {
-        super(name);
-        this.fight = fight;
-        this.dice = new Dice(12);
-        this.pendingAction = null;
+    async init(fight:Fight = null):Promise<boolean> {
+        if (await super.init()) {
+            if (!fight.hasStarted) {
+                this.fight = fight;
+                this.target = null;
+                this.assignedTeam = -1;
+                this.isReady = false;
+                this.hp = this.hpPerHeart();
+                this.heartsRemaining = this.maxHearts();
+                this.lust = 0;
+                this.orgasmsRemaining = this.maxOrgasms();
+                this.focus = this.willpower;
+                this.lastDiceRoll = null;
+                this.isInTheRing = true;
+                this.canMoveFromOrOffRing = true;
+                this.lastTagTurn = 9999999;
+                this.wantsDraw = false;
+                this.consecutiveTurnsWithoutFocus = 0;
+                this.modifiers = [];
+                this.actionsDone = [];
+                this.actionsInflicted = [];
+                this.pendingAction = null;
+                this.dice = new Dice(12);
+            }
+            else {
+                let connection = await Data.getDb();
+                let activeFightersRepo = connection.getRepository(ActiveFighter);
+                let myFighter = await activeFightersRepo.findOne({name: name, fight: fight});
+                myFighter.fight = fight;
+                this.loadExist(myFighter);
+            }
+            return true;
+        }
+        return false;
     }
 
-    static async load(name:string, isInitialization:boolean = true, fight:Fight = null) {
-        let connection = await Data.getDb();
-        let myNonActiveFighter:Fighter;
-        let myFighter:ActiveFighter;
-
-        if (isInitialization == true) {
-            let fightersRepo = connection.getRepository(Fighter);
-            myNonActiveFighter = await super.load(name);
-            if (myNonActiveFighter != null) {
-                myFighter = myNonActiveFighter as ActiveFighter;
-                myFighter.hp = myFighter.hpPerHeart();
-                myFighter.heartsRemaining = myFighter.maxHearts();
-                myFighter.lust = 0;
-                myFighter.orgasmsRemaining = myFighter.maxOrgasms();
-                myFighter.focus = myFighter.willpower;
-                myFighter.dice = new Dice(12);
-                myFighter.fight = fight;
-            }
-        }
-        else if (fight != null) {
-            let activeFightersRepo = connection.getRepository(ActiveFighter);
-            myFighter = await activeFightersRepo.findOne({name: name, fight: fight});
-            myFighter.dice = new Dice(12);
-            myFighter.fight = fight;
-        }
-        else {
-            throw new Error("Is not a fighter init nor a fight load, what's happening then?");
-        }
-
-        return myFighter;
+    async loadExist(loadedFighter:ActiveFighter) {
+        this.fight = loadedFighter.fight;
+        this.target = loadedFighter.target;
+        this.assignedTeam = loadedFighter.assignedTeam;
+        this.isReady = loadedFighter.isReady;
+        this.hp = loadedFighter.hp;
+        this.heartsRemaining = loadedFighter.heartsRemaining;
+        this.lust = loadedFighter.lust;
+        this.orgasmsRemaining = loadedFighter.orgasmsRemaining;
+        this.focus = loadedFighter.focus;
+        this.lastDiceRoll = loadedFighter.lastDiceRoll;
+        this.isInTheRing = loadedFighter.isInTheRing;
+        this.canMoveFromOrOffRing = loadedFighter.canMoveFromOrOffRing;
+        this.lastTagTurn = loadedFighter.lastTagTurn;
+        this.wantsDraw = loadedFighter.wantsDraw;
+        this.consecutiveTurnsWithoutFocus = loadedFighter.consecutiveTurnsWithoutFocus;
+        this.createdAt = loadedFighter.createdAt;
+        this.updatedAt = loadedFighter.updatedAt;
+        this.modifiers = loadedFighter.modifiers || [];
+        this.actionsDone = loadedFighter.actionsDone || [];
+        this.actionsInflicted = loadedFighter.actionsInflicted || [];
+        this.pendingAction = null;
+        this.dice = new Dice(12);
     }
 
     //returns dice score
@@ -442,7 +464,7 @@ export class ActiveFighter extends Fighter {
             `  [color=red]Target:[/color] ` + (this.target != undefined ? `${this.target.getStylizedName()}` : "None");
     }
 
-    getStylizedName() {
+    getStylizedName():string {
         let modifierBeginning = "";
         let modifierEnding = "";
         if (this.isTechnicallyOut()) {

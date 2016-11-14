@@ -189,7 +189,8 @@ export class Fight{
     async join(fighterName:string, team:Team):Promise<number> {
         if(!this.hasStarted){
             if (!this.getFighterByName(fighterName)) { //find fighter by its name property instead of comparing objects, which doesn't work.
-                let activeFighter = await ActiveFighter.load(fighterName, true, this);
+                let activeFighter:ActiveFighter = new ActiveFighter(fighterName);
+                await activeFighter.init(this);
                 if(team != Team.Unknown){
                     activeFighter.assignedTeam = team;
                 }
@@ -197,6 +198,7 @@ export class Fight{
                     team = this.getAvailableTeam();
                     activeFighter.assignedTeam = team;
                 }
+                activeFighter.fight = this;
                 this.fighters.push(activeFighter);
                 return team;
             }
@@ -214,10 +216,10 @@ export class Fight{
             if (!this.getFighterByName(fighterName)) {
                 await this.join(fighterName, Team.Unknown);
             }
-            var fighterInFight:ActiveFighter = this.getFighterByName(fighterName) as ActiveFighter;
+            var fighterInFight:ActiveFighter = this.getFighterByName(fighterName);
             if(fighterInFight && !fighterInFight.isReady){ //find fighter by its name property instead of comparing objects, which doesn't work.
                 fighterInFight.isReady = true;
-                this.message.addInfo(Utils.strFormat(Constants.Messages.Ready, [fighterInFight.getStylizedName()]));
+                this.message.addInfo(Utils.strFormat(Constants.Messages.Ready, [fighterInFight.getStylizedName()])); //Find out why the f it doesn't work
                 this.message.send();
                 if (this.canStart()) {
                     this.start();
@@ -229,14 +231,14 @@ export class Fight{
     }
 
     canStart() {
-        let canGo = (this.isEveryoneReady() && !this.hasStarted && this.getTeamsStillInGame().length >= this.requiredTeams);
+        let canGo = (this.isEveryoneReady() && !this.hasStarted && this.getAllUsedTeams().length >= this.requiredTeams);
         return canGo; //only start if everyone's ready and if the teams are balanced
     }
 
 
     //Fight logic
 
-    start() {
+    async start() {
         this.message.addInfo(Constants.Messages.startMatchAnnounce);
         this.currentTurn = 1;
         this.hasStarted = true;
@@ -290,7 +292,7 @@ export class Fight{
         }
 
         this.message.send();
-        Fight.saveState(this);
+        await Fight.saveState(this);
         this.outputStatus();
     }
 
