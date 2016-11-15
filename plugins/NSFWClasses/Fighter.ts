@@ -363,6 +363,7 @@ export class Fighter implements IFighter{
         this.features = loadedFighter.features;
         this.createdAt = loadedFighter.createdAt;
         this.updatedAt = loadedFighter.updatedAt;
+        this.features = loadedFighter.features;
     }
 
     static async create(name:string) {
