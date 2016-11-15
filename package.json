@@ -23,7 +23,6 @@
     "sprintf-js": "^1.0.3",
     "sqlite3": "*",
     "stats-lite": "*",
-    "typeorm": "0.0.2-alpha.70",
     "typescript": "^2.0",
     "typings": "*",
     "wait-until": "*"
