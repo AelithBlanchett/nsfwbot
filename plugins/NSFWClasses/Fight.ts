@@ -231,7 +231,7 @@ export class Fight{
     }
 
     canStart() {
-        let canGo = (this.isEveryoneReady() && !this.hasStarted && this.getAllUsedTeams().length >= this.requiredTeams);
+        let canGo = (this.isEveryoneReady() && !this.hasStarted && this.getAllOccupiedTeams().length >= this.requiredTeams);
         return canGo; //only start if everyone's ready and if the teams are balanced
     }
 
@@ -848,13 +848,19 @@ export class Fight{
         return fullTeamCount.length;
     }
 
-    getAllUsedTeams():Array<Team> {
+    getAllOccupiedTeams():Array<Team> {
         let usedTeams:Array<Team> = [];
         for (let player of this.fighters) {
             if (usedTeams.indexOf(player.assignedTeam) == -1) {
                 usedTeams.push(player.assignedTeam);
             }
         }
+        return usedTeams;
+    }
+    
+    getAllUsedTeams():Array<Team> {
+        let usedTeams:Array<Team> = this.getAllOccupiedTeams();
+        
         var teamIndex = 0;
         while (usedTeams.length < this.requiredTeams) {
             let teamToAdd = Team[Team[teamIndex]];
