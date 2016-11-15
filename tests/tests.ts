@@ -344,7 +344,7 @@ describe("The player(s)", () => {
 
     it("should swap to TheTinaArmstrong", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
-        await await initiateMatchSettings1vs1(cmd);
+        await initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => {
             return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction)
         }).done(() => {
@@ -362,7 +362,7 @@ describe("The player(s)", () => {
 
     it("should do a brawl move", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
-        await await initiateMatchSettings1vs1(cmd);
+        await initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
@@ -382,7 +382,7 @@ describe("The player(s)", () => {
 
     it("should do a sexstrike move", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
-        await await initiateMatchSettings1vs1(cmd);
+        await initiateMatchSettings1vs1(cmd);
         waitUntil().interval(2).times(500).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {

@@ -205,7 +205,8 @@ export class CommandHandler implements ICommandHandler {
         if (this.fight == undefined || this.fight.hasEnded) {
             this.fight = new Fight(this.fChatLibInstance, this.channel);
         }
-        if (!await this.fight.setFighterReady(data.character)) { //else, the match starts!
+        let result:boolean = await this.fight.setFighterReady(data.character);
+        if (!result) { //else, the match starts!
             this.fChatLibInstance.sendMessage("[color=red]You are already ready.[/color]", this.channel);
         }
     };
