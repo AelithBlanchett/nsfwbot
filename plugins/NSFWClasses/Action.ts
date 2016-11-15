@@ -25,10 +25,7 @@ import {Utils} from "./Utils";
 import {StrapToyModifier} from "./CustomModifiers";
 import {StrapToyLPDamagePerTurn} from "./Constants";
 import "reflect-metadata";
-import {Table, Column, PrimaryColumn, OneToMany, JoinTable, PrimaryGeneratedColumn, OneToOne, ManyToOne, ManyToMany} from "typeorm";
 import {Modifier} from "./Modifier";
-import {CreateDateColumn} from "typeorm/index";
-import {UpdateDateColumn} from "typeorm/index";
 import {ActiveFighter} from "./ActiveFighter";
 
 export enum ActionType {
@@ -54,102 +51,33 @@ export enum ActionType {
     Masturbate
 }
 
-//TODO FIND OUT WHY THE FUCK IT DOESNT FUCKING WORK
-//@Table()
 export class Action {
 
-    @PrimaryGeneratedColumn()
     id: number;
-
-    //@ManyToOne(type => Fight, fight => fight.pastActions, {
-    //    cascadeInsert: true,
-    //    cascadeUpdate: true,
-    //    cascadeRemove: true
-    //})
     fight:Fight;
-
-    @Column("int")
     atTurn: number;
-
-    @Column("int")
     type:ActionType;
-
-    @Column("int")
     tier: Tier;
-
-    @Column("boolean")
     isHold: boolean;
-
-    @OneToMany(type => Modifier, mod => mod.parentAction, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
-    modifiers:Modifier[]; //Do not need to store that in the DB
-
-    //@ManyToOne(type => ActiveFighter, fighter => fighter.actionsDone, {
-    //    cascadeInsert: true,
-    //    cascadeUpdate: true,
-    //    cascadeRemove: true
-    //})
+    modifiers:Modifier[];
     attacker:ActiveFighter;
-
-    //@ManyToOne(type => ActiveFighter, fighter => fighter.actionsDone, {
-    //    cascadeInsert: true,
-    //    cascadeUpdate: true,
-    //    cascadeRemove: true
-    //})
     defender:ActiveFighter;
-
-    @Column("int")
     hpDamageToDef: number;
-
-    @Column("int")
     lpDamageToDef: number;
-
-    @Column("int")
     fpDamageToDef: number;
-
-    @Column("int")
     hpDamageToAtk: number;
-
-    @Column("int")
     lpDamageToAtk: number;
-
-    @Column("int")
     fpDamageToAtk: number;
-
-    @Column("int")
     hpHealToDef: number;
-
-    @Column("int")
     lpHealToDef: number;
-
-    @Column("int")
     fpHealToDef: number;
-
-    @Column("int")
     hpHealToAtk: number;
-
-    @Column("int")
     lpHealToAtk: number;
-
-    @Column("int")
     fpHealToAtk: number;
-
-    @Column("int")
     diceScore: number;
-
-    @Column("boolean")
     missed: boolean;
-
-    @Column("boolean")
     requiresRoll: boolean;
-
-    @CreateDateColumn()
     createdAt:Date;
-
-    @UpdateDateColumn()
     updatedAt:Date;
 
     constructor(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:ActiveFighter, defender?:ActiveFighter) {
@@ -567,9 +495,7 @@ export class Action {
     }
 
     static async commitDb(action:Action) {
-        let connection = await Data.getDb();
-        let fightActionRepo = connection.getRepository(Action);
-        await fightActionRepo.persist(action);
+
     }
 
     commit(fight:Fight){
