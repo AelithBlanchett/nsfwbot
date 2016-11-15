@@ -139,6 +139,8 @@ export class ActiveFighter extends Fighter {
     }
 
     async loadExist(loadedFighter:ActiveFighter) {
+        super.loadExist(loadedFighter);
+    
         this.fight = loadedFighter.fight;
         this.target = loadedFighter.target;
         this.assignedTeam = loadedFighter.assignedTeam;
