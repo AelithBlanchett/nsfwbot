@@ -1,20 +1,42 @@
 import * as mysql from "mysql";
 import {IConnection} from "mysql";
-import {getConnectionManager} from "typeorm";
-import {Connection} from "typeorm/index";
+"use strict";
 
-export class Data {
-    static mydb:Connection = undefined;
+export abstract class Model {
+    static mydb:IConnection = undefined;
 
-    static async getDb():Promise<Connection> {
-        if (!getConnectionManager().has("default")) {
-            return await getConnectionManager().createAndConnect(require('../../config/config.mysql.js'));
-        }
-        return getConnectionManager().get("default");
+    public static get db(): IConnection{
+        return Model.initializeDb(false);
     }
+
+    public static initializeDb(forceReset){
+        if(Model.mydb == undefined || forceReset == true){
+            Model.mydb  = mysql.createConnection(require('../../config/config.mysql.js')); // Recreate the connection, since
+            // the old one cannot be reused.
+
+            Model.mydb .connect(function(err) {              // The server is either down
+                if(err) {                                     // or restarting (takes a while sometimes).
+                    console.log('error when connecting to db:', err);
+                    setTimeout(Model.initializeDb(true), 2000); // We introduce a delay before attempting to reconnect,
+                }                                     // to avoid a hot loop, and to allow our node script to
+            });                                     // process asynchronous requests in the meantime.
+                                                    // If you're also serving http, display a 503 error.
+            Model.mydb .on('error', function(err) {
+                console.log('db error', err);
+                if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
+                    Model.initializeDb(true);                         // lost due to either server restart, or a
+                } else {                                      // connnection idle timeout (the wait_timeout
+                    throw err;                                  // server variable configures this)
+                }
+            });
+        }
+        return Model.mydb ;
+    }
+
+    //public abstract get toJson():Promise<string>;
+    //public static create<T>(entity:T):Promise<T>;
+    //public abstract load<T>(...args : any[]):Promise<T>;
+    //public abstract save(...args : any[]):Promise<boolean>;
+    //public abstract delete(...args : any[]):Promise<boolean>;
+
 }
-
-
-
-
-//BaseModel.initializeDb(BaseModel.db);

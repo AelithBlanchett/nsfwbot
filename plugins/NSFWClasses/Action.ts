@@ -1,7 +1,6 @@
 import {Fighter} from "./Fighter";
 import * as Constants from "./Constants";
 import Tier = Constants.Tier;
-import {Data} from "./Model";
 import BaseDamage = Constants.BaseDamage;
 import {Fight} from "./Fight";
 import {Dice} from "./Dice";
@@ -27,6 +26,7 @@ import {StrapToyLPDamagePerTurn} from "./Constants";
 import "reflect-metadata";
 import {Modifier} from "./Modifier";
 import {ActiveFighter} from "./ActiveFighter";
+import {Model} from "./Model";
 
 export enum ActionType {
     Brawl,
@@ -51,7 +51,7 @@ export enum ActionType {
     Masturbate
 }
 
-export class Action {
+export class Action extends Model{
 
     id: number;
     fight:Fight;
@@ -81,6 +81,7 @@ export class Action {
     updatedAt:Date;
 
     constructor(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:ActiveFighter, defender?:ActiveFighter) {
+        super();
         this.fight = fight;
         this.isHold = false;
         this.modifiers = [];
@@ -710,4 +711,25 @@ export class Action {
             fight.endFight(tokensToGiveToWinners, tokensToGiveToLosers);
         }
     }
+
+    get toJson():string{
+        return "{}";
+    }
+
+    static async save(action:Action, withModifiers:boolean):Promise<boolean>{
+        return true;
+    }
+
+    static async delete(action:Action, withModifiers:boolean):Promise<boolean>{
+        return true;
+    }
+
+    static async load(actionId:number, withModifiers:boolean):Promise<Action>{
+        return new Action(null, null, null, null, null, null);
+    }
+
+    static async loadAllFromFight(fightId:number):Promise<Array<Action>>{
+        return [new Action(null, null, null, null, null, null)];
+    }
+
 }
