@@ -328,47 +328,61 @@ export class Fighter implements IFighter{
         return;
     }
 
-    static async loadFromDb(name:string) {
-        let connection = await Data.getDb();
-        let fightersRepo = connection.getRepository(Fighter);
-        let myFighter = await fightersRepo.findOneById(name);
-        return myFighter;
+    //static async loadFromDb(name:string) {
+    //    let connection = await Data.getDb();
+    //    let fightersRepo = connection.getRepository(Fighter);
+    //    let myFighter = await fightersRepo.findOneById(name);
+    //    return myFighter;
+    //}
+    //
+    //async init():Promise<boolean> {
+    //    let myFighter = await Fighter.loadFromDb(this.name);
+    //    if (myFighter) {
+    //        this.loadExist(myFighter);
+    //        return true;
+    //    }
+    //    return false;
+    //}
+    //
+    //async loadExist(loadedFighter:Fighter) {
+    //    this.name = loadedFighter.name;
+    //    this.tokens = loadedFighter.tokens;
+    //    this.tokensSpent = loadedFighter.tokensSpent;
+    //    this.wins = loadedFighter.wins;
+    //    this.losses = loadedFighter.losses;
+    //    this.forfeits = loadedFighter.forfeits;
+    //    this.quits = loadedFighter.quits;
+    //    this.totalFights = loadedFighter.totalFights;
+    //    this.areStatsPrivate = loadedFighter.areStatsPrivate;
+    //    this.power = loadedFighter.power;
+    //    this.sensuality = loadedFighter.sensuality;
+    //    this.toughness = loadedFighter.toughness;
+    //    this.endurance = loadedFighter.endurance;
+    //    this.dexterity = loadedFighter.dexterity;
+    //    this.willpower = loadedFighter.willpower;
+    //    this.features = loadedFighter.features;
+    //    this.createdAt = loadedFighter.createdAt;
+    //    this.updatedAt = loadedFighter.updatedAt;
+    //}
+
+    static dbToObject():Fighter{
+        return new Fighter(null);
     }
 
-    async init():Promise<boolean> {
-        let myFighter = await Fighter.loadFromDb(this.name);
-        if (myFighter) {
-            this.loadExist(myFighter);
-            return true;
-        }
-        return false;
+    static async save(action:Fighter, withModifiers:boolean):Promise<boolean>{
+        return true;
     }
 
-    async loadExist(loadedFighter:Fighter) {
-        this.name = loadedFighter.name;
-        this.tokens = loadedFighter.tokens;
-        this.tokensSpent = loadedFighter.tokensSpent;
-        this.wins = loadedFighter.wins;
-        this.losses = loadedFighter.losses;
-        this.forfeits = loadedFighter.forfeits;
-        this.quits = loadedFighter.quits;
-        this.totalFights = loadedFighter.totalFights;
-        this.areStatsPrivate = loadedFighter.areStatsPrivate;
-        this.power = loadedFighter.power;
-        this.sensuality = loadedFighter.sensuality;
-        this.toughness = loadedFighter.toughness;
-        this.endurance = loadedFighter.endurance;
-        this.dexterity = loadedFighter.dexterity;
-        this.willpower = loadedFighter.willpower;
-        this.features = loadedFighter.features;
-        this.createdAt = loadedFighter.createdAt;
-        this.updatedAt = loadedFighter.updatedAt;
+    static async delete(action:Fighter, withModifiers:boolean):Promise<boolean>{
+        return true;
     }
 
-    static async create(name:string) {
-        let connection = await Data.getDb();
-        let fightersRepo = connection.getRepository(Fighter);
-        await fightersRepo.persist(new Fighter(name));
+    static async load(actionId:number, withModifiers:boolean):Promise<Fighter>{
+        return new Fighter(null);
+    }
+
+    static async loadAllFromFight(fightId:number):Promise<Array<Fighter>>{
+        return [new Fighter(null)];
     }
 
 }
