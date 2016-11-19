@@ -92,7 +92,7 @@ var CommandHandler = (function () {
 
             // Check we even received a valid stat.
             // hp and lust are only valid in setFight, they are not valid here.
-            var valid_stats = ['maxLust', 'maxHp', 'endurance', 'expertise', 'agility', 'toughness', 'determination', 'strength'];
+            var valid_stats = ['maxLust', 'maxHp', 'endurance', 'expertise', 'agility', 'toughness', 'determination', 'strength', 'experience', 'experienceSpent', 'wins', 'losses'];
             var correction = didyoumean(result[0], valid_stats);
             if(correction != result[0]) {
                 if(correction === null) {
