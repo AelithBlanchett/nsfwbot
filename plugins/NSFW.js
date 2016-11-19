@@ -1265,7 +1265,7 @@ function attackPrepare(actionType, actionId, isSimulation) {
                 minDmg = 1;
                 break;
             case "medium":
-                minDmg = 4;
+                minDmg = 3;
                 break;
             case "heavy":
                 minDmg = 6;
@@ -1293,14 +1293,9 @@ function attackPrepare(actionType, actionId, isSimulation) {
         dmgLust = minDmg;
     }
     else{
+        minDmg += 1;
         dmgHp = Math.floor(minDmg / 2);
         dmgLust = Math.floor(minDmg / 2);
-        if(dmgHp <= 0){
-            dmgHp = 1;
-        }
-        if(dmgLust <= 0){
-            dmgLust = 0;
-        }
     }
 
 
