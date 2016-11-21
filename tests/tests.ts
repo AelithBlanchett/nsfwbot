@@ -111,11 +111,11 @@ function doAction(cmd:CommandHandler, action:string, target:string = "", conditi
                 return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction && cmd.fight.currentTurn > 0);
             };
         }
-        waitUntil().interval(10).times(50).condition(condition).done((res) => {
+        waitUntil().interval(5).times(50).condition(condition).done((res) => {
             if (res) {
                 cmd.fight.currentPlayer.dice.addMod(50);
                 cmd[action](target, {character: cmd.fight.currentPlayer.name, channel: "here"});
-                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                waitUntil().interval(5).times(50).condition(condition).done(() => {
                     resolve();
                 });
             }
@@ -318,15 +318,15 @@ describe("The player(s)", () => {
     it("should tag successfully with Aelith", async function (done) { // 9
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings2vs2Tag(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
-            waitUntil().interval(100).times(50).condition(() => {
+            waitUntil().interval(5).times(50).condition(() => {
                 return (cmd.fight.hasStarted && cmd.fight.waitingForAction);
             }).done(() => {
                 cmd.fight.setCurrentPlayer("TheTinaArmstrong");
                 doAction(cmd, "tag", "Aelith Blanchette").then(() => {
-                    waitUntil().interval(100).times(50).condition(() => {
+                    waitUntil().interval(5).times(50).condition(() => {
                         return (cmd.fight.getFighterByName("Aelith Blanchette").isInTheRing);
                     }).done((res) => {
                         if (res) {
@@ -484,7 +484,7 @@ describe("The player(s)", () => {
         waitUntil().interval(2).times(500).condition(() => {
             return cmd.fight.hasStarted;
         }).done(() => {
-            waitUntil().interval(100).times(50).condition(() => {
+            waitUntil().interval(5).times(50).condition(() => {
                 return cmd.fight.waitingForAction
             }).done(() => {
                 cmd.fight.setCurrentPlayer("TheTinaArmstrong");
@@ -505,7 +505,7 @@ describe("The player(s)", () => {
     it("should do a subhold and expire after the number of turns specified", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(10).times(500).condition(() => {
+        waitUntil().interval(5).times(500).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
@@ -538,7 +538,7 @@ describe("The player(s)", () => {
                     let condition = () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                     };
-                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                         if (cmd.fight.currentPlayer == cmd.fight.getFighterByName("Aelith Blanchette")) {
                             done();
                         }
@@ -567,7 +567,7 @@ describe("The player(s)", () => {
                     let condition = () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                     };
-                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                         if (wasMessageSent(Constants.Modifier.SubHoldBrawlBonus)) {
                             done();
                         }
@@ -596,7 +596,7 @@ describe("The player(s)", () => {
                     let condition = () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                     };
-                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                         if (cmd.fight.currentPlayer.isInHold()) {
                             done();
                         }
@@ -624,7 +624,7 @@ describe("The player(s)", () => {
                     let condition = () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                     };
-                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                         if (!wasMessageSent("[b][color=red]You cannot do that since you're in a hold.[/color][/b]\n")) {
                             done();
                         }
@@ -652,7 +652,7 @@ describe("The player(s)", () => {
                     let condition = () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                     };
-                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                         if (wasMessageSent("Hold Stacking!")) {
                             done();
                         }
@@ -686,7 +686,7 @@ describe("The player(s)", () => {
                     let condition = () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                     };
-                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                         let usesLeftAfter = 0;
                         if (cmd.fight.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier]) {
                             usesLeftAfter = cmd.fight.getFighterByName("Aelith Blanchette").modifiers[indexOfSubHoldModifier].uses;
@@ -716,7 +716,7 @@ describe("The player(s)", () => {
                 let condition = () => {
                     return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                 };
-                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                waitUntil().interval(5).times(50).condition(condition).done(() => {
                     if (wasLustHit(cmd, "Aelith Blanchette") && cmd.fight.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.SexHold) != -1) {
                         done();
                     }
@@ -741,7 +741,7 @@ describe("The player(s)", () => {
                 let condition = () => {
                     return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                 };
-                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                waitUntil().interval(5).times(50).condition(condition).done(() => {
                     if (wasPrivMessageSent(Constants.Messages.checkAttackRequirementsNotInSexualHold)) {
                         done();
                     }
@@ -768,7 +768,7 @@ describe("The player(s)", () => {
                     let condition = () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                     };
-                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                         if (cmd.fight.pastActions[cmd.fight.pastActions.length - 1].type == ActionType.HumHold) {
                             done();
                         }
@@ -797,7 +797,7 @@ describe("The player(s)", () => {
                     let condition = () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                     };
-                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                         if (cmd.fight.getFighterByName("Aelith Blanchette").modifiers.findIndex(x => x.name == Constants.Modifier.HumHold) != -1) {
                             done();
                         }
@@ -827,7 +827,7 @@ describe("The player(s)", () => {
                         let condition = () => {
                             return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                         };
-                        waitUntil().interval(100).times(50).condition(condition).done(() => {
+                        waitUntil().interval(5).times(50).condition(condition).done(() => {
                             if (wasMessageSent("is still affected by the degradation malus!")) {
                                 done();
                             }
@@ -857,7 +857,7 @@ describe("The player(s)", () => {
                     let condition = () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                     };
-                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                         if (wasMessageSent(Constants.Modifier.ItemPickupBonus)) {
                             done();
                         }
@@ -877,7 +877,7 @@ describe("The player(s)", () => {
     it("should pickup a sextoy and trigger bonus sexstrike modifier", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
@@ -887,7 +887,7 @@ describe("The player(s)", () => {
                     let condition = () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                     };
-                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                         if (cmd.fight.getFighterByName("TheTinaArmstrong").modifiers.findIndex((x) => x.type == Constants.ModifierType.SextoyPickupBonus) != -1) {
                             done();
                         }
@@ -907,7 +907,7 @@ describe("The player(s)", () => {
     it("should win the match with 3 bondage attacks", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
@@ -928,7 +928,7 @@ describe("The player(s)", () => {
                                 let condition = () => {
                                     return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                                 };
-                                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                                waitUntil().interval(5).times(50).condition(condition).done(() => {
                                     if (cmd.fight.getFighterByName("Aelith Blanchette").isCompletelyBound()) {
                                         done();
                                     }
@@ -965,7 +965,7 @@ describe("The player(s)", () => {
                 let condition = () => {
                     return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                 };
-                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                waitUntil().interval(5).times(50).condition(condition).done(() => {
                     if (wasPrivMessageSent(Constants.Messages.checkAttackRequirementsNotInSexualHold)) {
                         done();
                     }
@@ -989,7 +989,7 @@ describe("The player(s)", () => {
                 let condition = () => {
                     return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                 };
-                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                waitUntil().interval(5).times(50).condition(condition).done(() => {
                     if (wasMessageSent("has too many items on them to possibly fight!")) {
                         done();
                     }
@@ -1015,7 +1015,7 @@ describe("The player(s)", () => {
                     let condition = () => {
                         return (cmd.fight.hasEnded);
                     };
-                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                         if (wasMessageSent("Everybody agrees, it's a draw!")) {
                             done();
                         }
@@ -1034,7 +1034,7 @@ describe("The player(s)", () => {
     it("should win the match with 3 bondage attacks and check if mods are not incorrectly", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             cmd.fight.setCurrentPlayer("TheTinaArmstrong");
@@ -1056,7 +1056,7 @@ describe("The player(s)", () => {
                                     let condition = () => {
                                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                                     };
-                                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                                         if (cmd.fight.getFighterByName("Aelith Blanchette").isCompletelyBound()) {
                                             done();
                                         }
@@ -1101,7 +1101,7 @@ describe("The player(s)", () => {
             let condition = () => {
                 return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
             };
-            waitUntil().interval(100).times(50).condition(condition).done(() => {
+            waitUntil().interval(5).times(50).condition(condition).done(() => {
                 if (cmd.fight.getFighterByName("TheTinaArmstrong").modifiers.length == 1
                     && cmd.fight.getFighterByName("TheTinaArmstrong").modifiers[0].type == ModifierType.ItemPickupBonus) {
                     done();
@@ -1124,7 +1124,7 @@ describe("The player(s)", () => {
                 let condition = () => {
                     return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                 };
-                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                waitUntil().interval(5).times(50).condition(condition).done(() => {
                     if (cmd.fight.getFighterByName("Aelith Blanchette").modifiers.length > 0 &&
                         cmd.fight.getFighterByName("Aelith Blanchette").modifiers[0] instanceof StunModifier) {
                         done();
@@ -1151,7 +1151,7 @@ describe("The player(s)", () => {
                     let condition = () => {
                         return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                     };
-                    waitUntil().interval(100).times(50).condition(condition).done(() => {
+                    waitUntil().interval(5).times(50).condition(condition).done(() => {
                         if (cmd.fight.getFighterByName("Aelith Blanchette").modifiers.length == 0 && wasMessageSent("penalty applied on their dice roll")) {
                             done();
                         }
@@ -1177,7 +1177,7 @@ describe("The player(s)", () => {
                 let condition = () => {
                     return (cmd.fight.hasStarted && !cmd.fight.hasEnded && cmd.fight.waitingForAction);
                 };
-                waitUntil().interval(100).times(50).condition(condition).done(() => {
+                waitUntil().interval(5).times(50).condition(condition).done(() => {
                     if (wasMessageSent(Constants.Messages.HitMessage)) {
                         done();
                     }
@@ -1194,13 +1194,13 @@ describe("The player(s)", () => {
     it("should heal 0 hp because it's already full", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             var initialHp = cmd.fight.getFighterByName("Aelith Blanchette").hp;
             cmd.fight.getFighterByName("Aelith Blanchette").healHP(10);
             cmd.fight.message.send();
-            waitUntil().interval(100).times(50).condition(() => {
+            waitUntil().interval(5).times(50).condition(() => {
                 return (cmd.fight.hasStarted && cmd.fight.waitingForAction);
             }).done(() => {
                 var healedHp = (cmd.fight.getFighterByName("Aelith Blanchette").hpPerHeart() - initialHp);
@@ -1217,14 +1217,14 @@ describe("The player(s)", () => {
     it("should heal whatever hp amount is left", async function (done) { // 0
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             var initialHp = 10;
             cmd.fight.getFighterByName("Aelith Blanchette").hp = initialHp;
             cmd.fight.getFighterByName("Aelith Blanchette").healHP(50);
             cmd.fight.message.send();
-            waitUntil().interval(100).times(50).condition(() => {
+            waitUntil().interval(5).times(50).condition(() => {
                 return (cmd.fight.hasStarted && cmd.fight.waitingForAction);
             }).done(() => {
                 var healedFp = (cmd.fight.getFighterByName("Aelith Blanchette").hpPerHeart() - initialHp);
@@ -1242,14 +1242,14 @@ describe("The player(s)", () => {
     it("should heal 1 HP", async function (done) { // 0
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             var initialHp = 1;
             cmd.fight.getFighterByName("Aelith Blanchette").hp = initialHp;
             cmd.fight.getFighterByName("Aelith Blanchette").healHP(1);
             cmd.fight.message.send();
-            waitUntil().interval(100).times(50).condition(() => {
+            waitUntil().interval(5).times(50).condition(() => {
                 return (cmd.fight.hasStarted && cmd.fight.waitingForAction);
             }).done(() => {
                 var healedHp = (cmd.fight.getFighterByName("Aelith Blanchette").hp - initialHp);
@@ -1266,13 +1266,13 @@ describe("The player(s)", () => {
     it("should heal 0 lp because it's already full", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             var initialLp = cmd.fight.getFighterByName("Aelith Blanchette").lust;
             cmd.fight.getFighterByName("Aelith Blanchette").healLP(10);
             cmd.fight.message.send();
-            waitUntil().interval(100).times(50).condition(() => {
+            waitUntil().interval(5).times(50).condition(() => {
                 return (cmd.fight.hasStarted && cmd.fight.waitingForAction);
             }).done(() => {
                 if (cmd.fight.getFighterByName("Aelith Blanchette").lust == 0) {
@@ -1288,14 +1288,14 @@ describe("The player(s)", () => {
     it("should heal whatever lp amount is left", async function (done) { // 0
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             var initialLp = 2;
             cmd.fight.getFighterByName("Aelith Blanchette").lust = initialLp;
             cmd.fight.getFighterByName("Aelith Blanchette").healLP(50);
             cmd.fight.message.send();
-            waitUntil().interval(100).times(50).condition(() => {
+            waitUntil().interval(5).times(50).condition(() => {
                 return (cmd.fight.hasStarted && cmd.fight.waitingForAction);
             }).done(() => {
                 var healedLp = (initialLp - cmd.fight.getFighterByName("Aelith Blanchette").lust);
@@ -1313,14 +1313,14 @@ describe("The player(s)", () => {
     it("should heal 1 LP", async function (done) { // 0
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             var initialLp = 1;
             cmd.fight.getFighterByName("Aelith Blanchette").lust = 1;
             cmd.fight.getFighterByName("Aelith Blanchette").healLP(1);
             cmd.fight.message.send();
-            waitUntil().interval(100).times(50).condition(() => {
+            waitUntil().interval(5).times(50).condition(() => {
                 return (cmd.fight.hasStarted && cmd.fight.waitingForAction);
             }).done(() => {
                 var healedLp = (initialLp - cmd.fight.getFighterByName("Aelith Blanchette").lust);
@@ -1337,14 +1337,14 @@ describe("The player(s)", () => {
     it("should heal 0 fp because it's already full", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             refillHPLPFP(cmd, "Aelith Blanchette");
             var initialFp = cmd.fight.getFighterByName("Aelith Blanchette").focus;
             cmd.fight.getFighterByName("Aelith Blanchette").healFP(10);
             cmd.fight.message.send();
-            waitUntil().interval(100).times(50).condition(() => {
+            waitUntil().interval(5).times(50).condition(() => {
                 return (cmd.fight.hasStarted && cmd.fight.waitingForAction);
             }).done(() => {
                 var healedFp = (cmd.fight.getFighterByName("Aelith Blanchette").maxFocus() - initialFp);
@@ -1361,14 +1361,14 @@ describe("The player(s)", () => {
     it("should heal whatever fp amount is left", async function (done) { // 0
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             var initialFp = 1;
             cmd.fight.getFighterByName("Aelith Blanchette").focus = initialFp;
             cmd.fight.getFighterByName("Aelith Blanchette").healFP(50);
             cmd.fight.message.send();
-            waitUntil().interval(100).times(50).condition(() => {
+            waitUntil().interval(5).times(50).condition(() => {
                 return (cmd.fight.hasStarted && cmd.fight.waitingForAction);
             }).done(() => {
                 if (cmd.fight.getFighterByName("Aelith Blanchette").focus == cmd.fight.getFighterByName("Aelith Blanchette").maxFocus()) {
@@ -1384,14 +1384,14 @@ describe("The player(s)", () => {
     it("should heal 1 FP", async function (done) { // 0
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings1vs1(cmd);
-        waitUntil().interval(100).times(50).condition(() => {
+        waitUntil().interval(5).times(50).condition(() => {
             return cmd.fight.findFighterIndex(x => x.name == "TheTinaArmstrong") != -1;
         }).done(() => {
             var initialFp = 1;
             cmd.fight.getFighterByName("Aelith Blanchette").focus = initialFp;
             cmd.fight.getFighterByName("Aelith Blanchette").healFP(1);
             cmd.fight.message.send();
-            waitUntil().interval(100).times(50).condition(() => {
+            waitUntil().interval(5).times(50).condition(() => {
                 return (cmd.fight.hasStarted && cmd.fight.waitingForAction);
             }).done(() => {
                 var healedHp = (cmd.fight.getFighterByName("Aelith Blanchette").focus - initialFp);
