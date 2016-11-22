@@ -12,6 +12,7 @@ import {Utils} from "./Utils";
 import {FeatureType} from "./Constants";
 import {Modifier} from "./Modifier";
 import {Fighter} from "./Fighter";
+import {FightStatus} from "./Constants";
 
 export class ActiveFighter extends Fighter {
 
@@ -35,7 +36,7 @@ export class ActiveFighter extends Fighter {
     modifiers:Modifier[] = [];
     actionsDone:Action[] = [];
     actionsInflicted:Action[] = [];
-    status: Status;
+    status: FightStatus;
 
     //Objects, do not need to store
     pendingAction:Action;
