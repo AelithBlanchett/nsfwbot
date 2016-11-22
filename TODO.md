@@ -1,10 +1,9 @@
 #TODO
 
 ##Important
--   Re-arrange CommandHandler / Fight logic
--   Factorise everything
--   Refactor the fight class, use functions instead of just changing variables on the fly. It will clarify the code and easify modifications in the future. 
-
+-   Use GUIDs instead of integer identities
+-   Pass fight object to modifier to be able to save it for later
+-   Finish the MYSQL view for fighters.
 
 ###Next steps
 -   Add admin commands

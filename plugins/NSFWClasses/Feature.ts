@@ -9,7 +9,7 @@ import {ActiveFighter} from "./ActiveFighter";
 
 export class Feature{
 
-    id:number;
+    id:string;
     type:FeatureType;
     uses: number;
     permanent: boolean;
@@ -17,7 +17,7 @@ export class Feature{
     createdAt:Date;
     updatedAt:Date;
 
-    constructor(featureType:FeatureType, uses:number, id?:number) {
+    constructor(featureType:FeatureType, uses:number, id?:string) {
         if(id){
             this.id = id;
         }
@@ -108,8 +108,8 @@ export class Feature{
         return true;
     }
 
-    static async load(featureId:number):Promise<Feature>{
-        return new Feature(featureId, null);
+    static async load(featureId:string):Promise<Feature>{
+        return new Feature(null, null);
     }
 
     static async loadFeaturesOfFighter(fighterName:string):Promise<Feature>{

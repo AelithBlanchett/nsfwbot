@@ -16,8 +16,8 @@ import {Fighter} from "./Fighter";
 export class ActiveFighter extends Fighter {
 
     fight:Fight;
-    target:ActiveFighter;
     assignedTeam:Team;
+    target:ActiveFighter;
     isReady:boolean = false;
     hp:number = 0;
     heartsRemaining:number = 0;
@@ -35,6 +35,7 @@ export class ActiveFighter extends Fighter {
     modifiers:Modifier[] = [];
     actionsDone:Action[] = [];
     actionsInflicted:Action[] = [];
+    status: Status;
 
     //Objects, do not need to store
     pendingAction:Action;

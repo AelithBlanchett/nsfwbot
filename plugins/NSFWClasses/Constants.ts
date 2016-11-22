@@ -208,6 +208,15 @@ export class Messages {
     static commandError = "[color=red]An error happened: %s[/color]";
 }
 
+export enum FightStatus {
+    Lost = 0,
+    Won = 1,
+    TurnToPlay = 2,
+    Forfeited = 3,
+    Joined = 4,
+    Ready = 5
+}
+
 export enum Team {
     White = undefined,
     Unknown = -1,
