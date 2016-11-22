@@ -6,7 +6,6 @@ import * as Constants from "../plugins/NSFWClasses/Constants";
 import Tier = Constants.Tier;
 import {Utils} from "../plugins/NSFWClasses/Utils";
 import {Action, ActionType} from "../plugins/NSFWClasses/Action";
-import {Data} from "../plugins/NSFWClasses/Model";
 import {ItemPickupModifier} from "../plugins/NSFWClasses/CustomModifiers";
 import {ModifierType} from "../plugins/NSFWClasses/Constants";
 import {Feature} from "../plugins/NSFWClasses/Feature";

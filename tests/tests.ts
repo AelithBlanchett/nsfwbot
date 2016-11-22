@@ -6,7 +6,6 @@ import * as Constants from "../plugins/NSFWClasses/Constants";
 import Tier = Constants.Tier;
 import {Utils} from "../plugins/NSFWClasses/Utils";
 import {Action, ActionType} from "../plugins/NSFWClasses/Action";
-import {Data} from "../plugins/NSFWClasses/Model";
 import {StunModifier} from "../plugins/NSFWClasses/CustomModifiers";
 import {EnumEx} from "../plugins/NSFWClasses/Utils";
 import Trigger = Constants.Trigger;
@@ -16,7 +15,6 @@ import {ItemPickupModifier} from "../plugins/NSFWClasses/CustomModifiers";
 import {ModifierType} from "../plugins/NSFWClasses/Constants";
 var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
-import "reflect-metadata";
 import {ActiveFighter} from "../plugins/NSFWClasses/ActiveFighter";
 var jasmine = new Jasmine();
 var fChatLibInstance:any;
@@ -43,13 +41,13 @@ function getMock(mockedClass) {
 
 function abstractDatabase() {
 
-    Fighter.loadFromDb = async function (name) {
+    Fighter.load = async function (name) {
         return new Promise(function (resolve, reject) {
             resolve(createFighter(name));
         });
     };
 
-    ActiveFighter.loadFromDb = async function (name) {
+    ActiveFighter.load = async function (name, fightId) {
         return new Promise(function (resolve, reject) {
             resolve(createFighter(name));
         });

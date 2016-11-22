@@ -716,15 +716,15 @@ export class Action extends Model{
         return "{}";
     }
 
-    static async save(action:Action, withModifiers:boolean):Promise<boolean>{
+    static async save(action:Action):Promise<boolean>{
         return true;
     }
 
-    static async delete(action:Action, withModifiers:boolean):Promise<boolean>{
+    static async delete(actionId:number):Promise<boolean>{
         return true;
     }
 
-    static async load(actionId:number, withModifiers:boolean):Promise<Action>{
+    static async load(actionId:number):Promise<Action>{
         return new Action(null, null, null, null, null, null);
     }
 

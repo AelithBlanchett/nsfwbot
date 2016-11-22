@@ -6,10 +6,7 @@ import ModifierType = Constants.ModifierType;
 import TriggerMoment = Constants.TriggerMoment;
 import {Tier} from "./Constants";
 import {ActionType, Action} from "./Action";
-import {ManyToOne} from "typeorm";
 import {ActiveFighter} from "./ActiveFighter";
-var ES = require("es-abstract/es6.js");
-import "reflect-metadata";
 
 export interface IModifier{
     id: string;
@@ -52,12 +49,6 @@ export class Modifier implements IModifier{
     event:Trigger;
     timeToTrigger:TriggerMoment;
     parentIds: Array<string>;
-
-    @ManyToOne(type => Action, act => act.modifiers, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
     parentAction:Action;
 
     constructor(receiver:ActiveFighter, applier:ActiveFighter, tier:Tier, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage:number, diceRoll:number, escapeRoll:number, uses:number,
@@ -156,5 +147,21 @@ export class Modifier implements IModifier{
                 this.receiver.removeMod(this.id);
             }
         }
+    }
+
+    static dbToObject():Modifier{
+        return new Modifier(null, null, null, null, null, null, null, null, null,null,null,null,null,null);
+    }
+
+    static async save(fight:Modifier):Promise<boolean>{
+        return true;
+    }
+
+    static async delete(modId:string):Promise<boolean>{
+        return true;
+    }
+
+    static async load(modId:string):Promise<Modifier>{
+        return new Modifier(null, null, null, null, null, null, null, null, null,null,null,null,null,null);
     }
 }

@@ -1,4 +1,3 @@
-import {Table, TableInheritance, DiscriminatorColumn, PrimaryColumn, Column, ManyToMany, JoinTable, CreateDateColumn, UpdateDateColumn} from "typeorm/index";
 import {Feature} from "./Feature";
 import {IFighter} from "./interfaces/IFighter";
 import {Achievement} from "./Achievement";
@@ -8,83 +7,30 @@ import * as Constants from "./Constants";
 import {TokensWorth} from "./Constants";
 import {Stats} from "./Constants";
 import {FightTier} from "./Constants";
-import {Data} from "./Model";
-import {Index} from "typeorm/index";
 import {Fight} from "./Fight";
 import {ActiveFighter} from "./ActiveFighter";
 
-@Table()
-@TableInheritance("class-table")
 export class Fighter implements IFighter{
 
-    @PrimaryColumn("string")
-    @Index()
     name:string = "";
-
-    @Column("double")
     tokens: number = 0;
-
-    @Column("double")
     tokensSpent: number = 0;
-
-    @Column("int")
     wins: number = 0;
-
-    @Column("int")
     losses: number = 0;
-
-    @Column("int")
     forfeits: number = 0;
-
-    @Column("int")
     quits: number = 0;
-
-    @Column("int")
     totalFights: number = 0;
-
-    @Column()
     areStatsPrivate:boolean = true;
-
-    @Column("int")
     power:number = 0;
-
-    @Column("int")
     sensuality:number = 0;
-
-    @Column("int")
     toughness:number = 0;
-
-    @Column("int")
     endurance:number = 0;
-
-    @Column("int")
     dexterity:number = 0;
-
-    @Column("int")
     willpower:number = 0;
-
-    @ManyToMany(type => Feature, feature => feature.obtainedBy, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
-    @JoinTable()
     features:Feature[] = [];
-
-    @Column("simple_array")
     achievements:Achievement[] = [];
-
-    //@ManyToMany(type => Fight, fight => fight.fighters, {
-    //    cascadeInsert: true,
-    //    cascadeUpdate: true,
-    //    cascadeRemove: true
-    //})
-    //fights:Fight[] = [];
-
-    @CreateDateColumn()
+    fights:Fight[] = [];
     createdAt:Date;
-
-    @UpdateDateColumn()
     updatedAt:Date;
 
     constructor(name:string) {
@@ -113,13 +59,6 @@ export class Fighter implements IFighter{
         }
 
         return strBase;
-    }
-
-    async update() {
-        let connection = await Data.getDb();
-        let fightersRepo = connection.getRepository(Fighter);
-        fightersRepo.persist(this);
-        return true;
     }
 
     winRate():number{
@@ -203,7 +142,7 @@ export class Fighter implements IFighter{
         let index = this.features.findIndex(x => x.type == type);
         if(index != -1){
             this.features.splice(index, 1);
-            this.update();
+            Fighter.save(this);
         }
         else{
             throw new Error("You don't have this feature, you can't remove it.");
@@ -219,7 +158,7 @@ export class Fighter implements IFighter{
             if(index == -1){
                 this.features.push(feature);
                 this.removeTokens(amountToRemove);
-                this.update();
+                Fighter.save(this);
             }
             else{
                 throw new Error("You already have this feature. You have to wait for it to expire before adding another of the same type.");
@@ -232,7 +171,7 @@ export class Fighter implements IFighter{
 
     clearFeatures(){
         this.features = [];
-        this.update();
+        Fighter.save(this);
     }
 
     hasFeature(featureType:FeatureType):boolean{
@@ -263,7 +202,7 @@ export class Fighter implements IFighter{
         if(amountToRemove != 0 && (this.tokens - amountToRemove >= 0)){
             this.removeTokens(amountToRemove);
             this[Stats[stat].toLowerCase()]++;
-            this.update();
+            Fighter.save(this);
             return "";
         }
         else{
@@ -295,7 +234,7 @@ export class Fighter implements IFighter{
         if(amountToGive != 0){
             this.giveTokens(Math.floor(amountToGive/2));
             this[Stats[stat].toLowerCase()]--;
-            this.update();
+            Fighter.save(this);
             return "";
         }
         else{
@@ -369,20 +308,16 @@ export class Fighter implements IFighter{
         return new Fighter(null);
     }
 
-    static async save(action:Fighter, withModifiers:boolean):Promise<boolean>{
+    static async save(fighter:Fighter):Promise<boolean>{
         return true;
     }
 
-    static async delete(action:Fighter, withModifiers:boolean):Promise<boolean>{
+    static async delete(fighterName:string):Promise<boolean>{
         return true;
     }
 
-    static async load(actionId:number, withModifiers:boolean):Promise<Fighter>{
-        return new Fighter(null);
-    }
-
-    static async loadAllFromFight(fightId:number):Promise<Array<Fighter>>{
-        return [new Fighter(null)];
+    static async load(fighterName:string):Promise<Fighter>{
+        return new Fighter(fighterName);
     }
 
 }

@@ -8,7 +8,6 @@ import Team = Constants.Team;
 import BaseDamage = Constants.BaseDamage;
 import Tier = Constants.Tier;
 import FightType = Constants.FightType;
-import {Data} from "./Model";
 import FightTier = Constants.FightTier;
 import TokensPerWin = Constants.TokensPerWin;
 import Trigger = Constants.Trigger;
@@ -18,74 +17,28 @@ import {BondageModifier} from "./CustomModifiers";
 import TriggerMoment = Constants.TriggerMoment;
 import {Message} from "./Messaging";
 var CircularJSON = require('circular-json');
-var ES = require("es-abstract/es6.js");
-import {Table, Column, PrimaryColumn, ManyToOne, JoinTable, PrimaryGeneratedColumn, ManyToMany} from "typeorm";
 import {ActiveFighter} from "./ActiveFighter";
-import {OneToMany} from "typeorm/index";
-import {CreateDateColumn} from "typeorm/index";
-import {UpdateDateColumn} from "typeorm/index";
-import {Fighter} from "./Constants";
-import {Index} from "typeorm/index";
 import {Feature} from "./Feature";
+import {Fighter} from "./Fighter";
 
-@Table(Constants.SQL.fightTableName)
 export class Fight{
 
-    @PrimaryGeneratedColumn()
-    @Index()
     id:number = -1;
-
-    @Column("int")
     requiredTeams:number = 2;
-
-    @Column("boolean")
     hasStarted:boolean = false;
-
-    @Column("boolean")
     hasEnded:boolean = false;
-
-    @Column("string")
     stage:string;
-
-    @OneToMany(type => ActiveFighter, fighter => fighter.fight, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
-    @JoinTable()
     fighters:ActiveFighter[] = [];
-
-    @Column("int")
     currentTurn:number = 0;
-
-    @Column("int")
     fightType:FightType = FightType.Rumble;
-
-    //@ManyToOne(type => Action, fightAction => fightAction.fight, {
-    //    cascadeInsert: true,
-    //    cascadeUpdate: true,
-    //    cascadeRemove: true
-    //})
-    //@JoinTable()
     pastActions:Array<Action> = [];
-
-    @Column("int")
     winnerTeam:Team = Team.Unknown;
-
-    @Column("boolean")
     waitingForAction:boolean = true;
-
     message:Message;
     lastMessage:Message;
     fChatLibInstance:IFChatLib;
-
-    @Column("string")
     channel:string;
-
-    @CreateDateColumn()
     createdAt:Date;
-
-    @UpdateDateColumn()
     updatedAt:Date;
 
     public constructor(fChatLibInstance?:IFChatLib, channel?:string, stage?:string) {
@@ -148,21 +101,6 @@ export class Fight{
         this.message.send();
     }
 
-    static async saveState(fight) {
-        let connection = await Data.getDb();
-        let fightRepo = connection.getRepository(Fight);
-        await fightRepo.persist(fight);
-    }
-
-    static async loadState(fightId:number, fChatLib:IFChatLib, channel:string) {
-        let connection = await Data.getDb();
-        let fightRepo = connection.getRepository(Fight);
-        let fight = await fightRepo.findOneById(fightId);
-        fight.fChatLibInstance = fChatLib;
-        fight.channel = channel;
-        return fight;
-    }
-
     //Pre-fight utils
 
     async leave(fighterName:string) {
@@ -174,10 +112,8 @@ export class Fight{
 
                 //delete from DB
                 try {
-                    let connection = await Data.getDb();
-                    let activeFighterRepo = connection.getRepository(ActiveFighter);
-                    let activeFighterToRemove = await activeFighterRepo.findOne({name: fighter.name, fight: this});
-                    await activeFighterRepo.remove(activeFighterToRemove);
+                    let activeFighterToRemove = await ActiveFighter.load(fighter.name, this.id);
+                    await ActiveFighter.delete(fighter.name, this.id);
                 }
                 catch (ex) {
                     this.fChatLibInstance.throwError(Utils.strFormat(Constants.Messages.commandError, ex.message));
@@ -286,13 +222,13 @@ export class Fight{
                 if (feature.isExpired()) {
                     this.fighters[i].removeFeature(feature.type);
                     this.message.addHint("This feature has expired.");
-                    this.fighters[i].update();
+                    Fighter.save(this.fighters[i]); //save Fighter or ActiveFighter?
                 }
             }
         }
 
         this.message.send();
-        await Fight.saveState(this);
+        await Fight.save(this);
         this.outputStatus();
     }
 
@@ -349,7 +285,7 @@ export class Fight{
             this.endFight(tokensToGiveToWinners, tokensToGiveToLosers);
         }
         else{
-            Fight.saveState(this);
+            Fight.save(this);
             this.waitingForAction = true;
         }
     }
@@ -398,7 +334,7 @@ export class Fight{
     }
 
     setCurrentPlayer(fighterName:string){
-        let index = this.findFighterIndex((x) => x.name == fighterName && !x.isTechnicallyOut());
+        let index = this.fighters.findIndex((x) => x.name == fighterName && !x.isTechnicallyOut());
         if (index != -1 && this.fighters[this.currentPlayerIndex].name != fighterName) { //switch positions
             var temp = this.fighters[this.currentPlayerIndex];
             this.fighters[this.currentPlayerIndex] = this.fighters[index];
@@ -739,29 +675,7 @@ export class Fight{
             this.message.addInfo(fighter.checkAchievements());
         }
 
-        Fight.commitDb(this);
-    }
-
-    static async commitDb(fight) {
-        let connection = await Data.getDb();
-        let fightRepo = connection.getRepository(Fight);
-        await fightRepo.persist(fight);
-    }
-
-
-    findFighterIndex(predicate:(value:ActiveFighter) => boolean, thisArg?:any):number {
-        var list = ES.ToObject(this.fighters);
-        var length = ES.ToLength(ES.ToLength(list.length));
-        if (!ES.IsCallable(predicate)) {
-            throw new TypeError('Array#findIndex: predicate must be a function');
-        }
-        if (length === 0) return -1;
-        var thisArg = arguments[1];
-        for (var i = 0, value; i < length; i++) {
-            value = list[i];
-            if (ES.Call(predicate, thisArg, [value, i, list])) return i;
-        }
-        return -1;
+        Fight.save(this);
     }
 
     reorderFightersByInitiative(arrFightersSortedByInitiative:Array<ActiveFighter>) {
@@ -972,6 +886,23 @@ export class Fight{
 
     get aliveFighterCount():number {
         return this.getAlivePlayers().length;
+    }
+
+
+    static dbToObject():Fight{
+        return new Fight(null, null);
+    }
+
+    static async save(fight:Fight):Promise<boolean>{
+        return true;
+    }
+
+    static async delete(fightId:number):Promise<boolean>{
+        return true;
+    }
+
+    static async load(fightId:number):Promise<Fight>{
+        return new Fight(null);
     }
 
 }

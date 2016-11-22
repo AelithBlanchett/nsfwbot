@@ -361,6 +361,25 @@ export class ActiveFighter extends Fighter {
         return `${modifierBeginning}[b][color=${Team[this.assignedTeam].toLowerCase()}]${this.name}[/color][/b]${modifierEnding}`;
     }
 
+    static dbToObject():ActiveFighter{
+        return new ActiveFighter(null);
+    }
+
+    static async save(fighter:ActiveFighter):Promise<boolean>{
+        return true;
+    }
+
+    static async delete(fighterName:string, fightId?:number):Promise<boolean>{
+        return true;
+    }
+
+    static async load(fighterName:string, fightId?:number):Promise<ActiveFighter>{
+        return new ActiveFighter(fighterName);
+    }
+
+    async init(fight:Fight):Promise<boolean>{
+        return true;
+    }
 
     //async init(fight:Fight = null):Promise<boolean> {
     //    if (await super.init()) {

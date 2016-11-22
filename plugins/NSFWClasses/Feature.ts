@@ -5,36 +5,16 @@ import {ItemPickupModifier, SextoyPickupModifier} from "./CustomModifiers";
 import {Fighter} from "./Fighter";
 import {Fight} from "./Fight";
 import {FeatureType} from "./Constants";
-import "reflect-metadata";
-import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn} from "typeorm";
 import {ActiveFighter} from "./ActiveFighter";
 
-@Table()
 export class Feature{
 
-    @PrimaryGeneratedColumn()
     id:number;
-
-    @Column("int")
     type:FeatureType;
-
-    @Column("int")
     uses: number;
-
-    @Column("boolean")
     permanent: boolean;
-
-    @ManyToOne(type => Fighter, fighter => fighter.features, {
-        cascadeInsert: true,
-        cascadeUpdate: true,
-        cascadeRemove: true
-    })
     obtainedBy:Fighter[];
-
-    @CreateDateColumn()
     createdAt:Date;
-
-    @UpdateDateColumn()
     updatedAt:Date;
 
     constructor(featureType:FeatureType, uses:number, id?:number) {
@@ -114,6 +94,26 @@ export class Feature{
             }
         }
         return false;
+    }
+
+    static dbToObject():Feature{
+        return new Feature(null, null);
+    }
+
+    static async save(feature:Feature):Promise<boolean>{
+        return true;
+    }
+
+    static async delete(fighterName:string):Promise<boolean>{
+        return true;
+    }
+
+    static async load(featureId:number):Promise<Feature>{
+        return new Feature(featureId, null);
+    }
+
+    static async loadFeaturesOfFighter(fighterName:string):Promise<Feature>{
+        return new Feature(null, null);
     }
 
 
