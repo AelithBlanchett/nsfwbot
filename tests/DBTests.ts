@@ -35,10 +35,10 @@ async function initiateMatchSettings2vs2TagForDb(cmdHandler) {
 describe("The database(s)", () => {
 
     async function resetData() {
-        await Fighter.create("test1");
-        await Fighter.create("test2");
-        await Fighter.create("test3");
-        await Fighter.create("test4");
+        await Fighter.save(new Fighter("test1"));
+        await Fighter.save(new Fighter("test2"));
+        await Fighter.save(new Fighter("test3"));
+        await Fighter.save(new Fighter("test4"));
     }
 
     beforeAll(async function (done) {
@@ -77,15 +77,15 @@ describe("The database(s)", () => {
     });
 
     xit("should load Aelith Blanchette", async function (done) {
-        let fighter = await Fighter.loadFromDb("Aelith Blanchette");
+        let fighter = await Fighter.load("Aelith Blanchette");
         expect(fighter.name).toBe("Aelith Blanchette");
         done();
     });
 
     xit("should give ItemPickupBonus feature to Test2", function (done) {
-        Fighter.loadFromDb("test2").then(x => {
+        Fighter.load("test2").then(x => {
             x.features.push(new Feature(FeatureType.KickStart, 1));
-            x.update().then(updWorked => {
+            Fighter.save(x).then(updWorked => {
                 expect(updWorked).toBe(true);
                 done();
             }).catch(err => {
@@ -97,7 +97,7 @@ describe("The database(s)", () => {
     },500000);
 
     xit("should say test1 is already there", function (done) {
-        Fighter.loadFromDb("test1").then(x => {
+        Fighter.load("test1").then(x => {
             if (x.name == "test1") {
                 done();
             }
@@ -110,7 +110,7 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should say Test2 is already there", function (done) {
-        Fighter.loadFromDb("test2").then(x => {
+        Fighter.load("test2").then(x => {
             if(x.name == "test2"){
                 done();
             }
@@ -123,7 +123,7 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should say Tewefwefwfwst2 doesn't exist", function (done) {
-        Fighter.loadFromDb("Tewefwefwfwst2").then(x => {
+        Fighter.load("Tewefwefwfwst2").then(x => {
             if(x == undefined){
                 done();
             }
@@ -136,13 +136,13 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should update Test2's power to something else", function (done) {
-        Fighter.loadFromDb("test2").then(x => {
+        Fighter.load("test2").then(x => {
             let randomId = -1;
             do{
                 randomId = Utils.getRandomInt(1,6);
             }while(x.power == randomId);
             x.power = randomId;
-            x.update().then(updWorked => {
+            Fighter.save(x).then(updWorked => {
                 expect(updWorked).toBe(true);
                 done();
             }).catch(err => {
@@ -183,7 +183,7 @@ describe("The database(s)", () => {
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings2vs2TagForDb(cmd);
         waitUntil().interval(10).times(50).condition(() => {
-            return cmd.fight.findFighterIndex(x => x.name == "test1") != -1;
+            return cmd.fight.fighters.findIndex(x => x.name == "test1") != -1;
         }).done(() => {
             waitUntil().interval(100).times(50).condition(() => {
                 return (cmd.fight.hasStarted && cmd.fight.waitingForAction);
