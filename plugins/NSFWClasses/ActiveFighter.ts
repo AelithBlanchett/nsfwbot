@@ -1,5 +1,3 @@
-import {Table, Column, PrimaryColumn, ManyToMany, JoinTable, OneToMany, OneToOne, UpdateDateColumn, CreateDateColumn, ManyToOne, SingleTableChild} from "typeorm";
-import {getConnectionManager} from "typeorm/index";
 import {Dice} from "./Dice";
 import {Fight} from "./Fight";
 import {Team} from "./Constants";
@@ -14,10 +12,6 @@ import {Utils} from "./Utils";
 import {FeatureType} from "./Constants";
 import {Modifier} from "./Modifier";
 import {Fighter} from "./Fighter";
-import "reflect-metadata";
-import {ClassTableChild} from "typeorm/index";
-import {JoinColumn} from "typeorm/index";
-import {Index} from "typeorm/index";
 
 export class ActiveFighter extends Fighter {
 
