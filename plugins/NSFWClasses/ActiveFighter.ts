@@ -377,69 +377,64 @@ export class ActiveFighter extends Fighter {
         return new ActiveFighter(fighterName);
     }
 
-    async init(fight:Fight):Promise<boolean>{
-        return true;
+    async init(fight:Fight = null):Promise<boolean> {
+        if (await super.init()) {
+            if (!fight.hasStarted) {
+                this.fight = fight;
+                this.target = null;
+                this.assignedTeam = -1;
+                this.isReady = false;
+                this.hp = this.hpPerHeart();
+                this.heartsRemaining = this.maxHearts();
+                this.lust = 0;
+                this.orgasmsRemaining = this.maxOrgasms();
+                this.focus = this.willpower;
+                this.lastDiceRoll = null;
+                this.isInTheRing = true;
+                this.canMoveFromOrOffRing = true;
+                this.lastTagTurn = 9999999;
+                this.wantsDraw = false;
+                this.consecutiveTurnsWithoutFocus = 0;
+                this.modifiers = [];
+                this.actionsDone = [];
+                this.actionsInflicted = [];
+                this.pendingAction = null;
+                this.dice = new Dice(12);
+            }
+            else {
+                let myFighter = await ActiveFighter.load(this.name, fight.id);
+                myFighter.fight = fight;
+                this.loadExist(myFighter);
+            }
+            return true;
+        }
+        return false;
     }
 
-    //async init(fight:Fight = null):Promise<boolean> {
-    //    if (await super.init()) {
-    //        if (!fight.hasStarted) {
-    //            this.fight = fight;
-    //            this.target = null;
-    //            this.assignedTeam = -1;
-    //            this.isReady = false;
-    //            this.hp = this.hpPerHeart();
-    //            this.heartsRemaining = this.maxHearts();
-    //            this.lust = 0;
-    //            this.orgasmsRemaining = this.maxOrgasms();
-    //            this.focus = this.willpower;
-    //            this.lastDiceRoll = null;
-    //            this.isInTheRing = true;
-    //            this.canMoveFromOrOffRing = true;
-    //            this.lastTagTurn = 9999999;
-    //            this.wantsDraw = false;
-    //            this.consecutiveTurnsWithoutFocus = 0;
-    //            this.modifiers = [];
-    //            this.actionsDone = [];
-    //            this.actionsInflicted = [];
-    //            this.pendingAction = null;
-    //            this.dice = new Dice(12);
-    //        }
-    //        else {
-    //            let connection = await Data.getDb();
-    //            let activeFightersRepo = connection.getRepository(ActiveFighter);
-    //            let myFighter = await activeFightersRepo.findOne({name: name, fight: fight});
-    //            myFighter.fight = fight;
-    //            this.loadExist(myFighter);
-    //        }
-    //        return true;
-    //    }
-    //    return false;
-    //}
-    //
-    //async loadExist(loadedFighter:ActiveFighter) {
-    //    this.fight = loadedFighter.fight;
-    //    this.target = loadedFighter.target;
-    //    this.assignedTeam = loadedFighter.assignedTeam;
-    //    this.isReady = loadedFighter.isReady;
-    //    this.hp = loadedFighter.hp;
-    //    this.heartsRemaining = loadedFighter.heartsRemaining;
-    //    this.lust = loadedFighter.lust;
-    //    this.orgasmsRemaining = loadedFighter.orgasmsRemaining;
-    //    this.focus = loadedFighter.focus;
-    //    this.lastDiceRoll = loadedFighter.lastDiceRoll;
-    //    this.isInTheRing = loadedFighter.isInTheRing;
-    //    this.canMoveFromOrOffRing = loadedFighter.canMoveFromOrOffRing;
-    //    this.lastTagTurn = loadedFighter.lastTagTurn;
-    //    this.wantsDraw = loadedFighter.wantsDraw;
-    //    this.consecutiveTurnsWithoutFocus = loadedFighter.consecutiveTurnsWithoutFocus;
-    //    this.createdAt = loadedFighter.createdAt;
-    //    this.updatedAt = loadedFighter.updatedAt;
-    //    this.modifiers = loadedFighter.modifiers || [];
-    //    this.actionsDone = loadedFighter.actionsDone || [];
-    //    this.actionsInflicted = loadedFighter.actionsInflicted || [];
-    //    this.pendingAction = null;
-    //    this.dice = new Dice(12);
-    //}
+
+    loadExist(loadedFighter:ActiveFighter) {
+        this.fight = loadedFighter.fight;
+        this.target = loadedFighter.target;
+        this.assignedTeam = loadedFighter.assignedTeam;
+        this.isReady = loadedFighter.isReady;
+        this.hp = loadedFighter.hp;
+        this.heartsRemaining = loadedFighter.heartsRemaining;
+        this.lust = loadedFighter.lust;
+        this.orgasmsRemaining = loadedFighter.orgasmsRemaining;
+        this.focus = loadedFighter.focus;
+        this.lastDiceRoll = loadedFighter.lastDiceRoll;
+        this.isInTheRing = loadedFighter.isInTheRing;
+        this.canMoveFromOrOffRing = loadedFighter.canMoveFromOrOffRing;
+        this.lastTagTurn = loadedFighter.lastTagTurn;
+        this.wantsDraw = loadedFighter.wantsDraw;
+        this.consecutiveTurnsWithoutFocus = loadedFighter.consecutiveTurnsWithoutFocus;
+        this.createdAt = loadedFighter.createdAt;
+        this.updatedAt = loadedFighter.updatedAt;
+        this.modifiers = loadedFighter.modifiers || [];
+        this.actionsDone = loadedFighter.actionsDone || [];
+        this.actionsInflicted = loadedFighter.actionsInflicted || [];
+        this.pendingAction = null;
+        this.dice = new Dice(12);
+    }
 
 }
