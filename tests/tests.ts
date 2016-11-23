@@ -55,9 +55,9 @@ function abstractDatabase() {
     };
 
     Action.save = async function (action) {
-        return new Promise<number>(function (resolve, reject) {
-            action.id = Utils.getRandomInt(0, 1000000);
-            resolve(action.id);
+        return new Promise<boolean>(function (resolve, reject) {
+            action.id = Utils.generateUUID();
+            resolve(true);
         });
     };
 

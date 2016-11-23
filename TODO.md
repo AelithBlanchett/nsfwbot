@@ -2,7 +2,6 @@
 
 ##Important
 -   Use GUIDs instead of integer identities
--   Pass fight object to modifier to be able to save it for later
 -   Finish the MYSQL view for fighters.
 
 ###Next steps

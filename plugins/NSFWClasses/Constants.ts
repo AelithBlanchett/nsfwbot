@@ -211,7 +211,7 @@ export class Messages {
 export enum FightStatus {
     Lost = 0,
     Won = 1,
-    TurnToPlay = 2,
+    Playing = 2,
     Forfeited = 3,
     Joined = 4,
     Ready = 5

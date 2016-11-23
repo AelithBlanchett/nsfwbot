@@ -1,4 +1,3 @@
-import {Fighter} from "./Fighter";
 import * as Constants from "./Constants";
 import Tier = Constants.Tier;
 import BaseDamage = Constants.BaseDamage;
@@ -53,7 +52,7 @@ export enum ActionType {
 
 export class Action extends Model{
 
-    id: number;
+    id: string;
     fight:Fight;
     atTurn: number;
     type:ActionType;
@@ -82,6 +81,7 @@ export class Action extends Model{
 
     constructor(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:ActiveFighter, defender?:ActiveFighter) {
         super();
+        this.id = Utils.generateUUID();
         this.fight = fight;
         this.isHold = false;
         this.modifiers = [];
