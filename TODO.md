@@ -1,7 +1,7 @@
 #TODO
 
 ##Important
--   Use GUIDs instead of integer identities
+-   Change the ActiveFighter state at the right moment
 -   Finish the MYSQL view for fighters.
 
 ###Next steps

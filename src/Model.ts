@@ -11,7 +11,7 @@ export abstract class Model {
 
     public static initializeDb(forceReset){
         if(Model.mydb == undefined || forceReset == true){
-            Model.mydb  = mysql.createConnection(require('../../config/config.mysql.js')); // Recreate the connection, since
+            Model.mydb  = mysql.createConnection(require('../config/config.mysql.js')); // Recreate the connection, since
             // the old one cannot be reused.
 
             Model.mydb .connect(function(err) {              // The server is either down
@@ -32,11 +32,5 @@ export abstract class Model {
         }
         return Model.mydb ;
     }
-
-    //public abstract get toJson():Promise<string>;
-    //public static create<T>(entity:T):Promise<T>;
-    //public abstract load<T>(...args : any[]):Promise<T>;
-    //public abstract save(...args : any[]):Promise<boolean>;
-    //public abstract delete(...args : any[]):Promise<boolean>;
 
 }

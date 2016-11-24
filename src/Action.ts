@@ -27,29 +27,6 @@ import {Modifier} from "./Modifier";
 import {ActiveFighter} from "./ActiveFighter";
 import {Model} from "./Model";
 
-export enum ActionType {
-    Brawl,
-    SexStrike,
-    Tag,
-    Rest,
-    SubHold,
-    SexHold,
-    Bondage,
-    HumHold,
-    ItemPickup,
-    SextoyPickup,
-    Degradation,
-    ForcedWorship,
-    HighRisk,
-    Penetration,
-    Stun,
-    Escape,
-    Submit,
-    StrapToy,
-    Finish,
-    Masturbate
-}
-
 export class Action extends Model{
 
     id: string;
@@ -732,4 +709,28 @@ export class Action extends Model{
         return [new Action(null, null, null, null, null, null)];
     }
 
+}
+
+
+export enum ActionType {
+    Brawl,
+    SexStrike,
+    Tag,
+    Rest,
+    SubHold,
+    SexHold,
+    Bondage,
+    HumHold,
+    ItemPickup,
+    SextoyPickup,
+    Degradation,
+    ForcedWorship,
+    HighRisk,
+    Penetration,
+    Stun,
+    Escape,
+    Submit,
+    StrapToy,
+    Finish,
+    Masturbate
 }

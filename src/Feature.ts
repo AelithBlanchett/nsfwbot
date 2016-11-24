@@ -1,4 +1,3 @@
-import {Modifier, IModifier} from "./Modifier";
 import {Utils} from "./Utils";
 import * as Constants from "./Constants";
 import {ItemPickupModifier, SextoyPickupModifier} from "./CustomModifiers";
@@ -6,6 +5,7 @@ import {Fighter} from "./Fighter";
 import {Fight} from "./Fight";
 import {FeatureType} from "./Constants";
 import {ActiveFighter} from "./ActiveFighter";
+import {IModifier} from "./interfaces/IModifier";
 
 export class Feature{
 

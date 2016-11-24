@@ -8,7 +8,6 @@ import {TokensWorth} from "./Constants";
 import {Stats} from "./Constants";
 import {FightTier} from "./Constants";
 import {Fight} from "./Fight";
-import {ActiveFighter} from "./ActiveFighter";
 
 export class Fighter implements IFighter{
 

@@ -1,5 +1,4 @@
 import {Utils} from "./Utils";
-import {Fight} from "./Fight";
 import * as Constants from "./Constants";
 import Team = Constants.Team;
 import Tier = Constants.Tier;
@@ -7,7 +6,6 @@ import Stats = Constants.Stats;
 import StatTier = Constants.StatTier;
 import {FightType} from "./Constants";
 import {FeatureType} from "./Constants";
-import {Feature} from "./Feature";
 
 export class Commands{
 

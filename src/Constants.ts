@@ -73,8 +73,6 @@ export namespace Fight {
     }
 }
 
-
-
 export class Modifier {
     static SubHoldBrawlBonus = "bonus on brawl attacks accuracy during a submission hold";
     static SubHold = "submission hold";

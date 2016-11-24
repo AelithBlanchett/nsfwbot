@@ -1,36 +1,12 @@
-import {Fighter} from "./Fighter";
 import * as Constants from "./Constants";
 import Trigger = Constants.Trigger;
 import {Utils} from "./Utils";
 import ModifierType = Constants.ModifierType;
 import TriggerMoment = Constants.TriggerMoment;
 import {Tier} from "./Constants";
-import {ActionType, Action} from "./Action";
+import {Action} from "./Action";
 import {ActiveFighter} from "./ActiveFighter";
-
-export interface IModifier{
-    id: string;
-    name:string;
-    tier:Tier;
-    type:ModifierType;
-    applier: ActiveFighter;
-    receiver: ActiveFighter;
-    hpDamage: number;
-    lustDamage: number;
-    focusDamage: number;
-    areDamageMultipliers: boolean;
-    diceRoll: number;
-    escapeRoll: number;
-    uses: number;
-    parentAction: Action;
-    event:Trigger;
-    timeToTrigger:TriggerMoment;
-    parentIds: Array<string>;
-
-    isOver():boolean;
-    trigger(moment: TriggerMoment, event:Trigger, objFightAction?:any):void;
-    willTriggerForEvent(moment: TriggerMoment, event:Trigger):boolean;
-}
+import {IModifier} from "./interfaces/IModifier";
 
 export class Modifier implements IModifier{
     id: string;
