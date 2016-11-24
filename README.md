@@ -9,7 +9,7 @@ Not much here for the moment.
   - npm install
   - npm install typescript -g
   - tsc
-  - cd tests
+  - cd bin/tests
   - node tests.js
 And check if the tests are working correctly.
 

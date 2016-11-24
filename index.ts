@@ -1,4 +1,5 @@
-var FChatLib = require('fchatlib');
-var options = require(__dirname+'/config/config.js');
-var myFchatBot = new FChatLib(options);
-console.log("ok");
+import {CommandHandler} from "./src/CommandHandler";
+module.exports = function (parent, channel) {
+    let cmdHandler:CommandHandler = new CommandHandler(parent, channel);
+    return cmdHandler;
+};
