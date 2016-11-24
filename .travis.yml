@@ -7,5 +7,5 @@ install:
   - npm install typescript -g
 script:
   - tsc
-  - cd tests
+  - cd bin/tests
   - node tests.js
