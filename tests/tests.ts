@@ -1083,7 +1083,7 @@ describe("The player(s)", () => {
         createFighter("TheTinaArmstrong");
         let index = Utils.findIndex(usedFighters, "name", "TheTinaArmstrong");
         if (index != -1) {
-            usedFighters[index].features.push(new Feature(FeatureType.KickStart, 1));
+            usedFighters[index].features.push(new Feature(usedFighters[index], FeatureType.KickStart, 1));
         }
         await initiateMatchSettings1vs1(cmd);
 

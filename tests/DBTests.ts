@@ -84,7 +84,7 @@ describe("The database(s)", () => {
 
     xit("should give ItemPickupBonus feature to Test2", function (done) {
         Fighter.load("test2").then(x => {
-            x.features.push(new Feature(FeatureType.KickStart, 1));
+            x.features.push(new Feature(x, FeatureType.KickStart, 1));
             Fighter.save(x).then(updWorked => {
                 expect(updWorked).toBe(true);
                 done();

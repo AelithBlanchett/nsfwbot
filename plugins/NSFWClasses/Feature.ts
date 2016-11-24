@@ -13,14 +13,19 @@ export class Feature{
     type:FeatureType;
     uses: number;
     permanent: boolean;
-    obtainedBy:Fighter[];
+    obtainedBy:Fighter;
     createdAt:Date;
     updatedAt:Date;
 
-    constructor(featureType:FeatureType, uses:number, id?:string) {
+    constructor(fighter:Fighter, featureType:FeatureType, uses:number, id?:string) {
         if(id){
             this.id = id;
         }
+        else{
+            this.id = Utils.generateUUID();
+        }
+
+        this.obtainedBy = fighter;
 
         this.type = featureType;
 
@@ -97,7 +102,7 @@ export class Feature{
     }
 
     static dbToObject():Feature{
-        return new Feature(null, null);
+        return new Feature(null, null, null);
     }
 
     static async save(feature:Feature):Promise<boolean>{
@@ -109,11 +114,11 @@ export class Feature{
     }
 
     static async load(featureId:string):Promise<Feature>{
-        return new Feature(null, null);
+        return new Feature(null, null, null);
     }
 
     static async loadFeaturesOfFighter(fighterName:string):Promise<Feature>{
-        return new Feature(null, null);
+        return new Feature(null, null, null);
     }
 
 

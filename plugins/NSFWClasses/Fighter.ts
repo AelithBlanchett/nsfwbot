@@ -150,7 +150,7 @@ export class Fighter implements IFighter{
     }
 
     addFeature(type:FeatureType, turns:number){
-        let feature = new Feature(type, turns);
+        let feature = new Feature(this, type, turns);
         let amountToRemove = feature.getCost();
 
         if(this.tokens - amountToRemove >= 0){

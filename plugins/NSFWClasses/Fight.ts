@@ -23,7 +23,7 @@ import {Fighter} from "./Fighter";
 
 export class Fight{
 
-    id:number = -1;
+    id:string;
     requiredTeams:number = 2;
     hasStarted:boolean = false;
     hasEnded:boolean = false;
@@ -42,6 +42,7 @@ export class Fight{
     updatedAt:Date;
 
     public constructor(fChatLibInstance?:IFChatLib, channel?:string, stage?:string) {
+        this.id = Utils.generateUUID();
         this.stage = stage || this.pickStage();
         this.fChatLibInstance = fChatLibInstance;
         this.channel = channel;
@@ -116,7 +117,8 @@ export class Fight{
                     await ActiveFighter.delete(fighter.name, this.id);
                 }
                 catch (ex) {
-                    this.fChatLibInstance.throwError(Utils.strFormat(Constants.Messages.commandError, ex.message));
+                    this.message.addError(Utils.strFormat(Constants.Messages.commandError, ex.message));
+                    this.message.send();
                 }
             }
         }

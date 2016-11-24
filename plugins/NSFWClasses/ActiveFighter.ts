@@ -362,18 +362,23 @@ export class ActiveFighter extends Fighter {
     }
 
     static async save(fighter:ActiveFighter):Promise<boolean>{
+        //TODO SQL SAVE REQUEST
         return true;
     }
 
-    static async delete(fighterName:string, fightId?:number):Promise<boolean>{
+    static async delete(fighterName:string, fightId?:string):Promise<boolean>{
+        //TODO SQL DELETE REQUEST
         return true;
     }
 
-    static async load(fighterName:string, fightId?:number):Promise<ActiveFighter>{
+    //fight is "mistakenly" set as optional to be compatible with the super.init
+    static async load(fighterName:string, fightId?:string):Promise<ActiveFighter>{
+        //TODO SQL SELECT REQUEST
         return new ActiveFighter(fighterName);
     }
 
-    async init(fight:Fight = null):Promise<boolean> {
+    //fight is "mistakenly" set as optional to be compatible with the super.init
+    async init(fight?:Fight):Promise<boolean> {
         if (await super.init()) {
             if (!fight.hasStarted) {
                 this.fight = fight;
@@ -409,7 +414,6 @@ export class ActiveFighter extends Fighter {
 
 
     loadExistActive(loadedFighter:ActiveFighter) {
-        this.fight = loadedFighter.fight;
         this.target = loadedFighter.target;
         this.assignedTeam = loadedFighter.assignedTeam;
         this.isReady = loadedFighter.isReady;
