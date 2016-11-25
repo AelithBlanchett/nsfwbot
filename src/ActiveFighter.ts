@@ -405,7 +405,7 @@ export class ActiveFighter extends Fighter {
             else {
                 let myFighter = await ActiveFighter.load(this.name, fight.id);
                 myFighter.fight = fight;
-                this.loadExistActive(myFighter);
+                this.loadExist(myFighter);
             }
             return true;
         }
@@ -413,7 +413,8 @@ export class ActiveFighter extends Fighter {
     }
 
 
-    loadExistActive(loadedFighter:ActiveFighter) {
+    loadExist(loadedFighter:ActiveFighter) {
+        super.loadExist(loadedFighter);
         this.target = loadedFighter.target;
         this.assignedTeam = loadedFighter.assignedTeam;
         this.isReady = loadedFighter.isReady;
