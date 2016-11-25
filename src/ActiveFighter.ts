@@ -37,10 +37,41 @@ export class ActiveFighter extends Fighter {
     actionsDone:Action[] = [];
     actionsInflicted:Action[] = [];
     status: FightStatus;
+    powerDelta:number;
+    sensualityDelta:number;
+    toughnessDelta:number;
+    enduranceDelta:number;
+    dexterityDelta:number;
+    willpowerDelta:number;
+
 
     //Objects, do not need to store
     pendingAction:Action;
     dice:Dice;
+
+    get power():number{
+        return super.power + this.powerDelta;
+    }
+
+    get sensuality():number{
+        return super.sensuality + this.sensualityDelta;
+    }
+
+    get toughness():number{
+        return super.toughness + this.toughnessDelta;
+    }
+
+    get endurance():number{
+        return super.endurance + this.enduranceDelta;
+    }
+
+    get dexterity():number{
+        return super.dexterity + this.dexterityDelta;
+    }
+
+    get willpower():number{
+        return super.willpower + this.willpowerDelta;
+    }
 
     //returns dice score
     roll(times:number = 1, event:Trigger = Trigger.Roll):number {
