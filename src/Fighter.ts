@@ -310,6 +310,7 @@ export class Fighter implements IFighter{
     }
 
     static async load(fighterName:string):Promise<Fighter>{
+
         return new Fighter(fighterName);
     }
 

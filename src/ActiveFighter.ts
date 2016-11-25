@@ -37,6 +37,13 @@ export class ActiveFighter extends Fighter {
     actionsDone:Action[] = [];
     actionsInflicted:Action[] = [];
     status: FightStatus;
+
+    startingPower:number;
+    startingSensuality:number;
+    startingToughness:number;
+    startingEndurance:number;
+    startingDexterity:number;
+    startingWillpower:number;
     powerDelta:number;
     sensualityDelta:number;
     toughnessDelta:number;
