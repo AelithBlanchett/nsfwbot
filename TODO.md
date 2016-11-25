@@ -1,6 +1,8 @@
 #TODO
 
 ##Important
+-   Correct the loadExist in ActiveFighter to implement new variables
+-   Use startingPower in get power() (to resume fights correctly!)
 -   Change the ActiveFighter state at the right moment
 -   Finish the MYSQL view for fighters.
 
