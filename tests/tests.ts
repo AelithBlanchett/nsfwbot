@@ -1080,11 +1080,7 @@ describe("The player(s)", () => {
 
     it("should grant the itemPickupModifier bonus for the KickStart feature", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
-        createFighter("TheTinaArmstrong");
-        let index = Utils.findIndex(usedFighters, "name", "TheTinaArmstrong");
-        if (index != -1) {
-            usedFighters[index].features.push(new Feature(usedFighters[index], FeatureType.KickStart, 1));
-        }
+        createFighter("TheTinaArmstrong").features.push(new Feature(createFighter("TheTinaArmstrong"), FeatureType.KickStart, 1));
         await initiateMatchSettings1vs1(cmd);
 
         waitUntil().interval(2).times(500).condition(() => {
