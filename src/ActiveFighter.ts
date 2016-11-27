@@ -57,27 +57,51 @@ export class ActiveFighter extends Fighter {
     dice:Dice;
 
     get power():number{
-        return super.power + this.powerDelta;
+        return this.startingPower + this.powerDelta;
+    }
+
+    set power(delta:number){
+        this.powerDelta += delta;
     }
 
     get sensuality():number{
-        return super.sensuality + this.sensualityDelta;
+        return this.startingSensuality + this.sensualityDelta;
+    }
+
+    set sensuality(delta:number){
+        this.sensualityDelta += delta;
     }
 
     get toughness():number{
-        return super.toughness + this.toughnessDelta;
+        return this.startingToughness + this.toughnessDelta;
+    }
+
+    set toughness(delta:number){
+        this.toughnessDelta += delta;
     }
 
     get endurance():number{
-        return super.endurance + this.enduranceDelta;
+        return this.startingEndurance + this.enduranceDelta;
+    }
+
+    set endurance(delta:number){
+        this.enduranceDelta += delta;
     }
 
     get dexterity():number{
-        return super.dexterity + this.dexterityDelta;
+        return this.startingDexterity + this.dexterityDelta;
+    }
+
+    set dexterity(delta:number){
+        this.dexterityDelta += delta;
     }
 
     get willpower():number{
-        return super.willpower + this.willpowerDelta;
+        return this.startingWillpower + this.willpowerDelta;
+    }
+
+    set willpower(delta:number){
+        this.willpowerDelta += delta;
     }
 
     //returns dice score
