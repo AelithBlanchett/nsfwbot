@@ -44,63 +44,63 @@ export class ActiveFighter extends Fighter {
     startingEndurance:number;
     startingDexterity:number;
     startingWillpower:number;
-    powerDelta:number;
-    sensualityDelta:number;
-    toughnessDelta:number;
-    enduranceDelta:number;
-    dexterityDelta:number;
-    willpowerDelta:number;
+    powerDelta:number = 0;
+    sensualityDelta:number = 0;
+    toughnessDelta:number = 0;
+    enduranceDelta:number = 0;
+    dexterityDelta:number = 0;
+    willpowerDelta:number = 0;
 
 
     //Objects, do not need to store
     pendingAction:Action;
     dice:Dice;
 
-    get power():number{
+    get currentPower():number{
         return this.startingPower + this.powerDelta;
     }
 
-    set power(delta:number){
+    set currentPower(delta:number){
         this.powerDelta += delta;
     }
 
-    get sensuality():number{
+    get currentSensuality():number{
         return this.startingSensuality + this.sensualityDelta;
     }
 
-    set sensuality(delta:number){
+    set currentSensuality(delta:number){
         this.sensualityDelta += delta;
     }
 
-    get toughness():number{
+    get currentToughness():number{
         return this.startingToughness + this.toughnessDelta;
     }
 
-    set toughness(delta:number){
+    set currentToughness(delta:number){
         this.toughnessDelta += delta;
     }
 
-    get endurance():number{
+    get currentEndurance():number{
         return this.startingEndurance + this.enduranceDelta;
     }
 
-    set endurance(delta:number){
+    set currentEndurance(delta:number){
         this.enduranceDelta += delta;
     }
 
-    get dexterity():number{
+    get currentDexterity():number{
         return this.startingDexterity + this.dexterityDelta;
     }
 
-    set dexterity(delta:number){
+    set currentDexterity(delta:number){
         this.dexterityDelta += delta;
     }
 
-    get willpower():number{
+    get currentWillpower():number{
         return this.startingWillpower + this.willpowerDelta;
     }
 
-    set willpower(delta:number){
+    set currentWillpower(delta:number){
         this.willpowerDelta += delta;
     }
 
@@ -443,6 +443,18 @@ export class ActiveFighter extends Fighter {
     async init(fight?:Fight):Promise<boolean> {
         if (await super.init()) {
             if (!fight.hasStarted) {
+                this.startingPower = this.power;
+                this.startingEndurance = this.endurance;
+                this.startingSensuality = this.sensuality;
+                this.startingToughness = this.toughness;
+                this.startingWillpower = this.willpower;
+                this.startingDexterity = this.dexterity;
+                this.dexterityDelta = 0;
+                this.enduranceDelta = 0;
+                this.powerDelta = 0;
+                this.sensualityDelta = 0;
+                this.toughnessDelta = 0;
+                this.willpowerDelta = 0;
                 this.fight = fight;
                 this.target = null;
                 this.assignedTeam = -1;

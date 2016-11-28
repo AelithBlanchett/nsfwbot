@@ -80,9 +80,21 @@ function createFighter(name, intStatsToAssign:number = 3):ActiveFighter {
         do {
             randomId = Utils.getRandomInt(0, 1000000);
         } while (usedIndexes.indexOf(randomId) != -1);
+        myFighter.power = myFighter.dexterity = myFighter.sensuality = myFighter.toughness = myFighter.willpower = myFighter.endurance = intStatsToAssign;
+        myFighter.startingPower = intStatsToAssign;
+        myFighter.startingEndurance = intStatsToAssign;
+        myFighter.startingSensuality = intStatsToAssign;
+        myFighter.startingToughness = intStatsToAssign;
+        myFighter.startingWillpower = intStatsToAssign;
+        myFighter.startingDexterity = intStatsToAssign;
+        myFighter.dexterityDelta = 0;
+        myFighter.enduranceDelta = 0;
+        myFighter.powerDelta = 0;
+        myFighter.sensualityDelta = 0;
+        myFighter.toughnessDelta = 0;
+        myFighter.willpowerDelta = 0;
         myFighter.id = randomId;
         myFighter.name = name;
-        myFighter.power = myFighter.sensuality = myFighter.endurance = myFighter.toughness = myFighter.willpower = myFighter.dexterity = intStatsToAssign;
         myFighter.hp = myFighter.hpPerHeart();
         myFighter.heartsRemaining = myFighter.maxHearts();
         myFighter.lust = 0;
