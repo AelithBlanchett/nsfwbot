@@ -1,9 +1,7 @@
 #TODO
 
 ##Important
--   Correct the loadExist in ActiveFighter to implement new variables
--   Use startingPower in get power() (to resume fights correctly!)
--   Change the ActiveFighter state at the right moment
+-   Multiply every value by 100 so we're more flexible. Need to balance that too!
 -   Finish the MYSQL view for fighters.
 
 ###Next steps
@@ -13,7 +11,7 @@
 -   Do the goddamn' guide on Google Docs
 -   Temporary penalties on stats to force players to fight against newbs, and prevent grinding
 
-####Optional
+####Optional/Ideas
 -   Rename/add stages
 -   Add more finishers
 -   Use constants everywhere.
@@ -23,6 +21,9 @@
     Ladder/Cage
 
 #Needs testing
+*   Change the ActiveFighter state at the right moment
+*   Use startingPower in get power() (to resume fights correctly!)
+*   Correct the loadExist in ActiveFighter to implement new variables
 *   Separate the Fighter entity from the 'augmented' one used in fights with hp, lp and stuff
 *   Add tap out/submit move
 *   Finish features implementation

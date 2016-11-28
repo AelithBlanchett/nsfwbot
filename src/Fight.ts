@@ -129,6 +129,7 @@ export class Fight{
             if (!this.getFighterByName(fighterName)) { //find fighter by its name property instead of comparing objects, which doesn't work.
                 let activeFighter:ActiveFighter = new ActiveFighter(fighterName);
                 await activeFighter.init(this);
+                activeFighter.fightStatus = FightStatus.Joined;
                 if(team != Team.Unknown){
                     activeFighter.assignedTeam = team;
                 }
@@ -157,6 +158,7 @@ export class Fight{
             var fighterInFight:ActiveFighter = this.getFighterByName(fighterName);
             if(fighterInFight && !fighterInFight.isReady){ //find fighter by its name property instead of comparing objects, which doesn't work.
                 fighterInFight.isReady = true;
+                fighterInFight.fightStatus = FightStatus.Ready;
                 this.message.addInfo(Utils.strFormat(Constants.Messages.Ready, [fighterInFight.getStylizedName()])); //Find out why the f it doesn't work
                 this.message.send();
                 if (this.canStart()) {
@@ -216,6 +218,7 @@ export class Fight{
         }
 
         for (let i = 0; i < this.fighters.length; i++) {
+            this.fighters[i].fightStatus = FightStatus.Playing;
             for (let feature of this.fighters[i].features) {
                 let modToAdd = feature.getModifier(this, this.fighters[i]);
                 if (modToAdd) {
@@ -592,7 +595,7 @@ export class Fight{
                 for(var i = 0; i < 3; i++){
                     fighter.modifiers.push(new BondageModifier(fighter));
                 }
-                fighter.forfeits++;
+                fighter.fightStatus = FightStatus.Forfeited;
                 this.message.addHit(Utils.strFormat(Constants.Messages.forfeitTooManyItems, [fighter.getStylizedName()]));
                 fighter.triggerPermanentOutsideRing();
             }
@@ -663,13 +666,13 @@ export class Fight{
         for (let fighter of this.fighters) {
             fighter.totalFights++;
             if (fighter.assignedTeam == this.winnerTeam) {
-                fighter.wins++;
+                fighter.fightStatus = FightStatus.Won;
                 this.message.addInfo(`Awarded ${tokensToGiveToWinners} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
                 fighter.giveTokens(tokensToGiveToWinners);
             }
             else {
                 if (this.winnerTeam != Team.Unknown) {
-                    fighter.losses++;
+                    fighter.fightStatus = FightStatus.Lost;
                 }
                 this.message.addInfo(`Awarded ${tokensToGiveToLosers} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
                 fighter.giveTokens(tokensToGiveToLosers);
@@ -913,4 +916,14 @@ export class Fight{
         return new Fight(null);
     }
 
+}
+
+export enum FightStatus {
+    Lost = 0,
+    Won = 1,
+    Playing = 2,
+    Forfeited = 3,
+    Joined = 4,
+    Ready = 5,
+    Draw = 6
 }

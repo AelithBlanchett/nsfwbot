@@ -1,5 +1,5 @@
 import {Dice} from "./Dice";
-import {Fight} from "./Fight";
+import {Fight, FightStatus} from "./Fight";
 import {Team} from "./Constants";
 import {Action} from "./Action";
 import {Trigger} from "./Constants";
@@ -12,7 +12,6 @@ import {Utils} from "./Utils";
 import {FeatureType} from "./Constants";
 import {Modifier} from "./Modifier";
 import {Fighter} from "./Fighter";
-import {FightStatus} from "./Constants";
 
 export class ActiveFighter extends Fighter {
 
@@ -36,7 +35,7 @@ export class ActiveFighter extends Fighter {
     modifiers:Modifier[] = [];
     actionsDone:Action[] = [];
     actionsInflicted:Action[] = [];
-    status: FightStatus;
+    fightStatus: FightStatus;
 
     startingPower:number;
     startingSensuality:number;
@@ -331,10 +330,12 @@ export class ActiveFighter extends Fighter {
 
     requestDraw() {
         this.wantsDraw = true;
+        this.fightStatus = FightStatus.Draw;
     }
 
     unrequestDraw() {
         this.wantsDraw = false;
+        this.fightStatus = FightStatus.Playing;
     }
 
     isRequestingDraw():boolean {
@@ -489,6 +490,18 @@ export class ActiveFighter extends Fighter {
 
     loadExist(loadedFighter:ActiveFighter) {
         super.loadExist(loadedFighter);
+        this.startingPower = loadedFighter.power;
+        this.startingEndurance = loadedFighter.endurance;
+        this.startingSensuality = loadedFighter.sensuality;
+        this.startingToughness = loadedFighter.toughness;
+        this.startingWillpower = loadedFighter.willpower;
+        this.startingDexterity = loadedFighter.dexterity;
+        this.dexterityDelta = loadedFighter.dexterityDelta;
+        this.enduranceDelta = loadedFighter.enduranceDelta;
+        this.powerDelta = loadedFighter.powerDelta;
+        this.sensualityDelta = loadedFighter.sensualityDelta;
+        this.toughnessDelta = loadedFighter.toughnessDelta;
+        this.willpowerDelta = loadedFighter.willpowerDelta;
         this.target = loadedFighter.target;
         this.assignedTeam = loadedFighter.assignedTeam;
         this.isReady = loadedFighter.isReady;
