@@ -1,6 +1,7 @@
 #TODO
 
 ##Important
+-   Add Seasons thingy
 -   Add inventory/gallery to store belts/records/other?
 -   Multiply every value by 100 so we're more flexible. Need to balance that too!
 -   Finish the MYSQL view for fighters.
