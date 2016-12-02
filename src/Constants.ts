@@ -1,6 +1,7 @@
 export class Globals {
-    public static pluginName: string = "nsfw";
-    public static currencyName: string = "tokens";
+    public static pluginName:string = "nsfw";
+    public static currencyName:string = "tokens";
+    public static currentSeason:number = 1;
 }
 
 export class SQL {

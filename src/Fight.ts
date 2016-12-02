@@ -33,6 +33,7 @@ export class Fight{
     fightType:FightType = FightType.Rumble;
     pastActions:Array<Action> = [];
     winnerTeam:Team = Team.Unknown;
+    season:number;
     waitingForAction:boolean = true;
     message:Message;
     lastMessage:Message;
@@ -47,6 +48,7 @@ export class Fight{
         this.fChatLibInstance = fChatLibInstance;
         this.channel = channel;
         this.message = new Message(fChatLibInstance, channel);
+        this.season = Constants.Globals.currentSeason;
     }
 
     setTeamsCount(intNewNumberOfTeams:number){
