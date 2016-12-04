@@ -1,4 +1,4 @@
-SELECT fighters.name, fighters.areStatsPrivate, fighters.dexterity, fighters.power, fighters.sensuality, fighters.endurance, fighters.tokens, fighters.tokensSpent,
+SELECT fighters.name, fighters.areStatsPrivate, fighters.dexterity, fighters.power, fighters.sensuality, fighters.endurance, fighters.willpower, fighters.toughness, fighters.tokens, fighters.tokensSpent,
   (
     SELECT Count(idFight)
     FROM nsfw_activefighters

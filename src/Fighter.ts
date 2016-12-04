@@ -2,7 +2,7 @@ import {Feature} from "./Feature";
 import {IFighter} from "./interfaces/IFighter";
 import {Achievement} from "./Achievement";
 import {AchievementType} from "./Achievement";
-import {FeatureType} from "./Constants";
+import {FeatureType, Team} from "./Constants";
 import * as Constants from "./Constants";
 import {TokensWorth} from "./Constants";
 import {Stats} from "./Constants";
@@ -12,20 +12,74 @@ import {Fight} from "./Fight";
 export class Fighter implements IFighter{
 
     name:string = "";
-    tokens: number = 0;
-    tokensSpent: number = 0;
-    wins: number = 0;
-    losses: number = 0;
-    forfeits: number = 0;
-    quits: number = 0;
-    totalFights: number = 0;
     areStatsPrivate:boolean = true;
+
+    dexterity:number = 0;
     power:number = 0;
     sensuality:number = 0;
     toughness:number = 0;
     endurance:number = 0;
-    dexterity:number = 0;
     willpower:number = 0;
+
+    tokens: number = 0;
+    tokensSpent: number = 0;
+
+    fightsCount:number;
+    fightsCountCS:number;
+    losses:number;
+    lossesSeason:number;
+    wins:number;
+    winsSeason:number;
+    currentlyPlaying:number;
+    currentlyPlayingSeason:number;
+    fightsPendingReady:number;
+    fightsPendingReadySeason:number;
+    fightsPendingStart:number;
+    fightsPendingStartSeason:number;
+    fightsPendingDraw:number;
+    fightsPendingDrawSeason:number;
+    favoriteTeam:Team;
+    favoriteTagPartner:string;
+    timesFoughtWithFavoriteTagPartner:number;
+    nemesis:string;
+    lossesAgainstNemesis:number;
+    averageDiceRoll:number;
+    missedAttacks:number;
+    actionsCount:number;
+    actionsDefended:number;
+    brawlAtksCount:number;
+    sexstrikesCount:number;
+    tagsCount:number;
+    restCount:number;
+    subholdCount:number;
+    sexholdCount:number;
+    bondageCount:number;
+    humholdCount:number;
+    itemPickups:number;
+    sextoyPickups:number;
+    degradationCount:number;
+    forcedWorshipCount:number;
+    highRiskCount:number;
+    penetrationCount:number;
+    stunCount:number;
+    escapeCount:number;
+    submitCount:number;
+    straptoyCount:number;
+    finishCount:number;
+    masturbateCount:number;
+
+    matchesInLast24Hours:number;
+    matchesInLast48Hours:number;
+
+    elo:number;
+    globalRank:number;
+
+    forfeits;
+    quits;
+
+
+
+
     features:Feature[] = [];
     achievements:Achievement[] = [];
     fights:Fight[] = [];
@@ -62,11 +116,11 @@ export class Fighter implements IFighter{
 
     winRate():number{
         let winRate = 0.00;
-        if(this.totalFights > 0 && this.wins > 0){
-            winRate = this.totalFights/this.wins;
+        if(this.fightsCount > 0 && this.wins > 0){
+            winRate = this.fightsCount/this.wins;
         }
-        else if(this.totalFights > 0 && this.losses > 0){
-            winRate = 1 - this.totalFights/this.losses;
+        else if(this.fightsCount > 0 && this.losses > 0){
+            winRate = 1 - this.fightsCount/this.losses;
         }
         return winRate;
     }
@@ -283,7 +337,7 @@ export class Fighter implements IFighter{
         this.losses = loadedFighter.losses;
         this.forfeits = loadedFighter.forfeits;
         this.quits = loadedFighter.quits;
-        this.totalFights = loadedFighter.totalFights;
+        this.fightsCount = loadedFighter.fightsCount;
         this.areStatsPrivate = loadedFighter.areStatsPrivate;
         this.power = loadedFighter.power;
         this.sensuality = loadedFighter.sensuality;
