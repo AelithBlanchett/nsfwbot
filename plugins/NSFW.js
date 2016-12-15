@@ -306,17 +306,17 @@ var CommandHandler = (function () {
                 else{
                     experienceSpent = stats.experienceSpent;
                 }
-                _this.fChatLibInstance.sendPrivMessage(data.character, "[b]" + stats.character + "[/b]'s stats" + "\n" +
+                _this.fChatLibInstance.sendPrivMessage("[b]" + stats.character + "[/b]'s stats" + "\n" +
                     "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Health[/color][/b]: " + stats.maxHp + "\n" +
                     "[b][color=orange]Toughness[/color][/b]:  " + stats.toughness + "      " + "[b][color=pink]Max Lust[/color][/b]: " + stats.maxLust + "\n" +
                     "[b][color=green]Determination[/color][/b]:  " + stats.determination + "\n" +
                     "[b][color=cyan]Agility[/color][/b]:    " + stats.agility + "      " + "[b][color=green]Win[/color]/[color=red]Loss[/color] record[/b]: " + wins + " - " + losses + "\n" +
                     "[b][color=purple]Expertise[/color][/b]: " + stats.expertise +  "      " + "[b][color=orange]Experience[/color][/b]: " + experience + "\n" +
                     "[b][color=blue]Endurance[/color][/b]: " + stats.endurance +  "      " + "[b][color=orange]Exp. spent:[/color][/b]: " + experienceSpent + " / "+maxExp+ "\n" + "\n\n" +
-                    "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]");
+                    "[b][color=red]Perks[/color][/b]:[b]" + getFeaturesListString(stats.features) + "[/b]", data.character);
             }
             else {
-                _this.fChatLibInstance.sendPrivMessage(data.character, "You aren't registered yet.");
+                _this.fChatLibInstance.sendPrivMessage("You aren't registered yet.", data.character);
             }
         });
     };
@@ -477,7 +477,7 @@ var CommandHandler = (function () {
             strResult += attackPrepare("humiliation", "light", true);
             strResult += attackPrepare("humiliation", "medium", true);
             strResult += attackPrepare("humiliation", "heavy", true);
-            _this.fChatLibInstance.sendPrivMessage(data.character, strResult);
+            _this.fChatLibInstance.sendPrivMessage(strResult, data.character);
         }
         else{
             _this.fChatLibInstance.sendMessage("You can only check your possible damage output during your turn in a match.", _this.channel);
