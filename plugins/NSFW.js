@@ -212,7 +212,7 @@ var CommandHandler = (function () {
                         result.maxLust = parseInt(result.maxLust);
                         result.lust = 0;
                         currentFighters[1] = result;
-                        currentFighters[1].dice = new Dice(6);
+                        currentFighters[1].dice = new Dice(10);
                         currentFighters[1].ownSubmissiveness = 0;
                         _this.fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!", _this.channel);
                         startFight();
