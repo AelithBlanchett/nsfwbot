@@ -1493,8 +1493,7 @@ function isInHold(whoseTurn) {
 
 function releaseHold() {
     _this.fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is finally out of the " + currentFight.currentHold.holdName + "!", _this.channel);
-    currentFight.currentHold.turnsLeft = 0;
-    currentFight.currentHold.isInfinite = false;
+    currentFight.currentHold = {turnsLeft: 0, isInfinite: false};
 }
 
 function resetFight() {
