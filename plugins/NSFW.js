@@ -1003,12 +1003,12 @@ function roll() {
         // If there is a current hold stronger than the request one, in the same category, then we guarentee success.
         // This is balanced because this is only worse off, not better off, for the person who does it.
         // Effectively it means people can adjust to the actions in the roleplay better.
-        if(holdInPlace && currentFight.currentHold.holdName == currentFight.actionType) {
+        if(holdInPlace() && currentFight.currentHold.holdType == currentFight.actionType) {
             var previousLevel = ['light', 'medium', 'heavy'].indexOf(currentFight.currentHold.actionTier);
             var tierLevel = ['light', 'medium', 'heavy'].indexOf(currentFight.actionTier);
             
             if(tierLevel < previousLevel) {
-                _this.fChatlibInstance.sendMessage("\n[b]" + currentFighters[currentFight.whoseturn].character + "[/b] pulled back a bit on their hold!");
+                _this.fChatLibInstance.sendMessage("\n[b]" + currentFighters[currentFight.whoseturn].character + "[/b] pulled back a bit on their hold!", _this.channel);
                 checkRollWinner();
                 return;
             }
