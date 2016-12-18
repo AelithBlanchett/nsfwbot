@@ -1148,7 +1148,7 @@ function holdHandler(damageHP, damageLust, isSexual, actionTier) {
         currentFight.currentHold.actionTier = actionTier;
         var isInfinite = false;
 
-        var newTurnsLeft = parseInt(currentFight.currentHold.turnsLeft) + parseInt(turns);
+        var newTurnsLeft = parseInt(currentFight.currentHold.turnsLeft / 2) + parseInt(turns);
         var newDamageHP = parseInt(damageHP);
         var newDamageLust = parseInt(damageLust);
 
