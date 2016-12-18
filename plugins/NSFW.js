@@ -1190,7 +1190,8 @@ function holdHandler(damageHP, damageLust, isSexual, actionTier) {
             damageLust: newDamageLust,
             attacker: attacker,
             defender: defender,
-            isInfinite: isInfinite
+            isInfinite: isInfinite,
+            actionTier: actionTier
         };
 
         if(isSexual == 0){
