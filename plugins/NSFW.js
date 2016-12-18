@@ -759,7 +759,7 @@ var CommandHandler = (function () {
                     if (currentFight.actionTier != undefined) {
                         if (currentFight.turn > 0) {
                             if(['sexualhold', 'submission', 'humiliation'].indexOf(currentFight.actionType) >= 0 && holdInPlace()) {
-                                if(currentFight.currentHold.actionTier == currentFight.actionTier) {
+                                if(currentFight.currentHold.actionTier == currentFight.actionTier && currentFight.currentHold.holdType == currentFight.actionType) {
                                     _this.fChatLibInstance.sendMessage("You can't apply the same hold while it's still active.", _this.channel);
                                     return;
                                 }
