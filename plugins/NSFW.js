@@ -1189,13 +1189,30 @@ function holdHandler(damageHP, damageLust, isSexual, actionTier) {
 
         currentFight.currentHold = {
             holdName: holdName,
+            holdType: undefined,
             turnsLeft: newTurnsLeft,
             damageHP: newDamageHP,
             damageLust: newDamageLust,
             attacker: attacker,
             defender: defender,
-            isInfinite: isInfinite
+            isInfinite: isInfinite,
+            actionTier: actionTier
         };
+
+        switch(isSexual) {
+            case 0:
+                currentFight.currentHold.holdType = "submission";
+                break;
+            case 1:
+                currentFight.currentHold.holdType = "sexualhold";
+                break;
+            case 2:
+                currentFight.currentHold.holdType = "humiliation";
+                break;
+            default:
+                currentFight.currentHold.holdType = "unknown";
+                break;
+        }
 
         if(isSexual == 0){
             strAttack += " applied a submission hold!";
