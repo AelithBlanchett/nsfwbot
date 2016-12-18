@@ -1149,28 +1149,8 @@ function holdHandler(damageHP, damageLust, isSexual, actionTier) {
         var isInfinite = false;
 
         var newTurnsLeft = parseInt(currentFight.currentHold.turnsLeft) + parseInt(turns);
-        var newDamageHP = parseInt(currentFight.currentHold.damageHP);
-        if(damageHP != undefined && damageHP != -1){
-            var dmg = parseInt(damageHP);
-            if(dmg <= 0){
-                dmg = 1;
-            }
-            if(newDamageHP == -1){
-                newDamageHP = 0;
-            }
-            newDamageHP += dmg;
-        }
-        var newDamageLust = parseInt(currentFight.currentHold.damageLust);
-        if(damageLust != undefined && damageLust != -1){
-            var dmg = parseInt(damageLust);
-            if(dmg <= 0){
-                dmg = 1;
-            }
-            if(newDamageLust == -1){
-                newDamageLust = 0;
-            }
-            newDamageLust += dmg;
-        }
+        var newDamageHP = parseInt(damageHP);
+        var newDamageLust = parseInt(damageLust);
 
         var holdName = "";
 
