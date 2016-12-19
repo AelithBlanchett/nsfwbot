@@ -1009,7 +1009,9 @@ function roll() {
             
             if(tierLevel < previousLevel) {
                 _this.fChatLibInstance.sendMessage("\n[b]" + currentFighters[currentFight.whoseturn].character + "[/b] pulled back a bit on their hold!", _this.channel);
-                checkRollWinner();
+                // Just in case.
+                currentFight.diceResult = 100;
+                checkRollWinner(true);
                 return;
             }
         }
