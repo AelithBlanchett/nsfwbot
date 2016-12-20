@@ -649,10 +649,10 @@ var CommandHandler = (function () {
                 result.expertise = 1;
                 result.endurance = 1;
                 result.features = [];
-                result.experience = 50;
+                result.experience = 50 + result.experience;
                 result.experienceSpent = 0;
                 client.hmset(data.character, result);
-                _this.fChatLibInstance.sendMessage("You've successfully reset your stats. Don't forget to spend the 50XP!", _this.channel);
+                _this.fChatLibInstance.sendMessage("You've successfully reset your stats. Don't forget to spend the " + result.experience + " XP!", _this.channel);
             }
             else {
                 _this.fChatLibInstance.sendMessage("Are you sure this profile is registered?", _this.channel);
