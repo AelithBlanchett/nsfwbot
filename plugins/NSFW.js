@@ -755,9 +755,16 @@ var CommandHandler = (function () {
                     {
                         currentFight.actionTier = "bondage";
                     }
-
+                    
                     if (currentFight.actionTier != undefined) {
                         if (currentFight.turn > 0) {
+                            if(['sexualhold', 'submission', 'humiliation'].indexOf(currentFight.actionType) >= 0 && holdInPlace()) {
+                                if(currentFight.currentHold.actionTier == currentFight.actionTier && currentFight.currentHold.holdType == currentFight.actionType) {
+                                    _this.fChatLibInstance.sendMessage("You can't apply the same hold while it's still active.", _this.channel);
+                                    return;
+                                }
+                            }
+                        
                             roll();
                         }
                     }
@@ -991,6 +998,25 @@ function roll() {
             currentFight.diceResult = diceScore;
             break;
     }
+    
+    if(currentFight.actionIsHold) {
+        // If there is a current hold stronger than the request one, in the same category, then we guarentee success.
+        // This is balanced because this is only worse off, not better off, for the person who does it.
+        // Effectively it means people can adjust to the actions in the roleplay better.
+        if(holdInPlace() && currentFight.currentHold.holdType == currentFight.actionType) {
+            var previousLevel = ['light', 'medium', 'heavy'].indexOf(currentFight.currentHold.actionTier);
+            var tierLevel = ['light', 'medium', 'heavy'].indexOf(currentFight.actionTier);
+            
+            if(tierLevel < previousLevel) {
+                _this.fChatLibInstance.sendMessage("\n[b]" + currentFighters[currentFight.whoseturn].character + "[/b] pulled back a bit on their hold!", _this.channel);
+                // Just in case.
+                currentFight.diceResult = 100;
+                checkRollWinner(true);
+                return;
+            }
+        }
+    }
+    
     _this.fChatLibInstance.sendMessage("\n[b]" + currentFighters[currentFight.whoseturn].character + "[/b] rolled a [b]" + currentFight.diceResult + "[/b] " + (mods != 0 ? "(" + ((mods >= 0 ? "+" : "") + mods + " applied)") : "" ), _this.channel);
     checkRollWinner();
 }
@@ -1141,29 +1167,9 @@ function holdHandler(damageHP, damageLust, isSexual, actionTier) {
         currentFight.currentHold.actionTier = actionTier;
         var isInfinite = false;
 
-        var newTurnsLeft = parseInt(currentFight.currentHold.turnsLeft) + parseInt(turns);
-        var newDamageHP = parseInt(currentFight.currentHold.damageHP);
-        if(damageHP != undefined && damageHP != -1){
-            var dmg = parseInt(damageHP);
-            if(dmg <= 0){
-                dmg = 1;
-            }
-            if(newDamageHP == -1){
-                newDamageHP = 0;
-            }
-            newDamageHP += dmg;
-        }
-        var newDamageLust = parseInt(currentFight.currentHold.damageLust);
-        if(damageLust != undefined && damageLust != -1){
-            var dmg = parseInt(damageLust);
-            if(dmg <= 0){
-                dmg = 1;
-            }
-            if(newDamageLust == -1){
-                newDamageLust = 0;
-            }
-            newDamageLust += dmg;
-        }
+        var newTurnsLeft = parseInt(currentFight.currentHold.turnsLeft / 2) + parseInt(turns);
+        var newDamageHP = parseInt(damageHP);
+        var newDamageLust = parseInt(damageLust);
 
         var holdName = "";
 
@@ -1185,6 +1191,7 @@ function holdHandler(damageHP, damageLust, isSexual, actionTier) {
 
         currentFight.currentHold = {
             holdName: holdName,
+            holdType: undefined,
             turnsLeft: newTurnsLeft,
             damageHP: newDamageHP,
             damageLust: newDamageLust,
@@ -1193,6 +1200,21 @@ function holdHandler(damageHP, damageLust, isSexual, actionTier) {
             isInfinite: isInfinite,
             actionTier: actionTier
         };
+
+        switch(isSexual) {
+            case 0:
+                currentFight.currentHold.holdType = "submission";
+                break;
+            case 1:
+                currentFight.currentHold.holdType = "sexualhold";
+                break;
+            case 2:
+                currentFight.currentHold.holdType = "humiliation";
+                break;
+            default:
+                currentFight.currentHold.holdType = "unknown";
+                break;
+        }
 
         if(isSexual == 0){
             strAttack += " applied a submission hold!";
@@ -1473,8 +1495,7 @@ function isInHold(whoseTurn) {
 
 function releaseHold() {
     _this.fChatLibInstance.sendMessage(currentFighters[currentFight.currentHold.defender].character + " is finally out of the " + currentFight.currentHold.holdName + "!", _this.channel);
-    currentFight.currentHold.turnsLeft = 0;
-    currentFight.currentHold.isInfinite = false;
+    currentFight.currentHold = {turnsLeft: 0, isInfinite: false};
 }
 
 function resetFight() {
