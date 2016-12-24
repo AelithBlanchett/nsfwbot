@@ -666,7 +666,6 @@ export class Fight{
         }
 
         for (let fighter of this.fighters) {
-            fighter.totalFights++;
             if (fighter.assignedTeam == this.winnerTeam) {
                 fighter.fightStatus = FightStatus.Won;
                 this.message.addInfo(`Awarded ${tokensToGiveToWinners} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
