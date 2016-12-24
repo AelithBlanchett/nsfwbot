@@ -464,7 +464,7 @@ export class ActiveFighter extends Fighter {
                 this.heartsRemaining = this.maxHearts();
                 this.lust = 0;
                 this.orgasmsRemaining = this.maxOrgasms();
-                this.focus = this.willpower;
+                this.focus = this.currentWillpower;
                 this.lastDiceRoll = null;
                 this.isInTheRing = true;
                 this.canMoveFromOrOffRing = true;
@@ -523,6 +523,34 @@ export class ActiveFighter extends Fighter {
         this.actionsInflicted = loadedFighter.actionsInflicted || [];
         this.pendingAction = null;
         this.dice = new Dice(12);
+    }
+
+
+
+    hpPerHeart():number {
+        return 35;
+    }
+
+    maxHearts():number {
+        let heartsSup = Math.ceil(this.currentToughness / 2);
+        return 4 + heartsSup;
+    }
+
+    lustPerOrgasm():number {
+        return 35;
+    }
+
+    maxOrgasms():number {
+        let orgasmsSup = Math.ceil(this.currentEndurance / 2);
+        return 4 + orgasmsSup;
+    }
+
+    minFocus():number {
+        return -2 - this.currentWillpower;
+    }
+
+    maxFocus():number {
+        return 2 + this.currentWillpower;
     }
 
 }
