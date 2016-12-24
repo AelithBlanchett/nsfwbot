@@ -18,7 +18,6 @@ import TriggerMoment = Constants.TriggerMoment;
 import {Message} from "./Messaging";
 var CircularJSON = require('circular-json');
 import {ActiveFighter} from "./ActiveFighter";
-import {Feature} from "./Feature";
 import {Fighter} from "./Fighter";
 
 export class Fight{

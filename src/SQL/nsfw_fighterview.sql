@@ -1,5 +1,10 @@
 SELECT fighters.name, fighters.season, fighters.areStatsPrivate, fighters.dexterity, fighters.power, fighters.sensuality, fighters.endurance, fighters.willpower, fighters.toughness, fighters.tokens, fighters.tokensSpent,
   (
+    SELECT SUM(f2.tokensSpent)
+    FROM nsfw_fighters f2
+    WHERE f2.name = fighters.name
+  )                                        AS tokensSpentOverall,
+  (
     SELECT Count(idFight)
     FROM nsfw_activefighters
     WHERE idFighter = fighters.name
@@ -272,7 +277,8 @@ SELECT fighters.name, fighters.season, fighters.areStatsPrivate, fighters.dexter
     WHERE idFighter = fighters.name AND timestampdiff(HOUR, af.updatedAt, NOW()) <= 48
   )                                        AS matchesInLast48Hours
 FROM nsfw_fighters fighters, nsfw_constants consts
-WHERE consts.name = 'currentSeason';
+WHERE consts.key = 'currentSeason';
+
 
 
 

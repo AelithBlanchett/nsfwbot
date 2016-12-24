@@ -1,6 +1,8 @@
 import {EnumEx} from "./Utils";
 import {Fighter} from "./Fighter";
 import {FightTier} from "./Constants";
+import Knex = require("knex");
+import {Model} from "./Model";
 
 export class Achievement {
     type: AchievementType;
@@ -40,6 +42,23 @@ export class Achievement {
             }
         }
         return addedInfo;
+    }
+
+    static async loadAllForFighter(fighterName:string, season:number):Promise<Achievement[]>{
+        let result;
+
+        try{
+            result = await Model.db('nsfw_fighters_achievements').select('idAchievement').where('idFighter', fighterName).andWhere('season', season);
+        }
+        catch(ex){
+            throw ex;
+        }
+
+        let achievementsArray:Achievement[] = [];
+        for(let row of result){
+            achievementsArray.push(new Achievement(parseInt(row.idAchievement)));
+        }
+        return achievementsArray;
     }
 }
 
