@@ -27,61 +27,57 @@ import {Modifier} from "./Modifier";
 import {ActiveFighter} from "./ActiveFighter";
 import {Model} from "./Model";
 
-export class Action extends Model{
+export class Action{
 
-    id: string;
+    idAction: string;
     fight:Fight;
     atTurn: number;
     type:ActionType;
     tier: Tier;
-    isHold: boolean;
-    modifiers:Modifier[];
+    isHold: boolean = false;
+    diceScore: number = -1;
+    missed: boolean = true;
     attacker:ActiveFighter;
     defender:ActiveFighter;
-    hpDamageToDef: number;
-    lpDamageToDef: number;
-    fpDamageToDef: number;
-    hpDamageToAtk: number;
-    lpDamageToAtk: number;
-    fpDamageToAtk: number;
-    hpHealToDef: number;
-    lpHealToDef: number;
-    fpHealToDef: number;
-    hpHealToAtk: number;
-    lpHealToAtk: number;
-    fpHealToAtk: number;
-    diceScore: number;
-    missed: boolean;
-    requiresRoll: boolean;
+    hpDamageToDef: number = 0;
+    lpDamageToDef: number = 0;
+    fpDamageToDef: number = 0;
+    hpDamageToAtk: number = 0;
+    lpDamageToAtk: number = 0;
+    fpDamageToAtk: number = 0;
+    hpHealToDef: number = 0;
+    lpHealToDef: number = 0;
+    fpHealToDef: number = 0;
+    hpHealToAtk: number = 0;
+    lpHealToAtk: number = 0;
+    fpHealToAtk: number = 0;
+    requiresRoll: boolean = true;
     createdAt:Date;
     updatedAt:Date;
 
+    modifiers:Modifier[] = [];
+
+    get idFight():string{
+        return this.fight.id;
+    }
+
+    get idAttacker():string{
+        return this.attacker.name;
+    }
+
+    get idDefender():string{
+        return this.attacker.name;
+    }
+
     constructor(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:ActiveFighter, defender?:ActiveFighter) {
-        super();
-        this.id = Utils.generateUUID();
+        this.idAction = Utils.generateUUID();
         this.fight = fight;
-        this.isHold = false;
-        this.modifiers = [];
-        this.missed = true;
-        this.hpDamageToDef = 0;
-        this.lpDamageToDef = 0;
-        this.fpDamageToDef = 0;
-        this.hpDamageToAtk = 0;
-        this.lpDamageToAtk = 0;
-        this.fpDamageToAtk = 0;
-        this.hpHealToDef = 0;
-        this.lpHealToDef = 0;
-        this.fpHealToDef = 0;
-        this.hpHealToAtk = 0;
-        this.lpHealToAtk = 0;
-        this.fpHealToAtk = 0;
-        this.diceScore = 0;
-        this.tier = tier;
         this.atTurn = currentTurn;
+        this.tier = tier;
+        this.type = actionType;
         this.attacker = attacker;
         this.defender = defender;
-        this.requiresRoll = true;
-        this.type = actionType;
+        this.createdAt = new Date();
     }
 
     attackFormula(tier:Tier, actorAtk:number, targetDef:number, roll:number):number{
@@ -694,6 +690,40 @@ export class Action extends Model{
     }
 
     static async save(action:Action):Promise<boolean>{
+        try
+        {
+            await Model.db('nsfw_actions').insert(
+                {
+                    idAction: action.idAction,
+                    idFight: action.idFight,
+                    atTurn: action.atTurn,
+                    type: action.type,
+                    tier: action.tier,
+                    isHold: action.isHold,
+                    diceScore: action.diceScore,
+                    missed: action.missed,
+                    idAttacker: action.idAttacker,
+                    idDefender: action.idDefender,
+                    hpDamageToDef: action.hpDamageToDef,
+                    lpDamageToDef: action.fpDamageToDef,
+                    fpDamageToDef: action.lpDamageToDef,
+                    hpDamageToAtk: action.hpDamageToAtk,
+                    lpDamageToAtk: action.fpDamageToAtk,
+                    fpDamageToAtk: action.lpDamageToAtk,
+                    hpHealToDef: action.hpHealToDef,
+                    lpHealToDef: action.fpHealToDef,
+                    fpHealToDef: action.lpHealToDef,
+                    hpHealToAtk: action.hpHealToAtk,
+                    lpHealToAtk: action.fpHealToAtk,
+                    fpHealToAtk: action.lpHealToAtk,
+                    requiresRoll: action.requiresRoll,
+                    createdAt: action.createdAt
+                }).into("nsfw_actions");
+        }
+        catch(ex){
+            throw ex;
+        }
+
         return true;
     }
 

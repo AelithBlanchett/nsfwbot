@@ -49,8 +49,8 @@
 //
 //    Action.commitDb = function(action){
 //        return new Promise<number>(function(resolve, reject) {
-//            action.id = Utils.getRandomInt(0,1000000);
-//            resolve(action.id);
+//            action.idAction = Utils.getRandomInt(0,1000000);
+//            resolve(action.idAction);
 //        });
 //    };
 //
@@ -64,8 +64,8 @@
 //        });
 //    };
 //
-//    Fight.loadState = function(id, fight){
-//        fight.id = id;
+//    Fight.loadState = function(idAction, fight){
+//        fight.idAction = idAction;
 //        return true;
 //    };
 //}
@@ -80,7 +80,7 @@
 //        do{
 //            randomId = Utils.getRandomInt(0,1000000);
 //        }while(usedIndexes.indexOf(randomId) != -1);
-//        myFighter.id = randomId;
+//        myFighter.idAction = randomId;
 //        myFighter.name = name;
 //        myFighter.power = myFighter.sensuality = myFighter.endurance = myFighter.toughness = myFighter.willpower = myFighter.dexterity = intStatsToAssign;
 //        myFighter.hp = myFighter.hpPerHeart();

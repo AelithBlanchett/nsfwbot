@@ -187,7 +187,7 @@ export class CommandHandler implements ICommandHandler {
                     this.fight.channel =this.channel;
                 }
                 else {
-                    this.fChatLibInstance.sendMessage("[color=red]Wrong fight id. It must be a number.[/color]", this.channel);
+                    this.fChatLibInstance.sendMessage("[color=red]Wrong fight idAction. It must be a number.[/color]", this.channel);
                 }
             }
             catch (ex) {
