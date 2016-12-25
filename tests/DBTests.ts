@@ -157,8 +157,8 @@ describe("The database(s)", () => {
     //    ActiveFighter.load("test2").then(x => {
     //        let fight = new Fight(null, null);
     //        let myAction = new Action(fight, 1, 1, ActionType.Brawl, x);
-    //        Action.commitDb(myAction).then(id => {
-    //            expect(id).toBeGreaterThan(0);
+    //        Action.commitDb(myAction).then(idAction => {
+    //            expect(idAction).toBeGreaterThan(0);
     //            done();
     //        }).catch(err => {
     //            done.fail(err);
@@ -169,8 +169,8 @@ describe("The database(s)", () => {
     //it("should write a new fight in the database", function (done) {
     //    Fighter.load("test2").then(x => {
     //        let myFight = new Fight(fChatLibInstance, "here", "hello");
-    //        Fight.saveState(myFight).then(id => {
-    //            expect(id).toBeGreaterThan(0);
+    //        Fight.saveState(myFight).then(idAction => {
+    //            expect(idAction).toBeGreaterThan(0);
     //            done();
     //        }).catch(err => {
     //            done.fail(err);
