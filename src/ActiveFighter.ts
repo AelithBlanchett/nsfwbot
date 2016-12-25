@@ -16,6 +16,7 @@ import {Fighter} from "./Fighter";
 export class ActiveFighter extends Fighter {
 
     fight:Fight;
+    season:number;
     assignedTeam:Team;
     target:ActiveFighter;
     isReady:boolean = false;
