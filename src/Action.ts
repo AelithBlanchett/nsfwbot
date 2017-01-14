@@ -727,17 +727,25 @@ export class Action{
         return true;
     }
 
-    static async delete(actionId:number):Promise<boolean>{
+    static async delete(actionId:string):Promise<boolean>{
+        try{
+            await Model.db('nsfw_actions').where({idAction: actionId}).del();
+        }
         return true;
     }
 
-    static async load(actionId:number):Promise<Action>{
+    /*static async load(actionId:string):Promise<Action>{
+        let result = await Model.db('nsfw_actions').select('*').where({idAction: actionId});
+        if(result.length == 1){
+            let row = result[0];
+            return new Action(null, row["currentTurn"], row.tier, row.actionType, row.)
+        }
         return new Action(null, null, null, null, null, null);
     }
 
     static async loadAllFromFight(fightId:number):Promise<Array<Action>>{
         return [new Action(null, null, null, null, null, null)];
-    }
+    }*/
 
 }
 

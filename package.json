@@ -35,7 +35,7 @@
     "@types/node": "<5.0.0"
   },
   "scripts": {
-    "test": "cd tests && node tests.js"
+    "test": "cd bin/tests && node tests.js"
   },
   "repository": {
     "type": "git",
