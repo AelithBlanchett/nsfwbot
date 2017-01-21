@@ -193,7 +193,6 @@ function refillHPLPFP(cmd, name) {
 /// <reference path="../typings/jasmine/jasmine.d.ts">
 describe("The player(s)", () => {
 
-
     beforeEach(function () {
         abstractDatabase();
         fChatLibInstance = {
@@ -226,8 +225,6 @@ describe("The player(s)", () => {
         spyOn(fChatLibInstance, 'sendMessage').and.callThrough();
         spyOn(fChatLibInstance, 'throwError').and.callThrough();
         spyOn(fChatLibInstance, 'sendPrivMessage').and.callThrough();
-        spyOn(ActiveFighter, 'load').and.callThrough();
-        spyOn(Fighter, 'load').and.callThrough();
 
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
     }, DEFAULT_TIMEOUT);
