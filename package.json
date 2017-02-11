@@ -24,6 +24,7 @@
     "require-reload": "*",
     "sprintf-js": "^1.0.3",
     "stats-lite": "*",
+    "typeorm": "0.0.8",
     "typescript": "^2.0",
     "typings": "*",
     "wait-until": "*"

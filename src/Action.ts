@@ -2,7 +2,6 @@ import * as Constants from "./Constants";
 import Tier = Constants.Tier;
 import BaseDamage = Constants.BaseDamage;
 import {Fight} from "./Fight";
-import {Dice} from "./Dice";
 import TierDifficulty = Constants.TierDifficulty;
 import Trigger = Constants.Trigger;
 import FocusDamageHum = Constants.FocusDamageHumHold;
@@ -22,7 +21,6 @@ import {HighRiskMultipliers} from "./Constants";
 import {Utils} from "./Utils";
 import {StrapToyModifier} from "./CustomModifiers";
 import {StrapToyLPDamagePerTurn} from "./Constants";
-import "reflect-metadata";
 import {Modifier} from "./Modifier";
 import {ActiveFighter} from "./ActiveFighter";
 import {Model} from "./Model";
@@ -688,64 +686,6 @@ export class Action{
     get toJson():string{
         return "{}";
     }
-
-    static async save(action:Action):Promise<boolean>{
-        try
-        {
-            await Model.db('nsfw_actions').insert(
-                {
-                    idAction: action.idAction,
-                    idFight: action.idFight,
-                    atTurn: action.atTurn,
-                    type: action.type,
-                    tier: action.tier,
-                    isHold: action.isHold,
-                    diceScore: action.diceScore,
-                    missed: action.missed,
-                    idAttacker: action.idAttacker,
-                    idDefender: action.idDefender,
-                    hpDamageToDef: action.hpDamageToDef,
-                    lpDamageToDef: action.fpDamageToDef,
-                    fpDamageToDef: action.lpDamageToDef,
-                    hpDamageToAtk: action.hpDamageToAtk,
-                    lpDamageToAtk: action.fpDamageToAtk,
-                    fpDamageToAtk: action.lpDamageToAtk,
-                    hpHealToDef: action.hpHealToDef,
-                    lpHealToDef: action.fpHealToDef,
-                    fpHealToDef: action.lpHealToDef,
-                    hpHealToAtk: action.hpHealToAtk,
-                    lpHealToAtk: action.fpHealToAtk,
-                    fpHealToAtk: action.lpHealToAtk,
-                    requiresRoll: action.requiresRoll,
-                    createdAt: action.createdAt
-                }).into("nsfw_actions");
-        }
-        catch(ex){
-            throw ex;
-        }
-
-        return true;
-    }
-
-    static async delete(actionId:string):Promise<boolean>{
-        try{
-            await Model.db('nsfw_actions').where({idAction: actionId}).del();
-        }
-        return true;
-    }
-
-    /*static async load(actionId:string):Promise<Action>{
-        let result = await Model.db('nsfw_actions').select('*').where({idAction: actionId});
-        if(result.length == 1){
-            let row = result[0];
-            return new Action(null, row["currentTurn"], row.tier, row.actionType, row.)
-        }
-        return new Action(null, null, null, null, null, null);
-    }
-
-    static async loadAllFromFight(fightId:number):Promise<Array<Action>>{
-        return [new Action(null, null, null, null, null, null)];
-    }*/
 
 }
 

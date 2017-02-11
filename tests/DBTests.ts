@@ -178,7 +178,7 @@ describe("The database(s)", () => {
     //    });
     //},50000);
 
-    it("should tag successfully with Aelith", async function (done) {
+    xit("should tag successfully with Aelith", async function (done) {
         debug = true;
         var cmd = new CommandHandler(fChatLibInstance, "here");
         await initiateMatchSettings2vs2TagForDb(cmd);
@@ -203,6 +203,14 @@ describe("The database(s)", () => {
             });
         });
     }, 80000);
+
+    it("should create an action", async function (done) {
+        await Action.save(new Action(new Fight(null, null, null), 1, 0, 1, null));
+    });
+
+    xit("should ddelete something", async function (done) {
+        await Action.delete("7a1ee8c5-58bd-41f5-a0db-7bd1a533f43c");
+    }, 100000);
 });
 
 jasmine.execute();

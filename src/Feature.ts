@@ -1,7 +1,6 @@
 import {Utils} from "./Utils";
 import * as Constants from "./Constants";
 import {ItemPickupModifier, SextoyPickupModifier} from "./CustomModifiers";
-import {Fighter} from "./Fighter";
 import {Fight} from "./Fight";
 import {FeatureType} from "./Constants";
 import {ActiveFighter} from "./ActiveFighter";
@@ -13,11 +12,11 @@ export class Feature{
     type:FeatureType;
     uses: number;
     permanent: boolean;
-    obtainedBy:Fighter;
+    obtainedBy:string;
     createdAt:Date;
     updatedAt:Date;
 
-    constructor(fighter:Fighter, featureType:FeatureType, uses:number, id?:string) {
+    constructor(fighterName:string, featureType:FeatureType, uses:number, id?:string) {
         if(id){
             this.id = id;
         }
@@ -25,7 +24,7 @@ export class Feature{
             this.id = Utils.generateUUID();
         }
 
-        this.obtainedBy = fighter;
+        this.obtainedBy = fighterName;
 
         this.type = featureType;
 
@@ -99,26 +98,6 @@ export class Feature{
             }
         }
         return false;
-    }
-
-    static dbToObject():Feature{
-        return new Feature(null, null, null);
-    }
-
-    static async save(feature:Feature):Promise<boolean>{
-        return true;
-    }
-
-    static async delete(fighterName:string):Promise<boolean>{
-        return true;
-    }
-
-    static async load(featureId:string):Promise<Feature>{
-        return new Feature(null, null, null);
-    }
-
-    static async loadFeaturesOfFighter(fighterName:string):Promise<Feature>{
-        return new Feature(null, null, null);
     }
 
 

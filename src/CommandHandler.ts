@@ -1,8 +1,6 @@
 import {Fighter} from "./Fighter";
-import {Dice} from "./Dice";
 import * as Parser from "./Parser";
 import {Fight} from "./Fight";
-import {IParserResponse} from "./interfaces/IParserResponse";
 import {ICommandHandler} from "./interfaces/ICommandHandler";
 import {IFChatLib} from "./interfaces/IFChatLib";
 import * as Constants from "./Constants";
@@ -11,7 +9,6 @@ import Tier = Constants.Tier;
 import {Stats} from "./Constants";
 import {FightType} from "./Constants";
 import {FeatureType} from "./Constants";
-import {Feature} from "./Feature";
 import {EnumEx} from "./Utils";
 import {ActionType} from "./Action";
 import {Team} from "./Constants";

@@ -10,13 +10,15 @@ export class Achievement {
     name: string;
     description: AchievementDescription;
     condition: string;
+    createdAt:Date;
 
-    constructor(type: AchievementType){
+    constructor(type: AchievementType, createdAt?:Date){
         this.type = type;
         this.name = AchievementReward[AchievementReward[AchievementType[type]]]; //short name, the enumerator's name in fact
         this.reward = AchievementReward[AchievementType[type]];
         this.description = AchievementDescription[AchievementType[type]];
         this.condition = AchievementCondition[AchievementType[type]];
+        this.createdAt = createdAt || new Date();
     }
 
     static getAll():Achievement[]{
@@ -42,23 +44,6 @@ export class Achievement {
             }
         }
         return addedInfo;
-    }
-
-    static async loadAllForFighter(fighterName:string, season:number):Promise<Achievement[]>{
-        let result;
-
-        try{
-            result = await Model.db('nsfw_fighters_achievements').select('idAchievement').where('idFighter', fighterName).andWhere('season', season);
-        }
-        catch(ex){
-            throw ex;
-        }
-
-        let achievementsArray:Achievement[] = [];
-        for(let row of result){
-            achievementsArray.push(new Achievement(parseInt(row.idAchievement)));
-        }
-        return achievementsArray;
     }
 }
 

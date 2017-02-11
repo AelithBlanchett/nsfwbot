@@ -82,7 +82,6 @@ export class Fighter implements IFighter{
 
     features:Feature[] = [];
     achievements:Achievement[] = [];
-    fights:Fight[] = [];
     createdAt:Date;
     updatedAt:Date;
 
