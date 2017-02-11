@@ -44,15 +44,24 @@ export class FighterRepository{
         }
     }
 
+    public static async exists(name:string):Promise<boolean>{
+        let loadedData = await Model.db('nsfw_v_fighters').where({name: name}).select();
+        return (loadedData.length > 0);
+    }
+
     public static async load(name:string):Promise<Fighter>{
-        let loadedFighter:Fighter = new Fighter(name);
+        let loadedFighter:Fighter = new Fighter();
+
+        if(!FighterRepository.exists(name)){
+            return null;
+        }
 
         try
         {
             let currentSeason = await Model.db('nsfw_constants').where({key: "currentSeason"}).first();
-            var loadedData = await Model.db('nsfw_v_fighters').where({name: name, season: currentSeason.value}).select();
 
-            var data = loadedData[0];
+            let loadedData = await Model.db('nsfw_v_fighters').where({name: name, season: currentSeason.value}).select();
+            let data = loadedData[0];
 
             for(let prop of Object.getOwnPropertyNames(data)){
                 if(Object.getOwnPropertyNames(loadedFighter).indexOf(prop) != -1){
@@ -62,11 +71,8 @@ export class FighterRepository{
                 }
             }
 
-            let achievements = await FighterRepository.loadAllAchievements(name, currentSeason.value);
-            loadedFighter.achievements = achievements;
-
-            let features = await FighterRepository.loadAllFeatures(name, currentSeason.value);
-            loadedFighter.features = features;
+            loadedFighter.achievements = await FighterRepository.loadAllAchievements(name, currentSeason.value);
+            loadedFighter.features = await FighterRepository.loadAllFeatures(name, currentSeason.value);
         }
         catch(ex){
         }

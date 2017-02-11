@@ -12,6 +12,7 @@ import {FeatureType} from "./Constants";
 import {EnumEx} from "./Utils";
 import {ActionType} from "./Action";
 import {Team} from "./Constants";
+import {FighterRepository} from "./FighterRepository";
 
 export class CommandHandler implements ICommandHandler {
     fChatLibInstance:IFChatLib;
@@ -34,7 +35,7 @@ export class CommandHandler implements ICommandHandler {
             return;
         }
 
-        let fighter:Fighter = await Fighter.load(data.character);
+        let fighter:Fighter = await FighterRepository.load(data.character);
         if (fighter != undefined) {
             try {
                 fighter.addFeature(parsedFeatureArgs.featureType, parsedFeatureArgs.turns);
@@ -55,7 +56,7 @@ export class CommandHandler implements ICommandHandler {
             this.fChatLibInstance.sendPrivMessage("[color=red]Stat not found.[/color]", data.character);
             return;
         }
-        let fighter:Fighter = await Fighter.load(data.character);
+        let fighter:Fighter = await FighterRepository.load(data.character);
         if (fighter != undefined) {
             try {
                 fighter.addStat(parsedStat);
@@ -71,7 +72,7 @@ export class CommandHandler implements ICommandHandler {
     };
 
     async clearfeatures(args:string, data:FChatResponse) {
-        let fighter:Fighter = await Fighter.load(data.character);
+        let fighter:Fighter = await FighterRepository.load(data.character);
         if (fighter != undefined) {
             fighter.areStatsPrivate = false;
             try {
@@ -107,7 +108,7 @@ export class CommandHandler implements ICommandHandler {
             args = data.character;
         }
 
-        let fighter:Fighter = await Fighter.load(args);
+        let fighter:Fighter = await FighterRepository.load(args);
 
         if (fighter != undefined && (fighter.name == data.character || (fighter.name == data.character && !fighter.areStatsPrivate))) {
             this.fChatLibInstance.sendPrivMessage(fighter.outputStats(), data.character);
@@ -118,11 +119,11 @@ export class CommandHandler implements ICommandHandler {
     };
 
     async hidemystats(args:string, data:FChatResponse) {
-        let fighter:Fighter = await Fighter.load(data.character);
+        let fighter:Fighter = await FighterRepository.load(data.character);
         if (fighter != undefined) {
             fighter.areStatsPrivate = false;
             try {
-                Fighter.save(fighter);
+                FighterRepository.persist(fighter);
                 this.fChatLibInstance.sendPrivMessage("[color=green]You stats are now private.[/color]", data.character);
             }
             catch (ex) {
@@ -161,7 +162,7 @@ export class CommandHandler implements ICommandHandler {
             this.fChatLibInstance.sendMessage("[color=red]There is already a fight in progress. You must either do !forfeit or !draw to leave the fight.[/color]", this.channel);
             return false;
         }
-        let fighter = await Fighter.load(data.character);
+        let fighter = await FighterRepository.load(data.character);
         if (fighter != undefined) {
             if (this.fight.leave(data.character)) { //else, the match starts!
                 this.fChatLibInstance.sendMessage("[color=green]You are now out of the fight.[/color]", this.channel);
@@ -211,10 +212,12 @@ export class CommandHandler implements ICommandHandler {
     };
 
     async register(args:string, data:FChatResponse) {
-        let doesFighterExist = await Fighter.load(data.character);
+        let doesFighterExist = await FighterRepository.exists(data.character);
         if (!doesFighterExist) {
             try {
-                await Fighter.save(new Fighter(data.character));
+                let newFighter = new Fighter();
+                newFighter.name = data.character;
+                await FighterRepository.persist(newFighter);
                 this.fChatLibInstance.sendPrivMessage("[color=green]You are now registered! Welcome! Don't forget to type !howtostart here if you haven't read the quickstart guide yet.[/color]", data.character);
             }
             catch (ex) {
@@ -233,9 +236,9 @@ export class CommandHandler implements ICommandHandler {
                 "\nAvailable features: " + EnumEx.getNames(FeatureType).join(", ") + "[/color]", data.character);
             return;
         }
-        let fighter = await Fighter.load(data.character);
+        let fighter = await FighterRepository.load(data.character);
         try {
-            if (fighter != undefined) {
+            if (fighter != null) {
                 fighter.removeFeature(parsedFeatureArgs.featureType);
                 this.fChatLibInstance.sendPrivMessage(`[color=green]You successfully removed your ${FeatureType[parsedFeatureArgs.featureType]} feature.[/color]`, fighter.name);
             }
@@ -251,8 +254,8 @@ export class CommandHandler implements ICommandHandler {
             this.fChatLibInstance.sendPrivMessage("[color=red]Stat not found.[/color]", this.channel);
             return;
         }
-        let fighter:Fighter = await Fighter.load(data.character);
-        if (fighter != undefined) {
+        let fighter:Fighter = await FighterRepository.load(data.character);
+        if (fighter != null) {
             try {
                 let res = fighter.removeStat(parsedStat);
             }
@@ -263,8 +266,8 @@ export class CommandHandler implements ICommandHandler {
     };
 
     async stats(args:string, data:FChatResponse) {
-        let fighter:Fighter = await Fighter.load(data.character);
-        if (fighter != undefined) {
+        let fighter:Fighter = await FighterRepository.load(data.character);
+        if (fighter != null) {
             this.fChatLibInstance.sendPrivMessage(fighter.outputStats(), fighter.name);
         }
         else {
@@ -278,8 +281,8 @@ export class CommandHandler implements ICommandHandler {
             this.fChatLibInstance.sendMessage("[color=red]Fight Type not found. Types: Rumble, Tag. Example: !setFightType Tag[/color]", this.channel);
             return;
         }
-        let fighter:Fighter = await Fighter.load(data.character);
-        if (fighter != undefined) {
+        let fighter:Fighter = await FighterRepository.load(data.character);
+        if (fighter != null) {
             this.fight.setFightType(args);
         }
         else {
@@ -293,8 +296,8 @@ export class CommandHandler implements ICommandHandler {
             this.fChatLibInstance.sendMessage("[color=red]The number of teams involved must be a numeral higher than 1.[/color]", this.channel);
             return;
         }
-        let fighter:Fighter = await Fighter.load(data.character);
-        if (fighter != undefined) {
+        let fighter:Fighter = await FighterRepository.load(data.character);
+        if (fighter != null) {
             this.fight.setTeamsCount(parsedTeams);
         }
         else {
@@ -303,11 +306,11 @@ export class CommandHandler implements ICommandHandler {
     };
 
     async unhidemystats(args:string, data:FChatResponse) {
-        let fighter:Fighter = await Fighter.load(data.character);
+        let fighter:Fighter = await FighterRepository.load(data.character);
         if (fighter != undefined) {
             fighter.areStatsPrivate = false;
             try {
-                Fighter.save(fighter);
+                FighterRepository.persist(fighter);
                 this.fChatLibInstance.sendPrivMessage("[color=green]You stats are now public.[/color]", data.character);
             }
             catch (ex) {

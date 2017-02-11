@@ -8,18 +8,19 @@ import {TokensWorth} from "./Constants";
 import {Stats} from "./Constants";
 import {FightTier} from "./Constants";
 import {Fight} from "./Fight";
+import {FighterRepository} from "./FighterRepository";
 
 export class Fighter implements IFighter{
 
     name:string = "";
     areStatsPrivate:boolean = true;
 
-    dexterity:number = 0;
-    power:number = 0;
-    sensuality:number = 0;
-    toughness:number = 0;
-    endurance:number = 0;
-    willpower:number = 0;
+    dexterity:number = 1;
+    power:number = 1;
+    sensuality:number = 1;
+    toughness:number = 1;
+    endurance:number = 1;
+    willpower:number = 1;
 
     tokens: number = 0;
     tokensSpent: number = 0;
@@ -77,17 +78,10 @@ export class Fighter implements IFighter{
     forfeits;
     quits;
 
-
-
-
     features:Feature[] = [];
     achievements:Achievement[] = [];
     createdAt:Date;
     updatedAt:Date;
-
-    constructor(name:string) {
-        this.name = name;
-    }
 
     addAchievement(type:AchievementType){
         let added = false;
@@ -194,7 +188,7 @@ export class Fighter implements IFighter{
         let index = this.features.findIndex(x => x.type == type);
         if(index != -1){
             this.features.splice(index, 1);
-            Fighter.save(this);
+            FighterRepository.persist(this);
         }
         else{
             throw new Error("You don't have this feature, you can't remove it.");
@@ -202,7 +196,7 @@ export class Fighter implements IFighter{
     }
 
     addFeature(type:FeatureType, turns:number){
-        let feature = new Feature(this, type, turns);
+        let feature = new Feature(this.name, type, turns);
         let amountToRemove = feature.getCost();
 
         if(this.tokens - amountToRemove >= 0){
@@ -210,7 +204,7 @@ export class Fighter implements IFighter{
             if(index == -1){
                 this.features.push(feature);
                 this.removeTokens(amountToRemove);
-                Fighter.save(this);
+                FighterRepository.persist(this);
             }
             else{
                 throw new Error("You already have this feature. You have to wait for it to expire before adding another of the same type.");
@@ -223,7 +217,7 @@ export class Fighter implements IFighter{
 
     clearFeatures(){
         this.features = [];
-        Fighter.save(this);
+        FighterRepository.persist(this);
     }
 
     hasFeature(featureType:FeatureType):boolean{
@@ -254,7 +248,7 @@ export class Fighter implements IFighter{
         if(amountToRemove != 0 && (this.tokens - amountToRemove >= 0)){
             this.removeTokens(amountToRemove);
             this[Stats[stat].toLowerCase()]++;
-            Fighter.save(this);
+            FighterRepository.persist(this);
             return "";
         }
         else{
@@ -286,7 +280,7 @@ export class Fighter implements IFighter{
         if(amountToGive != 0){
             this.giveTokens(Math.floor(amountToGive/2));
             this[Stats[stat].toLowerCase()]--;
-            Fighter.save(this);
+            FighterRepository.persist(this);
             return "";
         }
         else{
@@ -317,53 +311,6 @@ export class Fighter implements IFighter{
             return FightTier.Gold;
         }
         return;
-    }
-
-    async init():Promise<boolean> {
-        let myFighter = await Fighter.load(this.name);
-        if (myFighter) {
-            this.loadExist(myFighter);
-            return true;
-        }
-        return false;
-    }
-
-    loadExist(loadedFighter:Fighter) {
-        this.name = loadedFighter.name;
-        this.tokens = loadedFighter.tokens;
-        this.tokensSpent = loadedFighter.tokensSpent;
-        this.wins = loadedFighter.wins;
-        this.losses = loadedFighter.losses;
-        this.forfeits = loadedFighter.forfeits;
-        this.quits = loadedFighter.quits;
-        this.fightsCount = loadedFighter.fightsCount;
-        this.areStatsPrivate = loadedFighter.areStatsPrivate;
-        this.power = loadedFighter.power;
-        this.sensuality = loadedFighter.sensuality;
-        this.toughness = loadedFighter.toughness;
-        this.endurance = loadedFighter.endurance;
-        this.dexterity = loadedFighter.dexterity;
-        this.willpower = loadedFighter.willpower;
-        this.features = loadedFighter.features;
-        this.createdAt = loadedFighter.createdAt;
-        this.updatedAt = loadedFighter.updatedAt;
-        this.features = loadedFighter.features;
-    }
-
-    static dbToObject():Fighter{
-        return new Fighter(null);
-    }
-
-    static async save(fighter:Fighter):Promise<boolean>{
-        return true;
-    }
-
-    static async delete(fighterName:string):Promise<boolean>{
-        return true;
-    }
-
-    static async load(fighterName:string):Promise<Fighter>{
-        return new Fighter(fighterName);
     }
 
 }
