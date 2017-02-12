@@ -8,9 +8,9 @@ export class FighterRepository{
     public static async persist(fighter:Fighter):Promise<void>{
         try
         {
-            let id = await Model.db('nsfw_fighters').where({name: fighter.name}).first();
             let currentSeason = await Model.db('nsfw_constants').where({key: "currentSeason"}).first();
-            if(id != null){
+
+            if(!await FighterRepository.exists(fighter.name)){
                 await Model.db('nsfw_fighters').insert({
                     name: fighter.name,
                     season: currentSeason.value,
@@ -52,7 +52,7 @@ export class FighterRepository{
     public static async load(name:string):Promise<Fighter>{
         let loadedFighter:Fighter = new Fighter();
 
-        if(!FighterRepository.exists(name)){
+        if(!await FighterRepository.exists(name)){
             return null;
         }
 
@@ -75,6 +75,7 @@ export class FighterRepository{
             loadedFighter.features = await FighterRepository.loadAllFeatures(name, currentSeason.value);
         }
         catch(ex){
+            throw ex;
         }
 
         return loadedFighter;
@@ -112,6 +113,10 @@ export class FighterRepository{
             featuresArray.push(new Feature(fighterName, row.type, row.uses, row.idFeature));
         }
         return featuresArray;
+    }
+
+    public static async delete(name:string, season:string):Promise<void>{
+        await Model.db('nsfw_fighters').where({name: name, season: season}).del();
     }
 
 }

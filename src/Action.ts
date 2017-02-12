@@ -683,10 +683,6 @@ export class Action{
         }
     }
 
-    get toJson():string{
-        return "{}";
-    }
-
 }
 
 

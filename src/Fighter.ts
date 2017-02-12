@@ -10,7 +10,7 @@ import {FightTier} from "./Constants";
 import {Fight} from "./Fight";
 import {FighterRepository} from "./FighterRepository";
 
-export class Fighter implements IFighter{
+export class Fighter{
 
     name:string = "";
     areStatsPrivate:boolean = true;

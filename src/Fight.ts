@@ -19,6 +19,7 @@ import {Message} from "./Messaging";
 var CircularJSON = require('circular-json');
 import {ActiveFighter} from "./ActiveFighter";
 import {Fighter} from "./Fighter";
+import {ActiveFighterRepository} from "./ActiveFighterRepository";
 
 export class Fight{
 
@@ -114,8 +115,9 @@ export class Fight{
 
                 //delete from DB
                 try {
-                    let activeFighterToRemove = await ActiveFighter.load(fighter.name, this.id);
-                    await ActiveFighter.delete(fighter.name, this.id);
+                    if(await ActiveFighterRepository.exists(fighter.name, this.id)){
+                        await ActiveFighterRepository.delete(fighter.name, this.id);
+                    }
                 }
                 catch (ex) {
                     this.message.addError(Utils.strFormat(Constants.Messages.commandError, ex.message));
