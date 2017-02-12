@@ -73,6 +73,19 @@ function abstractDatabase() {
     };
 
     FightRepository.persist = async function (fight) {
+        return new Promise<void>(function (resolve, reject) {
+            resolve();
+        });
+    };
+
+    FighterRepository.persist = async function (fight) {
+        return new Promise<void>(function (resolve, reject) {
+            resolve();
+        });
+    };
+
+    FightRepository.exists = async function (fight) {
+        return false;
     };
 
     FightRepository.load = async function (id) {
@@ -275,7 +288,7 @@ describe("The player(s)", () => {
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         await x.join("", data);
-        expect(FighterRepository.load).toHaveBeenCalled();
+        expect(ActiveFighterRepository.initialize).toHaveBeenCalled();
         done();
     }, DEFAULT_TIMEOUT);
 

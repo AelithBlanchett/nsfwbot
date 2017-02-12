@@ -184,11 +184,11 @@ export class Fighter{
         return Math.floor(this.tokens/TokensWorth.Gold);
     }
 
-    removeFeature(type:FeatureType):void{
+    async removeFeature(type:FeatureType):Promise<void>{
         let index = this.features.findIndex(x => x.type == type);
         if(index != -1){
             this.features.splice(index, 1);
-            FighterRepository.persist(this);
+            await FighterRepository.persist(this);
         }
         else{
             throw new Error("You don't have this feature, you can't remove it.");
