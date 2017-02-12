@@ -11,6 +11,8 @@ import {ModifierType} from "../src/Constants";
 import {Feature} from "../src/Feature";
 import {FeatureType} from "../src/Constants";
 import {ActiveFighter} from "../src/ActiveFighter";
+import {FighterRepository} from "../src/FighterRepository";
+import {ActionRepository} from "../src/ActionRepository";
 var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
 var jasmine = new Jasmine();
@@ -35,10 +37,19 @@ async function initiateMatchSettings2vs2TagForDb(cmdHandler) {
 describe("The database(s)", () => {
 
     async function resetData() {
-        await Fighter.save(new Fighter("test1"));
-        await Fighter.save(new Fighter("test2"));
-        await Fighter.save(new Fighter("test3"));
-        await Fighter.save(new Fighter("test4"));
+        let firstFighter = new Fighter();
+        firstFighter.name = "test1";
+        let secondFighter = new Fighter();
+        secondFighter.name = "test2";
+        let thirdFighter = new Fighter();
+        thirdFighter.name = "test3";
+        let fourthFighter = new Fighter();
+        fourthFighter.name = "test4";
+
+        await FighterRepository.persist(firstFighter);
+        await FighterRepository.persist(secondFighter);
+        await FighterRepository.persist(thirdFighter);
+        await FighterRepository.persist(fourthFighter);
     }
 
     beforeAll(async function (done) {
@@ -77,15 +88,15 @@ describe("The database(s)", () => {
     });
 
     xit("should load Aelith Blanchette", async function (done) {
-        let fighter = await Fighter.load("Aelith Blanchette");
+        let fighter = await FighterRepository.load("Aelith Blanchette");
         expect(fighter.name).toBe("Aelith Blanchette");
         done();
     });
 
     xit("should give ItemPickupBonus feature to Test2", function (done) {
-        Fighter.load("test2").then(x => {
-            x.features.push(new Feature(x, FeatureType.KickStart, 1));
-            Fighter.save(x).then(updWorked => {
+        FighterRepository.load("test2").then(x => {
+            x.features.push(new Feature(x.name, FeatureType.KickStart, 1));
+            FighterRepository.persist(x).then(updWorked => {
                 expect(updWorked).toBe(true);
                 done();
             }).catch(err => {
@@ -97,7 +108,7 @@ describe("The database(s)", () => {
     },500000);
 
     xit("should say test1 is already there", function (done) {
-        Fighter.load("test1").then(x => {
+        FighterRepository.load("test1").then(x => {
             if (x.name == "test1") {
                 done();
             }
@@ -110,7 +121,7 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should say Test2 is already there", function (done) {
-        Fighter.load("test2").then(x => {
+        FighterRepository.load("test2").then(x => {
             if(x.name == "test2"){
                 done();
             }
@@ -123,7 +134,7 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should say Tewefwefwfwst2 doesn't exist", function (done) {
-        Fighter.load("Tewefwefwfwst2").then(x => {
+        FighterRepository.load("Tewefwefwfwst2").then(x => {
             if(x == undefined){
                 done();
             }
@@ -136,13 +147,13 @@ describe("The database(s)", () => {
     },5000);
 
     xit("should update Test2's power to something else", function (done) {
-        Fighter.load("test2").then(x => {
+        FighterRepository.load("test2").then(x => {
             let randomId = -1;
             do{
                 randomId = Utils.getRandomInt(1,6);
             }while(x.power == randomId);
             x.power = randomId;
-            Fighter.save(x).then(updWorked => {
+            FighterRepository.persist(x).then(updWorked => {
                 expect(updWorked).toBe(true);
                 done();
             }).catch(err => {
@@ -205,11 +216,11 @@ describe("The database(s)", () => {
     }, 80000);
 
     it("should create an action", async function (done) {
-        await Action.save(new Action(new Fight(null, null, null), 1, 0, 1, null));
+        await ActionRepository.persist(new Action(new Fight(null, null, null), 1, 0, 1, null));
     });
 
-    xit("should ddelete something", async function (done) {
-        await Action.delete("7a1ee8c5-58bd-41f5-a0db-7bd1a533f43c");
+    xit("should delete something", async function (done) {
+        await ActionRepository.delete("7a1ee8c5-58bd-41f5-a0db-7bd1a533f43c");
     }, 100000);
 });
 

@@ -16,6 +16,9 @@ import {ModifierType} from "../src/Constants";
 var waitUntil = require('wait-until');
 var Jasmine = require('jasmine');
 import {ActiveFighter} from "../src/ActiveFighter";
+import {FighterRepository} from "../src/FighterRepository";
+import {ActiveFighterRepository} from "../src/ActiveFighterRepository";
+import {ActionRepository} from "../src/ActionRepository";
 var jasmine = new Jasmine();
 var fChatLibInstance:any;
 var debug = false;
@@ -42,19 +45,19 @@ function getMock(mockedClass) {
 
 function abstractDatabase() {
 
-    Fighter.load = async function (name) {
+    FighterRepository.load = async function (name) {
         return new Promise(function (resolve, reject) {
             resolve(createFighter(name));
         });
     };
 
-    ActiveFighter.load = async function (name, fightId) {
+    ActiveFighterRepository.load = async function (name, fightId) {
         return new Promise(function (resolve, reject) {
             resolve(createFighter(name));
         });
     };
 
-    Action.save = async function (action) {
+    ActionRepository.persist = async function (action) {
         return new Promise<boolean>(function (resolve, reject) {
             action.idAction = Utils.generateUUID();
             resolve(true);
@@ -263,7 +266,7 @@ describe("The player(s)", () => {
         var x = new CommandHandler(fChatLibInstance, "here");
         var data:FChatResponse = {character: "Aelith Blanchette", channel: "here"};
         await x.join("", data);
-        expect(Fighter.load).toHaveBeenCalled();
+        expect(FighterRepository.load).toHaveBeenCalled();
         done();
     }, DEFAULT_TIMEOUT);
 
@@ -1092,7 +1095,7 @@ describe("The player(s)", () => {
 
     it("should grant the itemPickupModifier bonus for the KickStart feature", async function (done) {
         var cmd = new CommandHandler(fChatLibInstance, "here");
-        createFighter("TheTinaArmstrong").features.push(new Feature(createFighter("TheTinaArmstrong"), FeatureType.KickStart, 1));
+        createFighter("TheTinaArmstrong").features.push(new Feature("TheTinaArmstrong", FeatureType.KickStart, 1));
         await initiateMatchSettings1vs1(cmd);
 
         waitUntil().interval(2).times(500).condition(() => {
