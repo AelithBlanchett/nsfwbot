@@ -216,7 +216,9 @@ describe("The database(s)", () => {
     }, 80000);
 
     it("should create an action", async function (done) {
-        await ActionRepository.persist(new Action(new Fight(null, null, null), 1, 0, 1, null));
+        let action = new Action();
+        action.buildAction(new Fight(null, null, null), 1, 0, 1, null);
+        await ActionRepository.persist(action);
     });
 
     xit("should delete something", async function (done) {

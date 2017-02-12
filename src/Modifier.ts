@@ -14,7 +14,9 @@ export class Modifier implements IModifier{
     tier:Tier;
     type:ModifierType;
     applier:ActiveFighter;
+    idApplier:string;
     receiver:ActiveFighter;
+    idReceiver:string;
     hpDamage: number;
     lustDamage: number;
     focusDamage: number;
@@ -24,14 +26,17 @@ export class Modifier implements IModifier{
     uses: number;
     event:Trigger;
     timeToTrigger:TriggerMoment;
-    parentIds: Array<string>;
-    parentAction:Action;
+    parentActionIds:Array<string>;
 
-    constructor(receiver:ActiveFighter, applier:ActiveFighter, tier:Tier, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage:number, diceRoll:number, escapeRoll:number, uses:number,
-                timeToTrigger:TriggerMoment, event:Trigger, parentIds:Array<string>, areMultipliers:boolean){
+    build(receiver:ActiveFighter, applier:ActiveFighter, tier:Tier, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage:number, diceRoll:number, escapeRoll:number, uses:number,
+                timeToTrigger:TriggerMoment, event:Trigger, parentActionIds:Array<string>, areMultipliers:boolean){
         this.id = Utils.generateUUID();
         this.receiver = receiver; //ALWAYS filled!
+        this.idReceiver = receiver.name;
         this.applier = applier; //can be null
+        if(this.applier){
+            this.idApplier = applier.name;
+        }
         this.tier = tier;
         this.type = modType;
         this.hpDamage = hpDamage;
@@ -42,7 +47,7 @@ export class Modifier implements IModifier{
         this.uses = uses;
         this.event = event;
         this.timeToTrigger = timeToTrigger;
-        this.parentIds = parentIds;
+        this.parentActionIds = parentActionIds;
         this.areDamageMultipliers = areMultipliers;
         this.name = Constants.Modifier[ModifierType[modType]];
     }
@@ -123,21 +128,5 @@ export class Modifier implements IModifier{
                 this.receiver.removeMod(this.id);
             }
         }
-    }
-
-    static dbToObject():Modifier{
-        return new Modifier(null, null, null, null, null, null, null, null, null,null,null,null,null,null);
-    }
-
-    static async save(fight:Modifier):Promise<boolean>{
-        return true;
-    }
-
-    static async delete(modId:string):Promise<boolean>{
-        return true;
-    }
-
-    static async load(modId:string):Promise<Modifier>{
-        return new Modifier(null, null, null, null, null, null, null, null, null,null,null,null,null,null);
     }
 }

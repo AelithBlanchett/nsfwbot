@@ -1,6 +1,7 @@
 import {Model} from "./Model";
 import {ActiveFighter} from "./ActiveFighter";
 import {FighterRepository} from "./FighterRepository";
+import {Utils} from "./Utils";
 
 export class ActiveFighterRepository{
 
@@ -135,6 +136,27 @@ export class ActiveFighterRepository{
         }
 
         return loadedActiveFighter;
+    }
+
+    public static async loadFromFight(idFight:string):Promise<ActiveFighter[]>{
+        let loadedActiveFighters:ActiveFighter[] = [];
+
+        try
+        {
+            let loadedData = await Model.db('nsfw_activefighters').where({idFight: idFight}).select();
+
+            for(let data of loadedData){
+                let action = new ActiveFighter();
+                Utils.mapChildren(data, action);
+                loadedActiveFighters.push(action);
+            }
+
+        }
+        catch(ex){
+            throw ex;
+        }
+
+        return loadedActiveFighters;
     }
 
     public static async delete(idFighter:string, idFight:string):Promise<void>{

@@ -8,7 +8,9 @@ export interface IModifier{
     tier:Tier;
     type:ModifierType;
     applier: ActiveFighter;
+    idApplier: string;
     receiver: ActiveFighter;
+    idReceiver: string;
     hpDamage: number;
     lustDamage: number;
     focusDamage: number;
@@ -16,12 +18,13 @@ export interface IModifier{
     diceRoll: number;
     escapeRoll: number;
     uses: number;
-    parentAction: Action;
     event:Trigger;
     timeToTrigger:TriggerMoment;
-    parentIds: Array<string>;
+    parentActionIds: Array<string>;
 
     isOver():boolean;
     trigger(moment: TriggerMoment, event:Trigger, objFightAction?:any):void;
     willTriggerForEvent(moment: TriggerMoment, event:Trigger):boolean;
+    build(receiver:ActiveFighter, applier:ActiveFighter, tier:Tier, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage:number, diceRoll:number, escapeRoll:number, uses:number,
+          timeToTrigger:TriggerMoment, event:Trigger, parentActionIds:Array<string>, areMultipliers:boolean):void;
 }

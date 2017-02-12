@@ -20,6 +20,8 @@ var CircularJSON = require('circular-json');
 import {ActiveFighter} from "./ActiveFighter";
 import {Fighter} from "./Fighter";
 import {ActiveFighterRepository} from "./ActiveFighterRepository";
+import {FightRepository} from "./FightRepository";
+import {FighterRepository} from "./FighterRepository";
 
 export class Fight{
 
@@ -234,7 +236,7 @@ export class Fight{
         }
 
         this.message.send();
-        await Fight.save(this);
+        await FightRepository.persist(this);
         this.outputStatus();
     }
 
@@ -291,7 +293,7 @@ export class Fight{
             this.endFight(tokensToGiveToWinners, tokensToGiveToLosers);
         }
         else{
-            Fight.save(this);
+            FightRepository.persist(this);
             this.waitingForAction = true;
         }
     }
@@ -545,7 +547,8 @@ export class Fight{
             let attacker = this.currentPlayer; // need to store them in case of turn-changing logic
             let defender = this.currentTarget;
 
-            attacker.pendingAction = new Action(this, this.currentTurn, tier, action, attacker, defender);
+            attacker.pendingAction = new Action();
+            attacker.pendingAction.buildAction(this, this.currentTurn, tier, action, attacker, defender);
             let eventToTriggerAfter = attacker.pendingAction.triggerAction(); //The specific trigger BEFORE is executed inside the attacks, see Action.ts
             attacker.triggerMods(TriggerMoment.After, eventToTriggerAfter, attacker.pendingAction);
             attacker.pendingAction.commit(this);
@@ -680,7 +683,7 @@ export class Fight{
             this.message.addInfo(fighter.checkAchievements());
         }
 
-        Fight.save(this);
+        FightRepository.persist(this);
     }
 
     reorderFightersByInitiative(arrFightersSortedByInitiative:Array<ActiveFighter>) {
@@ -889,7 +892,6 @@ export class Fight{
         return fighter;
     }
 
-
     //Misc. shortcuts
     get fighterCount():number {
         return this.fighters.length;
@@ -897,23 +899,6 @@ export class Fight{
 
     get aliveFighterCount():number {
         return this.getAlivePlayers().length;
-    }
-
-
-    static dbToObject():Fight{
-        return new Fight(null, null);
-    }
-
-    static async save(fight:Fight):Promise<boolean>{
-        return true;
-    }
-
-    static async delete(fightId:number):Promise<boolean>{
-        return true;
-    }
-
-    static async load(fightId:number):Promise<Fight>{
-        return new Fight(null);
     }
 
 }

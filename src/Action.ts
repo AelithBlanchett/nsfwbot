@@ -24,6 +24,7 @@ import {StrapToyLPDamagePerTurn} from "./Constants";
 import {Modifier} from "./Modifier";
 import {ActiveFighter} from "./ActiveFighter";
 import {Model} from "./Model";
+import {ActionRepository} from "./ActionRepository";
 
 export class Action{
 
@@ -35,6 +36,8 @@ export class Action{
     isHold: boolean = false;
     diceScore: number = -1;
     missed: boolean = true;
+    idAttacker:string;
+    idDefender:string;
     attacker:ActiveFighter;
     defender:ActiveFighter;
     hpDamageToDef: number = 0;
@@ -59,22 +62,16 @@ export class Action{
         return this.fight.id;
     }
 
-    get idAttacker():string{
-        return this.attacker.name;
-    }
-
-    get idDefender():string{
-        return this.attacker.name;
-    }
-
-    constructor(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:ActiveFighter, defender?:ActiveFighter) {
+    buildAction(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:ActiveFighter, defender?:ActiveFighter) {
         this.idAction = Utils.generateUUID();
         this.fight = fight;
         this.atTurn = currentTurn;
         this.tier = tier;
         this.type = actionType;
         this.attacker = attacker;
+        this.idAttacker = attacker.name;
         this.defender = defender;
+        this.idDefender = defender.name;
         this.createdAt = new Date();
     }
 
@@ -470,7 +467,7 @@ export class Action{
 
     }
 
-    commit(fight:Fight){
+    async commit(fight:Fight){
         if(this.defender){
             fight.message.addAction(`${ActionType[this.type]} on ${this.defender.getStylizedName()}`);
         }
@@ -601,13 +598,13 @@ export class Action{
                             mod.focusDamage += this.modifiers[indexOfNewHold].focusDamage;
                             //Did not add the dice/escape score modifications, if needed, implement here
                         }
-                        else if(mod.parentIds && mod.parentIds.indexOf(idOfFormerHold) != -1){
+                        else if(mod.parentActionIds && mod.parentActionIds.indexOf(idOfFormerHold) != -1){
                             mod.uses += this.modifiers[indexOfNewHold].uses;
                         }
                     }
                     for(let mod of this.attacker.modifiers){
                         //update the bonus modifiers length
-                        if(mod.parentIds.indexOf(idOfFormerHold) != -1){
+                        if(mod.parentActionIds.indexOf(idOfFormerHold) != -1){
                             mod.uses += this.modifiers[indexOfNewHold].uses;
                         }
                     }
@@ -666,7 +663,7 @@ export class Action{
         }
 
         //Save it to the DB
-        Action.commitDb(this);
+        await ActionRepository.persist(this);
 
         //check for fight ending status
         if (this.type == ActionType.Escape && this.missed == false) {
@@ -677,8 +674,8 @@ export class Action{
             fight.nextTurn();
         } else { //if there's only one team left in the fight, then we're sure it's over
             fight.outputStatus();
-            var tokensToGiveToWinners:number = TokensPerWin[FightTier[fight.getFightTier(fight.winnerTeam)]];
-            var tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.Fight.Globals.tokensPerLossMultiplier;
+            let tokensToGiveToWinners:number = TokensPerWin[FightTier[fight.getFightTier(fight.winnerTeam)]];
+            let tokensToGiveToLosers:number = tokensToGiveToWinners*Constants.Fight.Globals.tokensPerLossMultiplier;
             fight.endFight(tokensToGiveToWinners, tokensToGiveToLosers);
         }
     }

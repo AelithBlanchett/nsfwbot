@@ -19,6 +19,7 @@ import {ActiveFighter} from "../src/ActiveFighter";
 import {FighterRepository} from "../src/FighterRepository";
 import {ActiveFighterRepository} from "../src/ActiveFighterRepository";
 import {ActionRepository} from "../src/ActionRepository";
+import {FightRepository} from "../src/FightRepository";
 var jasmine = new Jasmine();
 var fChatLibInstance:any;
 var debug = false;
@@ -58,18 +59,17 @@ function abstractDatabase() {
     };
 
     ActionRepository.persist = async function (action) {
-        return new Promise<boolean>(function (resolve, reject) {
+        return new Promise<void>(function (resolve, reject) {
             action.idAction = Utils.generateUUID();
-            resolve(true);
+            resolve();
         });
     };
 
-    Fight.save = async function (fight) {
-        return true;
+    FightRepository.persist = async function (fight) {
     };
 
-    Fight.load = async function (id) {
-        return true;
+    FightRepository.load = async function (id) {
+        return new Fight();
     };
 }
 

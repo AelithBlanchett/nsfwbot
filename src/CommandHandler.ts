@@ -13,6 +13,7 @@ import {EnumEx} from "./Utils";
 import {ActionType} from "./Action";
 import {Team} from "./Constants";
 import {FighterRepository} from "./FighterRepository";
+import {FightRepository} from "./FightRepository";
 
 export class CommandHandler implements ICommandHandler {
     fChatLibInstance:IFChatLib;
@@ -180,7 +181,7 @@ export class CommandHandler implements ICommandHandler {
         if (this.fight == undefined || this.fight.hasEnded || !this.fight.hasStarted) {
             try {
                 if (!isNaN(parseInt(args))) {
-                    this.fight = await Fight.load(parseInt(args));
+                    this.fight = await FightRepository.load(args);
                     this.fight.fChatLibInstance= this.fChatLibInstance;
                     this.fight.channel =this.channel;
                 }

@@ -103,7 +103,7 @@ export class FighterRepository{
     }
 
     public static async exists(name:string):Promise<boolean>{
-        let loadedData = await Model.db('nsfw_v_fighters').where({name: name}).select();
+        let loadedData = await Model.db('nsfw_v_fighters').where({name: name}).and.whereNotNull('deletedAt').select();
         return (loadedData.length > 0);
     }
 
@@ -118,7 +118,7 @@ export class FighterRepository{
         {
             let currentSeason = await Model.db('nsfw_constants').where({key: "currentSeason"}).first();
 
-            let loadedData = await Model.db('nsfw_v_fighters').where({name: name, season: currentSeason.value}).select();
+            let loadedData = await Model.db('nsfw_v_fighters').where({name: name, season: currentSeason.value}).and.whereNotNull('deletedAt').select();
             let data = loadedData[0];
 
             for(let prop of Object.getOwnPropertyNames(data)){
@@ -160,7 +160,7 @@ export class FighterRepository{
         let result;
 
         try{
-            result = await Model.db('nsfw_fighters_features').where('idFighter', fighterName).andWhere('season', season).select();
+            result = await Model.db('nsfw_fighters_features').where('idFighter', fighterName).andWhere('season', season).and.whereNotNull('deletedAt').select();
         }
         catch(ex){
             throw ex;
@@ -174,7 +174,9 @@ export class FighterRepository{
     }
 
     public static async delete(name:string, season:string):Promise<void>{
-        await Model.db('nsfw_fighters').where({name: name, season: season}).del();
+        await Model.db('nsfw_fighters').where({name: name, season: season}).update({
+            deletedAt: new Date()
+        });
     }
 
 }

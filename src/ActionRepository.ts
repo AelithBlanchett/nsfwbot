@@ -2,14 +2,14 @@
 
 import {Action} from "./Action";
 import {Model} from "./Model";
+import {Utils} from "./Utils";
 export class ActionRepository{
 
     public static async persist(action:Action):Promise<void>{
-        let id = "";
         try
         {
-            if(action.idAction == ""){
-                id = await Model.db('nsfw_actions').returning('idAction').insert(
+            if(!await ActionRepository.exists(action.idAction)){
+                await Model.db('nsfw_actions').insert(
                     {
                         idAction: action.idAction,
                         idFight: action.idFight,
@@ -36,10 +36,9 @@ export class ActionRepository{
                         requiresRoll: action.requiresRoll,
                         createdAt: action.createdAt
                     }).into("nsfw_actions");
-                action.idAction = id;
             }
             else{
-                id = await Model.db('nsfw_actions').where({idAction: action.idAction}).update(
+                await Model.db('nsfw_actions').where({idAction: action.idAction}).update(
                     {
                         idFight: action.idFight,
                         atTurn: action.atTurn,
@@ -71,6 +70,32 @@ export class ActionRepository{
         catch(ex){
             throw ex;
         }
+    }
+
+    public static async loadFromFight(idFight:string):Promise<Action[]>{
+        let loadedActions:Action[] = [];
+
+        try
+        {
+            let loadedData = await Model.db('nsfw_actions').where({idFight: idFight}).select();
+
+            for(let data of loadedData){
+                let action = new Action();
+                Utils.mapChildren(data, action);
+                loadedActions.push(action);
+            }
+
+        }
+        catch(ex){
+            throw ex;
+        }
+
+        return loadedActions;
+    }
+
+    public static async exists(idAction:string):Promise<boolean>{
+        let loadedData = await Model.db('nsfw_actions').where({idAction: idAction}).select();
+        return (loadedData.length > 0);
     }
 
     public static async delete(actionId:string):Promise<void>{
