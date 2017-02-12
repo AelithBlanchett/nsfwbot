@@ -37,11 +37,69 @@ export class FighterRepository{
                     tokens: fighter.tokens,
                     tokensSpent: fighter.tokensSpent
                 });
+
+                FighterRepository.persistFeatures(fighter);
+                FighterRepository.persistAchievements(fighter);
             }
         }
         catch(ex){
             throw ex;
         }
+    }
+
+    public static async persistFeatures(fighter:Fighter):Promise<void>{
+
+        let featuresIdToKeep = [];
+        let currentSeason = await Model.db('nsfw_constants').where({key: "currentSeason"}).first();
+
+        for(let feature of fighter.features){
+            if(!feature.isExpired()){
+                featuresIdToKeep.push(feature.id);
+            }
+
+            let loadedData = await Model.db('nsfw_fighters_features').where({idFighter: fighter.name, idFeature: feature.id}).select();
+            if(loadedData.length > 0){
+                await Model.db('nsfw_fighters_features').insert({
+                    idFeature: feature.id,
+                    idFighter: fighter.name,
+                    season: currentSeason,
+                    type: feature.type,
+                    uses: feature.uses,
+                    permanent: feature.permanent,
+                    createdAt: new Date()
+                });
+            }
+            else{
+                await Model.db('nsfw_fighters_features').where({idFighter: fighter.name, idFeature: feature.id}).update({
+                    season: currentSeason,
+                    type: feature.type,
+                    uses: feature.uses,
+                    permanent: feature.permanent,
+                    updatedAt: new Date()
+                });
+            }
+
+        }
+
+        await Model.db('nsfw_fighters_features').where('idFighter', fighter.name).whereNull('deletedAt').whereNotIn('idFeature', featuresIdToKeep).update({
+            deletedAt: new Date()
+        });
+    }
+
+    public static async persistAchievements(fighter:Fighter):Promise<void>{
+
+        for(let achievement of fighter.achievements){
+            let loadedData = await Model.db('nsfw_fighters_achievements').where({idFighter: fighter.name, idAchievement: achievement.type}).select();
+
+            if(loadedData.length < 1){
+                await Model.db('nsfw_fighters_achievements').insert({
+                    idAchievement: achievement.type,
+                    idFighter: fighter.name,
+                    createdAt: new Date()
+                });
+            }
+        }
+
     }
 
     public static async exists(name:string):Promise<boolean>{

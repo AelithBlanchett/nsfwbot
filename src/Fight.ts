@@ -130,8 +130,7 @@ export class Fight{
     async join(fighterName:string, team:Team):Promise<number> {
         if(!this.hasStarted){
             if (!this.getFighterByName(fighterName)) { //find fighter by its name property instead of comparing objects, which doesn't work.
-                let activeFighter:ActiveFighter = new ActiveFighter(fighterName);
-                await activeFighter.init(this);
+                let activeFighter:ActiveFighter = await ActiveFighterRepository.initialize(fighterName);
                 activeFighter.fightStatus = FightStatus.Joined;
                 if(team != Team.Unknown){
                     activeFighter.assignedTeam = team;
@@ -230,7 +229,6 @@ export class Fight{
                 if (feature.isExpired()) {
                     this.fighters[i].removeFeature(feature.type);
                     this.message.addHint("This feature has expired.");
-                    Fighter.save(this.fighters[i]); //save Fighter or ActiveFighter?
                 }
             }
         }

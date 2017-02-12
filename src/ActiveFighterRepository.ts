@@ -89,12 +89,27 @@ export class ActiveFighterRepository{
         return (loadedData.length > 0);
     }
 
-    public static async load(idFighter:string, idFight:string):Promise<ActiveFighter>{
+    public static async initialize(idFighter:string):Promise<ActiveFighter>{
         let loadedActiveFighter:ActiveFighter = new ActiveFighter();
 
         if(!await FighterRepository.exists(idFighter)){
             return null;
         }
+
+        let loadedFighter = await FighterRepository.load(name);
+        for(let prop of Object.getOwnPropertyNames(loadedFighter)){
+            if(Object.getOwnPropertyNames(loadedActiveFighter).indexOf(prop) != -1){
+                if(typeof loadedFighter[prop] != "function"){
+                    loadedActiveFighter[prop] = loadedFighter[prop];
+                }
+            }
+        }
+
+        return loadedActiveFighter;
+    }
+
+    public static async load(idFighter:string, idFight:string):Promise<ActiveFighter>{
+        let loadedActiveFighter:ActiveFighter = new ActiveFighter();
 
         if(!await ActiveFighterRepository.exists(idFighter, idFight)){
             return null;
@@ -102,15 +117,7 @@ export class ActiveFighterRepository{
 
         try
         {
-
-            let loadedFighter = await FighterRepository.load(name);
-            for(let prop of Object.getOwnPropertyNames(loadedFighter)){
-                if(Object.getOwnPropertyNames(loadedActiveFighter).indexOf(prop) != -1){
-                    if(typeof loadedFighter[prop] != "function"){
-                        loadedActiveFighter[prop] = loadedFighter[prop];
-                    }
-                }
-            }
+            loadedActiveFighter = await ActiveFighterRepository.initialize(idFighter);
 
             let loadedData = await Model.db('nsfw_activefighters').where({idFighter: idFighter, idFight: idFight}).select();
             let data = loadedData[0];
