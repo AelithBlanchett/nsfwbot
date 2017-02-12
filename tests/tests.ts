@@ -20,6 +20,7 @@ import {FighterRepository} from "../src/FighterRepository";
 import {ActiveFighterRepository} from "../src/ActiveFighterRepository";
 import {ActionRepository} from "../src/ActionRepository";
 import {FightRepository} from "../src/FightRepository";
+import {Dice} from "../src/Dice";
 var jasmine = new Jasmine();
 var fChatLibInstance:any;
 var debug = false;
@@ -47,6 +48,12 @@ function getMock(mockedClass) {
 function abstractDatabase() {
 
     FighterRepository.load = async function (name) {
+        return new Promise(function (resolve, reject) {
+            resolve(createFighter(name));
+        });
+    };
+
+    ActiveFighterRepository.initialize = async function (name) {
         return new Promise(function (resolve, reject) {
             resolve(createFighter(name));
         });
@@ -103,6 +110,7 @@ function createFighter(name, intStatsToAssign:number = 3):ActiveFighter {
         myFighter.lust = 0;
         myFighter.orgasmsRemaining = myFighter.maxOrgasms();
         myFighter.focus = myFighter.willpower;
+        myFighter.dice = new Dice(10);
         usedFighters.push(myFighter);
     }
     else {
@@ -229,14 +237,15 @@ describe("The player(s)", () => {
         spyOn(fChatLibInstance, 'sendMessage').and.callThrough();
         spyOn(fChatLibInstance, 'throwError').and.callThrough();
         spyOn(fChatLibInstance, 'sendPrivMessage').and.callThrough();
-        spyOn(ActiveFighter, 'load').and.callThrough();
-        spyOn(Fighter, 'load').and.callThrough();
+        spyOn(ActiveFighterRepository, 'load').and.callThrough();
+        spyOn(ActiveFighterRepository, 'initialize').and.callThrough();
+        spyOn(FighterRepository, 'load').and.callThrough();
 
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
     }, DEFAULT_TIMEOUT);
 
 
-    it("should be initialized to 3-3-3-3-3-3 name = Yolo", async function () { //1
+   it("should be initialized to 3-3-3-3-3-3 name = Yolo", function () { //1
         let fighterYolo = createFighter("Yolo");
         expect(fighterYolo.name).toBe("Yolo");
     }, DEFAULT_TIMEOUT);

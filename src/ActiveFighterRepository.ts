@@ -2,6 +2,8 @@ import {Model} from "./Model";
 import {ActiveFighter} from "./ActiveFighter";
 import {FighterRepository} from "./FighterRepository";
 import {Utils} from "./Utils";
+import {ModifierRepository} from "./ModifierRepository";
+import {Dice} from "./Dice";
 
 export class ActiveFighterRepository{
 
@@ -106,6 +108,8 @@ export class ActiveFighterRepository{
             }
         }
 
+        loadedActiveFighter.dice = new Dice(10);
+
         return loadedActiveFighter;
     }
 
@@ -123,13 +127,15 @@ export class ActiveFighterRepository{
             let loadedData = await Model.db('nsfw_activefighters').where({idFighter: idFighter, idFight: idFight}).select();
             let data = loadedData[0];
 
-            for(let prop of Object.getOwnPropertyNames(data)){
-                if(Object.getOwnPropertyNames(loadedActiveFighter).indexOf(prop) != -1){
-                    if(typeof data[prop] != "function"){
+            for(let prop of Object.getOwnPropertyNames(data)) {
+                if (Object.getOwnPropertyNames(loadedActiveFighter).indexOf(prop) != -1) {
+                    if (typeof data[prop] != "function") {
                         loadedActiveFighter[prop] = data[prop];
                     }
                 }
             }
+
+            loadedActiveFighter.modifiers = await ModifierRepository.loadFromFight(idFight);
         }
         catch(ex){
             throw ex;
