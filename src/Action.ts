@@ -30,6 +30,7 @@ export class Action{
 
     idAction: string;
     fight:Fight;
+    idFight;
     atTurn: number;
     type:ActionType;
     tier: Tier;
@@ -58,13 +59,10 @@ export class Action{
 
     modifiers:Modifier[] = [];
 
-    get idFight():string{
-        return this.fight.id;
-    }
-
     buildAction(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:ActiveFighter, defender?:ActiveFighter) {
         this.idAction = Utils.generateUUID();
         this.fight = fight;
+        this.idFight = fight.id;
         this.atTurn = currentTurn;
         this.tier = tier;
         this.type = actionType;

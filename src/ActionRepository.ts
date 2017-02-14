@@ -1,5 +1,3 @@
-
-
 import {Action} from "./Action";
 import {Model} from "./Model";
 import {Utils} from "./Utils";
@@ -9,6 +7,7 @@ export class ActionRepository{
         try
         {
             if(!await ActionRepository.exists(action.idAction)){
+                action.createdAt = new Date();
                 await Model.db('nsfw_actions').insert(
                     {
                         idAction: action.idAction,
@@ -38,6 +37,7 @@ export class ActionRepository{
                     }).into("nsfw_actions");
             }
             else{
+                action.updatedAt = new Date();
                 await Model.db('nsfw_actions').where({idAction: action.idAction}).update(
                     {
                         idFight: action.idFight,
@@ -62,7 +62,7 @@ export class ActionRepository{
                         lpHealToAtk: action.fpHealToAtk,
                         fpHealToAtk: action.lpHealToAtk,
                         requiresRoll: action.requiresRoll,
-                        createdAt: action.createdAt
+                        updatedAt: action.updatedAt
                     }).into("nsfw_actions");
             }
 
@@ -94,16 +94,26 @@ export class ActionRepository{
     }
 
     public static async exists(idAction:string):Promise<boolean>{
-        let loadedData = await Model.db('nsfw_actions').where({idAction: idAction}).select();
+        let loadedData = [];
+        if(idAction){
+            try{
+                loadedData = await Model.db('nsfw_actions').where({idAction: idAction}).select();
+            }
+            catch(ex){
+                throw ex;
+            }
+        }
         return (loadedData.length > 0);
     }
 
     public static async delete(actionId:string):Promise<void>{
-        try{
-            await Model.db('nsfw_actions').where({idAction: actionId}).del();
-        }
-        catch(ex){
-            throw ex;
+        if(actionId){
+            try{
+                await Model.db('nsfw_actions').where({idAction: actionId}).del();
+            }
+            catch(ex){
+                throw ex;
+            }
         }
     }
 
