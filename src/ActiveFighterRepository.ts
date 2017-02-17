@@ -4,6 +4,7 @@ import {FighterRepository} from "./FighterRepository";
 import {Utils} from "./Utils";
 import {ModifierRepository} from "./ModifierRepository";
 import {Dice} from "./Dice";
+import {Fight} from "./Fight";
 
 export class ActiveFighterRepository{
 
@@ -12,14 +13,15 @@ export class ActiveFighterRepository{
         {
             let currentSeason = await Model.db('nsfw_constants').where({key: "currentSeason"}).first();
 
-            if(fighter.fight == null || fighter.fight.id == null){
+            if(fighter.idFight == null){
                 return;
             }
 
-            if(!await ActiveFighterRepository.exists(fighter.name, fighter.fight.id)){
+            if(!await ActiveFighterRepository.exists(fighter.name, fighter.idFight)){
+                fighter.createdAt = new Date();
                 await Model.db('nsfw_activefighters').insert({
                     idFighter: fighter.name,
-                    idFight: fighter.fight.id,
+                    idFight: fighter.idFight,
                     season: currentSeason.value,
                     assignedTeam: fighter.assignedTeam,
                     isReady: fighter.isReady,
@@ -47,11 +49,12 @@ export class ActiveFighterRepository{
                     toughnessDelta: fighter.toughnessDelta,
                     enduranceDelta: fighter.enduranceDelta,
                     willpowerDelta: fighter.willpowerDelta,
-                    createdAt: new Date()
+                    createdAt: fighter.createdAt
                 });
             }
             else{
-                await Model.db('nsfw_activefighters').where({name: fighter.name, idFight: fighter.fight.id}).update({
+                fighter.updatedAt = new Date();
+                await Model.db('nsfw_activefighters').where({idFighter: fighter.name, idFight: fighter.idFight}).update({
                     assignedTeam: fighter.assignedTeam,
                     isReady: fighter.isReady,
                     hp: fighter.hp,
@@ -78,7 +81,7 @@ export class ActiveFighterRepository{
                     toughnessDelta: fighter.toughnessDelta,
                     enduranceDelta: fighter.enduranceDelta,
                     willpowerDelta: fighter.willpowerDelta,
-                    updatedAt: new Date()
+                    updatedAt: fighter.updatedAt
                 });
             }
         }
@@ -108,7 +111,7 @@ export class ActiveFighterRepository{
             }
         }
 
-        loadedActiveFighter.dice = new Dice(10);
+        loadedActiveFighter.initialize();
 
         return loadedActiveFighter;
     }
@@ -136,6 +139,7 @@ export class ActiveFighterRepository{
             }
 
             loadedActiveFighter.modifiers = await ModifierRepository.loadFromFight(idFight);
+            //No need to load actions, that's done in the fight loading
         }
         catch(ex){
             throw ex;

@@ -2,6 +2,7 @@ export class Globals {
     public static pluginName:string = "nsfw";
     public static currencyName:string = "tokens";
     public static currentSeason:number = 1;
+    public static diceSides:number = 12;
 }
 
 export class SQL {

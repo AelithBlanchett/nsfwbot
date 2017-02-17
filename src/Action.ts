@@ -461,10 +461,6 @@ export class Action{
         return Trigger.PassiveAction;
     }
 
-    static async commitDb(action:Action) {
-
-    }
-
     async commit(fight:Fight){
         if(this.defender){
             fight.message.addAction(`${ActionType[this.type]} on ${this.defender.getStylizedName()}`);

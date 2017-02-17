@@ -16,8 +16,9 @@ import {Fighter} from "./Fighter";
 export class ActiveFighter extends Fighter {
 
     fight:Fight;
-    season:number;
-    assignedTeam:Team;
+    idFight:string;
+    season:number = Constants.Globals.currentSeason;
+    assignedTeam:Team = Team.Unknown;
     target:ActiveFighter;
     isReady:boolean = false;
     hp:number = 0;
@@ -53,8 +54,55 @@ export class ActiveFighter extends Fighter {
 
 
     //Objects, do not need to store
-    pendingAction:Action;
-    dice:Dice;
+    pendingAction:Action = null;
+    dice:Dice = new Dice(Constants.Globals.diceSides);
+
+    assignFight(fight:Fight):void{
+        this.fight = fight;
+        this.idFight = fight.id;
+    }
+
+    //fight is "mistakenly" set as optional to be compatible with the super.init
+    initialize():void {
+        this.startingToughness = this.toughness;
+        this.startingEndurance = this.endurance;
+        this.startingWillpower = this.willpower;
+        this.startingSensuality = this.sensuality;
+        this.startingPower = this.power;
+        this.startingDexterity = this.dexterity;
+
+        this.hp = this.hpPerHeart();
+        this.heartsRemaining = this.maxHearts();
+        this.lust = 0;
+        this.orgasmsRemaining = this.maxOrgasms();
+        this.focus = this.willpower;
+
+        this.assignedTeam = Team.Unknown;
+        this.target = null;
+        this.isReady = false;
+
+        this.lastDiceRoll = null;
+        this.isInTheRing = true;
+        this.canMoveFromOrOffRing = true;
+        this.lastTagTurn = 9999999;
+        this.wantsDraw = false;
+        this.consecutiveTurnsWithoutFocus = 0;
+        this.modifiers = [];
+        this.actionsDone = [];
+        this.actionsInflicted = [];
+        this.fightStatus = null;
+
+        this.powerDelta = 0;
+        this.sensualityDelta = 0;
+        this.toughnessDelta = 0;
+        this.enduranceDelta = 0;
+        this.dexterityDelta = 0;
+        this.willpowerDelta = 0;
+
+        this.dice = new Dice(Constants.Globals.diceSides);
+        this.season = Constants.Globals.currentSeason;
+        this.fightStatus = FightStatus.Initialized;
+    }
 
     get currentPower():number{
         return this.startingPower + this.powerDelta;

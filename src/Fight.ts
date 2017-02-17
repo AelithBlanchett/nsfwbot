@@ -30,27 +30,31 @@ export class Fight{
     hasStarted:boolean = false;
     hasEnded:boolean = false;
     stage:string;
-    fighters:ActiveFighter[] = [];
     currentTurn:number = 0;
     fightType:FightType = FightType.Rumble;
     pastActions:Array<Action> = [];
     winnerTeam:Team = Team.Unknown;
-    season:number;
+    season:number = Constants.Globals.currentSeason;
     waitingForAction:boolean = true;
-    message:Message;
-    lastMessage:Message;
-    fChatLibInstance:IFChatLib;
-    channel:string;
+
     createdAt:Date;
     updatedAt:Date;
 
-    public constructor(fChatLibInstance?:IFChatLib, channel?:string, stage?:string) {
+    fighters:ActiveFighter[] = [];
+    channel:string;
+    message:Message;
+    lastMessage:Message;
+    fChatLibInstance:IFChatLib;
+
+    public constructor() {
         this.id = Utils.generateUUID();
-        this.stage = stage || this.pickStage();
+        this.stage = this.pickStage();
+    }
+
+    build(fChatLibInstance:IFChatLib, channel:string){
         this.fChatLibInstance = fChatLibInstance;
         this.channel = channel;
         this.message = new Message(fChatLibInstance, channel);
-        this.season = Constants.Globals.currentSeason;
     }
 
     setTeamsCount(intNewNumberOfTeams:number){
@@ -142,6 +146,7 @@ export class Fight{
                     activeFighter.assignedTeam = team;
                 }
                 activeFighter.fight = this;
+                activeFighter.idFight = this.id;
                 this.fighters.push(activeFighter);
                 return team;
             }
@@ -904,6 +909,7 @@ export class Fight{
 }
 
 export enum FightStatus {
+    Initialized = -1,
     Lost = 0,
     Won = 1,
     Playing = 2,

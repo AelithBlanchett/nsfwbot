@@ -23,7 +23,8 @@ export class CommandHandler implements ICommandHandler {
     constructor(fChatLib:IFChatLib, chan:string) {
         this.fChatLibInstance = fChatLib;
         this.channel = chan;
-        this.fight = new Fight(this.fChatLibInstance, this.channel);
+        this.fight = new Fight();
+        this.fight.build(fChatLib, chan);
         this.fChatLibInstance.addPrivateMessageListener(privMsgEventHandler);
     }
 
@@ -142,7 +143,8 @@ export class CommandHandler implements ICommandHandler {
 
     async join(args:string, data:FChatResponse) {
         if (this.fight == undefined || this.fight.hasEnded) {
-            this.fight = new Fight(this.fChatLibInstance, this.channel);
+            this.fight = new Fight();
+            this.fight.build(this.fChatLibInstance, this.channel);
         }
         let chosenTeam = Parser.Commands.join(args);
         try {
@@ -204,7 +206,8 @@ export class CommandHandler implements ICommandHandler {
             return false;
         }
         if (this.fight == undefined || this.fight.hasEnded) {
-            this.fight = new Fight(this.fChatLibInstance, this.channel);
+            this.fight = new Fight();
+            this.fight.build(this.fChatLibInstance, this.channel);
         }
         let result:boolean = await this.fight.setFighterReady(data.character);
         if (!result) { //else, the match starts!
@@ -505,7 +508,8 @@ export class CommandHandler implements ICommandHandler {
 
     resetfight(args:string, data:FChatResponse) {
         if (this.fChatLibInstance.isUserChatOP(data.character, data.channel)) {
-            this.fight = new Fight(this.fChatLibInstance, this.channel);
+            this.fight = new Fight();
+            this.fight.build(this.fChatLibInstance, this.channel);
         }
         else {
             this.fChatLibInstance.sendPrivMessage("[color=red]You're not an operator for this channel.[/color]", data.character);

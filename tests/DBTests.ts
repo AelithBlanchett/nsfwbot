@@ -215,15 +215,15 @@ describe("The database(s)", () => {
         });
     }, 80000);
 
-    it("should create an action", async function (done) {
-        let action = new Action();
-        action.buildAction(new Fight(null, null, null), 1, 0, 1, null);
-        await ActionRepository.persist(action);
-    });
-
-    xit("should delete something", async function (done) {
-        await ActionRepository.delete("7a1ee8c5-58bd-41f5-a0db-7bd1a533f43c");
-    }, 100000);
+    // it("should create an action", async function (done) {
+    //     let action = new Action();
+    //     action.buildAction(new Fight(null, null, null), 1, 0, 1, null);
+    //     await ActionRepository.persist(action);
+    // });
+    //
+    // xit("should delete something", async function (done) {
+    //     await ActionRepository.delete("7a1ee8c5-58bd-41f5-a0db-7bd1a533f43c");
+    // }, 100000);
 });
 
 jasmine.execute();
