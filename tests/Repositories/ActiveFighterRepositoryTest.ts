@@ -19,7 +19,7 @@ describe("The Active Fighter Repository", () => {
         done();
     });
 
-    it("should delete action aa", async function (done) {
+    it("should delete Active Fighter Aelith", async function (done) {
 
         let myFighter = new ActiveFighter();
         myFighter.initialize();
@@ -41,7 +41,7 @@ describe("The Active Fighter Repository", () => {
         done();
     });
 
-    it("should say that action that was just inserted is in database.", async function (done) {
+    it("should say that Active Fighter that was just inserted is in database.", async function (done) {
         let myFighter = new ActiveFighter();
         myFighter.initialize();
         myFighter.name = "Aelith Blanchette";
@@ -56,7 +56,7 @@ describe("The Active Fighter Repository", () => {
         done();
     });
 
-    it("should save an action in the database.", async function (done) {
+    it("should save an Active Fighter in the database.", async function (done) {
         let myFighter = new ActiveFighter();
         myFighter.initialize();
         myFighter.name = "Aelith Blanchette";
@@ -71,7 +71,7 @@ describe("The Active Fighter Repository", () => {
         done();
     });
 
-    it("should load all actions from fight #1", async function (done) {
+    it("should load all Active Fighter from fight #1", async function (done) {
         let myFighter = new ActiveFighter();
         myFighter.initialize();
         myFighter.name = "Aelith Blanchette";

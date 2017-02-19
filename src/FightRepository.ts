@@ -13,28 +13,30 @@ export class FightRepository{
         {
             let currentSeason = await Model.db('nsfw_constants').where({key: "currentSeason"}).first();
 
-            if(!await FightRepository.exists(fight.id)){
+            if(!await FightRepository.exists(fight.idFight)){
+                fight.createdAt = new Date();
                 await Model.db('nsfw_fights').insert({
-                    idFight: fight.id,
+                    idFight: fight.idFight,
                     idFightType: fight.fightType,
-                    idStage: fight.stage,
+                    stage: fight.stage,
                     currentTurn: fight.currentTurn,
                     hasStarted: fight.hasStarted,
                     hasEnded: fight.hasEnded,
                     winnerTeam: fight.winnerTeam,
                     season: fight.season,
-                    createdAt: new Date()
+                    createdAt: fight.createdAt
                 });
             }
             else{
-                await Model.db('nsfw_fights').where({idFight: fight.id, season: currentSeason.value}).update({
+                fight.updatedAt = new Date();
+                await Model.db('nsfw_fights').where({idFight: fight.idFight, season: currentSeason.value}).update({
                     idFightType: fight.fightType,
-                    idStage: fight.stage,
+                    stage: fight.stage,
                     currentTurn: fight.currentTurn,
                     hasStarted: fight.hasStarted,
                     hasEnded: fight.hasEnded,
                     winnerTeam: fight.winnerTeam,
-                    updatedAt: new Date()
+                    updatedAt: fight.updatedAt
                 });
             }
         }
@@ -45,7 +47,7 @@ export class FightRepository{
 
 
     public static async exists(idFight:string):Promise<boolean>{
-        let loadedData = await Model.db('nsfw_fights').where({idFight: idFight}).and.whereNotNull('deletedAt').select();
+        let loadedData = await Model.db('nsfw_fights').where({idFight: idFight}).and.whereNull('deletedAt').select();
         return (loadedData.length > 0);
     }
 
@@ -58,13 +60,12 @@ export class FightRepository{
 
         try
         {
-            let loadedData = await Model.db('nsfw_fights').where({idFight: idFight}).and.whereNotNull('deletedAt').select();
+            let loadedData = await Model.db('nsfw_fights').where({idFight: idFight}).and.whereNull('deletedAt').select();
             let data = loadedData[0];
 
-            Utils.mapChildren(loadedFight, data);
+            Utils.mergeFromTo(data, loadedFight);
 
             loadedFight.fighters = await ActiveFighterRepository.loadFromFight(idFight);
-
             loadedFight.pastActions = await FightRepository.loadActions(loadedFight);
         }
         catch(ex){
@@ -77,13 +78,13 @@ export class FightRepository{
     public static async loadActions(fight:Fight):Promise<Action[]>{
         let loadedActions:Action[] = [];
 
-        if(!await FightRepository.exists(fight.id)){
+        if(!await FightRepository.exists(fight.idFight)){
             return null;
         }
 
         try
         {
-            loadedActions = await ActionRepository.loadFromFight(fight.id);
+            loadedActions = await ActionRepository.loadFromFight(fight.idFight);
 
             for(let action of loadedActions){
                 let attackingFighterIndex = fight.fighters.findIndex(x => x.name == action.idAttacker);

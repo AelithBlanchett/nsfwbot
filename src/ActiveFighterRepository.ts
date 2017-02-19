@@ -130,13 +130,7 @@ export class ActiveFighterRepository{
             let loadedData = await Model.db('nsfw_activefighters').where({idFighter: idFighter, idFight: idFight}).select();
             let data = loadedData[0];
 
-            for(let prop of Object.getOwnPropertyNames(data)) {
-                if (Object.getOwnPropertyNames(loadedActiveFighter).indexOf(prop) != -1) {
-                    if (typeof data[prop] != "function") {
-                        loadedActiveFighter[prop] = data[prop];
-                    }
-                }
-            }
+            Utils.mergeFromTo(data, loadedActiveFighter);
 
             loadedActiveFighter.modifiers = await ModifierRepository.loadFromFight(idFight);
             //No need to load actions, that's done in the fight loading
@@ -157,7 +151,7 @@ export class ActiveFighterRepository{
 
             for(let data of loadedData){
                 let action = new ActiveFighter();
-                Utils.mapChildren(data, action);
+                Utils.mergeFromTo(data, action);
                 loadedActiveFighters.push(action);
             }
 

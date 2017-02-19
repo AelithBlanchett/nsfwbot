@@ -62,7 +62,7 @@ export class Action{
     buildAction(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:ActiveFighter, defender?:ActiveFighter) {
         this.idAction = Utils.generateUUID();
         this.fight = fight;
-        this.idFight = fight.id;
+        this.idFight = fight.idFight;
         this.atTurn = currentTurn;
         this.tier = tier;
         this.type = actionType;

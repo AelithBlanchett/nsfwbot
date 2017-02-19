@@ -82,6 +82,7 @@ export class Fighter{
     achievements:Achievement[] = [];
     createdAt:Date;
     updatedAt:Date;
+    deletedAt:Date;
 
     addAchievement(type:AchievementType){
         let added = false;

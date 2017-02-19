@@ -38,7 +38,7 @@ export class Achievement {
         let x = FightTier.Bronze;
 
         for(let achievement of achievements){
-            if(eval(achievement.condition)){ // super dangerous, I know
+            if(fighter.achievements.findIndex(x => x.type == achievement.type) == -1 && eval(achievement.condition)){ // super dangerous, I know
                 fighter.giveTokens(achievement.reward);
                 addedInfo.push(achievement.description + " Reward: "+ achievement.reward + " tokens.");
             }

@@ -2,6 +2,7 @@ import {Model} from "./Model";
 import {Fighter} from "./Fighter";
 import {Achievement} from "./Achievement";
 import {Feature} from "./Feature";
+import {Utils} from "./Utils";
 
 export class FighterRepository{
 
@@ -11,6 +12,7 @@ export class FighterRepository{
             let currentSeason = await Model.db('nsfw_constants').where({key: "currentSeason"}).first();
 
             if(!await FighterRepository.exists(fighter.name)){
+                fighter.createdAt = new Date();
                 await Model.db('nsfw_fighters').insert({
                     name: fighter.name,
                     season: currentSeason.value,
@@ -22,10 +24,12 @@ export class FighterRepository{
                     willpower: fighter.willpower,
                     areStatsPrivate: fighter.areStatsPrivate,
                     tokens: fighter.tokens,
-                    tokensSpent: fighter.tokensSpent
+                    tokensSpent: fighter.tokensSpent,
+                    createdAt: fighter.createdAt
                 });
             }
             else{
+                fighter.updatedAt = new Date();
                 await Model.db('nsfw_fighters').where({name: fighter.name, season: currentSeason.value}).update({
                     power: fighter.power,
                     sensuality: fighter.sensuality,
@@ -35,7 +39,8 @@ export class FighterRepository{
                     willpower: fighter.willpower,
                     areStatsPrivate: fighter.areStatsPrivate,
                     tokens: fighter.tokens,
-                    tokensSpent: fighter.tokensSpent
+                    tokensSpent: fighter.tokensSpent,
+                    updatedAt: fighter.updatedAt
                 });
 
                 FighterRepository.persistFeatures(fighter);
@@ -53,12 +58,13 @@ export class FighterRepository{
         let currentSeason = await Model.db('nsfw_constants').where({key: "currentSeason"}).first();
 
         for(let feature of fighter.features){
-            if(!feature.isExpired()){
+            if(!feature.isExpired() && feature.deletedAt == null){
                 featuresIdToKeep.push(feature.id);
             }
 
             let loadedData = await Model.db('nsfw_fighters_features').where({idFighter: fighter.name, idFeature: feature.id}).select();
-            if(loadedData.length > 0){
+            if(loadedData.length == 0){
+                feature.createdAt = new Date();
                 await Model.db('nsfw_fighters_features').insert({
                     idFeature: feature.id,
                     idFighter: fighter.name,
@@ -66,16 +72,17 @@ export class FighterRepository{
                     type: feature.type,
                     uses: feature.uses,
                     permanent: feature.permanent,
-                    createdAt: new Date()
+                    createdAt: feature.createdAt
                 });
             }
             else{
+                feature.updatedAt = new Date();
                 await Model.db('nsfw_fighters_features').where({idFighter: fighter.name, idFeature: feature.id}).update({
                     season: currentSeason,
                     type: feature.type,
                     uses: feature.uses,
                     permanent: feature.permanent,
-                    updatedAt: new Date()
+                    updatedAt: feature.updatedAt
                 });
             }
 
@@ -84,6 +91,13 @@ export class FighterRepository{
         await Model.db('nsfw_fighters_features').where('idFighter', fighter.name).whereNull('deletedAt').whereNotIn('idFeature', featuresIdToKeep).update({
             deletedAt: new Date()
         });
+
+        for(let id of featuresIdToKeep){
+            let index = fighter.features.findIndex(x => x.id == id);
+            if(index != -1){
+                fighter.features.splice(index, 1);
+            }
+        }
     }
 
     public static async persistAchievements(fighter:Fighter):Promise<void>{
@@ -91,11 +105,12 @@ export class FighterRepository{
         for(let achievement of fighter.achievements){
             let loadedData = await Model.db('nsfw_fighters_achievements').where({idFighter: fighter.name, idAchievement: achievement.type}).select();
 
-            if(loadedData.length < 1){
+            if(loadedData.length == 0){
+                achievement.createdAt = new Date();
                 await Model.db('nsfw_fighters_achievements').insert({
                     idAchievement: achievement.type,
                     idFighter: fighter.name,
-                    createdAt: new Date()
+                    createdAt: achievement.createdAt
                 });
             }
         }
@@ -103,7 +118,8 @@ export class FighterRepository{
     }
 
     public static async exists(name:string):Promise<boolean>{
-        let loadedData = await Model.db('nsfw_v_fighters').where({name: name}).and.whereNotNull('deletedAt').select();
+        let currentSeason = await Model.db('nsfw_constants').where({key: "currentSeason"}).first();
+        let loadedData = await Model.db('nsfw_v_fighters').where({name: name, season: currentSeason.value}).and.whereNull('deletedAt').select();
         return (loadedData.length > 0);
     }
 
@@ -118,16 +134,10 @@ export class FighterRepository{
         {
             let currentSeason = await Model.db('nsfw_constants').where({key: "currentSeason"}).first();
 
-            let loadedData = await Model.db('nsfw_v_fighters').where({name: name, season: currentSeason.value}).and.whereNotNull('deletedAt').select();
+            let loadedData = await Model.db('nsfw_v_fighters').where({name: name, season: currentSeason.value}).and.whereNull('deletedAt').select();
             let data = loadedData[0];
 
-            for(let prop of Object.getOwnPropertyNames(data)){
-                if(Object.getOwnPropertyNames(loadedFighter).indexOf(prop) != -1){
-                    if(typeof data[prop] != "function"){
-                        loadedFighter[prop] = data[prop];
-                    }
-                }
-            }
+            Utils.mergeFromTo(data, loadedFighter);
 
             loadedFighter.achievements = await FighterRepository.loadAllAchievements(name, currentSeason.value);
             loadedFighter.features = await FighterRepository.loadAllFeatures(name, currentSeason.value);
@@ -143,7 +153,7 @@ export class FighterRepository{
         let result;
 
         try{
-            result = await Model.db('nsfw_fighters_achievements').select('idAchievement', 'createdAt').where('idFighter', fighterName).andWhere('season', season);
+            result = await Model.db('nsfw_fighters_achievements').select('idAchievement', 'createdAt').where({idFighter: fighterName, season: season});
         }
         catch(ex){
             throw ex;
@@ -160,7 +170,7 @@ export class FighterRepository{
         let result;
 
         try{
-            result = await Model.db('nsfw_fighters_features').where('idFighter', fighterName).andWhere('season', season).and.whereNotNull('deletedAt').select();
+            result = await Model.db('nsfw_fighters_features').where({idFighter: fighterName, season: season}).and.whereNull('deletedAt').select();
         }
         catch(ex){
             throw ex;
@@ -173,8 +183,9 @@ export class FighterRepository{
         return featuresArray;
     }
 
-    public static async delete(name:string, season:string):Promise<void>{
-        await Model.db('nsfw_fighters').where({name: name, season: season}).update({
+    public static async delete(name:string):Promise<void>{
+        let currentSeason = await Model.db('nsfw_constants').where({key: "currentSeason"}).first();
+        await Model.db('nsfw_fighters').where({name: name, season: currentSeason.value}).and.whereNull('deletedAt').update({
             deletedAt: new Date()
         });
     }

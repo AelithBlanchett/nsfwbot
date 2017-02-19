@@ -31,12 +31,12 @@ export class ActiveFighter extends Fighter {
     canMoveFromOrOffRing:boolean = true;
     lastTagTurn:number = 9999999;
     wantsDraw:boolean = false;
-    consecutiveTurnsWithoutFocus:number = 0;
+    consecutiveTurnsWithoutFocus:number;
     createdAt:Date;
     updatedAt:Date;
-    modifiers:Modifier[] = [];
-    actionsDone:Action[] = [];
-    actionsInflicted:Action[] = [];
+    modifiers:Modifier[];
+    actionsDone:Action[];
+    actionsInflicted:Action[];
     fightStatus: FightStatus;
 
     startingPower:number;
@@ -45,21 +45,28 @@ export class ActiveFighter extends Fighter {
     startingEndurance:number;
     startingDexterity:number;
     startingWillpower:number;
-    powerDelta:number = 0;
-    sensualityDelta:number = 0;
-    toughnessDelta:number = 0;
-    enduranceDelta:number = 0;
-    dexterityDelta:number = 0;
-    willpowerDelta:number = 0;
+    powerDelta:number;
+    sensualityDelta:number;
+    toughnessDelta:number;
+    enduranceDelta:number;
+    dexterityDelta:number;
+    willpowerDelta:number;
 
 
     //Objects, do not need to store
     pendingAction:Action = null;
-    dice:Dice = new Dice(Constants.Globals.diceSides);
+    dice:Dice;
+
+    constructor(){//TODO
+        super();
+        this.lust = 0;
+        this.pendingAction = null;
+        this.dice = new Dice(Constants.Globals.diceSides);
+    }
 
     assignFight(fight:Fight):void{
         this.fight = fight;
-        this.idFight = fight.id;
+        this.idFight = fight.idFight;
     }
 
     //fight is "mistakenly" set as optional to be compatible with the super.init

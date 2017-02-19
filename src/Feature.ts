@@ -15,6 +15,7 @@ export class Feature{
     obtainedBy:string;
     createdAt:Date;
     updatedAt:Date;
+    deletedAt:Date;
 
     constructor(fighterName:string, featureType:FeatureType, uses:number, id?:string) {
         if(id){

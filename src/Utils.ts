@@ -105,16 +105,16 @@ export class Utils {
         return uuid;
     };
 
-    static mapChildren(parent:any, children:any){
-        for(let prop of Object.getOwnPropertyNames(parent)){
-            if(Object.getOwnPropertyNames(children).indexOf(prop) != -1){
-                if(typeof parent[prop] != "function"){
-                    children[prop] = parent[prop];
+    static mergeFromTo(input:any, augmentedOutput:any){
+        for(let prop of Object.getOwnPropertyNames(input)){
+            if(Object.getOwnPropertyNames(augmentedOutput).indexOf(prop) != -1){
+                if(typeof input[prop] != "function"){
+                    augmentedOutput[prop] = input[prop];
                 }
             }
         }
 
-        return children;
+        return augmentedOutput;
     }
 }
 

@@ -25,20 +25,21 @@ import {FighterRepository} from "./FighterRepository";
 
 export class Fight{
 
-    id:string;
-    requiredTeams:number = 2;
+    idFight:string;
+    requiredTeams:number;
     hasStarted:boolean = false;
     hasEnded:boolean = false;
     stage:string;
-    currentTurn:number = 0;
-    fightType:FightType = FightType.Rumble;
-    pastActions:Array<Action> = [];
-    winnerTeam:Team = Team.Unknown;
-    season:number = Constants.Globals.currentSeason;
+    currentTurn:number;
+    fightType:FightType;
+    pastActions:Array<Action>;
+    winnerTeam:Team;
+    season:number;
     waitingForAction:boolean = true;
 
     createdAt:Date;
     updatedAt:Date;
+    deletedAt:Date;
 
     fighters:ActiveFighter[] = [];
     channel:string;
@@ -47,8 +48,14 @@ export class Fight{
     fChatLibInstance:IFChatLib;
 
     public constructor() {
-        this.id = Utils.generateUUID();
+        this.idFight = Utils.generateUUID();
         this.stage = this.pickStage();
+        this.fightType = FightType.Rumble;
+        this.pastActions = [];
+        this.winnerTeam = Team.Unknown;
+        this.currentTurn = 0;
+        this.season = Constants.Globals.currentSeason;
+        this.requiredTeams = 2;
     }
 
     build(fChatLibInstance:IFChatLib, channel:string){
@@ -121,8 +128,8 @@ export class Fight{
 
                 //delete from DB
                 try {
-                    if(await ActiveFighterRepository.exists(fighter.name, this.id)){
-                        await ActiveFighterRepository.delete(fighter.name, this.id);
+                    if(await ActiveFighterRepository.exists(fighter.name, this.idFight)){
+                        await ActiveFighterRepository.delete(fighter.name, this.idFight);
                     }
                 }
                 catch (ex) {
@@ -146,7 +153,7 @@ export class Fight{
                     activeFighter.assignedTeam = team;
                 }
                 activeFighter.fight = this;
-                activeFighter.idFight = this.id;
+                activeFighter.idFight = this.idFight;
                 this.fighters.push(activeFighter);
                 return team;
             }
