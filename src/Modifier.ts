@@ -9,7 +9,7 @@ import {ActiveFighter} from "./ActiveFighter";
 import {IModifier} from "./interfaces/IModifier";
 
 export class Modifier implements IModifier{
-    id: string;
+    idModifier: string;
     name:string = "modifier";
     tier:Tier;
     type:ModifierType;
@@ -28,15 +28,11 @@ export class Modifier implements IModifier{
     timeToTrigger:TriggerMoment;
     parentActionIds:Array<string>;
 
-    build(receiver:ActiveFighter, applier:ActiveFighter, tier:Tier, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage:number, diceRoll:number, escapeRoll:number, uses:number,
+    constructor(receiver:string, applier:string, tier:Tier, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage:number, diceRoll:number, escapeRoll:number, uses:number,
                 timeToTrigger:TriggerMoment, event:Trigger, parentActionIds:Array<string>, areMultipliers:boolean){
-        this.id = Utils.generateUUID();
-        this.receiver = receiver; //ALWAYS filled!
-        this.idReceiver = receiver.name;
-        this.applier = applier; //can be null
-        if(this.applier){
-            this.idApplier = applier.name;
-        }
+        this.idModifier = Utils.generateUUID();
+        this.idReceiver = receiver;
+        this.idApplier = applier;
         this.tier = tier;
         this.type = modType;
         this.hpDamage = hpDamage;
@@ -50,6 +46,11 @@ export class Modifier implements IModifier{
         this.parentActionIds = parentActionIds;
         this.areDamageMultipliers = areMultipliers;
         this.name = Constants.Modifier[ModifierType[modType]];
+    }
+
+    build(receiver:ActiveFighter, applier:ActiveFighter){
+        this.receiver = receiver;
+        this.applier = applier;
     }
 
     isOver():boolean{
@@ -125,7 +126,7 @@ export class Modifier implements IModifier{
 
             this.receiver.fight.message.send();
             if(this.isOver()){
-                this.receiver.removeMod(this.id);
+                this.receiver.removeMod(this.idModifier);
             }
         }
     }

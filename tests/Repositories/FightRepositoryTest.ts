@@ -1,25 +1,10 @@
-/**
- * Created by Canardlaquay on 18/févr./2017.
- */
-import {Action, ActionType} from "../../src/Action";
-import {ActionRepository} from "../../src/ActionRepository";
-import {Utils} from "../../src/Utils";
-import {ActiveFighter} from "../../src/ActiveFighter";
-import {ActiveFighterRepository} from "../../src/ActiveFighterRepository";
-import {Team} from "../../src/Constants";
-import {FightStatus, Fight} from "../../src/Fight";
+import {Fight} from "../../src/Fight";
 import {Model} from "../../src/Model";
-import {Fighter} from "../../src/Fighter";
-import {FighterRepository} from "../../src/FighterRepository";
 import {FightRepository} from "../../src/FightRepository";
 let Jasmine = require('jasmine');
 let testSuite = new Jasmine();
 
 describe("The Fight Repository", () => {
-
-    beforeEach(async () =>{
-        //await Model.db('nsfw_fighters').del();
-    });
 
     it("should do nothing. lol.", async function (done) {
         done();

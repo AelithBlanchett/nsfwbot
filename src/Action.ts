@@ -227,8 +227,8 @@ export class Action{
             this.fpDamageToDef += this.tier + 1;
             let hpDamage = this.attackFormula(this.tier, this.attacker.currentPower, this.defender.currentToughness, this.diceScore);
             let holdModifier = new HoldModifier(this.defender, this.attacker, this.tier, ModifierType.SubHold, hpDamage, 0, 0);
-            let brawlBonusAttacker = new BrawlBonusSubHoldModifier(this.attacker, [holdModifier.id]);
-            let brawlBonusDefender = new BrawlBonusSubHoldModifier(this.defender, [holdModifier.id]);
+            let brawlBonusAttacker = new BrawlBonusSubHoldModifier(this.attacker, [holdModifier.idModifier]);
+            let brawlBonusDefender = new BrawlBonusSubHoldModifier(this.defender, [holdModifier.idModifier]);
             this.modifiers.push(holdModifier);
             this.modifiers.push(brawlBonusAttacker);
             this.modifiers.push(brawlBonusDefender);
@@ -245,8 +245,8 @@ export class Action{
             this.fpDamageToDef += this.tier + 1;
             let lustDamage = this.attackFormula(this.tier, this.attacker.currentSensuality, this.defender.currentEndurance, this.diceScore);
             let holdModifier = new HoldModifier(this.defender, this.attacker, this.tier, ModifierType.SexHold, 0, lustDamage, 0);
-            let lustBonusAttacker = new LustBonusSexHoldModifier(this.attacker, [holdModifier.id]);
-            let lustBonusDefender = new LustBonusSexHoldModifier(this.defender, [holdModifier.id]);
+            let lustBonusAttacker = new LustBonusSexHoldModifier(this.attacker, [holdModifier.idModifier]);
+            let lustBonusDefender = new LustBonusSexHoldModifier(this.defender, [holdModifier.idModifier]);
             this.modifiers.push(holdModifier);
             this.modifiers.push(lustBonusAttacker);
             this.modifiers.push(lustBonusDefender);
@@ -580,10 +580,10 @@ export class Action{
                 let indexOfNewHold = this.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold || x.name == Constants.Modifier.SexHold || x.name == Constants.Modifier.HumHold);
                 let indexOfAlreadyExistantHoldForDefender = this.defender.modifiers.findIndex(x => x.name == Constants.Modifier.SubHold || x.name == Constants.Modifier.SexHold || x.name == Constants.Modifier.HumHold);
                 if(indexOfAlreadyExistantHoldForDefender != -1){
-                    let idOfFormerHold = this.defender.modifiers[indexOfAlreadyExistantHoldForDefender].id;
+                    let idOfFormerHold = this.defender.modifiers[indexOfAlreadyExistantHoldForDefender].idModifier;
                     for(let mod of this.defender.modifiers){
                         //we updated the children and parent's damage and turns
-                        if(mod.id == idOfFormerHold){
+                        if(mod.idModifier == idOfFormerHold){
                             mod.name = this.modifiers[indexOfNewHold].name;
                             mod.event = this.modifiers[indexOfNewHold].event;
                             mod.uses += this.modifiers[indexOfNewHold].uses;

@@ -916,6 +916,7 @@ export class Fight{
 }
 
 export enum FightStatus {
+    Idle = -2,
     Initialized = -1,
     Lost = 0,
     Won = 1,

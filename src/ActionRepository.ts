@@ -81,7 +81,7 @@ export class ActionRepository{
 
             for(let data of loadedData){
                 let action = new Action();
-                Utils.mapChildren(data, action);
+                Utils.mergeFromTo(data, action);
                 loadedActions.push(action);
             }
 

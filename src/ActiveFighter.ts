@@ -57,20 +57,15 @@ export class ActiveFighter extends Fighter {
     pendingAction:Action = null;
     dice:Dice;
 
-    constructor(){//TODO
+    constructor(){
         super();
-        this.lust = 0;
-        this.pendingAction = null;
-        this.dice = new Dice(Constants.Globals.diceSides);
-    }
-
-    assignFight(fight:Fight):void{
-        this.fight = fight;
-        this.idFight = fight.idFight;
-    }
-
-    //fight is "mistakenly" set as optional to be compatible with the super.init
-    initialize():void {
+        this.toughness = 1;
+        this.toughness = 1;
+        this.endurance = 1;
+        this.willpower = 1;
+        this.sensuality = 1;
+        this.power = 1;
+        this.dexterity = 1;
         this.startingToughness = this.toughness;
         this.startingEndurance = this.endurance;
         this.startingWillpower = this.willpower;
@@ -108,6 +103,36 @@ export class ActiveFighter extends Fighter {
 
         this.dice = new Dice(Constants.Globals.diceSides);
         this.season = Constants.Globals.currentSeason;
+        this.fightStatus = FightStatus.Idle;
+    }
+
+    assignFight(fight:Fight):void{
+        this.fight = fight;
+        this.idFight = fight.idFight;
+    }
+
+    //fight is "mistakenly" set as optional to be compatible with the super.init
+    initialize():void {
+        this.startingToughness = this.toughness;
+        this.startingEndurance = this.endurance;
+        this.startingWillpower = this.willpower;
+        this.startingSensuality = this.sensuality;
+        this.startingPower = this.power;
+        this.startingDexterity = this.dexterity;
+
+        this.hp = this.hpPerHeart();
+        this.heartsRemaining = this.maxHearts();
+        this.lust = 0;
+        this.orgasmsRemaining = this.maxOrgasms();
+        this.focus = this.willpower;
+
+        this.powerDelta = 0;
+        this.sensualityDelta = 0;
+        this.toughnessDelta = 0;
+        this.enduranceDelta = 0;
+        this.dexterityDelta = 0;
+        this.willpowerDelta = 0;
+
         this.fightStatus = FightStatus.Initialized;
     }
 
@@ -180,7 +205,7 @@ export class ActiveFighter extends Fighter {
     }
 
     removeMod(idMod:string) { //removes a mod, and also its children. If a children has two parent Ids, then it doesn't remove the mod.
-        let index = this.modifiers.findIndex(x => x.id == idMod);
+        let index = this.modifiers.findIndex(x => x.idModifier == idMod);
         let listOfModsToRemove = [];
         if (index != -1) {
             listOfModsToRemove.push(index);
@@ -445,7 +470,7 @@ export class ActiveFighter extends Fighter {
     escapeHolds() {
         for (let mod of this.modifiers) {
             if (mod.receiver == this && (mod.name == Constants.Modifier.SubHold || mod.name == Constants.Modifier.SexHold || mod.name == Constants.Modifier.HumHold )) {
-                this.removeMod(mod.id);
+                this.removeMod(mod.idModifier);
             }
         }
     }

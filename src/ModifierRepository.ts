@@ -2,16 +2,17 @@ import {Action} from "./Action";
 import {Model} from "./Model";
 import {Utils} from "./Utils";
 import {Modifier} from "./Modifier";
+import {EmptyModifier} from "./CustomModifiers";
 
 export class ModifierRepository{
 
     public static async persist(modifier:Modifier):Promise<void>{
         try
         {
-            if(!await ModifierRepository.exists(modifier.id)){
+            if(!await ModifierRepository.exists(modifier.idModifier)){
                 await Model.db('nsfw_modifiers').insert(
                     {
-                        idModifier: modifier.id,
+                        idModifier: modifier.idModifier,
                         idReceiver: modifier.idReceiver,
                         idApplier: modifier.idApplier,
                         name: modifier.name,
@@ -26,12 +27,12 @@ export class ModifierRepository{
                         uses: modifier.uses,
                         event: modifier.event,
                         timeToTrigger: modifier.timeToTrigger,
-                        idParentActions: modifier.parentActionIds,
+                        idParentActions: JSON.stringify(modifier.parentActionIds),
                         createdAt: new Date()
                     }).into("nsfw_modifiers");
             }
             else{
-                await Model.db('nsfw_modifiers').where({idModifier: modifier.id}).update(
+                await Model.db('nsfw_modifiers').where({idModifier: modifier.idModifier}).update(
                     {
                         idReceiver: modifier.idReceiver,
                         idApplier: modifier.idApplier,
@@ -66,8 +67,8 @@ export class ModifierRepository{
             let loadedData = await Model.db('nsfw_modifiers').where({idFight: idFight}).and.whereNotNull('deletedAt').select();
 
             for(let data of loadedData){
-                let action = new Modifier();
-                Utils.mapChildren(data, action);
+                let action = new EmptyModifier();
+                Utils.mergeFromTo(data, action);
                 loadedModifiers.push(action);
             }
 
@@ -80,7 +81,7 @@ export class ModifierRepository{
     }
 
     public static async exists(idModifier:string):Promise<boolean>{
-        let loadedData = await Model.db('nsfw_modifiers').where({idModifier: idModifier}).select();
+        let loadedData = await Model.db('nsfw_modifiers').where({idModifier: idModifier}).and.whereNull('deletedAt').select();
         return (loadedData.length > 0);
     }
 
