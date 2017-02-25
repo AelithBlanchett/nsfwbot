@@ -210,12 +210,12 @@ export class ActiveFighter extends Fighter {
         if (index != -1) {
             listOfModsToRemove.push(index);
             for (let mod of this.modifiers) {
-                if (mod.parentActionIds) {
-                    if (mod.parentActionIds.length == 1 && mod.parentActionIds[0] == idMod) {
+                if (mod.idParentActions) {
+                    if (mod.idParentActions.length == 1 && mod.idParentActions[0] == idMod) {
                         listOfModsToRemove.push(mod);
                     }
-                    else if (mod.parentActionIds.indexOf(idMod) != -1) {
-                        mod.parentActionIds.splice(mod.parentActionIds.indexOf(idMod), 1);
+                    else if (mod.idParentActions.indexOf(idMod) != -1) {
+                        mod.idParentActions.splice(mod.idParentActions.indexOf(idMod), 1);
                     }
                 }
 

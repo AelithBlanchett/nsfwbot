@@ -592,13 +592,13 @@ export class Action{
                             mod.focusDamage += this.modifiers[indexOfNewHold].focusDamage;
                             //Did not add the dice/escape score modifications, if needed, implement here
                         }
-                        else if(mod.parentActionIds && mod.parentActionIds.indexOf(idOfFormerHold) != -1){
+                        else if(mod.idParentActions && mod.idParentActions.indexOf(idOfFormerHold) != -1){
                             mod.uses += this.modifiers[indexOfNewHold].uses;
                         }
                     }
                     for(let mod of this.attacker.modifiers){
                         //update the bonus modifiers length
-                        if(mod.parentActionIds.indexOf(idOfFormerHold) != -1){
+                        if(mod.idParentActions.indexOf(idOfFormerHold) != -1){
                             mod.uses += this.modifiers[indexOfNewHold].uses;
                         }
                     }

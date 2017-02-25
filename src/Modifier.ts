@@ -4,18 +4,17 @@ import {Utils} from "./Utils";
 import ModifierType = Constants.ModifierType;
 import TriggerMoment = Constants.TriggerMoment;
 import {Tier} from "./Constants";
-import {Action} from "./Action";
 import {ActiveFighter} from "./ActiveFighter";
 import {IModifier} from "./interfaces/IModifier";
+import {Fight} from "./Fight";
 
 export class Modifier implements IModifier{
     idModifier: string;
+    idFight:string;
     name:string = "modifier";
     tier:Tier;
     type:ModifierType;
-    applier:ActiveFighter;
     idApplier:string;
-    receiver:ActiveFighter;
     idReceiver:string;
     hpDamage: number;
     lustDamage: number;
@@ -26,7 +25,15 @@ export class Modifier implements IModifier{
     uses: number;
     event:Trigger;
     timeToTrigger:TriggerMoment;
-    parentActionIds:Array<string>;
+    idParentActions:Array<string>;
+
+    fight:Fight;
+    applier:ActiveFighter;
+    receiver:ActiveFighter;
+
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
 
     constructor(receiver:string, applier:string, tier:Tier, modType:ModifierType, hpDamage:number, lustDamage:number, focusDamage:number, diceRoll:number, escapeRoll:number, uses:number,
                 timeToTrigger:TriggerMoment, event:Trigger, parentActionIds:Array<string>, areMultipliers:boolean){
@@ -43,14 +50,16 @@ export class Modifier implements IModifier{
         this.uses = uses;
         this.event = event;
         this.timeToTrigger = timeToTrigger;
-        this.parentActionIds = parentActionIds;
+        this.idParentActions = parentActionIds;
         this.areDamageMultipliers = areMultipliers;
         this.name = Constants.Modifier[ModifierType[modType]];
     }
 
-    build(receiver:ActiveFighter, applier:ActiveFighter){
+    build(receiver:ActiveFighter, applier:ActiveFighter, fight:Fight){
         this.receiver = receiver;
         this.applier = applier;
+        this.fight = fight;
+        this.idFight = fight.idFight;
     }
 
     isOver():boolean{

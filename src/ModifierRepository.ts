@@ -10,9 +10,11 @@ export class ModifierRepository{
         try
         {
             if(!await ModifierRepository.exists(modifier.idModifier)){
+                modifier.createdAt = new Date();
                 await Model.db('nsfw_modifiers').insert(
                     {
                         idModifier: modifier.idModifier,
+                        idFight: modifier.idFight,
                         idReceiver: modifier.idReceiver,
                         idApplier: modifier.idApplier,
                         name: modifier.name,
@@ -27,13 +29,15 @@ export class ModifierRepository{
                         uses: modifier.uses,
                         event: modifier.event,
                         timeToTrigger: modifier.timeToTrigger,
-                        idParentActions: JSON.stringify(modifier.parentActionIds),
-                        createdAt: new Date()
+                        idParentActions: modifier.idParentActions.join(";"),
+                        createdAt: modifier.createdAt
                     }).into("nsfw_modifiers");
             }
             else{
+                modifier.updatedAt = new Date();
                 await Model.db('nsfw_modifiers').where({idModifier: modifier.idModifier}).update(
                     {
+                        idFight: modifier.idFight,
                         idReceiver: modifier.idReceiver,
                         idApplier: modifier.idApplier,
                         name: modifier.name,
@@ -48,8 +52,8 @@ export class ModifierRepository{
                         uses: modifier.uses,
                         event: modifier.event,
                         timeToTrigger: modifier.timeToTrigger,
-                        idParentActions: modifier.parentActionIds,
-                        updatedAt: new Date()
+                        idParentActions: JSON.stringify(modifier.idParentActions),
+                        updatedAt: modifier.updatedAt
                     }).into("nsfw_modifiers");
             }
 
@@ -64,12 +68,18 @@ export class ModifierRepository{
 
         try
         {
-            let loadedData = await Model.db('nsfw_modifiers').where({idFight: idFight}).and.whereNotNull('deletedAt').select();
+            let loadedData = await Model.db('nsfw_modifiers').where({idFight: idFight}).and.whereNull('deletedAt').select();
 
             for(let data of loadedData){
-                let action = new EmptyModifier();
-                Utils.mergeFromTo(data, action);
-                loadedModifiers.push(action);
+                let modifier = new EmptyModifier();
+                Utils.mergeFromTo(data, modifier);
+                modifier.idParentActions = [];
+                if(data.idParentActions != null){
+                    for(let id of data.idParentActions.split(";")){
+                        modifier.idParentActions.push(id);
+                    }
+                }
+                loadedModifiers.push(modifier);
             }
 
         }
@@ -87,7 +97,18 @@ export class ModifierRepository{
 
     public static async delete(idModifier:string):Promise<void>{
         try{
-            await Model.db('nsfw_modifiers').where({idModifier: idModifier}).update({
+            await Model.db('nsfw_modifiers').where({idModifier: idModifier}).and.whereNull('deletedAt').update({
+                deletedAt: new Date()
+            });
+        }
+        catch(ex){
+            throw ex;
+        }
+    }
+
+    public static async deleteFromFight(idFight:string):Promise<void>{
+        try{
+            await Model.db('nsfw_modifiers').where({idFight: idFight}).and.whereNull('deletedAt').update({
                 deletedAt: new Date()
             });
         }
