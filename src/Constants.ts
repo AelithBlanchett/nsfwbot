@@ -3,6 +3,7 @@ export class Globals {
     public static currencyName:string = "tokens";
     public static currentSeason:number = 1;
     public static diceSides:number = 12;
+    public static numberOfRequiredStatPoints:number = 100;
 }
 
 export class SQL {

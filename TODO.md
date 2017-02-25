@@ -1,10 +1,8 @@
 #TODO
 
 ##Important
--   Add Seasons thingy
--   Add inventory/gallery to store belts/records/other?
+-   Static starting stats
 -   Multiply every value by 100 so we're more flexible. Need to balance that too!
--   Finish the MYSQL view for fighters.
 
 ###Next steps
 -   Add admin commands
@@ -14,6 +12,7 @@
 -   Temporary penalties on stats to force players to fight against newbs, and prevent grinding
 
 ####Optional/Ideas
+-   Add inventory/gallery to store belts/records/other?
 -   Rename/add stages
 -   Add more finishers
 -   Use constants everywhere.
@@ -23,6 +22,7 @@
     Ladder/Cage
 
 #Needs testing
+*   Add Seasons thingy
 *   Change the ActiveFighter state at the right moment
 *   Use startingPower in get power() (to resume fights correctly!)
 *   Correct the loadExist in ActiveFighter to implement new variables

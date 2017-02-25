@@ -33,6 +33,59 @@ export class Commands{
         return -1;
     }
 
+    private static isInt(value) {
+        return !isNaN(value) && (function (x) {
+                return (x | 0) === x;
+            })(parseFloat(value))
+    }
+
+    public static checkIfValidStats(strParameters:string, numberOfRequiredPoints:number):string {
+        let arrParam:Array<number> = [];
+
+        for(let nbr of strParameters.split(",")){
+            arrParam.push(parseInt(nbr));
+        }
+
+        if (arrParam.length != 6) {
+           return "The number of parameters was incorrect. Example: !register 4,3,5,1,6,30";
+        }
+        else if (!arrParam.every(arg => Commands.isInt(arg))) {
+            return "All the parameters aren't integers. Example: !register 4,3,5,1,6,30";
+        }
+        else {
+            //register
+            let total = 0;
+            let statsOnly:Array<number> = arrParam.slice(0, 5);
+            total = statsOnly.reduce(function (a, b) {
+                return a + b;
+            }, 0);
+            if (total != numberOfRequiredPoints) {
+                return "The total of points you've spent isn't equal to "+numberOfRequiredPoints+". (" + total + "). Example: !register 4,7,5,1,6,30";
+            }
+            else if (arrParam[0] > 10 || (arrParam[0] < 1)) {
+                return "The Strength stat must be higher than 0 and lower than 11. Example: !register 4,3,5,1,7,30";
+            }
+            else if (arrParam[1] > 10 || (arrParam[1] < 1)) {
+                return "The Dexterity stat must be higher than 0 and lower than 11. Example: !register 4,3,5,1,7,30";
+            }
+            else if (arrParam[2] > 10 || (arrParam[2] < 1)) {
+                return "The Endurance stat must be higher than 0 and lower than 11. Example: !register 4,3,5,1,7,30";
+            }
+            else if (arrParam[3] > 10 || (arrParam[3] < 1)) {
+                return "The Spellpower stat must be higher than 0 and lower than 11. Example: !register 4,3,5,1,7,30";
+            }
+            else if (arrParam[4] > 10 || (arrParam[4] < 1)) {
+                return "The Willpower stat must be higher than 0 and lower than 11. Example: !register 4,3,5,1,7,30";
+            }
+            else if (arrParam[5] < 0 || arrParam[5] > 100) {
+                return "The starting cloth stat can't be higher than 100 or lower than 0. Example: !register 4,3,5,1,7,30";
+            }
+            else {
+                return "";
+            }
+        }
+    }
+
     public static getFeatureType(args, onlyType:boolean = false){
         let result = {featureType: null, turns: -1, message: null};
         let splittedArgs = args.split(" ");

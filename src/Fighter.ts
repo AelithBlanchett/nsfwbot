@@ -225,6 +225,19 @@ export class Fighter{
         return this.features.findIndex(x => x.type == featureType) != -1;
     }
 
+    restat(dexterity:number, power:number, sensuality:number, toughness:number, endurance:number, willpower:number):boolean{
+        this.dexterity = dexterity;
+        this.power = power;
+        this.sensuality = sensuality;
+        this.toughness = toughness;
+        this.endurance = endurance;
+        this.willpower = willpower;
+
+        FighterRepository.persist(this);
+
+        return true;
+    }
+
     addStat(stat:Stats):any{
         let theStat = this[Stats[stat].toLowerCase()];
         theStat++;
@@ -302,16 +315,19 @@ export class Fighter{
     }
 
     tier(offset:number = 0):FightTier{
-        if((this.power + this.sensuality + this.dexterity + this.toughness + this.endurance + this.willpower) + offset <= 12){
-            return FightTier.Bronze;
-        }
-        else if((this.power + this.sensuality + this.dexterity + this.toughness + this.endurance + this.willpower) + offset <= 24){
-            return FightTier.Silver;
-        }
-        else if((this.power + this.sensuality + this.dexterity + this.toughness + this.endurance + this.willpower) + offset <= 36){
-            return FightTier.Gold;
-        }
-        return;
+        //TODO: rework how tiers are working
+        return FightTier.Bronze;
+
+        // if((this.power + this.sensuality + this.dexterity + this.toughness + this.endurance + this.willpower) + offset <= 12){
+        //     return FightTier.Bronze;
+        // }
+        // else if((this.power + this.sensuality + this.dexterity + this.toughness + this.endurance + this.willpower) + offset <= 24){
+        //     return FightTier.Silver;
+        // }
+        // else if((this.power + this.sensuality + this.dexterity + this.toughness + this.endurance + this.willpower) + offset <= 36){
+        //     return FightTier.Gold;
+        // }
+        // return;
     }
 
 }
