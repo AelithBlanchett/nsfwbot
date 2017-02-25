@@ -684,10 +684,14 @@ export class Fight{
                 fighter.fightStatus = FightStatus.Won;
                 this.message.addInfo(`Awarded ${tokensToGiveToWinners} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
                 fighter.giveTokens(tokensToGiveToWinners);
+                fighter.wins++;
+                fighter.winsSeason++;
             }
             else {
                 if (this.winnerTeam != Team.Unknown) {
                     fighter.fightStatus = FightStatus.Lost;
+                    fighter.losses++;
+                    fighter.lossesSeason++;
                 }
                 this.message.addInfo(`Awarded ${tokensToGiveToLosers} ${Constants.Globals.currencyName} to ${fighter.getStylizedName()}`);
                 fighter.giveTokens(tokensToGiveToLosers);
