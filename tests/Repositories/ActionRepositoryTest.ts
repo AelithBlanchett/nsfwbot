@@ -1,4 +1,4 @@
-import {Action, ActionType} from "../../src/Action";
+import {Action, ActionType, EmptyAction} from "../../src/Action";
 import {ActionRepository} from "../../src/ActionRepository";
 import {Utils} from "../../src/Utils";
 let Jasmine = require('jasmine');
@@ -12,10 +12,10 @@ describe("The Action Repository", () => {
 
     it("should delete action aa", async function (done) {
 
-        let myAction = new Action();
+        let myAction = new EmptyAction();
         myAction.idAction = Utils.generateUUID();
         myAction.idFight = 1;
-        myAction.idAttacker = "Aelith Blanchette";
+        myAction.idAttacker = "1";
         myAction.atTurn = 1;
         myAction.tier = 0;
         myAction.missed = false;
@@ -32,10 +32,10 @@ describe("The Action Repository", () => {
     });
 
     it("should say that action that was just inserted is in database.", async function (done) {
-        let myAction = new Action();
+        let myAction = new EmptyAction();
         myAction.idAction = Utils.generateUUID();
         myAction.idFight = 1;
-        myAction.idAttacker = "Aelith Blanchette";
+        myAction.idAttacker = "1";
         myAction.atTurn = 1;
         myAction.tier = 0;
         myAction.missed = false;
@@ -48,10 +48,10 @@ describe("The Action Repository", () => {
     });
 
     it("should save an action in the database.", async function (done) {
-        let myAction = new Action();
+        let myAction = new EmptyAction();
         myAction.idAction = Utils.generateUUID();
         myAction.idFight = 1;
-        myAction.idAttacker = "Aelith Blanchette";
+        myAction.idAttacker = "1";
         myAction.atTurn = 1;
         myAction.tier = 0;
         myAction.missed = false;

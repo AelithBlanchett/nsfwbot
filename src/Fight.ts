@@ -559,8 +559,8 @@ export class Fight{
             let attacker = this.currentPlayer; // need to store them in case of turn-changing logic
             let defender = this.currentTarget;
 
-            attacker.pendingAction = new Action();
-            attacker.pendingAction.buildAction(this, this.currentTurn, tier, action, attacker, defender);
+            attacker.pendingAction = new Action(this.idFight, this.currentTurn, action, tier, attacker.name, (defender != null ? defender.name : null));
+            attacker.pendingAction.buildAction(this, attacker, defender);
             let eventToTriggerAfter = attacker.pendingAction.triggerAction(); //The specific trigger BEFORE is executed inside the attacks, see Action.ts
             attacker.triggerMods(TriggerMoment.After, eventToTriggerAfter, attacker.pendingAction);
             attacker.pendingAction.commit(this);

@@ -1,4 +1,4 @@
-import {Action} from "./Action";
+import {Action, EmptyAction} from "./Action";
 import {Model} from "./Model";
 import {Utils} from "./Utils";
 export class ActionRepository{
@@ -80,7 +80,7 @@ export class ActionRepository{
             let loadedData = await Model.db('nsfw_actions').where({idFight: idFight}).select();
 
             for(let data of loadedData){
-                let action = new Action();
+                let action = new EmptyAction();
                 Utils.mergeFromTo(data, action);
                 loadedActions.push(action);
             }

@@ -59,13 +59,17 @@ export class Action{
 
     modifiers:Modifier[] = [];
 
-    buildAction(fight:Fight, currentTurn:number, tier:Tier, actionType:ActionType, attacker:ActiveFighter, defender?:ActiveFighter) {
+    constructor(idFight:string, currentTurn:number, actionType:ActionType, tier:Tier, attacker:string, defender?:string){
         this.idAction = Utils.generateUUID();
+        this.idFight = idFight;
+        this.idAttacker = attacker;
+        this.idDefender = defender;
+        this.createdAt = new Date();
+    }
+
+    buildAction(fight:Fight, attacker:ActiveFighter, defender?:ActiveFighter) {
         this.fight = fight;
         this.idFight = fight.idFight;
-        this.atTurn = currentTurn;
-        this.tier = tier;
-        this.type = actionType;
         this.attacker = attacker;
         this.idAttacker = attacker.name;
         this.defender = defender;
@@ -674,6 +678,12 @@ export class Action{
         }
     }
 
+}
+
+export class EmptyAction extends Action {
+    constructor() {
+        super("", 0, 0, 0, "", null);
+    }
 }
 
 
