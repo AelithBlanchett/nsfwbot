@@ -39,6 +39,7 @@ export class Achievement {
 
         for(let achievement of achievements){
             if(fighter.achievements.findIndex(x => x.type == achievement.type) == -1 && eval(achievement.condition)){ // super dangerous, I know
+                fighter.achievements.push(achievement);
                 fighter.giveTokens(achievement.reward);
                 addedInfo.push(achievement.description + " Reward: "+ achievement.reward + " tokens.");
             }

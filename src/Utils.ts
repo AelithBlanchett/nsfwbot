@@ -107,7 +107,7 @@ export class Utils {
 
     static mergeFromTo(input:any, augmentedOutput:any){
         for(let prop of Object.getOwnPropertyNames(input)){
-            if(Object.getOwnPropertyNames(augmentedOutput).indexOf(prop) != -1){
+            if(true || Object.getOwnPropertyNames(augmentedOutput).indexOf(prop) != -1){
                 if(typeof input[prop] != "function"){
                     augmentedOutput[prop] = input[prop];
                 }

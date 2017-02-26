@@ -62,6 +62,9 @@ export class Action{
     constructor(idFight:string, currentTurn:number, actionType:ActionType, tier:Tier, attacker:string, defender?:string){
         this.idAction = Utils.generateUUID();
         this.idFight = idFight;
+        this.atTurn = currentTurn;
+        this.type = actionType;
+        this.tier = tier;
         this.idAttacker = attacker;
         this.idDefender = defender;
         this.createdAt = new Date();
@@ -80,7 +83,7 @@ export class Action{
     attackFormula(tier:Tier, actorAtk:number, targetDef:number, roll:number):number{
         var statDiff = 0;
         if(actorAtk-targetDef > 0){
-            statDiff = (actorAtk-targetDef);
+            statDiff = Math.ceil((actorAtk-targetDef) / 10);
         }
         var diceBonus = 0;
         var calculatedBonus = Math.floor(roll - TierDifficulty.Light);
@@ -107,10 +110,10 @@ export class Action{
 
             if(this.defender){
                 scoreRequired -= (Constants.Fight.Action.Globals.difficultyIncreasePerBondageItem * this.defender.bondageItemsOnSelf()); //+2 difficulty per bondage item
-                scoreRequired += Math.floor(this.defender.currentDexterity / 2);
+                scoreRequired += Math.floor(this.defender.currentDexterity / 20);
 
                 if(this.defender.focus < 0){
-                    scoreRequired += Math.floor(this.defender.focus / 2);
+                    scoreRequired += Math.floor(this.defender.focus / 20);
                 }
                 if(this.defender.isStunned()){
                     scoreRequired -= 4;
@@ -185,7 +188,7 @@ export class Action{
                 result = this.actionStrapToy();
                 break;
             case ActionType.Finish:
-                result = this.actionFinish();
+                result = this.actionFinisher();
                 break;
             case ActionType.Masturbate:
                 result = this.actionMasturbate();
@@ -200,7 +203,7 @@ export class Action{
 
     actionBrawl():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.BrawlAttack);
-        this.diceScore = this.attacker.roll(1) + this.attacker.currentDexterity;
+        this.diceScore = this.attacker.roll(1) + this.attacker.currentDexterity / 10;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
@@ -212,7 +215,7 @@ export class Action{
 
     actionSexStrike():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.SexStrikeAttack);
-        this.diceScore = this.attacker.roll(1) + this.attacker.currentDexterity;
+        this.diceScore = this.attacker.roll(1) + this.attacker.currentDexterity / 10;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
@@ -224,7 +227,7 @@ export class Action{
 
     actionSubHold():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.SubmissionHold);
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.currentDexterity;
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.currentDexterity / 10;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
@@ -242,7 +245,7 @@ export class Action{
 
     actionSexHold():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.SexHoldAttack);
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.currentDexterity;
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.currentDexterity / 10;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
@@ -260,7 +263,7 @@ export class Action{
 
     actionHumHold():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.HumiliationHold);
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.currentDexterity;
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.currentDexterity / 10;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += FocusDamageHum[Tier[this.tier]];
@@ -285,7 +288,7 @@ export class Action{
 
     actionHighRisk():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.HighRiskAttack);
-        this.diceScore = this.attacker.roll(1) + this.attacker.currentDexterity;
+        this.diceScore = this.attacker.roll(1) + this.attacker.currentDexterity / 10;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
@@ -303,7 +306,7 @@ export class Action{
 
     actionPenetration():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Penetration);
-        this.diceScore = this.attacker.roll(1) + this.attacker.currentSensuality;
+        this.diceScore = this.attacker.roll(1) + this.attacker.currentSensuality / 10;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
@@ -321,7 +324,7 @@ export class Action{
 
     actionForcedWorship():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.ForcedWorshipAttack);
-        this.diceScore = this.attacker.roll(1) + this.attacker.currentSensuality;
+        this.diceScore = this.attacker.roll(1) + this.attacker.currentSensuality / 10;
         this.lpDamageToAtk += (this.tier+1) * 2; //deal damage anyway. They're gonna be exposed!
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
@@ -358,7 +361,7 @@ export class Action{
 
     actionDegradation():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Degradation);
-        this.diceScore = this.attacker.roll(1) + this.attacker.currentSensuality;
+        this.diceScore = this.attacker.roll(1) + this.attacker.currentSensuality / 10;
         if(this.diceScore >= this.requiredDiceScore()) {
             this.missed = false;
             this.fpDamageToDef += FocusDamageHum[Tier[this.tier]] * 2;
@@ -370,7 +373,7 @@ export class Action{
 
     actionTag():Trigger{ //"skips" a turn
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Tag);
-        this.diceScore = this.attacker.roll(1) + this.attacker.currentDexterity;
+        this.diceScore = this.attacker.roll(1) + this.attacker.currentDexterity / 10;
         if(this.diceScore >= this.requiredDiceScore()) {
             this.attacker.lastTagTurn = this.atTurn;
             this.defender.lastTagTurn = this.atTurn;
@@ -384,7 +387,7 @@ export class Action{
     actionRest():Trigger{ //"skips" a turn
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Rest);
         this.defender = null;
-        this.diceScore = this.attacker.roll(1) + this.attacker.currentDexterity;
+        this.diceScore = this.attacker.roll(1) + this.attacker.currentDexterity / 10;
         if(this.diceScore >= this.requiredDiceScore()) {
             this.missed = false;
             this.hpHealToAtk += this.attacker.hp * Constants.Fight.Action.Globals.hpPercentageToHealOnRest;
@@ -396,7 +399,7 @@ export class Action{
 
     actionStun():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Stun);
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.currentDexterity;
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.currentDexterity / 10;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
@@ -414,17 +417,25 @@ export class Action{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Escape);
         this.defender = null;
         this.tier = this.attacker.isInHoldOfTier();
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.currentDexterity;
-        if(this.diceScore >= this.requiredDiceScore()){
-            this.missed = false;
-            this.attacker.escapeHolds();
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.currentDexterity / 10;
+        if(this.attacker.isInHold()){
+            if(this.diceScore >= this.requiredDiceScore()){
+                this.missed = false;
+                this.attacker.escapeHolds();
+            }
         }
+        else{
+            this.missed = true;
+            this.fight.message.addHit(`${this.attacker.getStylizedName()} took some more distance... just in case!`);
+        }
+
         return Trigger.Escape;
     }
 
     actionSubmit():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Submit);
         this.requiresRoll = false;
+        this.missed = false;
         this.defender = null;
         this.attacker.triggerPermanentOutsideRing();
         this.attacker.fight.message.addHit(Utils.strFormat(Constants.Messages.tapoutMessage, [this.attacker.getStylizedName()]));
@@ -433,7 +444,7 @@ export class Action{
 
     actionStrapToy():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.StrapToy);
-        this.diceScore = this.attacker.dice.roll(1) + this.attacker.currentSensuality;
+        this.diceScore = this.attacker.dice.roll(1) + this.attacker.currentSensuality / 10;
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.fpHealToAtk += this.tier + 1;
@@ -442,25 +453,32 @@ export class Action{
             let lpDamage = StrapToyLPDamagePerTurn[Tier[this.tier]];
             let strapToyModifier = new StrapToyModifier(this.defender, nbOfTurnsWearingToy, lpDamage);
             this.modifiers.push(strapToyModifier);
-            this.attacker.fight.message.addHit("The sextoy started vibrating!");
+            this.fight.message.addHit("The sextoy started vibrating!");
         }
         return Trigger.StrapToy;
     }
 
-    actionFinish():Trigger{
+    actionFinisher():Trigger{
         this.attacker.triggerMods(TriggerMoment.Before, Trigger.Finisher);
         this.tier = Tier.Heavy;
+        this.requiresRoll = false; //subject to change
         if((this.defender.heartsRemaining <= 1 || this.defender.orgasmsRemaining <= 1 || this.defender.consecutiveTurnsWithoutFocus == Constants.Fight.Action.Globals.maxTurnsWithoutFocus - 1) && this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
             this.defender.triggerPermanentOutsideRing();
+            this.attacker.fight.message.addHit(Utils.strFormat(Constants.Messages.finishMessage, [this.defender.getStylizedName()]));
         }
-        this.attacker.fight.message.addHit(Utils.strFormat(Constants.Messages.finishMessage, [this.attacker.getStylizedName()]));
+        else{
+            this.missed = true;
+            this.attacker.fight.message.addHit(Utils.strFormat(Constants.Messages.finishFailMessage, [this.attacker.getStylizedName()]));
+        }
+
         return Trigger.Finisher;
     }
 
     actionMasturbate():Trigger{
         this.defender = null;
         this.requiresRoll = false;
+        this.missed = false;
         this.lpDamageToAtk = 3;
         return Trigger.PassiveAction;
     }
@@ -475,7 +493,7 @@ export class Action{
 
         if(this.missed == false){
             if(this.requiresRoll == false){ //-1 == no roll
-                fight.message.addHit(` ${Action[this.type]}! `);
+                fight.message.addHit(` ${ActionType[this.type]}! `);
             }
             else{
                 fight.message.addHit(Constants.Messages.HitMessage);

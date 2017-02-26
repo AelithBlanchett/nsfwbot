@@ -697,7 +697,10 @@ export class Fight{
                 fighter.giveTokens(tokensToGiveToLosers);
             }
             this.message.addInfo(fighter.checkAchievements());
+            FighterRepository.persist(fighter);
         }
+
+        this.message.send();
 
         FightRepository.persist(this);
     }

@@ -102,14 +102,8 @@ export class ActiveFighterRepository{
             return null;
         }
 
-        let loadedFighter = await FighterRepository.load(name);
-        for(let prop of Object.getOwnPropertyNames(loadedFighter)){
-            if(Object.getOwnPropertyNames(loadedActiveFighter).indexOf(prop) != -1){
-                if(typeof loadedFighter[prop] != "function"){
-                    loadedActiveFighter[prop] = loadedFighter[prop];
-                }
-            }
-        }
+        let loadedFighter = await FighterRepository.load(idFighter);
+        Utils.mergeFromTo(loadedFighter, loadedActiveFighter);
 
         loadedActiveFighter.initialize();
 

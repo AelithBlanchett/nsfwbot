@@ -3,7 +3,7 @@ export class Globals {
     public static currencyName:string = "tokens";
     public static currentSeason:number = 1;
     public static diceSides:number = 12;
-    public static numberOfRequiredStatPoints:number = 100;
+    public static numberOfRequiredStatPoints:number = 200;
 }
 
 export class SQL {
@@ -87,6 +87,7 @@ export class Modifier {
     static ItemPickupBonus = "bonus damage on item pickup";
     static SextoyPickupBonus = "bonus lust damage on sextoy pickup";
     static Stun = "stun malus";
+    static StrapToy = "strapped sex-toy"
 }
 
 export enum ModifierType {
@@ -135,7 +136,11 @@ export class Messages {
     static startupGuide = `Note: Any commands written down there are starting with a ! and must be typed without the "".
     It's easy! First, you need to register.
     Just type "!register", and your profile will be created.
-    You will have 1 point in every stat: Power, Sensuality, Toughness, Endurance, Dexterity, Willpower.
+    You will start with 1 point in every stat: Power, Sensuality, Toughness, Endurance, Dexterity, Willpower.
+    The stat system is fixed to 200 available points for the moment, and you can change your stats at any moment.
+    An example on how to change your stats: Type: !restat 31,32,29,28,30,50 
+    31 here represents your Power, 32 your Sensuality, 29 your Toughness, 28 your Endurance, 30 your Dexterity and 50 your Willpower.
+    You must have 200 attributed points in order to start a fight.
 
     Power will be used wear out the defender Physically with your strength, reducing their Health
     Sensuality will wear out the defender Sexually
@@ -198,6 +203,7 @@ export class Messages {
 
     static tapoutMessage = `%s couldn't handle it anymore! They SUBMIT!`;
 
+    static finishFailMessage = `%s failed their finisher!`;
     static finishMessage = `%s couldn't fight against that! They're out!`;
 
     static checkForDrawOK = `Everybody agrees, it's a draw!`;

@@ -99,13 +99,13 @@ export class Fighter{
         let added = Achievement.checkAll(this);
 
         if(added.length > 0){
-            strBase += added.join(", ");
+            strBase += added.join("\n");
         }
         else{
             strBase = "";
         }
 
-        return strBase;
+        return strBase + "\n";
     }
 
     winRate():number{
@@ -119,30 +119,52 @@ export class Fighter{
         return winRate;
     }
 
+    totalHp():number{
+        let hp = 100;
+        if (this.toughness > 35) {
+            hp += (this.toughness - 35);
+        }
+        return hp;
+    }
+
     hpPerHeart():number {
-        return 35;
+        return Math.ceil(this.totalHp() / this.maxHearts());
     }
 
     maxHearts():number {
-        let heartsSup = Math.ceil(this.toughness / 2);
-        return 4 + heartsSup;
+        return 3;
+    }
+
+    totalLust():number{
+        let lust = 100;
+        if (this.endurance > 35) {
+            lust += (this.endurance - 35);
+        }
+        return lust;
     }
 
     lustPerOrgasm():number {
-        return 35;
+        return Math.ceil(this.totalLust() / this.maxOrgasms());
     }
 
     maxOrgasms():number {
-        let orgasmsSup = Math.ceil(this.endurance / 2);
-        return 4 + orgasmsSup;
+        return 3;
     }
 
     minFocus():number {
-        return -2 - this.willpower;
+        return -20 - this.focusResistance();
+    }
+
+    focusResistance():number{
+        let resistance = 0;
+        if (this.willpower > 30) {
+            resistance += (this.willpower - 30);
+        }
+        return resistance;
     }
 
     maxFocus():number {
-        return 2 + this.willpower;
+        return 20 + this.focusResistance();
     }
 
     outputStats():string{
@@ -225,7 +247,7 @@ export class Fighter{
         return this.features.findIndex(x => x.type == featureType) != -1;
     }
 
-    restat(dexterity:number, power:number, sensuality:number, toughness:number, endurance:number, willpower:number):boolean{
+    restat(power:number, sensuality:number, toughness:number, endurance:number, dexterity:number, willpower:number):boolean{
         this.dexterity = dexterity;
         this.power = power;
         this.sensuality = sensuality;
@@ -321,9 +343,10 @@ export class Fighter{
         else if(this.wins < 30){
             return FightTier.Silver
         }
-        else{
+        else if(this.wins >= 30){
             return FightTier.Gold;
         }
+        return FightTier.Bronze;
     }
 
 }

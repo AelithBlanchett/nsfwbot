@@ -139,7 +139,7 @@ export class FighterRepository{
 
             Utils.mergeFromTo(data, loadedFighter);
 
-            loadedFighter.achievements = await FighterRepository.loadAllAchievements(name, currentSeason.value);
+            loadedFighter.achievements = await FighterRepository.loadAllAchievements(name);
             loadedFighter.features = await FighterRepository.loadAllFeatures(name, currentSeason.value);
         }
         catch(ex){
@@ -149,11 +149,11 @@ export class FighterRepository{
         return loadedFighter;
     }
 
-    static async loadAllAchievements(fighterName:string, season:number):Promise<Achievement[]>{
+    static async loadAllAchievements(fighterName:string):Promise<Achievement[]>{
         let result;
 
         try{
-            result = await Model.db('nsfw_fighters_achievements').select('idAchievement', 'createdAt').where({idFighter: fighterName, season: season});
+            result = await Model.db('nsfw_fighters_achievements').select('idAchievement', 'createdAt').where({idFighter: fighterName});
         }
         catch(ex){
             throw ex;

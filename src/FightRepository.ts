@@ -39,6 +39,10 @@ export class FightRepository{
                     updatedAt: fight.updatedAt
                 });
             }
+
+            for(let fighter of fight.fighters){
+                ActiveFighterRepository.persist(fighter);
+            }
         }
         catch(ex){
             throw ex;

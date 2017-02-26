@@ -515,7 +515,7 @@ export class CommandHandler implements ICommandHandler {
         }
     };
 
-    finish(args:string, data:FChatResponse) {
+    finisher(args:string, data:FChatResponse) {
         try {
             this.fight.prepareAction(data.character, ActionType.Finish, false, false, args);
         }
@@ -626,6 +626,7 @@ class PrivateCommandHandler {
     //removestat = CommandHandler.prototype.removestat;
     removefeature = CommandHandler.prototype.removefeature;
     unhidemystats = CommandHandler.prototype.unhidemystats;
+    restat = CommandHandler.prototype.restat;
 }
 
 var privMsgEventHandler = function (parent, data) {
