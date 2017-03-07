@@ -297,6 +297,9 @@ export class Fight{
         }
         this.currentTurn++;
         this.outputStatus();
+        for(let fighter of this.fighters){
+            fighter.nextRound();
+        }
 
         if (this.isOver()) { //Check for the ending
             this.outputStatus();

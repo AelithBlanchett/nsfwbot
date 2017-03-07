@@ -17,7 +17,7 @@ export class FightRepository{
                 fight.createdAt = new Date();
                 await Model.db('nsfw_fights').insert({
                     idFight: fight.idFight,
-                    idFightType: fight.fightType,
+                    fightType: fight.fightType,
                     stage: fight.stage,
                     currentTurn: fight.currentTurn,
                     hasStarted: fight.hasStarted,
@@ -30,7 +30,7 @@ export class FightRepository{
             else{
                 fight.updatedAt = new Date();
                 await Model.db('nsfw_fights').where({idFight: fight.idFight, season: currentSeason.value}).update({
-                    idFightType: fight.fightType,
+                    fightType: fight.fightType,
                     stage: fight.stage,
                     currentTurn: fight.currentTurn,
                     hasStarted: fight.hasStarted,
@@ -71,6 +71,10 @@ export class FightRepository{
 
             loadedFight.fighters = await ActiveFighterRepository.loadFromFight(idFight);
             loadedFight.pastActions = await FightRepository.loadActions(loadedFight);
+
+            for(let fighter of loadedFight.fighters){
+                fighter.fight = loadedFight;
+            }
         }
         catch(ex){
             throw ex;

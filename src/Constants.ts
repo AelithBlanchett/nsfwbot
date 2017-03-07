@@ -215,6 +215,27 @@ export class Messages {
     static commandError = "[color=red]An error happened: %s[/color]";
 }
 
+export enum Commands {
+    Bondage = 0,
+    Brawl = 1,
+    Degradation = 2,
+    Escape = 3,
+    ForcedWorship = 4,
+    HighRisk = 5,
+    Penetration = 6,
+    HumHold = 7,
+    ItemPickup = 8,
+    Rest = 9,
+    Sex = 10,
+    SexHold = 11,
+    SubHold = 12,
+    StrapToy = 13,
+    SextoyPickup = 14,
+    Stun = 15,
+    Tag = 16,
+    Masturbate = 17
+}
+
 export enum Team {
     White = undefined,
     Unknown = -1,

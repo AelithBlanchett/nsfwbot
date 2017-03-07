@@ -179,6 +179,10 @@ export class Message implements IMessage {
         if (typeof line === "string") this.error.push(line);
     }
 
+    addSpecial(line){
+        if (typeof line === "string") this.special.push(line);
+    }
+
 
     getMessage() {
         let message = "";
@@ -189,8 +193,8 @@ export class Message implements IMessage {
         if (this.action.length) lines.push(this.getAction());
         if (this.hit.length) lines.push(this.getHit());
         if (this.status.length) lines.push(this.getStatus());
-        let damages = this.getDeltaHPLPFP();
-        if(damages != "") lines.push(damages);
+        // let damages = this.getDeltaHPLPFP();
+        // if(damages != "") lines.push(damages);
         if (this.hint.length) lines.push(this.getHint());
         if (this.special.length) lines.push(this.getSpecial());
         if (this.error.length) lines.push(this.getError());

@@ -254,6 +254,8 @@ describe("The player(s)", () => {
         spyOn(ActiveFighterRepository, 'initialize').and.callThrough();
         spyOn(FighterRepository, 'load').and.callThrough();
 
+        debug = true;
+
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
     }, DEFAULT_TIMEOUT);
 

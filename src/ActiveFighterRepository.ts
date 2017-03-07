@@ -144,9 +144,9 @@ export class ActiveFighterRepository{
             let loadedData = await Model.db('nsfw_activefighters').where({idFight: idFight}).select();
 
             for(let data of loadedData){
-                let action = new ActiveFighter();
-                Utils.mergeFromTo(data, action);
-                loadedActiveFighters.push(action);
+                let activeFighter = new ActiveFighter();
+                activeFighter = await ActiveFighterRepository.load(data.idFighter, idFight);
+                loadedActiveFighters.push(activeFighter);
             }
 
         }

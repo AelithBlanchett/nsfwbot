@@ -52,6 +52,17 @@ export class ActiveFighter extends Fighter {
     dexterityDelta:number;
     willpowerDelta:number;
 
+    hpDamageLastRound: number = 0;
+    lpDamageLastRound: number = 0;
+    fpDamageLastRound: number = 0;
+    hpHealLastRound: number = 0;
+    lpHealLastRound: number = 0;
+    fpHealLastRound: number = 0;
+    heartsDamageLastRound: number = 0;
+    orgasmsDamageLastRound: number = 0;
+    heartsHealLastRound: number = 0;
+    orgasmsHealLastRound: number = 0;
+
 
     //Objects, do not need to store
     pendingAction:Action = null;
@@ -101,6 +112,17 @@ export class ActiveFighter extends Fighter {
         this.dexterityDelta = 0;
         this.willpowerDelta = 0;
 
+        this.hpDamageLastRound = 0;
+        this.lpDamageLastRound = 0;
+        this.fpDamageLastRound = 0;
+        this.hpHealLastRound = 0;
+        this.lpHealLastRound = 0;
+        this.fpHealLastRound = 0;
+        this.heartsDamageLastRound = 0;
+        this.orgasmsDamageLastRound = 0;
+        this.heartsHealLastRound = 0;
+        this.orgasmsHealLastRound = 0;
+
         this.dice = new Dice(Constants.Globals.diceSides);
         this.season = Constants.Globals.currentSeason;
         this.fightStatus = FightStatus.Idle;
@@ -124,7 +146,7 @@ export class ActiveFighter extends Fighter {
         this.heartsRemaining = this.maxHearts();
         this.lust = 0;
         this.orgasmsRemaining = this.maxOrgasms();
-        this.focus = this.willpower;
+        this.focus = 0;
 
         this.powerDelta = 0;
         this.sensualityDelta = 0;
@@ -198,6 +220,20 @@ export class ActiveFighter extends Fighter {
         return result;
     }
 
+    nextRound(){
+        this.hpDamageLastRound = 0;
+        this.lpDamageLastRound = 0;
+        this.fpDamageLastRound = 0;
+        this.hpHealLastRound = 0;
+        this.lpHealLastRound = 0;
+        this.fpHealLastRound = 0;
+
+        this.heartsDamageLastRound = 0;
+        this.orgasmsDamageLastRound = 0;
+        this.heartsHealLastRound = 0;
+        this.orgasmsHealLastRound = 0;
+    }
+
     triggerMods(moment:TriggerMoment, event:Trigger, objFightAction?:any) {
         for (let mod of this.modifiers) {
             mod.trigger(moment, event, objFightAction);
@@ -238,6 +274,7 @@ export class ActiveFighter extends Fighter {
             hp = this.hpPerHeart() - this.hp; //reduce the number if it overflows the bar
         }
         this.hp += hp;
+        this.hpHealLastRound = hp;
         if (triggerMods) {
             this.triggerMods(TriggerMoment.After, Trigger.HPHealing);
         }
@@ -255,6 +292,7 @@ export class ActiveFighter extends Fighter {
             lust = this.lust; //reduce the number if it overflows the bar
         }
         this.lust -= lust;
+        this.lpHealLastRound = lust;
         if (triggerMods) {
             this.triggerMods(TriggerMoment.After, Trigger.LustHealing);
         }
@@ -272,6 +310,7 @@ export class ActiveFighter extends Fighter {
             focus = this.maxFocus() - this.focus; //reduce the number if it overflows the bar
         }
         this.focus += focus;
+        this.fpHealLastRound = focus;
         if (triggerMods) {
             this.triggerMods(TriggerMoment.After, Trigger.FocusHealing);
         }
@@ -286,10 +325,12 @@ export class ActiveFighter extends Fighter {
             this.triggerMods(TriggerMoment.Before, Trigger.HPDamage);
         }
         this.hp -= hp;
+        this.hpDamageLastRound = hp;
         if (this.hp <= 0) {
             this.triggerMods(TriggerMoment.Before, Trigger.HeartLoss);
             this.hp = 0;
             this.heartsRemaining--;
+            this.heartsDamageLastRound = 1;
             this.fight.message.addHit(`[b][color=red]Heart broken![/color][/b] ${this.name} has ${this.heartsRemaining} hearts left.`);
             if (this.heartsRemaining > 0) {
                 this.hp = this.hpPerHeart();
@@ -313,10 +354,12 @@ export class ActiveFighter extends Fighter {
             this.triggerMods(TriggerMoment.Before, Trigger.LustDamage);
         }
         this.lust += lust;
+        this.lpDamageLastRound = lust;
         if (this.lust >= this.lustPerOrgasm()) {
             this.triggerMods(TriggerMoment.Before, Trigger.Orgasm);
             this.lust = 0;
             this.orgasmsRemaining--;
+            this.orgasmsDamageLastRound = 1;
             this.fight.message.addHit(`[b][color=pink]Orgasm on the mat![/color][/b] ${this.name} has ${this.orgasmsRemaining} orgasms left.`);
             this.lust = 0;
             if (triggerMods) {
@@ -338,6 +381,7 @@ export class ActiveFighter extends Fighter {
             this.triggerMods(TriggerMoment.Before, Trigger.FocusDamage);
         }
         this.focus -= focusDamage;
+        this.fpDamageLastRound = focusDamage;
         if (triggerMods) {
             this.triggerMods(TriggerMoment.After, Trigger.FocusDamage);
         }
@@ -484,16 +528,20 @@ export class ActiveFighter extends Fighter {
     }
 
     outputStatus() {
-        return Utils.pad(64, `${this.getStylizedName()}:`, "-") +
-            `  ${this.hp}/${this.hpPerHeart()} [color=red]HP[/color]  |` +
-            `  ${this.heartsRemaining}/${this.maxHearts()} [color=red]Hearts[/color]  ------` +
-            `  ${this.lust}/${this.lustPerOrgasm()} [color=pink]Lust[/color]  |` +
-            `  ${this.orgasmsRemaining}/${this.maxOrgasms()} [color=pink]Orgasms[/color]  ------` +
-            `  [color=red]${this.minFocus()}[/color]|[b]${this.focus}[/b]|[color=orange]${this.maxFocus()}[/color] ${this.hasFeature(FeatureType.DomSubLover) ? "Submissiveness" : "Focus"}  |` +
-            `  ${this.consecutiveTurnsWithoutFocus}/[color=orange]${Constants.Fight.Action.Globals.maxTurnsWithoutFocus}[/color] Turns ${this.hasFeature(FeatureType.DomSubLover) ? "being too submissive" : "without focus"}  ------` +
-            `  ${this.bondageItemsOnSelf()}/${Constants.Fight.Action.Globals.maxBondageItemsOnSelf} [color=purple]Bondage Items[/color]  ------` +
-            `  [color=cyan]Affected by modifiers: [/color] ${this.getListOfActiveModifiers()} ------` +
-            `  [color=red]Target:[/color] ` + (this.target != undefined ? `${this.target.getStylizedName()}` : "None");
+        let nameLine = `${this.getStylizedName()}:`;
+        let hpLine = `  [color=yellow]hit points: ${this.hp}${((this.hpDamageLastRound > 0 || this.hpHealLastRound > 0) ? `${(((-this.hpDamageLastRound + this.hpHealLastRound) < 0) ? "[color=red]" : "[color=green]")} (${Utils.getSignedNumber(-this.hpDamageLastRound + this.hpHealLastRound)})[/color]` : "")}|${this.hpPerHeart()}[/color] `;
+        let heartsLine = `  [color=yellow]hearts: ${this.heartsRemaining}${((this.heartsDamageLastRound > 0 || this.heartsHealLastRound > 0) ? `${(((-this.heartsDamageLastRound + this.heartsHealLastRound) < 0) ? "[color=red]" : "[color=green]")}  (${Utils.getSignedNumber(-this.heartsDamageLastRound + this.heartsHealLastRound)})[/color]` : "")}|${this.maxHearts()}[/color] `;
+        let lpLine = `  [color=pink]lust points: ${this.lust}${((this.lpDamageLastRound > 0 || this.lpHealLastRound > 0) ? `${(((-this.lpDamageLastRound + this.lpHealLastRound) < 0) ? "[color=red]" : "[color=green]")} (${Utils.getSignedNumber(this.lpDamageLastRound - this.lpHealLastRound)})[/color]` : "")}|${this.lustPerOrgasm()}[/color] `;
+        let orgasmsLine = `  [color=pink]orgasms: ${this.orgasmsRemaining}${((this.orgasmsDamageLastRound > 0 || this.orgasmsHealLastRound > 0) ? `${(((-this.orgasmsDamageLastRound + this.orgasmsHealLastRound) < 0) ? "[color=red]" : "[color=green]")} (${Utils.getSignedNumber(-this.orgasmsDamageLastRound + this.orgasmsHealLastRound)})[/color]` : "")}|${this.maxOrgasms()}[/color] `;
+        let focusLine = `  [color=orange]${this.hasFeature(FeatureType.DomSubLover) ? "submissiveness" : "focus"}:[/color] [color=red]${this.minFocus()}[/color]|[b][color=orange]${this.focus}[/color][/b]${((this.fpDamageLastRound > 0 || this.fpHealLastRound > 0) ? `${(((-this.fpDamageLastRound + this.fpHealLastRound) < 0) ? "[color=red]" : "[color=green]")} (${Utils.getSignedNumber(-this.fpDamageLastRound + this.fpHealLastRound)})[/color]` : "")}|[color=green]${this.maxFocus()}[/color] `;
+        let turnsFocusLine = `  [color=orange]turns ${this.hasFeature(FeatureType.DomSubLover) ? "being too submissive" : "without focus"}: ${this.consecutiveTurnsWithoutFocus}|${Constants.Fight.Action.Globals.maxTurnsWithoutFocus}[/color] `;
+        let bondageLine = `  [color=purple]bondage items ${this.bondageItemsOnSelf()}|${Constants.Fight.Action.Globals.maxBondageItemsOnSelf}[/color] `;
+        let modifiersLine = `  [color=cyan]affected by: ${this.getListOfActiveModifiers()}[/color] `;
+        let targetLine = `  [color=red]target: ` + (this.target != undefined ? `${this.target.getStylizedName()}` : "None") + `[/color]`;
+
+        let compiledLine = `${Utils.pad(50, nameLine, "-")} ${hpLine} ${heartsLine} ${lpLine} ${orgasmsLine} ${focusLine} ${turnsFocusLine} ${bondageLine} ${modifiersLine} ${targetLine}`;
+
+        return compiledLine;
     }
 
     getStylizedName():string {

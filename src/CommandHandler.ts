@@ -14,11 +14,14 @@ import {ActionType} from "./Action";
 import {Team} from "./Constants";
 import {FighterRepository} from "./FighterRepository";
 import {FightRepository} from "./FightRepository";
+import {Commands} from "./Constants";
 
 export class CommandHandler implements ICommandHandler {
     fChatLibInstance:IFChatLib;
     channel:string;
     fight:Fight;
+
+    blnAutofight:boolean = false;
 
     constructor(fChatLib:IFChatLib, chan:string) {
         this.fChatLibInstance = fChatLib;
@@ -26,6 +29,68 @@ export class CommandHandler implements ICommandHandler {
         this.fight = new Fight();
         this.fight.build(fChatLib, chan);
         this.fChatLibInstance.addPrivateMessageListener(privMsgEventHandler);
+    }
+
+    private wait(ms){
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async autoplay(args:string, data:FChatResponse) {
+        if (this.fChatLibInstance.isUserMaster(data.character, "")) {
+            this.blnAutofight = !this.blnAutofight;
+            if(this.blnAutofight == false){
+                return;
+            }
+            let availableCommands = Utils.getEnumList(Constants.Commands);
+            let availableTiers = Utils.getEnumList(Constants.Tier);
+            availableTiers.shift();
+
+            let firstCharData:FChatResponse = {character: "Aelith Blanchette", channel: data.channel};
+            let secondCharData:FChatResponse = {character: "Tina Armstrong", channel: data.channel};
+
+
+
+            while(this.blnAutofight == true){
+                if (this.fight == undefined || this.fight.hasEnded) {
+                    this.fight = new Fight();
+                    this.fight.build(this.fChatLibInstance, this.channel);
+                }
+                if(!this.fight.hasStarted){
+                    await this.ready("", firstCharData);
+                    await this.wait(1000);
+                    await this.ready("", secondCharData);
+                    await this.wait(1000);
+                }
+
+                await this.wait(1000);
+
+                if(this.fight.currentPlayer.name == firstCharData.character){
+                    let randomCommand = availableCommands[Utils.getRandomInt(0, availableCommands.length)].toLowerCase();
+                    let randomTier = availableTiers[Utils.getRandomInt(0, availableTiers.length)].toLowerCase();
+                    await this[randomCommand].apply(this, [randomTier, firstCharData]);
+                }
+                else if(this.fight.currentPlayer.name == secondCharData.character)
+                {
+                    let randomCommandTina = availableCommands[Utils.getRandomInt(0, availableCommands.length)].toLowerCase();
+                    let randomTierTina = availableTiers[Utils.getRandomInt(0, availableTiers.length)].toLowerCase();
+                    await this[randomCommandTina].apply(this, [randomTierTina, secondCharData]);
+                }
+
+                if(!this.blnAutofight){
+                    break;
+                }
+            }
+        }
+    }
+
+    async runas(args:string, data:FChatResponse) {
+        let splits = args.split(" ");
+        let command = splits[0];
+        splits.shift();
+        let commandArgs = splits.join(" ");
+        let impersonatedData = data;
+        impersonatedData.character = "Tina Armstrong";
+        this[command].apply(this, [commandArgs, impersonatedData]);
     }
 
     async addfeature(args:string, data:FChatResponse) {
@@ -209,17 +274,17 @@ export class CommandHandler implements ICommandHandler {
     async loadfight(args:string, data:FChatResponse) {
         if (this.fight == undefined || this.fight.hasEnded || !this.fight.hasStarted) {
             try {
-                if (!isNaN(parseInt(args))) {
+                if (args) {
                     this.fight = await FightRepository.load(args);
-                    this.fight.fChatLibInstance= this.fChatLibInstance;
-                    this.fight.channel =this.channel;
+                    this.fight.build(this.fChatLibInstance, this.channel);
+                    this.fight.outputStatus();
                 }
                 else {
-                    this.fChatLibInstance.sendMessage("[color=red]Wrong fight idAction. It must be a number.[/color]", this.channel);
+                    this.fChatLibInstance.sendMessage("[color=red]Wrong idFight. It must be specified.[/color]", this.channel);
                 }
             }
             catch (ex) {
-                this.fChatLibInstance.sendPrivMessage(Utils.strFormat(Constants.Messages.commandError, ex.message), data.character);
+                this.fChatLibInstance.sendPrivMessage(Utils.strFormat(Constants.Messages.commandError, ex.stack), data.character);
             }
         }
         else {
@@ -306,7 +371,7 @@ export class CommandHandler implements ICommandHandler {
         }
     };
 
-    async setfighttype(args:string, data:FChatResponse) {
+    async fighttype(args:string, data:FChatResponse) {
         let parsedFT:FightType = Parser.Commands.setFightType(args);
         if (parsedFT == -1) {
             this.fChatLibInstance.sendMessage("[color=red]Fight Type not found. Types: Rumble, Tag. Example: !setFightType Tag[/color]", this.channel);
@@ -321,7 +386,7 @@ export class CommandHandler implements ICommandHandler {
         }
     };
 
-    async setteamscount(args:string, data:FChatResponse) {
+    async teamscount(args:string, data:FChatResponse) {
         let parsedTeams:number = Parser.Commands.setTeamsCount(args);
         if (parsedTeams <= 1) {
             this.fChatLibInstance.sendMessage("[color=red]The number of teams involved must be a numeral higher than 1.[/color]", this.channel);
@@ -533,10 +598,14 @@ export class CommandHandler implements ICommandHandler {
         }
     };
 
-    resetfight(args:string, data:FChatResponse) {
+    async resetfight(args:string, data:FChatResponse) {
         if (this.fChatLibInstance.isUserChatOP(data.character, data.channel)) {
+            if(this.fight && this.fight.idFight){
+                await FightRepository.delete(this.fight.idFight);
+            }
             this.fight = new Fight();
             this.fight.build(this.fChatLibInstance, this.channel);
+            this.fChatLibInstance.sendMessage("The fight has been ended.", data.character);
         }
         else {
             this.fChatLibInstance.sendPrivMessage("[color=red]You're not an operator for this channel.[/color]", data.character);

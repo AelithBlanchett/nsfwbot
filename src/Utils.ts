@@ -11,6 +11,16 @@ export class Utils {
         return Math.max.apply(Math, arr);
     }
 
+    static getSignedNumber(theNumber)
+    {
+        if(theNumber > 0){
+            return "+" + theNumber;
+        }
+        else{
+            return theNumber.toString();
+        }
+    }
+
 
     static strFormat(str:string, params: Array<string>){
         if(typeof params == "string"){

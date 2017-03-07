@@ -16,6 +16,9 @@ export interface IModifier{
     hpDamage: number;
     lustDamage: number;
     focusDamage: number;
+    hpHeal: number;
+    lustHeal: number;
+    focusHeal: number;
     areDamageMultipliers: boolean;
     diceRoll: number;
     escapeRoll: number;
