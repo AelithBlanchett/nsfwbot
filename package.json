@@ -1,6 +1,6 @@
 {
   "name": "nsfwbot",
-  "version": "3.0.0a",
+  "version": "3.0.0",
   "description": "A bot with a fighting mechanism plugin for fun times.",
   "main": "index.js",
   "dependencies": {
