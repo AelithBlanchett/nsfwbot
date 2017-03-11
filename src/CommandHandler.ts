@@ -202,10 +202,13 @@ export class CommandHandler implements ICommandHandler {
 
     resetdmg(args:string, data:FChatResponse) {
         if (this.fChatLibInstance.isUserMaster(data.character, "") && this.fight.hasStarted && this.fight.debug) {
-            this.fight.getFighterByName(args).orgasmsRemaining = this.fight.getFighterByName(args).maxOrgasms(); //to prevent ending the fight this way
-            this.fight.getFighterByName(args).heartsRemaining = this.fight.getFighterByName(args).maxHearts();
-            this.fight.getFighterByName(args).consecutiveTurnsWithoutFocus = 0; //to prevent ending the fight this way
-            this.fight.getFighterByName(args).focus = this.fight.getFighterByName(args).maxFocus();
+            for(let fighter of this.fight.fighters){
+                fighter.orgasmsRemaining = fighter.maxOrgasms(); //to prevent ending the fight this way
+                fighter.heartsRemaining = fighter.maxHearts();
+                fighter.consecutiveTurnsWithoutFocus = 0; //to prevent ending the fight this way
+                fighter.focus = fighter.initialFocus();
+            }
+
             this.fChatLibInstance.sendPrivMessage(`Successfully resplenished ${args}'s HP, LP and FP.`, data.character);
         }
     }

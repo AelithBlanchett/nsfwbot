@@ -163,6 +163,10 @@ export class Fighter{
         return resistance;
     }
 
+    initialFocus():number{
+        return 0;
+    }
+
     maxFocus():number {
         return 20 + this.focusResistance();
     }

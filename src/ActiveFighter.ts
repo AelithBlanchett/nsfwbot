@@ -88,7 +88,7 @@ export class ActiveFighter extends Fighter {
         this.heartsRemaining = this.maxHearts();
         this.lust = 0;
         this.orgasmsRemaining = this.maxOrgasms();
-        this.focus = this.willpower;
+        this.focus = this.initialFocus();
 
         this.assignedTeam = Team.Unknown;
         this.target = null;
@@ -146,7 +146,7 @@ export class ActiveFighter extends Fighter {
         this.heartsRemaining = this.maxHearts();
         this.lust = 0;
         this.orgasmsRemaining = this.maxOrgasms();
-        this.focus = 0;
+        this.focus = this.initialFocus();
 
         this.powerDelta = 0;
         this.sensualityDelta = 0;

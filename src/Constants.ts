@@ -45,9 +45,9 @@ export namespace Fight {
             public static initialNumberOfTurnsForHold: number = 5;
             public static holdDamageMultiplier: number = 0.5;
             //Rest
-            public static hpPercentageToHealOnRest: number = 0.25;
-            public static lpPercentageToHealOnRest: number = 0.25;
-            public static fpPointsToHealOnRest: number = 1;
+            public static hpPercentageToHealOnRest: number = 0.30;
+            public static lpPercentageToHealOnRest: number = 0.30;
+            public static fpPointsToHealOnRest: number = 0.20;
             //Forced Lewd
             public static forcedLewdPercentageOfLPRemoved: number = 3;
             //HighRisk
@@ -69,6 +69,7 @@ export namespace Fight {
 
             public static degradationUses: number = 1;
             public static degradationFocusDamage: number = 2;
+            public static degradationFocusMultiplier: number = 2;
 
             public static accuracyForBrawlInsideSubHold: number = 3;
             public static accuracyForSexStrikeInsideSexHold: number = 3;
@@ -294,7 +295,14 @@ export enum FocusDamageOnMiss {
     Heavy = 10
 }
 
-export enum FocusDamageHumHold {
+export enum FocusHealOnHit {
+    None = 1,
+    Light = 3,
+    Medium = 6,
+    Heavy = 10
+}
+
+export enum FocusDamageOnHit {
     Light = 4,
     Medium = 9,
     Heavy = 15

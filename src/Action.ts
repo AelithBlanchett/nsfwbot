@@ -4,7 +4,6 @@ import BaseDamage = Constants.BaseDamage;
 import {Fight} from "./Fight";
 import TierDifficulty = Constants.TierDifficulty;
 import Trigger = Constants.Trigger;
-import FocusDamageHum = Constants.FocusDamageHumHold;
 import TokensPerWin = Constants.TokensPerWin;
 import FightTier = Constants.FightTier;
 import {BondageModifier} from "./CustomModifiers";
@@ -26,6 +25,8 @@ import {ActiveFighter} from "./ActiveFighter";
 import {Model} from "./Model";
 import {ActionRepository} from "./ActionRepository";
 import {FocusDamageOnMiss} from "./Constants";
+import {FocusHealOnHit} from "./Constants";
+import {FocusDamageOnHit} from "./Constants";
 
 export class Action{
 
@@ -207,8 +208,8 @@ export class Action{
         this.diceScore = this.attacker.roll(1) + Math.ceil(this.attacker.currentDexterity / 10);
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += this.tier + 1;
-            this.fpDamageToDef += this.tier + 1;
+            this.fpHealToAtk += FocusHealOnHit[Tier[this.tier]];
+            this.fpDamageToDef += FocusDamageOnHit[Tier[this.tier]];
             this.hpDamageToDef += this.attackFormula(this.tier, this.attacker.currentPower, this.defender.currentToughness, this.diceScore);
         }
         return Trigger.BrawlAttack;
@@ -219,8 +220,8 @@ export class Action{
         this.diceScore = this.attacker.roll(1) + Math.ceil(this.attacker.currentDexterity / 10);
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += this.tier + 1;
-            this.fpDamageToDef += this.tier + 1;
+            this.fpHealToAtk += FocusHealOnHit[Tier[this.tier]];
+            this.fpDamageToDef += FocusDamageOnHit[Tier[this.tier]];
             this.lpDamageToDef += this.attackFormula(this.tier, this.attacker.currentSensuality, this.defender.currentEndurance, this.diceScore);
         }
         return Trigger.SexStrikeAttack;
@@ -231,8 +232,8 @@ export class Action{
         this.diceScore = this.attacker.dice.roll(1) + Math.ceil(this.attacker.currentDexterity / 10);
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += this.tier + 1;
-            this.fpDamageToDef += this.tier + 1;
+            this.fpHealToAtk += FocusHealOnHit[Tier[this.tier]];
+            this.fpDamageToDef += FocusDamageOnHit[Tier[this.tier]];
             let hpDamage = this.attackFormula(this.tier, this.attacker.currentPower, this.defender.currentToughness, this.diceScore);
             let holdModifier = new HoldModifier(this.defender, this.attacker, this.tier, ModifierType.SubHold, hpDamage, 0, 0);
             let brawlBonusAttacker = new BrawlBonusSubHoldModifier(this.attacker, [holdModifier.idModifier]);
@@ -249,8 +250,8 @@ export class Action{
         this.diceScore = this.attacker.dice.roll(1) + Math.ceil(this.attacker.currentDexterity / 10);
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += this.tier + 1;
-            this.fpDamageToDef += this.tier + 1;
+            this.fpHealToAtk += FocusHealOnHit[Tier[this.tier]];
+            this.fpDamageToDef += FocusDamageOnHit[Tier[this.tier]];
             let lustDamage = this.attackFormula(this.tier, this.attacker.currentSensuality, this.defender.currentEndurance, this.diceScore);
             let holdModifier = new HoldModifier(this.defender, this.attacker, this.tier, ModifierType.SexHold, 0, lustDamage, 0);
             let lustBonusAttacker = new LustBonusSexHoldModifier(this.attacker, [holdModifier.idModifier]);
@@ -267,8 +268,8 @@ export class Action{
         this.diceScore = this.attacker.dice.roll(1) + Math.ceil(this.attacker.currentDexterity / 10);
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += FocusDamageHum[Tier[this.tier]];
-            let focusDamage = FocusDamageHum[Tier[this.tier]];
+            this.fpHealToAtk += FocusHealOnHit[Tier[this.tier]];
+            let focusDamage = FocusDamageOnHit[Tier[this.tier]];
             let holdModifier = new HoldModifier(this.defender, this.attacker, this.tier, ModifierType.HumHold, 0, 0, focusDamage);
             this.modifiers.push(holdModifier);
         }
@@ -280,8 +281,8 @@ export class Action{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
-        this.fpHealToAtk += 3;
-        this.fpDamageToDef += 3;
+        this.fpHealToAtk += FocusHealOnHit[Tier[Tier.Heavy]];
+        this.fpDamageToDef += FocusDamageOnHit[Tier[Tier.Heavy]];
         let bdModifier = new BondageModifier(this.defender, this.attacker);
         this.modifiers.push(bdModifier);
         return Trigger.Bondage;
@@ -292,14 +293,14 @@ export class Action{
         this.diceScore = this.attacker.roll(1) + Math.ceil(this.attacker.currentDexterity / 10);
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += this.tier + 1;
-            this.fpDamageToDef += this.tier + 1;
+            this.fpHealToAtk += FocusHealOnHit[Tier[this.tier]];
+            this.fpDamageToDef += FocusDamageOnHit[Tier[this.tier]];
             this.hpDamageToDef += Math.floor(this.attackFormula(this.tier, this.attacker.currentPower, this.defender.currentToughness, this.diceScore) * HighRiskMultipliers[Tier[this.tier]]);
         }
         else{
             this.missed = true;
-            this.fpDamageToAtk += this.tier + 1;
-            this.fpHealToDef += this.tier + 1;
+            this.fpDamageToAtk += FocusDamageOnHit[Tier[this.tier]];
+            this.fpHealToDef += FocusHealOnHit[Tier[this.tier]];
             this.hpDamageToAtk += Math.floor(this.attackFormula(this.tier, this.attacker.currentPower, this.attacker.currentToughness, 0) * (1 + (1 - HighRiskMultipliers[Tier[this.tier]])));
         }
         return Trigger.HighRiskAttack;
@@ -310,14 +311,14 @@ export class Action{
         this.diceScore = this.attacker.roll(1) + Math.ceil(this.attacker.currentSensuality / 10);
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += this.tier + 1;
-            this.fpDamageToDef += this.tier + 1;
+            this.fpHealToAtk += FocusHealOnHit[Tier[this.tier]];
+            this.fpDamageToDef += FocusDamageOnHit[Tier[this.tier]];
             this.lpDamageToDef += Math.floor(this.attackFormula(this.tier, this.attacker.currentSensuality, this.defender.currentEndurance, this.diceScore) * HighRiskMultipliers[Tier[this.tier]]);
         }
         else{
             this.missed = true;
-            this.fpDamageToAtk += this.tier + 1;
-            this.fpHealToDef += this.tier + 1;
+            this.fpDamageToAtk += FocusDamageOnHit[Tier[this.tier]];
+            this.fpHealToDef += FocusHealOnHit[Tier[this.tier]];
             this.lpDamageToAtk += Math.floor(this.attackFormula(this.tier, this.attacker.currentSensuality, this.attacker.currentEndurance, 0) * (1 + (1 - HighRiskMultipliers[Tier[this.tier]])));
         }
         return Trigger.Penetration;
@@ -329,8 +330,8 @@ export class Action{
         this.lpDamageToAtk += (this.tier+1) * 2; //deal damage anyway. They're gonna be exposed!
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += FocusDamageHum[Tier[this.tier]];
-            this.fpDamageToDef += FocusDamageHum[Tier[this.tier]];
+            this.fpHealToAtk += FocusHealOnHit[Tier[this.tier]];
+            this.fpDamageToDef += FocusDamageOnHit[Tier[this.tier]];
             this.lpDamageToDef += 1;
         }
         return Trigger.ForcedWorshipAttack;
@@ -341,8 +342,8 @@ export class Action{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
-        this.fpHealToAtk += 1;
-        this.fpDamageToDef += 1;
+        this.fpHealToAtk += FocusHealOnHit[Tier[Tier.Light]];
+        this.fpDamageToDef += FocusDamageOnHit[Tier[Tier.Light]];
         let itemPickupModifier = new ItemPickupModifier(this.attacker);
         this.modifiers.push(itemPickupModifier);
         return Trigger.ItemPickup;
@@ -353,8 +354,8 @@ export class Action{
         this.diceScore = -1;
         this.requiresRoll = false;
         this.missed = false;
-        this.fpHealToAtk += 1;
-        this.fpDamageToDef += 1;
+        this.fpHealToAtk += FocusHealOnHit[Tier[Tier.Light]];
+        this.fpDamageToDef += FocusDamageOnHit[Tier[Tier.Light]];
         let itemPickupModifier = new SextoyPickupModifier(this.attacker);
         this.modifiers.push(itemPickupModifier);
         return Trigger.SextoyPickup;
@@ -365,7 +366,7 @@ export class Action{
         this.diceScore = this.attacker.roll(1) + Math.ceil(this.attacker.currentSensuality / 10);
         if(this.diceScore >= this.requiredDiceScore()) {
             this.missed = false;
-            this.fpDamageToDef += FocusDamageHum[Tier[this.tier]] * 2;
+            this.fpDamageToDef += FocusDamageOnHit[Tier[this.tier]] * Constants.Fight.Action.Globals.degradationFocusMultiplier;
             let humiliationModifier = new DegradationModifier(this.defender, this.attacker);
             this.modifiers.push(humiliationModifier);
         }
@@ -391,9 +392,9 @@ export class Action{
         this.diceScore = this.attacker.roll(1) + Math.ceil(this.attacker.currentDexterity / 10);
         if(this.diceScore >= this.requiredDiceScore()) {
             this.missed = false;
-            this.hpHealToAtk += this.attacker.hp * Constants.Fight.Action.Globals.hpPercentageToHealOnRest;
-            this.lpHealToAtk += this.attacker.lust * Constants.Fight.Action.Globals.lpPercentageToHealOnRest;
-            this.fpHealToAtk += this.attacker.focus * Constants.Fight.Action.Globals.fpPointsToHealOnRest;
+            this.hpHealToAtk += this.attacker.hpPerHeart() * Constants.Fight.Action.Globals.hpPercentageToHealOnRest;
+            this.lpHealToAtk += this.attacker.lustPerOrgasm() * Constants.Fight.Action.Globals.lpPercentageToHealOnRest;
+            this.fpHealToAtk += this.attacker.maxFocus() * Constants.Fight.Action.Globals.fpPointsToHealOnRest;
         }
         return Trigger.Rest;
     }
@@ -403,7 +404,7 @@ export class Action{
         this.diceScore = this.attacker.dice.roll(1) + Math.ceil(this.attacker.currentDexterity / 10);
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += this.tier + 1;
+            this.fpHealToAtk += FocusHealOnHit[Tier[this.tier]];
             this.fpDamageToDef += this.tier + 1;
             let nbOfAttacksStunned = this.tier + 1;
             this.hpDamageToDef = this.attackFormula(this.tier, Math.floor(this.attacker.currentPower / Constants.Fight.Action.Globals.stunPowerDivider), this.defender.currentToughness, this.diceScore);
@@ -448,7 +449,7 @@ export class Action{
         this.diceScore = this.attacker.dice.roll(1) + Math.ceil(this.attacker.currentSensuality / 10);
         if(this.diceScore >= this.requiredDiceScore()){
             this.missed = false;
-            this.fpHealToAtk += this.tier + 1;
+            this.fpHealToAtk += FocusHealOnHit[Tier[this.tier]];
             this.fpDamageToDef += this.tier + 1;
             let nbOfTurnsWearingToy = this.tier + 1;
             let lpDamage = StrapToyLPDamagePerTurn[Tier[this.tier]];

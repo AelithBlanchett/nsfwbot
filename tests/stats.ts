@@ -389,30 +389,30 @@ describe("The player(s)", () => {
     });
 
     it("calculates Brawl attacks to end the fight", function (done) {
-        console.log(`Random;Tier;Attack;Mean;Median;Variance;Deviation;99thPercentile;HPMean;HPMedian;HPVariance;HPDeviation;HP99thPercentile;LPMean;LPMedian;LPVariance;LPDeviation;LP99tLPercentile;FPMean;FPMedian;FPVariance;FPDeviation;FP99tFPercentile`);
-        let tierList = Utils.getEnumList(Tier);
-        let attackList = [
-            ActionType.Brawl,
-            ActionType.SexStrike,
-            ActionType.SubHold,
-            ActionType.SexHold,
-            ActionType.Degradation,
-            ActionType.ForcedWorship,
-            ActionType.HighRisk,
-            ActionType.Penetration,
-            ActionType.Stun,
-            ActionType.StrapToy
-        ];
-
-        attackList = [ActionType.SubHold];
-
-        for(let atk of attackList){
-            for(let tier of tierList){
-                calculateFor(Tier[tier], atk, false, null);
-            }
-        }
-
-        calculateFor(0, 0, false, done);
+        // console.log(`Random;Tier;Attack;Mean;Median;Variance;Deviation;99thPercentile;HPMean;HPMedian;HPVariance;HPDeviation;HP99thPercentile;LPMean;LPMedian;LPVariance;LPDeviation;LP99tLPercentile;FPMean;FPMedian;FPVariance;FPDeviation;FP99tFPercentile`);
+        // let tierList = Utils.getEnumList(Tier);
+        // let attackList = [
+        //     ActionType.Brawl,
+        //     ActionType.SexStrike,
+        //     ActionType.SubHold,
+        //     ActionType.SexHold,
+        //     ActionType.Degradation,
+        //     ActionType.ForcedWorship,
+        //     ActionType.HighRisk,
+        //     ActionType.Penetration,
+        //     ActionType.Stun,
+        //     ActionType.StrapToy
+        // ];
+        //
+        // attackList = [ActionType.SubHold];
+        //
+        // for(let atk of attackList){
+        //     for(let tier of tierList){
+        //         calculateFor(Tier[tier], atk, false, null);
+        //     }
+        // }
+        //
+        // calculateFor(0, 0, false, done);
 
     }, 1000000000);
 
