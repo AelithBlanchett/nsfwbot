@@ -5,6 +5,7 @@ import {Action} from "./Action";
 import {ActionRepository} from "./ActionRepository";
 import {Utils} from "./Utils";
 import {ActiveFighterRepository} from "./ActiveFighterRepository";
+import {FighterRepository} from "./FighterRepository";
 
 export class FightRepository{
 
@@ -50,9 +51,39 @@ export class FightRepository{
     }
 
 
-    public static async exists(idFight:string):Promise<boolean>{
-        let loadedData = await Model.db('nsfw_fights').where({idFight: idFight}).and.whereNull('deletedAt').select();
+    public static async exists(idFight:string, notFinished?:boolean):Promise<boolean>{
+        let loadedData;
+        if(notFinished){
+            loadedData = await Model.db('nsfw_fights').where({idFight: idFight, hasEnded: false}).and.whereNull('deletedAt').select();
+        }
+        else{
+            loadedData = await Model.db('nsfw_fights').where({idFight: idFight}).and.whereNull('deletedAt').select();
+        }
         return (loadedData.length > 0);
+    }
+
+    public static async loadLatestInvolvingFighter(idFighter:string):Promise<Fight>{
+        let loadedFight:Fight = new Fight();
+
+        if(!await FighterRepository.exists(idFighter)){
+            return null;
+        }
+
+        let latestIdFightInvolvingFighter = await Model.db('nsfw_activefighters').where({idFighter: idFighter}).and.whereNull('deletedAt').select();
+
+        if(!await FightRepository.exists(latestIdFightInvolvingFighter, true)){
+            return null;
+        }
+
+        try
+        {
+            loadedFight = await FightRepository.load(latestIdFightInvolvingFighter);
+        }
+        catch(ex){
+            throw ex;
+        }
+
+        return loadedFight;
     }
 
     public static async load(idFight:string):Promise<Fight>{

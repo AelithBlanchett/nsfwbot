@@ -84,13 +84,15 @@ export class CommandHandler implements ICommandHandler {
     }
 
     async runas(args:string, data:FChatResponse) {
-        let splits = args.split(" ");
-        let command = splits[0];
-        splits.shift();
-        let commandArgs = splits.join(" ");
-        let impersonatedData = data;
-        impersonatedData.character = "Tina Armstrong";
-        this[command].apply(this, [commandArgs, impersonatedData]);
+        if (this.fChatLibInstance.isUserMaster(data.character, "")) {
+            let splits = args.split(" ");
+            let command = splits[0];
+            splits.shift();
+            let commandArgs = splits.join(" ");
+            let impersonatedData = data;
+            impersonatedData.character = "Tina Armstrong";
+            this[command].apply(this, [commandArgs, impersonatedData]);
+        }
     }
 
     async addfeature(args:string, data:FChatResponse) {
@@ -182,7 +184,33 @@ export class CommandHandler implements ICommandHandler {
         }
     };
 
-    debug(args:string, data:FChatResponse) {
+    //admin commands
+
+    debugmode(args:string, data:FChatResponse) {
+        if (this.fChatLibInstance.isUserMaster(data.character, "") && this.fight.hasStarted) {
+            this.fight.debug = !this.fight.debug;
+            this.fChatLibInstance.sendPrivMessage(`Debug mode is now set to ${this.fight.debug}`, data.character);
+        }
+    }
+
+    setdicescore(args:string, data:FChatResponse) {
+        if (this.fChatLibInstance.isUserMaster(data.character, "") && this.fight.hasStarted) {
+            this.fight.forcedDiceRoll = parseInt(args);
+            this.fChatLibInstance.sendPrivMessage(`Dice score is now automatically set to ${this.fight.debug}`, data.character);
+        }
+    }
+
+    resetdmg(args:string, data:FChatResponse) {
+        if (this.fChatLibInstance.isUserMaster(data.character, "") && this.fight.hasStarted && this.fight.debug) {
+            this.fight.getFighterByName(args).orgasmsRemaining = this.fight.getFighterByName(args).maxOrgasms(); //to prevent ending the fight this way
+            this.fight.getFighterByName(args).heartsRemaining = this.fight.getFighterByName(args).maxHearts();
+            this.fight.getFighterByName(args).consecutiveTurnsWithoutFocus = 0; //to prevent ending the fight this way
+            this.fight.getFighterByName(args).focus = this.fight.getFighterByName(args).maxFocus();
+            this.fChatLibInstance.sendPrivMessage(`Successfully resplenished ${args}'s HP, LP and FP.`, data.character);
+        }
+    }
+
+    exec(args:string, data:FChatResponse) {
         if (this.fChatLibInstance.isUserMaster(data.character, "")) {
             eval(args);
         }
@@ -271,13 +299,46 @@ export class CommandHandler implements ICommandHandler {
         }
     };
 
+    async loadmyfight(args:string, data:FChatResponse) {
+        if (this.fight == undefined || this.fight.hasEnded || !this.fight.hasStarted) {
+            try {
+                if (args) {
+                    let theFight = await FightRepository.loadLatestInvolvingFighter(args);
+                    if(theFight != null){
+                        this.fight = theFight;
+                        this.fight.build(this.fChatLibInstance, this.channel);
+                        this.fight.outputStatus();
+                    }
+                    else{
+                        this.fChatLibInstance.sendMessage("[color=red]Your latest fight doesn't exist or is already finished.[/color]", this.channel);
+                    }
+                }
+                else {
+                    this.fChatLibInstance.sendMessage("[color=red]Wrong idFight. It must be specified.[/color]", this.channel);
+                }
+            }
+            catch (ex) {
+                this.fChatLibInstance.sendPrivMessage(Utils.strFormat(Constants.Messages.commandError, ex.stack), data.character);
+            }
+        }
+        else {
+            this.fChatLibInstance.sendMessage("[color=red]There is already a fight in progress.[/color]", this.channel);
+        }
+    };
+
     async loadfight(args:string, data:FChatResponse) {
         if (this.fight == undefined || this.fight.hasEnded || !this.fight.hasStarted) {
             try {
                 if (args) {
-                    this.fight = await FightRepository.load(args);
-                    this.fight.build(this.fChatLibInstance, this.channel);
-                    this.fight.outputStatus();
+                    let theFight = await FightRepository.load(args);
+                    if(theFight != null){
+                        this.fight = theFight;
+                        this.fight.build(this.fChatLibInstance, this.channel);
+                        this.fight.outputStatus();
+                    }
+                    else{
+                        this.fChatLibInstance.sendMessage("[color=red]No fight is associated with this id.[/color]", this.channel);
+                    }
                 }
                 else {
                     this.fChatLibInstance.sendMessage("[color=red]Wrong idFight. It must be specified.[/color]", this.channel);
@@ -687,7 +748,11 @@ class PrivateCommandHandler {
 
     //addstat = CommandHandler.prototype.addstat;
     clearfeatures = CommandHandler.prototype.clearfeatures;
-    debug = CommandHandler.prototype.debug;
+    debugmode = CommandHandler.prototype.debugmode;
+    setdicescore = CommandHandler.prototype.setdicescore;
+    resetdmg = CommandHandler.prototype.resetdmg;
+    exec = CommandHandler.prototype.exec;
+    runas = CommandHandler.prototype.runas;
     getstats = CommandHandler.prototype.getstats;
     hidemystats = CommandHandler.prototype.hidemystats;
     howtostart = CommandHandler.prototype.howtostart;

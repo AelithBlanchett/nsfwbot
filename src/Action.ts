@@ -25,6 +25,7 @@ import {Modifier} from "./Modifier";
 import {ActiveFighter} from "./ActiveFighter";
 import {Model} from "./Model";
 import {ActionRepository} from "./ActionRepository";
+import {FocusDamageOnMiss} from "./Constants";
 
 export class Action{
 
@@ -508,6 +509,7 @@ export class Action{
         }
         else{
             fight.message.addHit(` MISS! `);
+            this.attacker.hitFP(FocusDamageOnMiss[Tier[this.tier]]);
         }
 
         if(this.requiresRoll){

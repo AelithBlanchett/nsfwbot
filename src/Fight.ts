@@ -47,6 +47,9 @@ export class Fight{
     lastMessage:Message;
     fChatLibInstance:IFChatLib;
 
+    debug:boolean = false;
+    forcedDiceRoll:number = 0;
+
     public constructor() {
         this.idFight = Utils.generateUUID();
         this.stage = this.pickStage();

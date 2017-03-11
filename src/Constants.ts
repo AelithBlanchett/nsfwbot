@@ -77,9 +77,9 @@ export namespace Fight {
 }
 
 export class Modifier {
-    static SubHoldBrawlBonus = "bonus on brawl attacks accuracy during a submission hold";
+    static SubHoldBrawlBonus = "brawl attacks accuracy increase during a submission hold";
     static SubHold = "submission hold";
-    static SexHoldLustBonus = "bonus on lust attacks accuracy during a sexual hold";
+    static SexHoldLustBonus = "lust attacks accuracy increase during a sexual hold";
     static SexHold = "sexual hold";
     static Bondage = "bondage items";
     static HumHold = "humiliation hold";
@@ -287,16 +287,23 @@ export enum BaseDamage {
     Heavy = 20
 }
 
+export enum FocusDamageOnMiss {
+    None = 1,
+    Light = 3,
+    Medium = 6,
+    Heavy = 10
+}
+
 export enum FocusDamageHumHold {
-    Light = 2,
-    Medium = 3,
-    Heavy = 4
+    Light = 4,
+    Medium = 9,
+    Heavy = 15
 }
 
 export enum StrapToyLPDamagePerTurn {
-    Light = 2,
-    Medium = 3,
-    Heavy = 4
+    Light = 4,
+    Medium = 9,
+    Heavy = 15
 }
 
 export enum TierDifficulty {
